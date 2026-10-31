@@ -202,7 +202,7 @@ able to reach the supply switch.
 | 2 | | | | |
 | 3 | | | | |
 | 4 | | | | |
-| 5 | A | ENS160+AHT21 on I²C 41/42 (instead of BME680): AHT21 0x38 23–25 °C / 21 % RH; ENS160 found at 0x53, first data after ~20 s (AQI 1, TVOC 9–24 ppb, eCO2 400 ppm, `warmup=1`). Pressure/gas null as expected. Reference-thermometer comparison and unplug test pending. | 2026-10-31 | PP + Claude |
+| 5 | A | ENS160+AHT21 on I²C 41/42 (instead of BME680): AHT21 0x38 23–25 °C / 21 % RH; ENS160 found at 0x53, first data after ~20 s (AQI 1, TVOC 9–24 ppb, eCO2 400 ppm, `warmup=1`). Pressure/gas null as expected. Breath test: RH 21→54 %, TVOC 22→91 ppb, eCO2 400→535, AQI 1→2, back to baseline within 15 s. Reference-thermometer comparison and unplug test pending. | 2026-10-31 | PP + Claude |
 | 6 | | | | |
 | 7 | | | | |
 | 8 | | | | |
