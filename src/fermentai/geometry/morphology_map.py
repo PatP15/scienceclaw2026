@@ -820,7 +820,9 @@ def _chain_summary(specs: list[_Specimen], files: dict, render_path: Path | None
             "alchemi": {
                 "applied_to_kinetics": bool(up.get("alchemi_applied")),
                 "status": up.get("status"),
-                "descriptor_provenance": (up.get("descriptor_provenance") or {}).get("label"),
+                "descriptor_provenance": (
+                dp.get("label") if isinstance(dp := up.get("descriptor_provenance"), dict) else dp
+            ),
                 "method": (up.get("descriptor_provenance") or {}).get("method"),
                 "checkpoint": (up.get("descriptor_provenance") or {}).get("checkpoint"),
                 "descriptor_source_files": (up.get("descriptor_provenance") or {}).get(
