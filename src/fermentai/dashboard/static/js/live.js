@@ -1,6 +1,6 @@
 // Section 1: Live Laboratories - chamber A and B side by side, fed by REST snapshots + SSE.
 import { get, post, del, getToken, ApiError } from "./api.js";
-import { h, clear, fmt, fmtOhms, timeAgo, hhmmss, provBadge, statusBadge, sparkline, agentSide, toast, COLORS, num, normProv, tfield, demoMode } from "./util.js";
+import { h, clear, fmt, fmtOhms, timeAgo, hhmmss, statusBadge, sparkline, agentSide, toast, COLORS, num, normProv, tfield, demoMode, deviceBadge, PROV_LABEL } from "./util.js";
 import { messageText, messageSender } from "./messages.js";
 
 const CHAMBERS = ["A", "B"];
@@ -32,7 +32,7 @@ const SENSOR_FOR = {
   internal_heatsink_temperature_c: ["ds18b20_heatsink_internal", "internal_heatsink"],
   external_heatsink_temperature_c: ["ds18b20_heatsink_external", "external_heatsink"],
 };
-const PROV_SHORT = { real: "meas", simulated: "sim", replay: "replay", estimated: "est", imported_human: "manual" };
+const PROV_SHORT = { measured: "measured", simulated_device: "sim device", modeled: "modeled", computed: "computed", replay: "replay", estimated: "est", manual: "manual" };
 
 export class LivePanel {
   constructor(store, stream) {
@@ -180,8 +180,8 @@ export class LivePanel {
     const fp = (tel && (tel.field_provenance || tel.payload?.field_provenance)) || {};
     const raw = fp[field] || (tel ? tel.source : null);
     if (!raw) return null;
-    const n = normProv(raw);
-    return h("span", { class: `badge mini prov-${n}`, title: `provenance of this value: ${raw}${fp[field] ? " (field_provenance)" : " (record source)"}` }, PROV_SHORT[n] || raw);
+    const n = normProv(raw, "device");
+    return h("span", { class: `badge mini prov-${n}`, title: `provenance of this value: ${raw} → ${PROV_LABEL[n] || n}${fp[field] ? " (field_provenance)" : " (record source)"}` }, PROV_SHORT[n] || raw);
   }
   /** A value cell: real number, or an explicit "unavailable" state - never an invented value. */
   val(tel, field, format) {
@@ -205,14 +205,14 @@ export class LivePanel {
     const diag = tfield(tel, "diagnostics") || {};
     const unsynced = tel && (tel.timestamp_utc === null || tel.timestamp_utc === undefined || tfield(tel, "timestamp_quality") === "unsynced");
 
-    const modeBadge = mode ? h("span", { class: `badge prov-${mode === "live" ? "real" : mode === "replay" ? "replay" : "simulated"}`, title: "demonstration mode from this chamber's record source" },
+    const modeBadge = mode ? h("span", { class: `badge prov-${mode === "live" ? "measured" : mode === "replay" ? "replay" : "simulated_device"}`, title: "demonstration mode from this chamber's record source" },
       mode === "live" ? "LIVE" : mode === "replay" ? "REPLAY" : "SIMULATION") : null;
     const head = h("div", { class: "ch-head" },
       h("div", null,
         h("div", { class: "ch-title" }, "Chamber ", h("span", { class: "letter" }, c)),
         h("div", { class: "ch-sub" }, (st.label || "").replace(/^Chamber [AB]\s*[-–]\s*/, ""))),
       h("div", { class: "ch-badges" },
-        modeBadge, prov ? provBadge(prov) : statusBadge("no data", "info"),
+        modeBadge, prov ? deviceBadge(prov) : statusBadge("no data", "info"),
         stale ? statusBadge("stale", "bad") : statusBadge("fresh", "good"),
         st.experiment_id ? h("span", { class: "badge status-info", title: "current experiment" }, st.experiment_id) : null));
 
@@ -257,7 +257,7 @@ export class LivePanel {
     if (!snap || snap.dataset.key !== imgKey) {
       snap = h("div", { class: "snap", dataset: { key: imgKey } },
         img ? h("img", { src: img.url, alt: `Chamber ${c} camera snapshot`, loading: "lazy" }) : h("div", { class: "snap-empty" }, "No camera snapshot yet"),
-        img ? h("div", { class: "snap-cap" }, h("span", null, `📷 ${hhmmss(img.timestamp_utc)}`), provBadge(img.source)) : null);
+        img ? h("div", { class: "snap-cap" }, h("span", null, `📷 ${hhmmss(img.timestamp_utc)}`), deviceBadge(img.source)) : null);
     } else {
       const cap = snap.querySelector(".snap-cap span");
       if (cap && img) cap.textContent = `📷 ${hhmmss(img.timestamp_utc)}`;

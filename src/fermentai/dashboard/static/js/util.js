@@ -8,7 +8,20 @@ export const COLORS = {
 };
 export const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
-export const PROVENANCES = ["real", "simulated", "replay", "estimated", "imported_human"];
+// Display vocabulary (display mapping only; stored/API provenance values are never changed):
+//   MEASURED          physical sensor data (record source "measured", v1.0 alias "real")
+//   COMPUTED          NVIDIA ALCHEMI GPU results ("real: ALCHEMI/AIMNet2 on ...") and PreForm print-prep
+//                     output (source "preform_local_api")
+//   MODELED           model outputs: kinetics forecasts, crumb geometry, in-silico benchmark ("simulated")
+//   SIMULATED DEVICE  virtual-ESP32 telemetry (record source "simulated" in a device context)
+//   REPLAY            recorded/scripted data
+//   estimated         heuristics, policy proposals, assumptions, bounded ALCHEMI-informed nudges
+//   manual (human)    human-entered values (field provenance "manual", judge feedback, imported_human)
+export const PROVENANCES = ["measured", "computed", "modeled", "simulated_device", "replay", "estimated", "manual"];
+export const PROV_LABEL = {
+  measured: "measured", computed: "computed", modeled: "modeled", simulated_device: "simulated device",
+  replay: "replay", estimated: "estimated", manual: "manual (human)", placeholder: "placeholder", unknown: "unknown",
+};
 
 /** Create an element: h("div", {class: "x", onclick}, child, "text", [more]) */
 export function h(tag, attrs, ...children) {
@@ -41,27 +54,34 @@ export function esc(s) {
   return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
 
-/** Normalise any provenance-ish string to one of the five canonical labels (or "unknown"). */
-export function normProv(p) {
+/**
+ * Normalise any provenance-ish value to a display category (see PROVENANCES).
+ * ctx === "device": the value is a telemetry/image record source, so "simulated" means a virtual device.
+ */
+export function normProv(p, ctx) {
   if (p && typeof p === "object") p = p.source || p.provenance || p.label;
-  const s = String(p ?? "").toLowerCase();
+  const s = String(p ?? "").toLowerCase().trim();
   if (!s) return "unknown";
-  if (s.startsWith("real") || s.startsWith("measured") || s === "physical") return "real";
-  if (s === "manual") return "imported_human";
+  if (s.includes("informed") || s.includes("assumption")) return "estimated";        // bounded nudges / mapping coefficients
+  if (s.includes("preform") || s.includes("alchemi") || s.includes("aimnet") || /^real\s*[:(]/.test(s)) return "computed";
+  if (s.startsWith("real") || s.startsWith("measured") || s === "physical") return "measured";
   if (s.includes("replay") || s.includes("scripted")) return "replay";
-  if (s.includes("imported") || s.includes("human") || s.includes("judge")) return "imported_human";
-  if (s.includes("simul") || s.includes("model") || s.includes("in_silico") || s.includes("in-silico")) return "simulated";
-  if (s.includes("estimat") || s.includes("heuristic") || s.includes("fallback") || s.includes("deterministic")) return "estimated";
+  if (s === "manual" || s.includes("imported") || s.includes("human") || s.includes("judge")) return "manual";
+  if (s.includes("simul") || s.includes("virtual")) return ctx === "device" ? "simulated_device" : "modeled";
+  if (s.includes("model") || s.includes("in_silico") || s.includes("in-silico")) return "modeled";
+  if (s.includes("estimat") || s.includes("heuristic") || s.includes("fallback") || s.includes("deterministic") || s.includes("policy")) return "estimated";
   if (s.includes("placeholder")) return "placeholder";
-  return PROVENANCES.includes(s) ? s : "unknown";
+  return "unknown";
 }
-/** Provenance badge. `raw` (optional) is shown as the tooltip/title text. */
-export function provBadge(p, text) {
-  const n = normProv(p);
+/** Provenance badge. `text` overrides the label; `ctx` "device" for telemetry/image record sources. */
+export function provBadge(p, text, ctx) {
+  const n = normProv(p, ctx);
   const raw = typeof p === "string" ? p : (p && (p.source || p.provenance)) || "";
-  const label = text || (n === "unknown" ? (raw || "unknown") : n === "real" ? "real · physical" : n === "imported_human" && /manual/i.test(raw) ? "manual (human)" : n);
-  return h("span", { class: `badge prov-${n}`, title: raw ? `provenance: ${raw}` : "provenance" }, label);
+  const label = text || (n === "unknown" ? (raw || "unknown") : PROV_LABEL[n]);
+  return h("span", { class: `badge prov-${n}`, title: raw ? `provenance: ${raw} → ${PROV_LABEL[n] || n}` : "provenance" }, label);
 }
+/** Badge for a telemetry/image record source ("simulated" -> SIMULATED DEVICE). */
+export const deviceBadge = (p, text) => provBadge(p, text, "device");
 export function statusBadge(text, kind = "info") { return h("span", { class: `badge status-${kind}` }, text); }
 
 export function num(v) {
@@ -270,6 +290,6 @@ export function tfield(tel, k) {
 
 /** Map a telemetry record source to a demonstration mode. */
 export function demoMode(source) {
-  const n = normProv(source);
-  return n === "real" ? "live" : n === "replay" ? "replay" : n === "simulated" ? "simulation" : null;
+  const n = normProv(source, "device");
+  return n === "measured" ? "live" : n === "replay" ? "replay" : n === "simulated_device" ? "simulation" : null;
 }

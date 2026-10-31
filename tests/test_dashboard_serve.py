@@ -146,3 +146,24 @@ def test_replay_examples_come_from_api_not_bundled():
     js = "\n".join(p.read_text() for p in (STATIC_DIR / "js").glob("*.js"))
     assert "/api/v1/demos" in js
     assert not (STATIC_DIR / "js" / "examples.js").exists()
+
+
+NAMED_IMPORT_RE = re.compile(r"""import\s*\{([^}]*)\}\s*from\s*["'](\.{1,2}/[^"']+)["']""")
+EXPORT_RE = re.compile(r"""^export\s+(?:async\s+)?(?:function\*?|const|let|var|class)\s+([A-Za-z_$][\w$]*)""", re.M)
+
+
+def test_every_named_import_is_exported():
+    """A missing export only fails at module-link time in the browser (blank page), so check statically."""
+    js_dir = STATIC_DIR / "js"
+    exports = {p.name: set(EXPORT_RE.findall(p.read_text())) for p in js_dir.glob("*.js")}
+    problems = []
+    for p in js_dir.glob("*.js"):
+        for names, target in NAMED_IMPORT_RE.findall(p.read_text()):
+            tgt = (p.parent / target).resolve()
+            if tgt.name not in exports:
+                problems.append(f"{p.name}: imports missing module {target}")
+                continue
+            for n in (x.strip().split(" as ")[0].strip() for x in names.split(",")):
+                if n and n not in exports[tgt.name]:
+                    problems.append(f"{p.name}: '{n}' is not exported by {tgt.name}")
+    assert not problems, problems

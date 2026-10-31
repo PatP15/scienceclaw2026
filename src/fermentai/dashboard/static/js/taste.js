@@ -249,7 +249,7 @@ export class TastePanel {
     const modeBadge = h("span", { class: `badge status-${/placeholder/i.test(r.mode_label || "") ? "bad" : /online/i.test(reasoning) ? "good" : "info"}`, title: `mode_label: ${r.mode_label || "—"}` },
       resp.recorded ? `${reasoning} · recorded` : reasoning);
     const steps = [
-      ["saved", () => ({ badges: [provBadge(isReplay ? "replay" : "imported_human", isReplay ? "replay input" : "judge input"), modeBadge], body: this.bodySaved(resp, label, isReplay, text) })],
+      ["saved", () => ({ badges: [provBadge(isReplay ? "replay" : "manual", isReplay ? "replay input" : "judge input (human)"), modeBadge], body: this.bodySaved(resp, label, isReplay, text) })],
       ["interp", () => ({ badges: [provBadge("estimated", "interpreted"), r.sensory_interpretation?.method ? statusBadge(r.sensory_interpretation.method, "info") : null], body: this.bodyInterp(r.sensory_interpretation) })],
       ["compare", () => ({ badges: [provBadge(this.compareProv(r))], body: this.bodyCompare(r) })],
       ["hyp", () => ({ badges: [provBadge("estimated", "hypothesis")], body: this.bodyHyp(r.hypothesis) })],
@@ -354,7 +354,7 @@ export class TastePanel {
         const anoms = o?.latest?.anomalies || [];
         const src = o?.latest?.record_source || (qq.sources || []).join("+");
         return h("div", { class: "obs-card" },
-          h("div", null, h("span", { class: `chip chip-${agentSide(cid) || "sys"}` }, cid), " ", src ? provBadge(src) : statusBadge("no telemetry", "info"),
+          h("div", null, h("span", { class: `chip chip-${agentSide(cid) || "sys"}` }, cid), " ", src ? provBadge(src, null, "device") : statusBadge("no telemetry", "info"),
             qq.latest_stale ? statusBadge("stale", "bad") : null,
             o?.latest?.age_s !== undefined && o?.latest?.age_s !== null ? h("span", { class: "tiny faint" }, ` latest ${Math.round(o.latest.age_s)} s old`) : null),
           !o?.latest ? h("div", { class: "faint" }, "No usable telemetry for this chamber.") : null,

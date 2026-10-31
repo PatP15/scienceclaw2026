@@ -67,15 +67,21 @@ export class MolecularPanel {
     const fileUrl = (name) => (files.find((f) => f.path === name || f.name === name) || {}).url;
     const prov = digest.provenance || "";
     const isReal = /^real/i.test(String(prov));
-    const realBadge = () => (isReal ? provBadge("real", "real · GPU computed") : provBadge(prov || "unknown"));
+    const realBadge = () => (isReal ? provBadge(prov, "computed · NVIDIA GPU") : provBadge(prov || "unknown"));
     const v = digest.versions || {}, m = digest.method || {}, md = digest.md || {};
+
+    // ---------------------------------------------------------------- validation vs published experiment
+    const validation = experimentCheck(digest.campaign2);
 
     // ---------------------------------------------------------------- provenance + caveat
     const showReport = isReal && String(v.gpu || "").includes("A6000");
     const xc = digest.crosscheck_upstream_aimnet;
     const provCard = h("div", { class: "card" },
-      h("h3", null, "Simulation provenance ", realBadge()),
-      h("p", { class: "small" }, prov || "provenance not recorded"),
+      h("h3", null, "Computation provenance ", realBadge()),
+      isReal ? h("p", { class: "small", title: `stored provenance: ${prov}` }, h("b", null, `Computed on ${v.gpu || "an NVIDIA GPU"} via ALCHEMI`),
+        validation ? " — compared against published experiment: ΔpKa, dimer energy" : "")
+        : h("p", { class: "small" }, prov || "provenance not recorded"),
+      validation,
       h("dl", { class: "kv" },
         kv("GPU", v.gpu ? `${v.gpu}${v.gpu_memory_gb ? ` (${Math.round(v.gpu_memory_gb)} GB, sm ${v.gpu_capability || "?"})` : ""}` : null),
         kv("Toolkit", ["nvalchemi-toolkit", "nvalchemi-toolkit-ops", "aimnet", "warp-lang", "torch"].filter((k) => v[k]).map((k) => `${k} ${v[k]}`).join(" · ")),
@@ -225,7 +231,7 @@ export class MolecularPanel {
     clear(slot,
       h("p", { class: "tiny faint" }, "Which kinetic-model parameters the ALCHEMI descriptors moved, relative to the literature value. Bounded, deliberately small nudges — the fermentation model, not ALCHEMI, predicts pH and rise."),
       entries.map(([cid, c]) => h("div", null,
-        h("div", { class: "small", style: { margin: "4px 0" } }, h("b", null, `Chamber ${cid}`), " ", statusBadge(c.status || "?", c.status === "complete" ? "good" : "warn")),
+        h("div", { class: "small", style: { margin: "4px 0" } }, h("b", null, `Chamber ${cid}`), " ", statusBadge(c.status || "?", ["complete", "applied"].includes(c.status) ? "good" : "warn")),
         h("div", { class: "tbl-wrap" }, h("table", { class: "tbl" },
           h("thead", null, h("tr", null, h("th", null, "Parameter"), h("th", { class: "num" }, "Literature"), h("th", { class: "num" }, "Used"), h("th", { class: "num" }, "Change"), h("th", null, "Source"))),
           h("tbody", null, Object.entries(c.parameters || {}).map(([k, p]) => {
@@ -235,7 +241,7 @@ export class MolecularPanel {
             return h("tr", null, h("td", null, pretty(k), p.mapping ? h("div", { class: "tiny faint" }, p.mapping) : null),
               h("td", { class: "num" }, fmt(lit, 3)), h("td", { class: "num" }, fmt(val, 3)),
               h("td", { class: `num ${moved ? "" : "faint"}` }, moved ? `${d > 0 ? "+" : ""}${fmt(d, 3)}${lit ? ` (${d > 0 ? "+" : ""}${fmt((d / lit) * 100, 0)} %)` : ""}` : "unchanged"),
-              h("td", null, p.source === "alchemi-informed" ? provBadge("estimated", "alchemi-informed") : provBadge("imported_human", p.source || "literature")));
+              h("td", null, p.source === "alchemi-informed" ? provBadge("estimated", "alchemi-informed") : statusBadge(p.source || "literature", "info")));
           })))),
         (c.notes || []).length ? h("div", { class: "tiny warn-text" }, "Notes: ", c.notes.join("; ")) : null,
         c.descriptor_provenance?.note ? h("div", { class: "tiny faint" }, c.descriptor_provenance.note) : null)));
@@ -268,3 +274,33 @@ export class MolecularPanel {
 }
 
 function kv(k, val) { return val === undefined || val === null || val === "" ? null : [h("dt", null, k), h("dd", null, String(val))]; }
+
+/** Campaign-2 comparison with published experiment (ΔpKa lactic−acetic, acetic-acid dimer energy).
+ *  Reports agreement honestly: values, experiment, deviation / range - no pass/fail spin. */
+function experimentCheck(c2) {
+  if (!c2 || typeof c2 !== "object") return null;
+  const pk = c2.relative_pka_estimate, ap = c2.acid_pairs;
+  const rows = [];
+  if (pk && num(pk.value) !== null && num(pk.experiment) !== null) {
+    const dev = pk.value - pk.experiment, sig = num(pk.uncertainty);
+    const z = sig ? Math.abs(dev) / sig : null;
+    rows.push(h("tr", null, h("td", null, "ΔpKa (lactic − acetic)"),
+      h("td", { class: "num" }, `${fmt(pk.value, 1)}${sig !== null ? ` ± ${fmt(sig, 1)}` : ""}`),
+      h("td", { class: "num" }, fmt(pk.experiment, 2)),
+      h("td", null, Math.sign(pk.value) === Math.sign(pk.experiment) ? "sign correct; " : "sign wrong; ",
+        `off by ${fmt(dev, 1)} pKa units${z !== null ? ` (${fmt(z, 1)} σ)` : ""}`)));
+  }
+  if (ap && num(ap.acetic_dimer_kcal) !== null && Array.isArray(ap.acetic_dimer_literature_kcal)) {
+    const [lo, hi] = [Math.min(...ap.acetic_dimer_literature_kcal), Math.max(...ap.acetic_dimer_literature_kcal)];
+    const inside = ap.acetic_dimer_kcal >= lo && ap.acetic_dimer_kcal <= hi;
+    rows.push(h("tr", null, h("td", null, "Acetic-acid dimer binding (kcal/mol)"),
+      h("td", { class: "num" }, fmt(ap.acetic_dimer_kcal, 1)), h("td", { class: "num" }, `${fmt(lo, 0)} to ${fmt(hi, 0)}`),
+      h("td", null, inside ? h("span", { class: "verdict-good" }, "within published range") : h("span", { class: "verdict-bad" }, "outside published range"))));
+  }
+  if (!rows.length) return null;
+  return h("div", { style: { margin: "6px 0" } },
+    h("div", { class: "tbl-wrap" }, h("table", { class: "tbl" },
+      h("thead", null, h("tr", null, h("th", null, "Check vs published experiment"), h("th", { class: "num" }, "Computed"), h("th", { class: "num" }, "Experiment"), h("th", null, "Agreement"))),
+      h("tbody", null, rows))),
+    pk?.note ? h("div", { class: "tiny faint" }, "ΔpKa: ", pk.note, ".") : null);
+}

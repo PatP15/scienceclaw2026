@@ -1,6 +1,6 @@
 // Section 2: Digital Twin - model predictions (from /api/v1/predictions) vs observed telemetry.
 import { get, getText } from "./api.js";
-import { h, clear, fmt, num, parseCSV, provBadge, statusBadge, plotLayout, PLOT_CONFIG, whenPlotly, COLORS, timeAgo } from "./util.js";
+import { h, clear, fmt, num, parseCSV, provBadge, normProv, PROV_LABEL, statusBadge, plotLayout, PLOT_CONFIG, whenPlotly, COLORS, timeAgo } from "./util.js";
 
 const CHAMBERS = ["A", "B"];
 const CHARTS = [
@@ -95,7 +95,7 @@ export class TwinPanel {
     }
     if (!xs.length) return null;
     const provs = [...new Set(rows.map((r) => r.source).filter(Boolean))];
-    return { xs, ys, prov: provs.join("+") || "unknown", n: xs.length };
+    return { xs, ys, prov: provs.join("+") || "unknown", label: provs.map((p) => PROV_LABEL[normProv(p, "device")] || p).join(" + ") || "unknown", n: xs.length };
   }
 
   renderStatus() {
@@ -134,7 +134,7 @@ export class TwinPanel {
           h("span", { class: "small" },
             h("span", { style: { color: COLORS.A, fontWeight: 700 } }, "━ Chamber A predicted"), "   ",
             h("span", { style: { color: COLORS.B, fontWeight: 700 } }, "━ Chamber B predicted"), "   ",
-            h("span", { class: "muted" }, "▒ 5–95 % Monte-Carlo band   ● observed telemetry (hours since first record)  "),
+            h("span", { class: "muted" }, "▒ 5–95 % Monte-Carlo band   ● observed telemetry, measured or simulated device (hours since first record)  "),
             provBadge("simulated"), " predictions ")),
         CHARTS.map((s) => h("div", { class: "chart-card" },
           h("h4", null, s.title), h("div", { class: "chart-sub" }, s.sub || s.unit),
@@ -159,9 +159,9 @@ export class TwinPanel {
         }
         const obs = this.observedSeries(c, spec);
         if (obs) {
-          traces.push({ x: obs.xs, y: obs.ys, type: "scatter", mode: "markers", name: `${c} observed (${obs.prov})`,
+          traces.push({ x: obs.xs, y: obs.ys, type: "scatter", mode: "markers", name: `${c} observed (${obs.label})`,
             marker: { color: col, size: 8, line: { color: "#1a1a19", width: 2 }, symbol: "circle" },
-            hovertemplate: `${c} observed %{y:.2f} (${obs.prov})<extra></extra>` });
+            hovertemplate: `${c} observed %{y:.2f} (${obs.label})<extra></extra>` });
         }
       }
       if (annotations.length === 2) {
@@ -232,8 +232,8 @@ export class TwinPanel {
       h("div", { class: "img-pair" },
         h("figure", null, base ? h("img", { src: base.url, alt: "baseline mild vs sour crumb hypotheses", loading: "lazy" }) : h("div", { class: "empty" }, "No baseline render."),
           h("figcaption", null, "Baseline hypotheses: crumb_mild / crumb_sour (hand-set parameters).")),
-        h("figure", null, sim ? h("img", { src: sim.url, alt: "simulation-derived chamber A vs B crumb specimens", loading: "lazy" }) : h("div", { class: "empty" }, "No simulation-derived specimens yet."),
-          h("figcaption", null, "Simulation-derived: crumb_chamber_A / crumb_chamber_B (kinetics → morphology mapping)."))),
+        h("figure", null, sim ? h("img", { src: sim.url, alt: "simulation-derived chamber A vs B crumb specimens", loading: "lazy" }) : h("div", { class: "empty" }, "No model-derived specimens yet."),
+          h("figcaption", null, "Modeled from the kinetics forecast: crumb_chamber_A / crumb_chamber_B (kinetics → morphology mapping)."))),
       Object.keys(ch).length ? h("div", { class: "tbl-wrap", style: { marginTop: "8px" } }, h("table", { class: "tbl" },
         h("thead", null, h("tr", null, h("th", null, "Specimen"), h("th", { class: "num" }, "Porosity target"), h("th", { class: "num" }, "Pore Ø mean (mm)"),
           h("th", { class: "num" }, "Eccentricity"), h("th", { class: "num" }, "Clustering"), h("th", { class: "num" }, "Cut-face pore fraction"), h("th", { class: "num" }, "Pores on cut face"), h("th", null, "Mesh"))),
@@ -248,10 +248,9 @@ export class TwinPanel {
     if (!chain || !Array.isArray(chain.chain)) { clear(this.chainEl, h("h3", null, "Evidence chain"), h("div", { class: "empty" }, "data/stl/chain_summary.json not available.")); return; }
     const badgeFor = (p) => {
       const s = String(p || "").toLowerCase();
-      if (s.startsWith("real")) return provBadge("real", "real · GPU");
-      if (s.includes("alchemi-informed")) return provBadge("estimated", "alchemi-informed");
-      if (s.includes("assumption")) return provBadge("estimated", "assumption");
-      if (s.includes("simulated")) return provBadge("simulated");
+      if (s.includes("alchemi-informed")) return provBadge(p, "estimated · alchemi-informed");
+      if (s.includes("assumption")) return provBadge(p, "estimated · assumption");
+      if (normProv(p) === "computed") return provBadge(p, "computed · NVIDIA GPU");
       return provBadge(p);
     };
     const short = { "ALCHEMI descriptors": "ALCHEMI", "kinetic parameter nudge": "Kinetics nudge", "kinetics ODE + morphology summary at window end": "Kinetics ODE", "morphology mapping": "Morphology map", "stochastic crumb geometry -> STL": "STL" };
@@ -265,7 +264,7 @@ export class TwinPanel {
       h("h3", null, "Evidence chain: ALCHEMI → kinetics → morphology → STL"),
       h("div", { class: "chain" }, steps),
       moved.length ? h("div", { class: "small", style: { marginTop: "6px" } }, "ALCHEMI changed ", moved.map(([k, p]) => `${k.replace(/_/g, " ")} ${fmt(p.literature_value, 3)} → ${fmt(p.value, 3)}`).join("; "),
-        " (small, bounded nudge). Everything downstream is model output, labelled simulated.") : null);
+        " (small, bounded nudge). Everything downstream is model output, labelled modeled.") : null);
   }
 
   async renderBenchmark() {

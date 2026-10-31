@@ -59,7 +59,7 @@
   <section id="tab-twin" class="tabpanel" role="tabpanel" aria-labelledby="tabbtn-twin" hidden>
     <div class="section-head">
       <div>
-        <h2>Digital Twin <span class="badge prov-simulated">simulated</span></h2>
+        <h2>Digital Twin <span class="badge prov-modeled">modeled</span></h2>
         <p class="muted" id="twin-sub">Fermentation model predictions (median with 5–95 % band) for Chamber A vs B, with observed telemetry overlaid where it exists.</p>
       </div>
       <div class="head-actions">
@@ -133,11 +133,13 @@
 
 <footer class="legend-bar">
   <span class="muted small">Provenance:</span>
-  <span class="badge prov-real">real</span>
-  <span class="badge prov-simulated">simulated</span>
-  <span class="badge prov-replay">replay</span>
-  <span class="badge prov-estimated">estimated</span>
-  <span class="badge prov-imported_human">imported_human</span>
+  <span class="badge prov-measured" title="physical sensor data (source measured)">measured</span>
+  <span class="badge prov-computed" title="NVIDIA ALCHEMI GPU results; PreForm print preparation">computed</span>
+  <span class="badge prov-modeled" title="model outputs: kinetics forecasts, crumb geometry, in-silico benchmark">modeled</span>
+  <span class="badge prov-simulated_device" title="telemetry from virtual ESP32 devices (source simulated)">simulated device</span>
+  <span class="badge prov-replay" title="recorded / scripted data">replay</span>
+  <span class="badge prov-estimated" title="heuristics, policy proposals, assumptions">estimated</span>
+  <span class="badge prov-manual" title="entered by a person">manual (human)</span>
   <span class="muted small legend-note">Every value carries one of these labels. Gas resistance is a BME680 signal, not CO₂.</span>
 </footer>
 

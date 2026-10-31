@@ -29,6 +29,14 @@ twin,molecular,taste}.png
 - Twin: baseline vs simulation-derived crumb specimens + table (chain_summary.json), evidence-chain strip,
   IN-SILICO benchmark panel from static/snapshots/benchmarks/ (synced by vendor.py; no API route).
 
+## v3: display vocabulary (display mapping only; stored/API values untouched)
+util.js normProv(p, ctx) / PROV_LABEL / provBadge / deviceBadge:
+measured (green) | computed (teal: "real: ALCHEMI…", aimnet, preform_local_api) | modeled (purple: "simulated"
+model outputs) | simulated device (amber: telemetry/image source "simulated", ctx "device") | replay (grey) |
+estimated (olive: policy, fallback, assumption, alchemi-informed) | manual (human) (pink).
+Mode indicator LIVE/REPLAY/SIMULATION unchanged (colours green/grey/amber). Tests: tests/test_dashboard_provenance.py
+(runs util.js in Node >= 22), test_every_named_import_is_exported (static import/export check).
+
 ## Open items for other areas
 - API: /molecular/summary -> HTTP 500 (NaN in analysis_summary.json; jsonable() the summaries).
 - API/agents: build_context passes `recent_telemetry` (reduced keys, no received_at_utc/v1.1 fields) but the
