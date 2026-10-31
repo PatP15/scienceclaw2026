@@ -1,0 +1,192 @@
+Processing esp32s3cam_a_serial (platform: espressif32@6.9.0; board: esp32-s3-devkitc-1; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/esp32-s3-devkitc-1.html
+PLATFORM: Espressif 32 (6.9.0) > Espressif ESP32-S3-DevKitC-1-N8 (8 MB QD, No PSRAM)
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 8MB Flash
+DEBUG: Current (esp-builtin) On-board (esp-builtin) External (cmsis-dap, esp-bridge, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES: 
+ - framework-arduinoespressif32 @ 3.20017.241212+sha.dcc1105b 
+ - tool-esptoolpy @ 1.40501.0 (4.5.1) 
+ - toolchain-riscv32-esp @ 8.4.0+2021r2-patch5 
+ - toolchain-xtensa-esp32s3 @ 8.4.0+2021r2-patch5
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 46 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- ArduinoJson @ 7.2.1
+|-- DallasTemperature @ 3.11.0
+|-- Adafruit Unified Sensor @ 1.1.14
+|-- Adafruit BusIO @ 1.16.1
+|-- Adafruit BME680 Library @ 2.0.4
+|-- Adafruit SHT31 Library @ 2.2.2
+|-- Adafruit AHTX0 @ 2.0.6
+|-- Wire @ 2.0.0
+|-- HTTPClient @ 2.0.0
+|-- WiFi @ 2.0.0
+|-- OneWire @ 2.3.8
+|-- Preferences @ 2.0.0
+Building in release mode
+Compiling .pio/build/esp32s3cam_a_serial/src/app/ChamberStateMachine.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/src/app/CommandProcessor.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/src/app/ExperimentManager.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/src/camera/CameraManager.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/src/control/MotorController.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/src/control/PeltierDriver.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/src/control/SafetyManager.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/src/control/TemperatureController.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/src/hal/ArduinoHal.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/src/main.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/src/network/CommandClient.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/src/network/NetworkManager.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/src/network/SerialTransport.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/src/network/TelemetryClient.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/src/sensors/BME680Sensor.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/src/sensors/DS18B20Manager.cpp.o
+src/main.cpp:577:6: warning: 'void {anonymous}::tStatusLog(uint32_t, void*)' defined but not used [-Wunused-function]
+ void tStatusLog(uint32_t now, void*) { printStatus(now); }
+      ^~~~~~~~~~
+src/main.cpp:561:6: warning: 'void {anonymous}::tConsole(uint32_t, void*)' defined but not used [-Wunused-function]
+ void tConsole(uint32_t, void*) {
+      ^~~~~~~~
+Compiling .pio/build/esp32s3cam_a_serial/src/sensors/DoorSensor.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/src/sensors/ENS160AHT21Sensor.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/src/sensors/EnvSensor.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/src/sensors/PHSensor.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/src/sensors/SHT31Sensor.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/src/sensors/SensorManager.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/src/simulation/MockActuators.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/src/simulation/MockSensors.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/src/util/TimeUtil.cpp.o
+Building .pio/build/esp32s3cam_a_serial/bootloader.bin
+Generating partitions .pio/build/esp32s3cam_a_serial/partitions.bin
+Compiling .pio/build/esp32s3cam_a_serial/lib145/OneWire/OneWire.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/lib819/DallasTemperature/DallasTemperature.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/lib4ea/Adafruit Unified Sensor/Adafruit_Sensor.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/lib43d/Wire/Wire.cpp.o
+esptool.py v4.5.1
+Creating esp32s3 image...
+Merged 1 ELF section
+Successfully created esp32s3 image.
+Compiling .pio/build/esp32s3cam_a_serial/lib5de/SPI/SPI.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/lib7c3/Adafruit BusIO/Adafruit_BusIO_Register.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/lib7c3/Adafruit BusIO/Adafruit_I2CDevice.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/lib7c3/Adafruit BusIO/Adafruit_SPIDevice.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/lib599/Adafruit BME680 Library/Adafruit_BME680.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/lib599/Adafruit BME680 Library/bme68x.c.o
+lib/OneWire/OneWire.cpp:599:22: warning: extra tokens at end of #undef directive
+ #  undef noInterrupts() {portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;portENTER_CRITICAL(&mux)
+                      ^
+lib/OneWire/OneWire.cpp:600:20: warning: extra tokens at end of #undef directive
+ #  undef interrupts() portEXIT_CRITICAL(&mux);}
+                    ^
+Compiling .pio/build/esp32s3cam_a_serial/lib561/Adafruit SHT31 Library/Adafruit_SHT31.cpp.o
+Archiving .pio/build/esp32s3cam_a_serial/lib145/libOneWire.a
+Archiving .pio/build/esp32s3cam_a_serial/lib819/libDallasTemperature.a
+Archiving .pio/build/esp32s3cam_a_serial/lib4ea/libAdafruit Unified Sensor.a
+Archiving .pio/build/esp32s3cam_a_serial/lib43d/libWire.a
+Archiving .pio/build/esp32s3cam_a_serial/lib5de/libSPI.a
+Indexing .pio/build/esp32s3cam_a_serial/lib145/libOneWire.a
+Indexing .pio/build/esp32s3cam_a_serial/lib819/libDallasTemperature.a
+Compiling .pio/build/esp32s3cam_a_serial/lib577/Adafruit AHTX0/Adafruit_AHTX0.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/lib92a/WiFi/WiFi.cpp.o
+Archiving .pio/build/esp32s3cam_a_serial/lib599/libAdafruit BME680 Library.a
+Indexing .pio/build/esp32s3cam_a_serial/lib4ea/libAdafruit Unified Sensor.a
+Indexing .pio/build/esp32s3cam_a_serial/lib43d/libWire.a
+Archiving .pio/build/esp32s3cam_a_serial/lib561/libAdafruit SHT31 Library.a
+Compiling .pio/build/esp32s3cam_a_serial/lib92a/WiFi/WiFiAP.cpp.o
+Indexing .pio/build/esp32s3cam_a_serial/lib5de/libSPI.a
+Compiling .pio/build/esp32s3cam_a_serial/lib92a/WiFi/WiFiClient.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/lib92a/WiFi/WiFiGeneric.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/lib92a/WiFi/WiFiMulti.cpp.o
+Archiving .pio/build/esp32s3cam_a_serial/lib577/libAdafruit AHTX0.a
+Compiling .pio/build/esp32s3cam_a_serial/lib92a/WiFi/WiFiSTA.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/lib92a/WiFi/WiFiScan.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/lib92a/WiFi/WiFiServer.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/lib92a/WiFi/WiFiUdp.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/libded/WiFiClientSecure/WiFiClientSecure.cpp.o
+Indexing .pio/build/esp32s3cam_a_serial/lib599/libAdafruit BME680 Library.a
+Compiling .pio/build/esp32s3cam_a_serial/libded/WiFiClientSecure/esp_crt_bundle.c.o
+Compiling .pio/build/esp32s3cam_a_serial/libded/WiFiClientSecure/ssl_client.cpp.o
+Indexing .pio/build/esp32s3cam_a_serial/lib561/libAdafruit SHT31 Library.a
+Compiling .pio/build/esp32s3cam_a_serial/lib8e8/HTTPClient/HTTPClient.cpp.o
+Indexing .pio/build/esp32s3cam_a_serial/lib577/libAdafruit AHTX0.a
+Archiving .pio/build/esp32s3cam_a_serial/lib7c3/libAdafruit BusIO.a
+Compiling .pio/build/esp32s3cam_a_serial/libb1d/Preferences/Preferences.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/Esp.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/FirmwareMSC.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/FunctionalInterrupt.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/HWCDC.cpp.o
+Indexing .pio/build/esp32s3cam_a_serial/lib7c3/libAdafruit BusIO.a
+Archiving .pio/build/esp32s3cam_a_serial/lib92a/libWiFi.a
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/HardwareSerial.cpp.o
+Archiving .pio/build/esp32s3cam_a_serial/libded/libWiFiClientSecure.a
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/IPAddress.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/IPv6Address.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/MD5Builder.cpp.o
+Archiving .pio/build/esp32s3cam_a_serial/libb1d/libPreferences.a
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/Print.cpp.o
+Indexing .pio/build/esp32s3cam_a_serial/libded/libWiFiClientSecure.a
+Indexing .pio/build/esp32s3cam_a_serial/lib92a/libWiFi.a
+Indexing .pio/build/esp32s3cam_a_serial/libb1d/libPreferences.a
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/Stream.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/StreamString.cpp.o
+Archiving .pio/build/esp32s3cam_a_serial/lib8e8/libHTTPClient.a
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/Tone.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/USB.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/USBCDC.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/USBMSC.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/WMath.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/WString.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/base64.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/cbuf.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/esp32-hal-adc.c.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/esp32-hal-bt.c.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/esp32-hal-cpu.c.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/esp32-hal-dac.c.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/esp32-hal-gpio.c.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/esp32-hal-i2c-slave.c.o
+Indexing .pio/build/esp32s3cam_a_serial/lib8e8/libHTTPClient.a
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/esp32-hal-i2c.c.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/esp32-hal-ledc.c.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/esp32-hal-matrix.c.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/esp32-hal-misc.c.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/esp32-hal-psram.c.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/esp32-hal-rgb-led.c.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/esp32-hal-rmt.c.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/esp32-hal-sigmadelta.c.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/esp32-hal-spi.c.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/esp32-hal-time.c.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/esp32-hal-timer.c.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/esp32-hal-tinyusb.c.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/esp32-hal-touch.c.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/esp32-hal-uart.c.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/firmware_msc_fat.c.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/libb64/cdecode.c.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/libb64/cencode.c.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/main.cpp.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/stdlib_noniso.c.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/wiring_pulse.c.o
+Compiling .pio/build/esp32s3cam_a_serial/FrameworkArduino/wiring_shift.c.o
+Archiving .pio/build/esp32s3cam_a_serial/libFrameworkArduino.a
+Indexing .pio/build/esp32s3cam_a_serial/libFrameworkArduino.a
+Linking .pio/build/esp32s3cam_a_serial/firmware.elf
+Retrieving maximum program size .pio/build/esp32s3cam_a_serial/firmware.elf
+Checking size .pio/build/esp32s3cam_a_serial/firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [==        ]  17.7% (used 58032 bytes from 327680 bytes)
+Flash: [===       ]  25.5% (used 851149 bytes from 3342336 bytes)
+Building .pio/build/esp32s3cam_a_serial/firmware.bin with action:
+  "$PYTHONEXE" "$OBJCOPY" --chip esp32s3 elf2image --flash_mode ${__get_board_flash_mode(__env__)} --flash_freq ${__get_board_f_image(__env__)} --flash_size 8MB --elf-sha256-offset 0xb0 -o $TARGET $SOURCES
+Building .pio/build/esp32s3cam_a_serial/firmware.bin
+esptool.py v4.5.1
+Creating esp32s3 image...
+Merged 2 ELF sections
+Successfully created esp32s3 image.
+========================= [SUCCESS] Took 21.35 seconds =========================
+
+Environment          Status    Duration
+-------------------  --------  ------------
+esp32s3cam_a_serial  SUCCESS   00:00:21.346
+========================= 1 succeeded in 00:00:21.346 =========================

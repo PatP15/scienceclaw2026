@@ -81,6 +81,9 @@ class SerialTransport : public IHttpTransport {
   uint32_t pollIntervalS() const { return poll_interval_s_; }
   // Optional: called on every hello_ack/time/command server_time_utc (epoch ms, receipt millis).
   std::function<void(int64_t, uint32_t)> onServerTime;
+  // Monotonic ms used inside request() (which has no time argument). Defaults to millis() on the
+  // ESP32; native tests inject a fake. If unset off-target, the last poll() time is used.
+  std::function<uint32_t()> nowFn;
 
   struct Stats {
     uint32_t lines_rx = 0, lines_tx = 0, oversize_dropped = 0, non_json = 0, bad_json = 0,
@@ -103,6 +106,7 @@ class SerialTransport : public IHttpTransport {
   void sendHello(uint32_t now_ms);
   bool writeLine(const std::string& line);  // appends '\n', enforces max_line_bytes
   void flushLogs();
+  uint32_t nowMs() const;
 
   ISerialPort* port_;
   SerialTransportConfig cfg_;
@@ -112,6 +116,7 @@ class SerialTransport : public IHttpTransport {
   bool began_ = false;
   uint32_t last_hello_ms_ = 0;
   uint32_t last_rx_ms_ = 0;
+  uint32_t last_poll_ms_ = 0;
   uint32_t poll_interval_s_ = 0;
   ClockSync clock_;
   std::deque<PendingCommand> cmds_;

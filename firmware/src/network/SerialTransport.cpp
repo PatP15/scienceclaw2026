@@ -6,11 +6,24 @@
 
 #include <algorithm>
 
+#if defined(ARDUINO)
+#include <Arduino.h>
+#endif
+
 namespace fa {
 
 namespace {
 bool startsWith(const char* s, const char* p) { return strncmp(s, p, strlen(p)) == 0; }
 }  // namespace
+
+uint32_t SerialTransport::nowMs() const {
+  if (nowFn) return nowFn();
+#if defined(ARDUINO)
+  return millis();
+#else
+  return last_poll_ms_;
+#endif
+}
 
 void SerialTransport::begin(uint32_t now_ms) {
   began_ = true;
@@ -88,6 +101,7 @@ void SerialTransport::syncClock(const char* iso, uint32_t now_ms) {
 }
 
 void SerialTransport::poll(uint32_t now_ms) {
+  last_poll_ms_ = now_ms;
   if (!began_) begin(now_ms);
   // ---- RX: bounded work per call; never waits for bytes
   size_t budget = cfg_.rx_budget_bytes;
@@ -239,8 +253,7 @@ int SerialTransport::request(const char* method, const char* path, const char* c
     JsonDocument env;
     env["schema_version"] = "1.0";
     env["chamber_id"] = cfg_.chamber_id;
-    const uint32_t now_ms = last_rx_ms_ > 0 ? 0 : 0;  // placeholder (overwritten below)
-    (void)now_ms;
+    const uint32_t now_ms = nowMs();
     JsonArray arr = env["commands"].to<JsonArray>();
     // Ascending sequence_number (serial_v1 / command_v1 ordering); stable for equal numbers.
     std::stable_sort(cmds_.begin(), cmds_.end(), [](const PendingCommand& a, const PendingCommand& b) {
@@ -253,7 +266,7 @@ int SerialTransport::request(const char* method, const char* path, const char* c
       JsonDocument c;
       if (deserializeJson(c, pc.json) != DeserializationError::Ok) continue;
       if (pc.has_ttl) {
-        const int64_t left_ms = pc.ttl_ms - (int64_t)(uint32_t)(pollNow_ - pc.received_ms);
+        const int64_t left_ms = pc.ttl_ms - (int64_t)(uint32_t)(now_ms - pc.received_ms);
         c["ttl_s"] = (double)left_ms / 1000.0;
       }
       arr.add(c.as<JsonObject>());
@@ -261,7 +274,7 @@ int SerialTransport::request(const char* method, const char* path, const char* c
     }
     if (clock_.hasSync()) {
       char ts[24];
-      formatIso8601Utc(clock_.nowEpochMs(pollNow_), ts, sizeof ts);
+      formatIso8601Utc(clock_.nowEpochMs(now_ms), ts, sizeof ts);
       env["server_time_utc"] = ts;
     }
     if (poll_interval_s_) env["poll_interval_s"] = poll_interval_s_;

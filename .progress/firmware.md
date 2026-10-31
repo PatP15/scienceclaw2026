@@ -87,3 +87,46 @@ cd .. && uv run python firmware/tools/validate_contract_samples.py   # after pio
 If the backend contract changes, regenerate it (`uv run python -m fermentai.api.contract
 --write-schemas`) and re-run the native tests. `test_telemetry` and `test_commands` read
 `firmware_contract/` and `contracts/` directly.
+
+## Serial transport (USB, serial_v1): added 2026-10-31, NEW FILES ONLY
+
+- **Files:**
+  - `src/network/SerialLink.h` (ISerialPort, ArduinoStreamPort)
+  - `src/network/SerialTransport.h/.cpp` (an IHttpTransport drop-in: telemetry/ack lines,
+    synthesized desired-control from `command` lines, hello/hello_ack/time/ping/pong/log)
+  - `test/test_serial/` (19 tests)
+  - `platformio_serial.ini` (envs `esp32s3cam_a_serial` / `_b_serial`, via `extra_configs`;
+    `build_unflags` sets CORE_DEBUG_LEVEL=0 and CAMERA_ENABLED=0)
+  - `docs/SERIAL_TRANSPORT.md` (protocol, debug-output rules, the main.cpp hook patch, hardware
+    steps)
+- **Native:** 113/113 pass (`build_logs/native_test_with_serial.log`).
+
+  | Suite | Tests |
+  |---|---|
+  | control | 20 |
+  | sensors | 18 |
+  | motor | 12 |
+  | commands | 23 |
+  | telemetry | 13 |
+  | network | 8 |
+  | serial | 19 |
+
+- **Builds** (`build_logs/esp32s3cam_{a,b}_serial.log`):
+
+  | Env | RAM | Flash | Status |
+  |---|---|---|---|
+  | `esp32s3cam_a_serial` | 57,872 B (17.7%) | 848,973 B (25.4%) | SUCCESS |
+  | `esp32s3cam_b_serial` | 57,776 B (17.6%) | 841,753 B (25.2%) | SUCCESS |
+
+  Without the hook, SerialTransport is compiled but not linked.
+- **Hook verified on a scratch copy of firmware/** (not in the repo):
+  `esp32s3cam_a_serial` with the patch gives RAM 58,032 B, Flash 851,149 B, and links 50
+  `fa::SerialTransport::` symbols (`build_logs/esp32s3cam_a_serial_WITH_HOOK_scratch_copy.log`).
+  The Wi-Fi build with the patch also succeeds.
+- **NOT applied:** the main.cpp hook. The bring-up session owns main.cpp and the USB port.
+  `contracts/serial_v1.md` hadn't landed when this was written; re-check the field names when it
+  does.
+- **WARNING:** commit `26602a5` (made by the other session) swept in an EARLY, NON-COMPILING
+  draft of `SerialTransport.h/.cpp` (it uses an undefined `pollNow_`). `src/` is compiled in every
+  env, so HEAD alone does not build. The working-tree versions are correct and must go into the
+  next commit.
