@@ -1,0 +1,3410 @@
+{
+ "label": "Replay",
+ "provenance": "replay",
+ "disclaimer": "REPLAY: scripted example for the offline demo. The feedback text is written by the team, not a real judge's tasting; any telemetry is synthetic. The decision output is genuine output of the offline deterministic policy for this input.",
+ "id": "demo_04_master_plan_judge_script",
+ "title": "Replay: PLAN_MASTER §14 judge script ('more sour, but still fluffy')",
+ "feedback_text": "Loaf A tastes mild and has nice texture. Loaf B is more sour, which I prefer, but the crumb is too dense. I'd like a more sour loaf that's still fluffy.",
+ "context": {
+  "setpoints": {
+   "A": 22.0,
+   "B": 27.0
+  },
+  "experiment_id": "trial_001",
+  "lead_agent": "A",
+  "telemetry": {
+   "A": [
+    {
+     "schema_version": "1.1",
+     "device_id": "fermentai-esp32-a",
+     "chamber_id": "A",
+     "experiment_id": "trial_001",
+     "boot_id": "boot_a001",
+     "sequence_number": 200,
+     "timestamp_utc": "2026-10-31T16:18:00Z",
+     "timestamp_quality": "synced",
+     "device_uptime_ms": 3600000,
+     "chamber_temperature_c": 22.5,
+     "starter_temperature_c": 21.8,
+     "internal_heatsink_temperature_c": 16.0,
+     "external_heatsink_temperature_c": 38.0,
+     "relative_humidity_percent": 74.0,
+     "pressure_pa": 101300.0,
+     "gas_resistance_ohms": 98000.0,
+     "ph": null,
+     "ph_method": null,
+     "starter_height_mm": 20.0,
+     "door_open": false,
+     "peltier_mode": "idle",
+     "peltier_output_fraction": 0.3,
+     "temperature_setpoint_c": 22.0,
+     "motor_running": false,
+     "source": "replay",
+     "quality_flags": [],
+     "diagnostics": {},
+     "field_provenance": {
+      "starter_height_mm": {
+       "source": "replay",
+       "confidence": 0.85
+      }
+     }
+    },
+    {
+     "schema_version": "1.1",
+     "device_id": "fermentai-esp32-a",
+     "chamber_id": "A",
+     "experiment_id": "trial_001",
+     "boot_id": "boot_a001",
+     "sequence_number": 201,
+     "timestamp_utc": "2026-10-31T16:38:00Z",
+     "timestamp_quality": "synced",
+     "device_uptime_ms": 4800000,
+     "chamber_temperature_c": 22.5,
+     "starter_temperature_c": 21.8,
+     "internal_heatsink_temperature_c": 16.0,
+     "external_heatsink_temperature_c": 38.0,
+     "relative_humidity_percent": 74.0,
+     "pressure_pa": 101300.0,
+     "gas_resistance_ohms": 97100.0,
+     "ph": null,
+     "ph_method": null,
+     "starter_height_mm": 21.5,
+     "door_open": false,
+     "peltier_mode": "idle",
+     "peltier_output_fraction": 0.3,
+     "temperature_setpoint_c": 22.0,
+     "motor_running": false,
+     "source": "replay",
+     "quality_flags": [],
+     "diagnostics": {},
+     "field_provenance": {
+      "starter_height_mm": {
+       "source": "replay",
+       "confidence": 0.85
+      }
+     }
+    },
+    {
+     "schema_version": "1.1",
+     "device_id": "fermentai-esp32-a",
+     "chamber_id": "A",
+     "experiment_id": "trial_001",
+     "boot_id": "boot_a001",
+     "sequence_number": 202,
+     "timestamp_utc": "2026-10-31T16:58:00Z",
+     "timestamp_quality": "synced",
+     "device_uptime_ms": 6000000,
+     "chamber_temperature_c": 22.5,
+     "starter_temperature_c": 21.8,
+     "internal_heatsink_temperature_c": 16.0,
+     "external_heatsink_temperature_c": 38.0,
+     "relative_humidity_percent": 74.0,
+     "pressure_pa": 101300.0,
+     "gas_resistance_ohms": 96200.0,
+     "ph": null,
+     "ph_method": null,
+     "starter_height_mm": 23.4,
+     "door_open": false,
+     "peltier_mode": "idle",
+     "peltier_output_fraction": 0.3,
+     "temperature_setpoint_c": 22.0,
+     "motor_running": false,
+     "source": "replay",
+     "quality_flags": [],
+     "diagnostics": {},
+     "field_provenance": {
+      "starter_height_mm": {
+       "source": "replay",
+       "confidence": 0.85
+      }
+     }
+    },
+    {
+     "schema_version": "1.1",
+     "device_id": "fermentai-esp32-a",
+     "chamber_id": "A",
+     "experiment_id": "trial_001",
+     "boot_id": "boot_a001",
+     "sequence_number": 203,
+     "timestamp_utc": "2026-10-31T17:18:00Z",
+     "timestamp_quality": "synced",
+     "device_uptime_ms": 7200000,
+     "chamber_temperature_c": 22.5,
+     "starter_temperature_c": 21.8,
+     "internal_heatsink_temperature_c": 16.0,
+     "external_heatsink_temperature_c": 38.0,
+     "relative_humidity_percent": 74.0,
+     "pressure_pa": 101300.0,
+     "gas_resistance_ohms": 95300.0,
+     "ph": null,
+     "ph_method": null,
+     "starter_height_mm": 25.6,
+     "door_open": false,
+     "peltier_mode": "idle",
+     "peltier_output_fraction": 0.3,
+     "temperature_setpoint_c": 22.0,
+     "motor_running": false,
+     "source": "replay",
+     "quality_flags": [],
+     "diagnostics": {},
+     "field_provenance": {
+      "starter_height_mm": {
+       "source": "replay",
+       "confidence": 0.85
+      }
+     }
+    },
+    {
+     "schema_version": "1.1",
+     "device_id": "fermentai-esp32-a",
+     "chamber_id": "A",
+     "experiment_id": "trial_001",
+     "boot_id": "boot_a001",
+     "sequence_number": 204,
+     "timestamp_utc": "2026-10-31T17:38:00Z",
+     "timestamp_quality": "synced",
+     "device_uptime_ms": 8400000,
+     "chamber_temperature_c": 22.5,
+     "starter_temperature_c": 21.8,
+     "internal_heatsink_temperature_c": 16.0,
+     "external_heatsink_temperature_c": 38.0,
+     "relative_humidity_percent": 74.0,
+     "pressure_pa": 101300.0,
+     "gas_resistance_ohms": 94400.0,
+     "ph": null,
+     "ph_method": null,
+     "starter_height_mm": 27.9,
+     "door_open": false,
+     "peltier_mode": "idle",
+     "peltier_output_fraction": 0.3,
+     "temperature_setpoint_c": 22.0,
+     "motor_running": false,
+     "source": "replay",
+     "quality_flags": [],
+     "diagnostics": {},
+     "field_provenance": {
+      "starter_height_mm": {
+       "source": "replay",
+       "confidence": 0.85
+      }
+     }
+    },
+    {
+     "schema_version": "1.1",
+     "device_id": "fermentai-esp32-a",
+     "chamber_id": "A",
+     "experiment_id": "trial_001",
+     "boot_id": "boot_a001",
+     "sequence_number": 205,
+     "timestamp_utc": "2026-10-31T17:58:00Z",
+     "timestamp_quality": "synced",
+     "device_uptime_ms": 9600000,
+     "chamber_temperature_c": 22.5,
+     "starter_temperature_c": 21.8,
+     "internal_heatsink_temperature_c": 16.0,
+     "external_heatsink_temperature_c": 38.0,
+     "relative_humidity_percent": 74.0,
+     "pressure_pa": 101300.0,
+     "gas_resistance_ohms": 93500.0,
+     "ph": null,
+     "ph_method": null,
+     "starter_height_mm": 30.1,
+     "door_open": false,
+     "peltier_mode": "idle",
+     "peltier_output_fraction": 0.3,
+     "temperature_setpoint_c": 22.0,
+     "motor_running": false,
+     "source": "replay",
+     "quality_flags": [],
+     "diagnostics": {},
+     "field_provenance": {
+      "starter_height_mm": {
+       "source": "replay",
+       "confidence": 0.85
+      }
+     }
+    }
+   ],
+   "B": [
+    {
+     "schema_version": "1.1",
+     "device_id": "fermentai-esp32-b",
+     "chamber_id": "B",
+     "experiment_id": "trial_001",
+     "boot_id": "boot_b001",
+     "sequence_number": 200,
+     "timestamp_utc": "2026-10-31T16:18:00Z",
+     "timestamp_quality": "synced",
+     "device_uptime_ms": 3600000,
+     "chamber_temperature_c": 27.5,
+     "starter_temperature_c": 26.8,
+     "internal_heatsink_temperature_c": 21.0,
+     "external_heatsink_temperature_c": 38.0,
+     "relative_humidity_percent": 74.0,
+     "pressure_pa": 101300.0,
+     "gas_resistance_ohms": 98000.0,
+     "ph": null,
+     "ph_method": null,
+     "starter_height_mm": 20.0,
+     "door_open": false,
+     "peltier_mode": "heating",
+     "peltier_output_fraction": 0.3,
+     "temperature_setpoint_c": 27.0,
+     "motor_running": false,
+     "source": "replay",
+     "quality_flags": [],
+     "diagnostics": {},
+     "field_provenance": {
+      "starter_height_mm": {
+       "source": "replay",
+       "confidence": 0.85
+      }
+     }
+    },
+    {
+     "schema_version": "1.1",
+     "device_id": "fermentai-esp32-b",
+     "chamber_id": "B",
+     "experiment_id": "trial_001",
+     "boot_id": "boot_b001",
+     "sequence_number": 201,
+     "timestamp_utc": "2026-10-31T16:38:00Z",
+     "timestamp_quality": "synced",
+     "device_uptime_ms": 4800000,
+     "chamber_temperature_c": 27.5,
+     "starter_temperature_c": 26.8,
+     "internal_heatsink_temperature_c": 21.0,
+     "external_heatsink_temperature_c": 38.0,
+     "relative_humidity_percent": 74.0,
+     "pressure_pa": 101300.0,
+     "gas_resistance_ohms": 97100.0,
+     "ph": null,
+     "ph_method": null,
+     "starter_height_mm": 25.0,
+     "door_open": false,
+     "peltier_mode": "heating",
+     "peltier_output_fraction": 0.3,
+     "temperature_setpoint_c": 27.0,
+     "motor_running": false,
+     "source": "replay",
+     "quality_flags": [],
+     "diagnostics": {},
+     "field_provenance": {
+      "starter_height_mm": {
+       "source": "replay",
+       "confidence": 0.85
+      }
+     }
+    },
+    {
+     "schema_version": "1.1",
+     "device_id": "fermentai-esp32-b",
+     "chamber_id": "B",
+     "experiment_id": "trial_001",
+     "boot_id": "boot_b001",
+     "sequence_number": 202,
+     "timestamp_utc": "2026-10-31T16:58:00Z",
+     "timestamp_quality": "synced",
+     "device_uptime_ms": 6000000,
+     "chamber_temperature_c": 27.5,
+     "starter_temperature_c": 26.8,
+     "internal_heatsink_temperature_c": 21.0,
+     "external_heatsink_temperature_c": 38.0,
+     "relative_humidity_percent": 74.0,
+     "pressure_pa": 101300.0,
+     "gas_resistance_ohms": 96200.0,
+     "ph": null,
+     "ph_method": null,
+     "starter_height_mm": 31.0,
+     "door_open": false,
+     "peltier_mode": "heating",
+     "peltier_output_fraction": 0.3,
+     "temperature_setpoint_c": 27.0,
+     "motor_running": false,
+     "source": "replay",
+     "quality_flags": [],
+     "diagnostics": {},
+     "field_provenance": {
+      "starter_height_mm": {
+       "source": "replay",
+       "confidence": 0.85
+      }
+     }
+    },
+    {
+     "schema_version": "1.1",
+     "device_id": "fermentai-esp32-b",
+     "chamber_id": "B",
+     "experiment_id": "trial_001",
+     "boot_id": "boot_b001",
+     "sequence_number": 203,
+     "timestamp_utc": "2026-10-31T17:18:00Z",
+     "timestamp_quality": "synced",
+     "device_uptime_ms": 7200000,
+     "chamber_temperature_c": 27.5,
+     "starter_temperature_c": 26.8,
+     "internal_heatsink_temperature_c": 21.0,
+     "external_heatsink_temperature_c": 38.0,
+     "relative_humidity_percent": 74.0,
+     "pressure_pa": 101300.0,
+     "gas_resistance_ohms": 95300.0,
+     "ph": null,
+     "ph_method": null,
+     "starter_height_mm": 36.5,
+     "door_open": false,
+     "peltier_mode": "heating",
+     "peltier_output_fraction": 0.3,
+     "temperature_setpoint_c": 27.0,
+     "motor_running": false,
+     "source": "replay",
+     "quality_flags": [],
+     "diagnostics": {},
+     "field_provenance": {
+      "starter_height_mm": {
+       "source": "replay",
+       "confidence": 0.85
+      }
+     }
+    },
+    {
+     "schema_version": "1.1",
+     "device_id": "fermentai-esp32-b",
+     "chamber_id": "B",
+     "experiment_id": "trial_001",
+     "boot_id": "boot_b001",
+     "sequence_number": 204,
+     "timestamp_utc": "2026-10-31T17:38:00Z",
+     "timestamp_quality": "synced",
+     "device_uptime_ms": 8400000,
+     "chamber_temperature_c": 27.5,
+     "starter_temperature_c": 26.8,
+     "internal_heatsink_temperature_c": 21.0,
+     "external_heatsink_temperature_c": 38.0,
+     "relative_humidity_percent": 74.0,
+     "pressure_pa": 101300.0,
+     "gas_resistance_ohms": 94400.0,
+     "ph": null,
+     "ph_method": null,
+     "starter_height_mm": 39.8,
+     "door_open": false,
+     "peltier_mode": "heating",
+     "peltier_output_fraction": 0.3,
+     "temperature_setpoint_c": 27.0,
+     "motor_running": false,
+     "source": "replay",
+     "quality_flags": [],
+     "diagnostics": {},
+     "field_provenance": {
+      "starter_height_mm": {
+       "source": "replay",
+       "confidence": 0.85
+      }
+     }
+    },
+    {
+     "schema_version": "1.1",
+     "device_id": "fermentai-esp32-b",
+     "chamber_id": "B",
+     "experiment_id": "trial_001",
+     "boot_id": "boot_b001",
+     "sequence_number": 205,
+     "timestamp_utc": "2026-10-31T17:58:00Z",
+     "timestamp_quality": "synced",
+     "device_uptime_ms": 9600000,
+     "chamber_temperature_c": 27.5,
+     "starter_temperature_c": 26.8,
+     "internal_heatsink_temperature_c": 21.0,
+     "external_heatsink_temperature_c": 38.0,
+     "relative_humidity_percent": 74.0,
+     "pressure_pa": 101300.0,
+     "gas_resistance_ohms": 93500.0,
+     "ph": 4.05,
+     "ph_method": "probe_sample",
+     "starter_height_mm": 40.6,
+     "door_open": false,
+     "peltier_mode": "heating",
+     "peltier_output_fraction": 0.3,
+     "temperature_setpoint_c": 27.0,
+     "motor_running": false,
+     "source": "replay",
+     "quality_flags": [],
+     "diagnostics": {
+      "ph_calibration_valid": true,
+      "ph_calibration_date": "2026-10-31"
+     },
+     "field_provenance": {
+      "starter_height_mm": {
+       "source": "replay",
+       "confidence": 0.85
+      }
+     }
+    }
+   ]
+  }
+ },
+ "expected_interpretation": {
+  "loaves": {
+   "A": {
+    "sourness": {
+     "label": "mild",
+     "score": 0.25,
+     "confidence": 0.85
+    },
+    "texture": {
+     "label": "fairly open / soft",
+     "score": 0.72,
+     "confidence": 0.6
+    }
+   },
+   "B": {
+    "sourness": {
+     "label": "sour",
+     "score": 0.75,
+     "confidence": 0.95
+    },
+    "density": {
+     "label": "dense / heavy",
+     "score": 0.972,
+     "confidence": 0.95
+    },
+    "texture": {
+     "label": "tight / gummy",
+     "score": 0.162,
+     "confidence": 0.95
+    }
+   }
+  },
+  "desired": {
+   "density": {
+    "direction": "maintain",
+    "strength": "moderate",
+    "confidence": 0.598
+   },
+   "texture": {
+    "direction": "maintain",
+    "strength": "moderate",
+    "confidence": 0.598
+   },
+   "sourness": {
+    "direction": "increase",
+    "strength": "moderate",
+    "confidence": 0.855
+   }
+  },
+  "desired_summary": "More sour (moderate); keep crumb openness high; lower density; preferred Loaf B.",
+  "structured_preference": [
+   "More sourness",
+   "Lower density",
+   "Preserve good rise (airy/fluffy crumb)"
+  ],
+  "preferred_loaf": "B",
+  "flags": []
+ },
+ "expected_structured_preference": [
+  "More sourness",
+  "Lower density",
+  "Preserve good rise (airy/fluffy crumb)"
+ ],
+ "resulting_experiment": {
+  "id": "trial_002",
+  "title": "Trial 002: A: warm acid route vs B: intermediate temperature",
+  "objective": "More sour (moderate); keep crumb openness high; lower density; preferred Loaf B. Test whether 'Hot 32 °C 5 h -> cool 18 °C' (warm acid route) or 'Steady 24 °C, 12 h' (intermediate temperature) better achieves it.",
+  "schedules": {
+   "A": {
+    "schedule_id": "warm_then_cool_32_18",
+    "name": "Hot 32 °C 5 h -> cool 18 °C",
+    "points": [
+     [
+      0.0,
+      32.0
+     ],
+     [
+      5.0,
+      32.0
+     ],
+     [
+      6.0,
+      18.0
+     ],
+     [
+      16.0,
+      18.0
+     ]
+    ]
+   },
+   "B": {
+    "schedule_id": "steady_24_12h",
+    "name": "Steady 24 °C, 12 h",
+    "points": [
+     [
+      0.0,
+      24.0
+     ],
+     [
+      12.0,
+      24.0
+     ]
+    ]
+   }
+  },
+  "proposed_by": "scientist_A",
+  "reviewed_by": "scientist_B",
+  "hypothesis": "Running 'Hot 32 °C 5 h -> cool 18 °C' in chamber A will move the loaf toward the judge's target (More sour (moderate); keep crumb openness high; lower density; preferred Loaf B). LAB outpace yeast near 30-32 °C, so a short hot phase adds acid per unit of rise; the cool tail protects structure."
+ },
+ "result": {
+  "cycle_id": "cyc_296978a39787",
+  "timestamp_utc": "2026-10-31T18:00:00Z",
+  "feedback_text": "Loaf A tastes mild and has nice texture. Loaf B is more sour, which I prefer, but the crumb is too dense. I'd like a more sour loaf that's still fluffy.",
+  "sensory_interpretation": {
+   "method": "rule_based_lexicon_v1",
+   "provenance": "judge_feedback",
+   "raw_text": "Loaf A tastes mild and has nice texture. Loaf B is more sour, which I prefer, but the crumb is too dense. I'd like a more sour loaf that's still fluffy.",
+   "loaves": {
+    "A": {
+     "mentioned": true,
+     "references": [
+      {
+       "text": "Loaf A",
+       "start": 0,
+       "end": 6,
+       "kind": "explicit",
+       "confidence": 1.0,
+       "note": ""
+      }
+     ],
+     "attributes": {
+      "sourness": {
+       "score": 0.25,
+       "confidence": 0.85,
+       "evidence": [
+        {
+         "text": "mild",
+         "start": 14,
+         "end": 18,
+         "rule": "lexicon:mild"
+        }
+       ],
+       "label": "mild"
+      },
+      "texture": {
+       "score": 0.72,
+       "confidence": 0.6,
+       "evidence": [
+        {
+         "text": "nice texture",
+         "start": 27,
+         "end": 39,
+         "rule": "lexicon:nice texture"
+        }
+       ],
+       "label": "fairly open / soft"
+      }
+     },
+     "aroma_tags": []
+    },
+    "B": {
+     "mentioned": true,
+     "references": [
+      {
+       "text": "Loaf B",
+       "start": 41,
+       "end": 47,
+       "kind": "explicit",
+       "confidence": 1.0,
+       "note": ""
+      }
+     ],
+     "attributes": {
+      "sourness": {
+       "score": 0.75,
+       "confidence": 0.95,
+       "evidence": [
+        {
+         "text": "more sour",
+         "start": 51,
+         "end": 60,
+         "rule": "lexicon:sour modifiers:more comparative"
+        }
+       ],
+       "label": "sour"
+      },
+      "density": {
+       "score": 0.972,
+       "confidence": 0.95,
+       "evidence": [
+        {
+         "text": "too dense",
+         "start": 95,
+         "end": 104,
+         "rule": "lexicon:dense modifiers:too"
+        }
+       ],
+       "label": "dense / heavy"
+      },
+      "texture": {
+       "score": 0.162,
+       "confidence": 0.95,
+       "evidence": [
+        {
+         "text": "too dense",
+         "start": 95,
+         "end": 104,
+         "rule": "lexicon:dense modifiers:too"
+        }
+       ],
+       "label": "tight / gummy"
+      }
+     },
+     "aroma_tags": []
+    }
+   },
+   "unattributed": {
+    "attributes": {},
+    "aroma_tags": []
+   },
+   "comparisons": [
+    {
+     "dimension": "sourness",
+     "higher": "B",
+     "lower": "A",
+     "evidence": {
+      "text": "more sour",
+      "start": 51,
+      "end": 60,
+      "rule": "lexicon:sour modifiers:more comparative"
+     }
+    }
+   ],
+   "desired": {
+    "density": {
+     "direction": "maintain",
+     "strength": "moderate",
+     "step": 0.15,
+     "confidence": 0.598,
+     "target_level": null,
+     "preferred_pole": "low",
+     "bound": null,
+     "anchor_loaf": null,
+     "implied": false,
+     "conflicting_votes": true,
+     "votes": {
+      "decrease": 0.665,
+      "maintain": 0.855
+     },
+     "poles": [
+      "low"
+     ],
+     "evidence": [
+      {
+       "text": "fluffy",
+       "start": 145,
+       "end": 151,
+       "rule": "lexicon:fluffy mode:maintain"
+      }
+     ]
+    },
+    "texture": {
+     "direction": "maintain",
+     "strength": "moderate",
+     "step": 0.15,
+     "confidence": 0.598,
+     "target_level": null,
+     "preferred_pole": "high",
+     "bound": null,
+     "anchor_loaf": null,
+     "implied": false,
+     "conflicting_votes": true,
+     "votes": {
+      "increase": 0.665,
+      "maintain": 0.855
+     },
+     "poles": [
+      "high"
+     ],
+     "evidence": [
+      {
+       "text": "fluffy",
+       "start": 145,
+       "end": 151,
+       "rule": "lexicon:fluffy mode:maintain"
+      }
+     ]
+    },
+    "sourness": {
+     "direction": "increase",
+     "strength": "moderate",
+     "step": 0.15,
+     "confidence": 0.855,
+     "target_level": null,
+     "preferred_pole": null,
+     "bound": null,
+     "anchor_loaf": null,
+     "implied": false,
+     "conflicting_votes": false,
+     "votes": {
+      "increase": 0.855
+     },
+     "poles": [],
+     "evidence": [
+      {
+       "text": "more sour",
+       "start": 117,
+       "end": 126,
+       "rule": "lexicon:sour modifiers:more comparative mode:desire"
+      }
+     ]
+    }
+   },
+   "desired_aroma_tags": [],
+   "desired_summary": "More sour (moderate); keep crumb openness high; lower density; preferred Loaf B.",
+   "structured_preference": [
+    "More sourness",
+    "Lower density",
+    "Preserve good rise (airy/fluffy crumb)"
+   ],
+   "primary_dimension": "sourness",
+   "preferred_loaf": "B",
+   "preference_evidence": [
+    {
+     "text": "Loaf B is more sour, which I prefer",
+     "start": 41,
+     "end": 76,
+     "rule": "preference"
+    }
+   ],
+   "flags": [],
+   "overall_confidence": 0.794,
+   "notes": [],
+   "scales": {
+    "sourness": "0 very mild .. 1 very sour/sharp",
+    "texture": "0 tight/gummy .. 1 open/airy/fluffy",
+    "density": "0 light .. 1 dense/heavy",
+    "aroma": "0 faint/bland .. 1 strong/complex",
+    "flavor_intensity": "0 flat .. 1 strong/rich"
+   }
+  },
+  "hypothesis": {
+   "text": "Running 'Hot 32 °C 5 h -> cool 18 °C' in chamber A will move the loaf toward the judge's target (More sour (moderate); keep crumb openness high; lower density; preferred Loaf B). LAB outpace yeast near 30-32 °C, so a short hot phase adds acid per unit of rise; the cool tail protects structure.",
+   "statement": "Running 'Hot 32 °C 5 h -> cool 18 °C' in chamber A will move the loaf toward the judge's target (More sour (moderate); keep crumb openness high; lower density; preferred Loaf B). LAB outpace yeast near 30-32 °C, so a short hot phase adds acid per unit of rise; the cool tail protects structure.",
+   "mechanism": "LAB outpace yeast near 30-32 °C, so a short hot phase adds acid per unit of rise; the cool tail protects structure. (warm phase front-loads lactic acidification (total acid route))",
+   "proposed_by": "scientist_A",
+   "lead_reason": "the operator asked scientist_A to open this round (lead_agent)",
+   "challenged_by": "scientist_B",
+   "peer_agrees": false,
+   "alternative_hypothesis": "Perceived sourness may depend more on the acetic share than on total acid; a long cool phase could raise sharpness without pushing the dough past peak rise.",
+   "independent_variable": "fermentation temperature schedule",
+   "dependent_variables": [
+    "perceived sourness",
+    "crumb openness",
+    "rise (starter height)",
+    "pH"
+   ],
+   "held_constant": [
+    "recipe (200 g flour, 135 g water, 40 g starter, 4.4 g salt)",
+    "starter feed",
+    "mixing and folds",
+    "bake"
+   ],
+   "targets": {
+    "sourness": {
+     "target": 0.9,
+     "mode": "near",
+     "weight": 0.855,
+     "reason": "more sour than the sourest judged loaf (0.75)"
+    },
+    "openness": {
+     "target": 0.67,
+     "mode": "at_least",
+     "weight": 1.495,
+     "constraint": true,
+     "reason": "keep crumb as open as Loaf A (0.72)"
+    }
+   },
+   "explore": false,
+   "predictions": {
+    "A": {
+     "sourness": 0.393,
+     "openness": 0.513,
+     "rise_progress": 1.531,
+     "overproof_risk": 0.677,
+     "time_to_peak_rise_h": 10.45,
+     "final_ph": 4.095,
+     "uncertainty": 0.23,
+     "provenance": "simulated"
+    },
+    "B": {
+     "sourness": 0.28,
+     "openness": 0.724,
+     "rise_progress": 1.463,
+     "overproof_risk": 0.747,
+     "time_to_peak_rise_h": 8.2,
+     "final_ph": 4.163,
+     "uncertainty": 0.16,
+     "provenance": "simulated"
+    }
+   },
+   "uncertainty": "Predictions come from the fermentation simulator (uncalibrated against this starter); the judge-scale map rests on 2 judged loaf/loaves for sourness (anchored) and 2 for crumb (anchored); band ±0.23 grows with distance from the recorded conditions (widened by 0.05 for missing/invalid observations); one judge, one tasting, one shared pH probe; perceived sourness ≠ pH (lactic/acetic balance matters); No valid pH measurement for chamber A (no pH reading for this chamber (single shared electrode)); I rely on model predictions and widen the stated uncertainty by ±0.05.; no validated schedule is predicted to reach sourness 0.90 (best 0.39) without passing peak rise; this run tests how far the warm acid route can go.",
+   "confidence": "moderate",
+   "status": "proposed"
+  },
+  "recommended_schedules": {
+   "A": [
+    [
+     0.0,
+     32.0
+    ],
+    [
+     5.0,
+     32.0
+    ],
+    [
+     6.0,
+     18.0
+    ],
+    [
+     16.0,
+     18.0
+    ]
+   ],
+   "B": [
+    [
+     0.0,
+     24.0
+    ],
+    [
+     12.0,
+     24.0
+    ]
+   ]
+  },
+  "agent_messages": [
+   {
+    "id": "f_fd621e62b4a8bba3",
+    "agent_id": "scientist_A",
+    "timestamp_utc": "2026-10-31T18:00:00Z",
+    "type": "hypothesis",
+    "content": "[scientist_A → scientist_B] Hypothesis: Running 'Hot 32 °C 5 h -> cool 18 °C' in chamber A will move the loaf toward the judge's target (More sour (moderate); keep crumb openness high; lower density; preferred Loaf B). LAB outpace yeast near 30-32 °C, so a short hot phase adds acid per unit of rise; the cool tail protects structure. Proposed for chamber A: 'Hot 32 °C 5 h -> cool 18 °C'. Predicted (simulator, anchored on judged loaves): sourness 0.39 ± 0.23, crumb openness 0.51 ± 0.23; rise progress 1.53× peak (overproof risk 68%), peak rise expected near 10.4 h, final pH ≈ 4.09 (simulated). Suggestion for chamber B: 'Steady 24 °C, 12 h'.",
+    "payload": {
+     "role": "proposer",
+     "decision_source": "offline_policy",
+     "reasoning_mode_label": "Offline Policy",
+     "lead_reason": "the operator asked scientist_A to open this round (lead_agent)",
+     "hypothesis": {
+      "statement": "Running 'Hot 32 °C 5 h -> cool 18 °C' in chamber A will move the loaf toward the judge's target (More sour (moderate); keep crumb openness high; lower density; preferred Loaf B). LAB outpace yeast near 30-32 °C, so a short hot phase adds acid per unit of rise; the cool tail protects structure.",
+      "mechanism": "LAB outpace yeast near 30-32 °C, so a short hot phase adds acid per unit of rise; the cool tail protects structure. (warm phase front-loads lactic acidification (total acid route))",
+      "independent_variable": "fermentation temperature schedule",
+      "dependent_variables": [
+       "perceived sourness",
+       "crumb openness",
+       "rise (starter height)",
+       "pH"
+      ],
+      "held_constant": [
+       "recipe (200 g flour, 135 g water, 40 g starter, 4.4 g salt)",
+       "starter feed",
+       "mixing and folds",
+       "bake"
+      ]
+     },
+     "own_decision": {
+      "chamber": "A",
+      "schedule_id": "warm_then_cool_32_18",
+      "name": "Hot 32 °C 5 h -> cool 18 °C",
+      "points": [
+       [
+        0.0,
+        32.0
+       ],
+       [
+        5.0,
+        32.0
+       ],
+       [
+        6.0,
+        18.0
+       ],
+       [
+        16.0,
+        18.0
+       ]
+      ],
+      "route": "total_acid_warm",
+      "family": "warm_then_cool",
+      "predicted": {
+       "sourness": 0.393,
+       "openness": 0.513,
+       "rise_progress": 1.531,
+       "overproof_risk": 0.677,
+       "time_to_peak_rise_h": 10.45,
+       "final_ph": 4.095,
+       "uncertainty": 0.23,
+       "provenance": "simulated"
+      }
+     },
+     "suggestion_for_peer": {
+      "chamber": "B",
+      "schedule_id": "steady_24_12h",
+      "name": "Steady 24 °C, 12 h",
+      "reason": "Chamber B could run 'Steady 24 °C, 12 h' (intermediate temperature) so the two chambers test different mechanisms instead of duplicating one."
+     },
+     "prediction": "Predicted (simulator, anchored on judged loaves): sourness 0.39 ± 0.23, crumb openness 0.51 ± 0.23; rise progress 1.53× peak (overproof risk 68%), peak rise expected near 10.4 h, final pH ≈ 4.09 (simulated).",
+     "uncertainty": "Predictions come from the fermentation simulator (uncalibrated against this starter); the judge-scale map rests on 2 judged loaf/loaves for sourness (anchored) and 2 for crumb (anchored); band ±0.23 grows with distance from the recorded conditions (widened by 0.05 for missing/invalid observations); one judge, one tasting, one shared pH probe; perceived sourness ≠ pH (lactic/acetic balance matters); No valid pH measurement for chamber A (no pH reading for this chamber (single shared electrode)); I rely on model predictions and widen the stated uncertainty by ±0.05.; no validated schedule is predicted to reach sourness 0.90 (best 0.39) without passing peak rise; this run tests how far the warm acid route can go.",
+     "proposed_measurement": "Side-camera starter height every 10 min (end at peak/plateau, not by the clock); pH spot checks on a separate non-edible sample at 0 h and at each temperature change (t≈5 h) and at the end (single shared probe); chamber temperature continuously; blind tasting for sourness, crumb texture and aroma plus a crumb photo.",
+     "rationale": "I lead because the operator asked scientist_A to open this round (lead_agent). Of 17 validated candidates, 'Hot 32 °C 5 h -> cool 18 °C' has the lowest cost 0.3391 against targets [sourness ≈0.90, openness ≥0.67] (runner-up 'Steady 27 °C, 10 h (capped)' 0.4034). Recorded conditions: A: assumed steady 22 °C for 14 h (from setpoints) -> model rise progress 1.47× peak; B: assumed steady 27 °C for 14 h (from setpoints) -> model rise progress 1.94× peak (exceeded the 10 h hot-hold guideline).",
+     "targets": {
+      "sourness": {
+       "target": 0.9,
+       "mode": "near",
+       "weight": 0.855,
+       "reason": "more sour than the sourest judged loaf (0.75)"
+      },
+      "openness": {
+       "target": 0.67,
+       "mode": "at_least",
+       "weight": 1.495,
+       "constraint": true,
+       "reason": "keep crumb as open as Loaf A (0.72)"
+      }
+     },
+     "ph_status": {
+      "valid": false,
+      "reason": "no pH reading for this chamber (single shared electrode)",
+      "latest": null
+     }
+    },
+    "evidence_source": "replay",
+    "in_reply_to": null,
+    "chamber_id": "A",
+    "cycle_id": "cyc_296978a39787",
+    "schema_version": "1.0",
+    "recipients": [
+     "scientist_B"
+    ],
+    "experiment_id": "trial_002",
+    "evidence_refs": [
+     "f_7e80b1979c4ab2e9",
+     "f_3e17ee49422ca69f"
+    ],
+    "claim": "Running 'Hot 32 °C 5 h -> cool 18 °C' in chamber A will move the loaf toward the judge's target (More sour (moderate); keep crumb openness high; lower density; preferred Loaf B). LAB outpace yeast near 30-32 °C, so a short hot phase adds acid per unit of rise; the cool tail protects structure.",
+    "uncertainty": "Predictions come from the fermentation simulator (uncalibrated against this starter); the judge-scale map rests on 2 judged loaf/loaves for sourness (anchored) and 2 for crumb (anchored); band ±0.23 grows with distance from the recorded conditions (widened by 0.05 for missing/invalid observations); one judge, one tasting, one shared pH probe; perceived sourness ≠ pH (lactic/acetic balance matters); No valid pH measurement for chamber A (no pH reading for this chamber (single shared electrode)); I rely on model predictions and widen the stated uncertainty by ±0.05.; no validated schedule is predicted to reach sourness 0.90 (best 0.39) without passing peak rise; this run tests how far the warm acid route can go.",
+    "proposed_action": {
+     "type": "set_schedule",
+     "chamber": "A",
+     "schedule_id": "warm_then_cool_32_18",
+     "validated_library_schedule": true,
+     "suggestion_for_peer": {
+      "chamber": "B",
+      "schedule_id": "steady_24_12h"
+     }
+    }
+   },
+   {
+    "id": "f_08866a7471699e02",
+    "agent_id": "scientist_B",
+    "timestamp_utc": "2026-10-31T18:00:00Z",
+    "type": "critique",
+    "content": "[scientist_B → scientist_A] Critique: I am not convinced yet: (1) My chamber B telemetry (6 rows, sources replay; usable now: chamber_temperature, door_open, peltier_mode, peltier_output_fraction, ph, pressure, relative_humidity, starter_height, starter_temperature, temperature_setpoint) shows proofing status 'near_peak': Near peak expansion: do not keep holding 27 °C; propose stepping down to 20 °C or ending fermentation when the plateau is confirmed. (rise ratio 2.03× with recent slope 0.307/h (plateauing)) (2) 'Hot 32 °C 5 h -> cool 18 °C' is predicted to reach 1.53× peak rise (overproof risk 68%) — the same failure mode that plausibly made the warm loaf dense; end at the plateau rather than the clock. (3) predicted crumb openness 0.51 misses the target ≥0.67. (4) predicted sourness 0.39 vs target ≈0.90: the requested change may not be reachable on this route alone. (5) timing sensitivity: at 32 °C each extra hour adds ≈0.22× of peak-rise progress (heuristic), so the step-down must happen on time. Alternative hypothesis: Perceived sourness may depend more on the acetic share than on total acid; a long cool phase could raise sharpness without pushing the dough past peak rise. I accept your suggestion for chamber B: 'Steady 24 °C, 12 h'. Decision for chamber B: 'Steady 24 °C, 12 h'. Without the proposer's message I would have chosen 'Hot 32 °C 5 h -> cool 18 °C'; I switched to 'Steady 24 °C, 12 h' because it would duplicate the proposer's arm. Latest valid pH in chamber B: 4.05 (calibrated, method stated).",
+    "payload": {
+     "role": "critic",
+     "decision_source": "offline_policy",
+     "reasoning_mode_label": "Offline Policy",
+     "message_kind": "peer_critique",
+     "agrees_with_hypothesis": false,
+     "concerns": [
+      "My chamber B telemetry (6 rows, sources replay; usable now: chamber_temperature, door_open, peltier_mode, peltier_output_fraction, ph, pressure, relative_humidity, starter_height, starter_temperature, temperature_setpoint) shows proofing status 'near_peak': Near peak expansion: do not keep holding 27 °C; propose stepping down to 20 °C or ending fermentation when the plateau is confirmed. (rise ratio 2.03× with recent slope 0.307/h (plateauing))",
+      "'Hot 32 °C 5 h -> cool 18 °C' is predicted to reach 1.53× peak rise (overproof risk 68%) — the same failure mode that plausibly made the warm loaf dense; end at the plateau rather than the clock.",
+      "predicted crumb openness 0.51 misses the target ≥0.67.",
+      "predicted sourness 0.39 vs target ≈0.90: the requested change may not be reachable on this route alone.",
+      "timing sensitivity: at 32 °C each extra hour adds ≈0.22× of peak-rise progress (heuristic), so the step-down must happen on time."
+     ],
+     "alternative_hypothesis": "Perceived sourness may depend more on the acetic share than on total acid; a long cool phase could raise sharpness without pushing the dough past peak rise.",
+     "own_decision": {
+      "chamber": "B",
+      "schedule_id": "steady_24_12h",
+      "name": "Steady 24 °C, 12 h",
+      "points": [
+       [
+        0.0,
+        24.0
+       ],
+       [
+        12.0,
+        24.0
+       ]
+      ],
+      "route": "dose_response",
+      "family": "steady",
+      "predicted": {
+       "sourness": 0.28,
+       "openness": 0.724,
+       "rise_progress": 1.463,
+       "overproof_risk": 0.747,
+       "time_to_peak_rise_h": 8.2,
+       "final_ph": 4.163,
+       "uncertainty": 0.16,
+       "provenance": "simulated"
+      }
+     },
+     "accepted_peer_suggestion": true,
+     "independent_choice": {
+      "chamber": "B",
+      "schedule_id": "warm_then_cool_32_18",
+      "name": "Hot 32 °C 5 h -> cool 18 °C",
+      "points": [
+       [
+        0.0,
+        32.0
+       ],
+       [
+        5.0,
+        32.0
+       ],
+       [
+        6.0,
+        18.0
+       ],
+       [
+        16.0,
+        18.0
+       ]
+      ],
+      "route": "total_acid_warm",
+      "family": "warm_then_cool",
+      "predicted": {
+       "sourness": 0.393,
+       "openness": 0.513,
+       "rise_progress": 1.531,
+       "overproof_risk": 0.677,
+       "time_to_peak_rise_h": 10.45,
+       "final_ph": 4.095,
+       "uncertainty": 0.18,
+       "provenance": "simulated"
+      }
+     },
+     "decision_changed_by_peer": true,
+     "decision_change_note": "Without the proposer's message I would have chosen 'Hot 32 °C 5 h -> cool 18 °C'; I switched to 'Steady 24 °C, 12 h' because it would duplicate the proposer's arm.",
+     "prediction": "Predicted (simulator, anchored on judged loaves): sourness 0.28 ± 0.16, crumb openness 0.72 ± 0.16; rise progress 1.46× peak (overproof risk 75%), peak rise expected near 8.2 h, final pH ≈ 4.16 (simulated).",
+     "uncertainty": "Predictions come from the fermentation simulator (uncalibrated against this starter); the judge-scale map rests on 2 judged loaf/loaves for sourness (anchored) and 2 for crumb (anchored); band ±0.16 grows with distance from the recorded conditions; one judge, one tasting, one shared pH probe; perceived sourness ≠ pH (lactic/acetic balance matters); Latest valid pH in chamber B: 4.05 (calibrated, method stated)..",
+     "proposed_measurement": "Side-camera starter height every 10 min (end at peak/plateau, not by the clock); pH spot checks on a separate non-edible sample at 0 h and at the end (single shared probe); chamber temperature continuously; blind tasting for sourness, crumb texture and aroma plus a crumb photo. Retain a slice of each loaf for a side-by-side re-taste.",
+     "rationale": "My chamber runs 'Steady 24 °C, 12 h' (intermediate temperature) so that, together with 'Hot 32 °C 5 h -> cool 18 °C' (warm acid route), the round discriminates between the two mechanisms. Targets: sourness ≈0.90, openness ≥0.67.",
+     "ph_status": {
+      "valid": true,
+      "reason": "",
+      "latest": 4.05
+     },
+     "challenged_finding_type": "hypothesis",
+     "challenged_agent_id": "scientist_A"
+    },
+    "evidence_source": "replay",
+    "in_reply_to": "f_fd621e62b4a8bba3",
+    "chamber_id": "B",
+    "cycle_id": "cyc_296978a39787",
+    "schema_version": "1.0",
+    "recipients": [
+     "scientist_A"
+    ],
+    "experiment_id": "trial_002",
+    "evidence_refs": [
+     "f_fd621e62b4a8bba3",
+     "f_17bdcb9e213e46b6"
+    ],
+    "claim": "Perceived sourness may depend more on the acetic share than on total acid; a long cool phase could raise sharpness without pushing the dough past peak rise.",
+    "uncertainty": "Predictions come from the fermentation simulator (uncalibrated against this starter); the judge-scale map rests on 2 judged loaf/loaves for sourness (anchored) and 2 for crumb (anchored); band ±0.16 grows with distance from the recorded conditions; one judge, one tasting, one shared pH probe; perceived sourness ≠ pH (lactic/acetic balance matters); Latest valid pH in chamber B: 4.05 (calibrated, method stated)..",
+    "proposed_action": {
+     "type": "set_schedule",
+     "chamber": "B",
+     "schedule_id": "steady_24_12h",
+     "validated_library_schedule": true
+    }
+   },
+   {
+    "id": "f_98fe16a1711df042",
+    "agent_id": "scientist_A",
+    "timestamp_utc": "2026-10-31T18:00:00Z",
+    "type": "rationale",
+    "content": "[scientist_A → scientist_B] Thanks. Your overproofing concern stands (risk 68%), but no validated alternative lowers it without giving up most of the predicted gain, so I keep 'Hot 32 °C 5 h -> cool 18 °C' and will end at the rise plateau from the starter-height curve rather than the clock. I adopt your proposal to retain slices for a side-by-side re-taste. The round now contrasts warm acid route vs intermediate temperature.",
+    "payload": {
+     "role": "proposer_reply",
+     "decision_source": "offline_policy",
+     "revised": false,
+     "final_decision": {
+      "chamber": "A",
+      "schedule_id": "warm_then_cool_32_18",
+      "name": "Hot 32 °C 5 h -> cool 18 °C",
+      "points": [
+       [
+        0.0,
+        32.0
+       ],
+       [
+        5.0,
+        32.0
+       ],
+       [
+        6.0,
+        18.0
+       ],
+       [
+        16.0,
+        18.0
+       ]
+      ],
+      "route": "total_acid_warm",
+      "family": "warm_then_cool",
+      "predicted": {
+       "sourness": 0.393,
+       "openness": 0.513,
+       "rise_progress": 1.531,
+       "overproof_risk": 0.677,
+       "time_to_peak_rise_h": 10.45,
+       "final_ph": 4.095,
+       "uncertainty": 0.23,
+       "provenance": "simulated"
+      }
+     }
+    },
+    "evidence_source": "replay",
+    "in_reply_to": "f_08866a7471699e02",
+    "chamber_id": "A",
+    "cycle_id": "cyc_296978a39787",
+    "schema_version": "1.0",
+    "recipients": [
+     "scientist_B"
+    ],
+    "experiment_id": "trial_002",
+    "evidence_refs": [
+     "f_08866a7471699e02"
+    ],
+    "claim": "Thanks. Your overproofing concern stands (risk 68%), but no validated alternative lowers it without giving up most of the predicted gain, so I keep 'Hot 32 °C 5 h -> cool 18 °C' and will end at the rise plateau from the starter-height curve rather than the clock. I adopt your proposal to retain slices for a side-by-side re-taste. The round now contrasts warm acid route vs intermediate temperature.",
+    "uncertainty": null,
+    "proposed_action": {
+     "type": "set_schedule",
+     "chamber": "A",
+     "schedule_id": "warm_then_cool_32_18",
+     "validated_library_schedule": true
+    }
+   }
+  ],
+  "next_experiment": {
+   "id": "trial_002",
+   "title": "Trial 002: A: warm acid route vs B: intermediate temperature",
+   "status": "proposed",
+   "requires_human_confirmation": true,
+   "objective": "More sour (moderate); keep crumb openness high; lower density; preferred Loaf B. Test whether 'Hot 32 °C 5 h -> cool 18 °C' (warm acid route) or 'Steady 24 °C, 12 h' (intermediate temperature) better achieves it.",
+   "schedules": {
+    "A": {
+     "chamber": "A",
+     "schedule_id": "warm_then_cool_32_18",
+     "name": "Hot 32 °C 5 h -> cool 18 °C",
+     "points": [
+      [
+       0.0,
+       32.0
+      ],
+      [
+       5.0,
+       32.0
+      ],
+      [
+       6.0,
+       18.0
+      ],
+      [
+       16.0,
+       18.0
+      ]
+     ],
+     "route": "total_acid_warm",
+     "family": "warm_then_cool",
+     "predicted": {
+      "sourness": 0.393,
+      "openness": 0.513,
+      "rise_progress": 1.531,
+      "overproof_risk": 0.677,
+      "time_to_peak_rise_h": 10.45,
+      "final_ph": 4.095,
+      "uncertainty": 0.23,
+      "provenance": "simulated"
+     },
+     "owner_agent": "scientist_A",
+     "summary": "Hot lactic burst near the LAB optimum, then a long cool phase that nearly stalls rise; more acid than steady 22 °C with moderate overproof risk."
+    },
+    "B": {
+     "chamber": "B",
+     "schedule_id": "steady_24_12h",
+     "name": "Steady 24 °C, 12 h",
+     "points": [
+      [
+       0.0,
+       24.0
+      ],
+      [
+       12.0,
+       24.0
+      ]
+     ],
+     "route": "dose_response",
+     "family": "steady",
+     "predicted": {
+      "sourness": 0.28,
+      "openness": 0.724,
+      "rise_progress": 1.463,
+      "overproof_risk": 0.747,
+      "time_to_peak_rise_h": 8.2,
+      "final_ph": 4.163,
+      "uncertainty": 0.16,
+      "provenance": "simulated"
+     },
+     "owner_agent": "scientist_B",
+     "summary": "Intermediate: faster acidification than 22 °C; moderate risk of passing peak rise near the end of the window."
+    }
+   },
+   "success_criteria": [
+    "Blind tasting: at least one loaf is judged closer to the requested sourness — target sourness ≈0.90 on the 0-1 scale (more sour than the sourest judged loaf (0.75)); the same feedback parser scores the new comments.",
+    "Crumb: judged crumb openness ≥0.67 (keep crumb as open as Loaf A (0.72)); crumb photo shows no collapse or gumminess.",
+    "Proofing: each chamber ends at its rise plateau — starter height must not fall >3% below its peak before ending (no overproofing).",
+    "Discrimination: the two loaves are distinguishable in blind tasting on the targeted attribute, so the two mechanisms can be told apart.",
+    "Model check: measured end-of-fermentation pH within ±0.15 of the simulated value."
+   ],
+   "measurements": [
+    {
+     "quantity": "chamber_temperature_c",
+     "method": "chamber sensor, continuous",
+     "label": "real (when hardware connected)"
+    },
+    {
+     "quantity": "starter_height_mm / rise",
+     "method": "side camera every 10 min; end at plateau",
+     "label": "real (when hardware connected)"
+    },
+    {
+     "quantity": "pH",
+     "method": "single shared probe; spot checks on a separate non-edible sample at 0 h, at each temperature change and at the end",
+     "label": "real (experimental probe)"
+    },
+    {
+     "quantity": "gas_resistance_ohms",
+     "method": "BME680 VOC signal (NOT CO2; no calibrated mapping)",
+     "label": "real (environmental signal)"
+    },
+    {
+     "quantity": "sensory: sourness, crumb texture, aroma",
+     "method": "blind tasting, free-text feedback parsed by the same rules",
+     "label": "judge_feedback"
+    },
+    {
+     "quantity": "crumb photo",
+     "method": "cross-section photo after cooling",
+     "label": "real"
+    }
+   ],
+   "held_constant": [
+    "recipe (200 g flour, 135 g water, 40 g starter, 4.4 g salt)",
+    "starter feed",
+    "mixing and folds",
+    "bake"
+   ],
+   "window_h": [
+    12,
+    16
+   ],
+   "notes": [
+    "End each chamber at its rise plateau, not by the clock (PLAN §5).",
+    "Schedules are setpoint proposals; API/firmware clamp and acknowledge every command."
+   ]
+  },
+  "comparison_with_recorded": {
+   "A": {
+    "recorded_schedule": [
+     [
+      0.0,
+      22.0
+     ],
+     [
+      14.0,
+      22.0
+     ]
+    ],
+    "recorded_source": "assumed steady 22 °C for 14 h (from setpoints)",
+    "recorded_violations": [],
+    "judged": {
+     "sourness": 0.25,
+     "openness": 0.72
+    },
+    "model_rise_progress": 1.474,
+    "model_overproof_risk": 0.755
+   },
+   "B": {
+    "recorded_schedule": [
+     [
+      0.0,
+      27.0
+     ],
+     [
+      14.0,
+      27.0
+     ]
+    ],
+    "recorded_source": "assumed steady 27 °C for 14 h (from setpoints)",
+    "recorded_violations": [
+     "holds >= 27.0 °C for 14.0 h (> 10.0 h) without a step-down"
+    ],
+    "judged": {
+     "sourness": 0.75,
+     "openness": 0.095
+    },
+    "model_rise_progress": 1.944,
+    "model_overproof_risk": 1.0
+   }
+  },
+  "current_run_actions": {
+   "A": {
+    "status": "rising",
+    "action": "continue",
+    "suggested_setpoint_c": null,
+    "rationale": "Still rising: continue, re-check every 10-15 min. (rise ratio 1.51× and still climbing (0.337/h))",
+    "evidence": {
+     "telemetry_points": 6,
+     "sources": [
+      "replay"
+     ],
+     "usable_height_points": 6,
+     "excluded_height_points": {},
+     "initial_mm": 20.0,
+     "peak_mm": 30.1,
+     "peak_at_h": 1.67,
+     "latest_mm": 30.1,
+     "rise_ratio": 1.505,
+     "peak_ratio": 1.505,
+     "recent_slope_per_h": 0.3375
+    },
+    "requires_human_confirmation": false,
+    "deviations": null,
+    "observation_quality": {
+     "n": 6,
+     "sources": [
+      "replay"
+     ],
+     "latest_age_s": 120.0,
+     "latest_stale": false,
+     "latest_usable": [
+      "chamber_temperature",
+      "door_open",
+      "peltier_mode",
+      "peltier_output_fraction",
+      "pressure",
+      "relative_humidity",
+      "starter_height",
+      "starter_temperature",
+      "temperature_setpoint"
+     ],
+     "ph_valid": false,
+     "ph_reason": "no pH reading for this chamber (single shared electrode)"
+    },
+    "additional_actions": [
+     {
+      "action": "request_measurement",
+      "what": "pH spot check (calibrated probe, separate sample)",
+      "reason": "no pH reading for this chamber (single shared electrode)"
+     }
+    ]
+   },
+   "B": {
+    "status": "near_peak",
+    "action": "step_down",
+    "suggested_setpoint_c": 20.0,
+    "rationale": "Near peak expansion: do not keep holding 27 °C; propose stepping down to 20 °C or ending fermentation when the plateau is confirmed. (rise ratio 2.03× with recent slope 0.307/h (plateauing))",
+    "evidence": {
+     "telemetry_points": 6,
+     "sources": [
+      "replay"
+     ],
+     "usable_height_points": 6,
+     "excluded_height_points": {},
+     "initial_mm": 20.0,
+     "peak_mm": 40.6,
+     "peak_at_h": 1.67,
+     "latest_mm": 40.6,
+     "rise_ratio": 2.03,
+     "peak_ratio": 2.03,
+     "recent_slope_per_h": 0.3075
+    },
+    "requires_human_confirmation": false,
+    "deviations": null,
+    "observation_quality": {
+     "n": 6,
+     "sources": [
+      "replay"
+     ],
+     "latest_age_s": 120.0,
+     "latest_stale": false,
+     "latest_usable": [
+      "chamber_temperature",
+      "door_open",
+      "peltier_mode",
+      "peltier_output_fraction",
+      "ph",
+      "pressure",
+      "relative_humidity",
+      "starter_height",
+      "starter_temperature",
+      "temperature_setpoint"
+     ],
+     "ph_valid": true,
+     "ph_reason": null
+    },
+    "additional_actions": []
+   }
+  },
+  "observations": {
+   "A": {
+    "latest": {
+     "chamber_id": "A",
+     "effective_time_utc": "2026-10-31T17:58:00Z",
+     "time_basis": "device_utc",
+     "record_source": "replay",
+     "age_s": 120.0,
+     "fields": {
+      "starter_temperature": {
+       "value": 21.8,
+       "unit": "°C",
+       "quality": "ok",
+       "role": "controlled_variable"
+      },
+      "chamber_temperature": {
+       "value": 22.5,
+       "unit": "°C",
+       "quality": "ok",
+       "role": "environment"
+      },
+      "internal_heatsink_temperature": {
+       "value": 16.0,
+       "unit": "°C",
+       "quality": "ok",
+       "role": "equipment_safety"
+      },
+      "external_heatsink_temperature": {
+       "value": 38.0,
+       "unit": "°C",
+       "quality": "ok",
+       "role": "equipment_safety"
+      },
+      "heatsink_temperature": {
+       "value": null,
+       "unit": "°C",
+       "quality": "missing",
+       "role": "equipment_safety",
+       "note": "v1.1 split heatsink fields used instead"
+      },
+      "relative_humidity": {
+       "value": 74.0,
+       "unit": "%",
+       "quality": "ok",
+       "role": "environment"
+      },
+      "pressure": {
+       "value": 101300.0,
+       "unit": "Pa",
+       "quality": "ok",
+       "role": "environment"
+      },
+      "gas_resistance": {
+       "value": 93500.0,
+       "unit": "ohm",
+       "quality": "uncalibrated",
+       "role": "headspace_response_uncalibrated",
+       "note": "relative headspace response only; NOT a CO2 concentration or fermentation rate"
+      },
+      "ph": {
+       "value": null,
+       "unit": "pH",
+       "quality": "missing",
+       "role": "acidity"
+      },
+      "starter_height": {
+       "value": 30.1,
+       "unit": "mm",
+       "quality": "ok",
+       "role": "expansion_estimate"
+      },
+      "door_open": {
+       "value": false,
+       "unit": null,
+       "quality": "ok",
+       "role": "disturbance"
+      },
+      "peltier_mode": {
+       "value": "idle",
+       "unit": null,
+       "quality": "ok",
+       "role": "control_input"
+      },
+      "peltier_output_fraction": {
+       "value": 0.3,
+       "unit": "fraction",
+       "quality": "ok",
+       "role": "control_input"
+      },
+      "temperature_setpoint": {
+       "value": 22.0,
+       "unit": "°C",
+       "quality": "ok",
+       "role": "control_input"
+      },
+      "motor_running": {
+       "value": false,
+       "unit": null,
+       "quality": "ok",
+       "role": "decorative"
+      }
+     },
+     "derived": {
+      "thermal_lag_c": 0.7,
+      "tracking_error_c": -0.2,
+      "elapsed_h": 1.6667,
+      "elapsed_basis": "utc"
+     },
+     "anomalies": [],
+     "quality_summary": {
+      "counts": {
+       "ok": 12,
+       "missing": 2,
+       "uncalibrated": 1
+      },
+      "usable": [
+       "chamber_temperature",
+       "door_open",
+       "peltier_mode",
+       "peltier_output_fraction",
+       "pressure",
+       "relative_humidity",
+       "starter_height",
+       "starter_temperature",
+       "temperature_setpoint"
+      ],
+      "downweighted": [
+       "gas_resistance"
+      ],
+      "rejected": [],
+      "missing": [
+       "heatsink_temperature",
+       "ph"
+      ],
+      "ph_valid": false,
+      "time_basis": "device_utc"
+     }
+    },
+    "quality": {
+     "n": 6,
+     "sources": [
+      "replay"
+     ],
+     "time_basis": [
+      "utc"
+     ],
+     "latest_effective_time_utc": "2026-10-31T17:58:00Z",
+     "latest_age_s": 120.0,
+     "latest_stale": false,
+     "latest_usable": [
+      "chamber_temperature",
+      "door_open",
+      "peltier_mode",
+      "peltier_output_fraction",
+      "pressure",
+      "relative_humidity",
+      "starter_height",
+      "starter_temperature",
+      "temperature_setpoint"
+     ],
+     "field_quality_counts": {
+      "starter_temperature": {
+       "ok": 6
+      },
+      "chamber_temperature": {
+       "ok": 6
+      },
+      "internal_heatsink_temperature": {
+       "ok": 6
+      },
+      "external_heatsink_temperature": {
+       "ok": 6
+      },
+      "heatsink_temperature": {
+       "missing": 6
+      },
+      "relative_humidity": {
+       "ok": 6
+      },
+      "pressure": {
+       "ok": 6
+      },
+      "gas_resistance": {
+       "uncalibrated": 6
+      },
+      "ph": {
+       "missing": 6
+      },
+      "starter_height": {
+       "ok": 6
+      },
+      "door_open": {
+       "ok": 6
+      },
+      "peltier_mode": {
+       "ok": 6
+      },
+      "peltier_output_fraction": {
+       "ok": 6
+      },
+      "temperature_setpoint": {
+       "ok": 6
+      },
+      "motor_running": {
+       "ok": 6
+      }
+     },
+     "ph_valid": false,
+     "ph_reason": "no pH reading for this chamber (single shared electrode)",
+     "latest_valid_ph": null,
+     "anomalies": []
+    },
+    "ph_status": {
+     "valid": false,
+     "reason": "no pH reading for this chamber (single shared electrode)",
+     "latest": null
+    },
+    "deviations_from_prediction": null
+   },
+   "B": {
+    "latest": {
+     "chamber_id": "B",
+     "effective_time_utc": "2026-10-31T17:58:00Z",
+     "time_basis": "device_utc",
+     "record_source": "replay",
+     "age_s": 120.0,
+     "fields": {
+      "starter_temperature": {
+       "value": 26.8,
+       "unit": "°C",
+       "quality": "ok",
+       "role": "controlled_variable"
+      },
+      "chamber_temperature": {
+       "value": 27.5,
+       "unit": "°C",
+       "quality": "ok",
+       "role": "environment"
+      },
+      "internal_heatsink_temperature": {
+       "value": 21.0,
+       "unit": "°C",
+       "quality": "ok",
+       "role": "equipment_safety"
+      },
+      "external_heatsink_temperature": {
+       "value": 38.0,
+       "unit": "°C",
+       "quality": "ok",
+       "role": "equipment_safety"
+      },
+      "heatsink_temperature": {
+       "value": null,
+       "unit": "°C",
+       "quality": "missing",
+       "role": "equipment_safety",
+       "note": "v1.1 split heatsink fields used instead"
+      },
+      "relative_humidity": {
+       "value": 74.0,
+       "unit": "%",
+       "quality": "ok",
+       "role": "environment"
+      },
+      "pressure": {
+       "value": 101300.0,
+       "unit": "Pa",
+       "quality": "ok",
+       "role": "environment"
+      },
+      "gas_resistance": {
+       "value": 93500.0,
+       "unit": "ohm",
+       "quality": "uncalibrated",
+       "role": "headspace_response_uncalibrated",
+       "note": "relative headspace response only; NOT a CO2 concentration or fermentation rate"
+      },
+      "ph": {
+       "value": 4.05,
+       "unit": "pH",
+       "quality": "ok",
+       "role": "acidity",
+       "note": "method probe_sample; calibration valid"
+      },
+      "starter_height": {
+       "value": 40.6,
+       "unit": "mm",
+       "quality": "ok",
+       "role": "expansion_estimate"
+      },
+      "door_open": {
+       "value": false,
+       "unit": null,
+       "quality": "ok",
+       "role": "disturbance"
+      },
+      "peltier_mode": {
+       "value": "heat",
+       "unit": null,
+       "quality": "ok",
+       "role": "control_input"
+      },
+      "peltier_output_fraction": {
+       "value": 0.3,
+       "unit": "fraction",
+       "quality": "ok",
+       "role": "control_input"
+      },
+      "temperature_setpoint": {
+       "value": 27.0,
+       "unit": "°C",
+       "quality": "ok",
+       "role": "control_input"
+      },
+      "motor_running": {
+       "value": false,
+       "unit": null,
+       "quality": "ok",
+       "role": "decorative"
+      }
+     },
+     "derived": {
+      "thermal_lag_c": 0.7,
+      "tracking_error_c": -0.2,
+      "elapsed_h": 1.6667,
+      "elapsed_basis": "utc"
+     },
+     "anomalies": [],
+     "quality_summary": {
+      "counts": {
+       "ok": 13,
+       "missing": 1,
+       "uncalibrated": 1
+      },
+      "usable": [
+       "chamber_temperature",
+       "door_open",
+       "peltier_mode",
+       "peltier_output_fraction",
+       "ph",
+       "pressure",
+       "relative_humidity",
+       "starter_height",
+       "starter_temperature",
+       "temperature_setpoint"
+      ],
+      "downweighted": [
+       "gas_resistance"
+      ],
+      "rejected": [],
+      "missing": [
+       "heatsink_temperature"
+      ],
+      "ph_valid": true,
+      "time_basis": "device_utc"
+     }
+    },
+    "quality": {
+     "n": 6,
+     "sources": [
+      "replay"
+     ],
+     "time_basis": [
+      "utc"
+     ],
+     "latest_effective_time_utc": "2026-10-31T17:58:00Z",
+     "latest_age_s": 120.0,
+     "latest_stale": false,
+     "latest_usable": [
+      "chamber_temperature",
+      "door_open",
+      "peltier_mode",
+      "peltier_output_fraction",
+      "ph",
+      "pressure",
+      "relative_humidity",
+      "starter_height",
+      "starter_temperature",
+      "temperature_setpoint"
+     ],
+     "field_quality_counts": {
+      "starter_temperature": {
+       "ok": 6
+      },
+      "chamber_temperature": {
+       "ok": 6
+      },
+      "internal_heatsink_temperature": {
+       "ok": 6
+      },
+      "external_heatsink_temperature": {
+       "ok": 6
+      },
+      "heatsink_temperature": {
+       "missing": 6
+      },
+      "relative_humidity": {
+       "ok": 6
+      },
+      "pressure": {
+       "ok": 6
+      },
+      "gas_resistance": {
+       "uncalibrated": 6
+      },
+      "ph": {
+       "missing": 5,
+       "ok": 1
+      },
+      "starter_height": {
+       "ok": 6
+      },
+      "door_open": {
+       "ok": 6
+      },
+      "peltier_mode": {
+       "ok": 6
+      },
+      "peltier_output_fraction": {
+       "ok": 6
+      },
+      "temperature_setpoint": {
+       "ok": 6
+      },
+      "motor_running": {
+       "ok": 6
+      }
+     },
+     "ph_valid": true,
+     "ph_reason": null,
+     "latest_valid_ph": 4.05,
+     "anomalies": []
+    },
+    "ph_status": {
+     "valid": true,
+     "reason": "",
+     "latest": 4.05
+    },
+    "deviations_from_prediction": null
+   }
+  },
+  "candidate_ranking": [
+   {
+    "id": "warm_then_cool_32_18",
+    "name": "Hot 32 °C 5 h -> cool 18 °C",
+    "route": "total_acid_warm",
+    "score": 0.33913,
+    "pred_sourness": 0.393,
+    "pred_openness": 0.513,
+    "overproof_risk": 0.677
+   },
+   {
+    "id": "steady_27_10h",
+    "name": "Steady 27 °C, 10 h (capped)",
+    "route": "total_acid_warm",
+    "score": 0.40342,
+    "pred_sourness": 0.283,
+    "pred_openness": 0.797,
+    "overproof_risk": 0.658
+   },
+   {
+    "id": "steady_24_12h",
+    "name": "Steady 24 °C, 12 h",
+    "route": "dose_response",
+    "score": 0.4291,
+    "pred_sourness": 0.28,
+    "pred_openness": 0.724,
+    "overproof_risk": 0.747
+   },
+   {
+    "id": "steady_26_10h",
+    "name": "Steady 26 °C, 10 h",
+    "route": "total_acid_warm",
+    "score": 0.45427,
+    "pred_sourness": 0.214,
+    "pred_openness": 0.98,
+    "overproof_risk": 0.537
+   },
+   {
+    "id": "steady_22_14h",
+    "name": "Steady 22 °C, 14 h",
+    "route": "baseline",
+    "score": 0.46384,
+    "pred_sourness": 0.25,
+    "pred_openness": 0.72,
+    "overproof_risk": 0.755
+   },
+   {
+    "id": "step_down_27_24_20",
+    "name": "Step-down 27 -> 24 -> 20 °C",
+    "route": "overproof_protection",
+    "score": 0.48457,
+    "pred_sourness": 0.179,
+    "pred_openness": 0.98,
+    "overproof_risk": 0.472
+   }
+  ],
+  "findings_logged": [
+   {
+    "id": "f_3e17ee49422ca69f",
+    "agent_id": "scientist_A",
+    "timestamp_utc": "2026-10-31T18:00:00Z",
+    "type": "observation_summary",
+    "content": "Chamber A: 6 telemetry records over 1.7 h; starter 21.8 °C; chamber air 22.5 °C; usable now: chamber_temperature, door_open, peltier_mode, peltier_output_fraction, pressure, relative_humidity, starter_height, starter_temperature, temperature_setpoint; proofing status: rising. No valid pH measurement for chamber A (no pH reading for this chamber (single shared electrode)); I rely on model predictions and widen the stated uncertainty by ±0.05.",
+    "payload": {
+     "telemetry_summary": {
+      "n": 6,
+      "sources": [
+       "replay"
+      ],
+      "span_h": 1.67,
+      "latest_temp_c": 22.5,
+      "mean_temp_c": 22.5,
+      "latest_starter_temp_c": 21.8,
+      "latest_setpoint_c": 22.0
+     },
+     "observation_quality": {
+      "n": 6,
+      "sources": [
+       "replay"
+      ],
+      "time_basis": [
+       "utc"
+      ],
+      "latest_effective_time_utc": "2026-10-31T17:58:00Z",
+      "latest_age_s": 120.0,
+      "latest_stale": false,
+      "latest_usable": [
+       "chamber_temperature",
+       "door_open",
+       "peltier_mode",
+       "peltier_output_fraction",
+       "pressure",
+       "relative_humidity",
+       "starter_height",
+       "starter_temperature",
+       "temperature_setpoint"
+      ],
+      "field_quality_counts": {
+       "starter_temperature": {
+        "ok": 6
+       },
+       "chamber_temperature": {
+        "ok": 6
+       },
+       "internal_heatsink_temperature": {
+        "ok": 6
+       },
+       "external_heatsink_temperature": {
+        "ok": 6
+       },
+       "heatsink_temperature": {
+        "missing": 6
+       },
+       "relative_humidity": {
+        "ok": 6
+       },
+       "pressure": {
+        "ok": 6
+       },
+       "gas_resistance": {
+        "uncalibrated": 6
+       },
+       "ph": {
+        "missing": 6
+       },
+       "starter_height": {
+        "ok": 6
+       },
+       "door_open": {
+        "ok": 6
+       },
+       "peltier_mode": {
+        "ok": 6
+       },
+       "peltier_output_fraction": {
+        "ok": 6
+       },
+       "temperature_setpoint": {
+        "ok": 6
+       },
+       "motor_running": {
+        "ok": 6
+       }
+      },
+      "ph_valid": false,
+      "ph_reason": "no pH reading for this chamber (single shared electrode)",
+      "latest_valid_ph": null,
+      "anomalies": []
+     },
+     "latest_observation": {
+      "chamber_id": "A",
+      "effective_time_utc": "2026-10-31T17:58:00Z",
+      "time_basis": "device_utc",
+      "record_source": "replay",
+      "age_s": 120.0,
+      "fields": {
+       "starter_temperature": {
+        "value": 21.8,
+        "unit": "°C",
+        "quality": "ok",
+        "role": "controlled_variable"
+       },
+       "chamber_temperature": {
+        "value": 22.5,
+        "unit": "°C",
+        "quality": "ok",
+        "role": "environment"
+       },
+       "internal_heatsink_temperature": {
+        "value": 16.0,
+        "unit": "°C",
+        "quality": "ok",
+        "role": "equipment_safety"
+       },
+       "external_heatsink_temperature": {
+        "value": 38.0,
+        "unit": "°C",
+        "quality": "ok",
+        "role": "equipment_safety"
+       },
+       "heatsink_temperature": {
+        "value": null,
+        "unit": "°C",
+        "quality": "missing",
+        "role": "equipment_safety",
+        "note": "v1.1 split heatsink fields used instead"
+       },
+       "relative_humidity": {
+        "value": 74.0,
+        "unit": "%",
+        "quality": "ok",
+        "role": "environment"
+       },
+       "pressure": {
+        "value": 101300.0,
+        "unit": "Pa",
+        "quality": "ok",
+        "role": "environment"
+       },
+       "gas_resistance": {
+        "value": 93500.0,
+        "unit": "ohm",
+        "quality": "uncalibrated",
+        "role": "headspace_response_uncalibrated",
+        "note": "relative headspace response only; NOT a CO2 concentration or fermentation rate"
+       },
+       "ph": {
+        "value": null,
+        "unit": "pH",
+        "quality": "missing",
+        "role": "acidity"
+       },
+       "starter_height": {
+        "value": 30.1,
+        "unit": "mm",
+        "quality": "ok",
+        "role": "expansion_estimate"
+       },
+       "door_open": {
+        "value": false,
+        "unit": null,
+        "quality": "ok",
+        "role": "disturbance"
+       },
+       "peltier_mode": {
+        "value": "idle",
+        "unit": null,
+        "quality": "ok",
+        "role": "control_input"
+       },
+       "peltier_output_fraction": {
+        "value": 0.3,
+        "unit": "fraction",
+        "quality": "ok",
+        "role": "control_input"
+       },
+       "temperature_setpoint": {
+        "value": 22.0,
+        "unit": "°C",
+        "quality": "ok",
+        "role": "control_input"
+       },
+       "motor_running": {
+        "value": false,
+        "unit": null,
+        "quality": "ok",
+        "role": "decorative"
+       }
+      },
+      "derived": {
+       "thermal_lag_c": 0.7,
+       "tracking_error_c": -0.2,
+       "elapsed_h": 1.6667,
+       "elapsed_basis": "utc"
+      },
+      "anomalies": [],
+      "quality_summary": {
+       "counts": {
+        "ok": 12,
+        "missing": 2,
+        "uncalibrated": 1
+       },
+       "usable": [
+        "chamber_temperature",
+        "door_open",
+        "peltier_mode",
+        "peltier_output_fraction",
+        "pressure",
+        "relative_humidity",
+        "starter_height",
+        "starter_temperature",
+        "temperature_setpoint"
+       ],
+       "downweighted": [
+        "gas_resistance"
+       ],
+       "rejected": [],
+       "missing": [
+        "heatsink_temperature",
+        "ph"
+       ],
+       "ph_valid": false,
+       "time_basis": "device_utc"
+      }
+     },
+     "deviations_from_prediction": null,
+     "overproofing": {
+      "status": "rising",
+      "action": "continue",
+      "suggested_setpoint_c": null,
+      "rationale": "Still rising: continue, re-check every 10-15 min. (rise ratio 1.51× and still climbing (0.337/h))",
+      "evidence": {
+       "telemetry_points": 6,
+       "sources": [
+        "replay"
+       ],
+       "usable_height_points": 6,
+       "excluded_height_points": {},
+       "initial_mm": 20.0,
+       "peak_mm": 30.1,
+       "peak_at_h": 1.67,
+       "latest_mm": 30.1,
+       "rise_ratio": 1.505,
+       "peak_ratio": 1.505,
+       "recent_slope_per_h": 0.3375
+      },
+      "requires_human_confirmation": false,
+      "deviations": null,
+      "observation_quality": {
+       "n": 6,
+       "sources": [
+        "replay"
+       ],
+       "latest_age_s": 120.0,
+       "latest_stale": false,
+       "latest_usable": [
+        "chamber_temperature",
+        "door_open",
+        "peltier_mode",
+        "peltier_output_fraction",
+        "pressure",
+        "relative_humidity",
+        "starter_height",
+        "starter_temperature",
+        "temperature_setpoint"
+       ],
+       "ph_valid": false,
+       "ph_reason": "no pH reading for this chamber (single shared electrode)"
+      },
+      "additional_actions": [
+       {
+        "action": "request_measurement",
+        "what": "pH spot check (calibrated probe, separate sample)",
+        "reason": "no pH reading for this chamber (single shared electrode)"
+       }
+      ]
+     }
+    },
+    "evidence_source": "replay",
+    "in_reply_to": null,
+    "chamber_id": "A",
+    "cycle_id": "cyc_296978a39787",
+    "schema_version": "1.0",
+    "recipients": [
+     "scientist_B"
+    ],
+    "experiment_id": "trial_001",
+    "evidence_refs": [
+     "telemetry:fermentai-esp32-a:boot_a001:201",
+     "telemetry:fermentai-esp32-a:boot_a001:202",
+     "telemetry:fermentai-esp32-a:boot_a001:203",
+     "telemetry:fermentai-esp32-a:boot_a001:204",
+     "telemetry:fermentai-esp32-a:boot_a001:205"
+    ],
+    "claim": "Chamber A: 6 telemetry records over 1.7 h; starter 21.8 °C; chamber air 22.5 °C; usable now: chamber_temperature, door_open, peltier_mode, peltier_output_fraction, pressure, relative_humidity, starter_height, starter_temperature, temperature_setpoint; proofing status: rising.",
+    "uncertainty": "No valid pH measurement for chamber A (no pH reading for this chamber (single shared electrode)); I rely on model predictions and widen the stated uncertainty by ±0.05.",
+    "proposed_action": null
+   },
+   {
+    "id": "f_17bdcb9e213e46b6",
+    "agent_id": "scientist_B",
+    "timestamp_utc": "2026-10-31T18:00:00Z",
+    "type": "observation_summary",
+    "content": "Chamber B: 6 telemetry records over 1.7 h; starter 26.8 °C; chamber air 27.5 °C; usable now: chamber_temperature, door_open, peltier_mode, peltier_output_fraction, ph, pressure, relative_humidity, starter_height, starter_temperature, temperature_setpoint; proofing status: near_peak. Latest valid pH in chamber B: 4.05 (calibrated, method stated).",
+    "payload": {
+     "telemetry_summary": {
+      "n": 6,
+      "sources": [
+       "replay"
+      ],
+      "span_h": 1.67,
+      "latest_temp_c": 27.5,
+      "mean_temp_c": 27.5,
+      "latest_starter_temp_c": 26.8,
+      "latest_setpoint_c": 27.0,
+      "latest_ph": 4.05,
+      "ph_points": 1
+     },
+     "observation_quality": {
+      "n": 6,
+      "sources": [
+       "replay"
+      ],
+      "time_basis": [
+       "utc"
+      ],
+      "latest_effective_time_utc": "2026-10-31T17:58:00Z",
+      "latest_age_s": 120.0,
+      "latest_stale": false,
+      "latest_usable": [
+       "chamber_temperature",
+       "door_open",
+       "peltier_mode",
+       "peltier_output_fraction",
+       "ph",
+       "pressure",
+       "relative_humidity",
+       "starter_height",
+       "starter_temperature",
+       "temperature_setpoint"
+      ],
+      "field_quality_counts": {
+       "starter_temperature": {
+        "ok": 6
+       },
+       "chamber_temperature": {
+        "ok": 6
+       },
+       "internal_heatsink_temperature": {
+        "ok": 6
+       },
+       "external_heatsink_temperature": {
+        "ok": 6
+       },
+       "heatsink_temperature": {
+        "missing": 6
+       },
+       "relative_humidity": {
+        "ok": 6
+       },
+       "pressure": {
+        "ok": 6
+       },
+       "gas_resistance": {
+        "uncalibrated": 6
+       },
+       "ph": {
+        "missing": 5,
+        "ok": 1
+       },
+       "starter_height": {
+        "ok": 6
+       },
+       "door_open": {
+        "ok": 6
+       },
+       "peltier_mode": {
+        "ok": 6
+       },
+       "peltier_output_fraction": {
+        "ok": 6
+       },
+       "temperature_setpoint": {
+        "ok": 6
+       },
+       "motor_running": {
+        "ok": 6
+       }
+      },
+      "ph_valid": true,
+      "ph_reason": null,
+      "latest_valid_ph": 4.05,
+      "anomalies": []
+     },
+     "latest_observation": {
+      "chamber_id": "B",
+      "effective_time_utc": "2026-10-31T17:58:00Z",
+      "time_basis": "device_utc",
+      "record_source": "replay",
+      "age_s": 120.0,
+      "fields": {
+       "starter_temperature": {
+        "value": 26.8,
+        "unit": "°C",
+        "quality": "ok",
+        "role": "controlled_variable"
+       },
+       "chamber_temperature": {
+        "value": 27.5,
+        "unit": "°C",
+        "quality": "ok",
+        "role": "environment"
+       },
+       "internal_heatsink_temperature": {
+        "value": 21.0,
+        "unit": "°C",
+        "quality": "ok",
+        "role": "equipment_safety"
+       },
+       "external_heatsink_temperature": {
+        "value": 38.0,
+        "unit": "°C",
+        "quality": "ok",
+        "role": "equipment_safety"
+       },
+       "heatsink_temperature": {
+        "value": null,
+        "unit": "°C",
+        "quality": "missing",
+        "role": "equipment_safety",
+        "note": "v1.1 split heatsink fields used instead"
+       },
+       "relative_humidity": {
+        "value": 74.0,
+        "unit": "%",
+        "quality": "ok",
+        "role": "environment"
+       },
+       "pressure": {
+        "value": 101300.0,
+        "unit": "Pa",
+        "quality": "ok",
+        "role": "environment"
+       },
+       "gas_resistance": {
+        "value": 93500.0,
+        "unit": "ohm",
+        "quality": "uncalibrated",
+        "role": "headspace_response_uncalibrated",
+        "note": "relative headspace response only; NOT a CO2 concentration or fermentation rate"
+       },
+       "ph": {
+        "value": 4.05,
+        "unit": "pH",
+        "quality": "ok",
+        "role": "acidity",
+        "note": "method probe_sample; calibration valid"
+       },
+       "starter_height": {
+        "value": 40.6,
+        "unit": "mm",
+        "quality": "ok",
+        "role": "expansion_estimate"
+       },
+       "door_open": {
+        "value": false,
+        "unit": null,
+        "quality": "ok",
+        "role": "disturbance"
+       },
+       "peltier_mode": {
+        "value": "heat",
+        "unit": null,
+        "quality": "ok",
+        "role": "control_input"
+       },
+       "peltier_output_fraction": {
+        "value": 0.3,
+        "unit": "fraction",
+        "quality": "ok",
+        "role": "control_input"
+       },
+       "temperature_setpoint": {
+        "value": 27.0,
+        "unit": "°C",
+        "quality": "ok",
+        "role": "control_input"
+       },
+       "motor_running": {
+        "value": false,
+        "unit": null,
+        "quality": "ok",
+        "role": "decorative"
+       }
+      },
+      "derived": {
+       "thermal_lag_c": 0.7,
+       "tracking_error_c": -0.2,
+       "elapsed_h": 1.6667,
+       "elapsed_basis": "utc"
+      },
+      "anomalies": [],
+      "quality_summary": {
+       "counts": {
+        "ok": 13,
+        "missing": 1,
+        "uncalibrated": 1
+       },
+       "usable": [
+        "chamber_temperature",
+        "door_open",
+        "peltier_mode",
+        "peltier_output_fraction",
+        "ph",
+        "pressure",
+        "relative_humidity",
+        "starter_height",
+        "starter_temperature",
+        "temperature_setpoint"
+       ],
+       "downweighted": [
+        "gas_resistance"
+       ],
+       "rejected": [],
+       "missing": [
+        "heatsink_temperature"
+       ],
+       "ph_valid": true,
+       "time_basis": "device_utc"
+      }
+     },
+     "deviations_from_prediction": null,
+     "overproofing": {
+      "status": "near_peak",
+      "action": "step_down",
+      "suggested_setpoint_c": 20.0,
+      "rationale": "Near peak expansion: do not keep holding 27 °C; propose stepping down to 20 °C or ending fermentation when the plateau is confirmed. (rise ratio 2.03× with recent slope 0.307/h (plateauing))",
+      "evidence": {
+       "telemetry_points": 6,
+       "sources": [
+        "replay"
+       ],
+       "usable_height_points": 6,
+       "excluded_height_points": {},
+       "initial_mm": 20.0,
+       "peak_mm": 40.6,
+       "peak_at_h": 1.67,
+       "latest_mm": 40.6,
+       "rise_ratio": 2.03,
+       "peak_ratio": 2.03,
+       "recent_slope_per_h": 0.3075
+      },
+      "requires_human_confirmation": false,
+      "deviations": null,
+      "observation_quality": {
+       "n": 6,
+       "sources": [
+        "replay"
+       ],
+       "latest_age_s": 120.0,
+       "latest_stale": false,
+       "latest_usable": [
+        "chamber_temperature",
+        "door_open",
+        "peltier_mode",
+        "peltier_output_fraction",
+        "ph",
+        "pressure",
+        "relative_humidity",
+        "starter_height",
+        "starter_temperature",
+        "temperature_setpoint"
+       ],
+       "ph_valid": true,
+       "ph_reason": null
+      },
+      "additional_actions": []
+     }
+    },
+    "evidence_source": "replay",
+    "in_reply_to": null,
+    "chamber_id": "B",
+    "cycle_id": "cyc_296978a39787",
+    "schema_version": "1.0",
+    "recipients": [
+     "scientist_A"
+    ],
+    "experiment_id": "trial_001",
+    "evidence_refs": [
+     "telemetry:fermentai-esp32-b:boot_b001:201",
+     "telemetry:fermentai-esp32-b:boot_b001:202",
+     "telemetry:fermentai-esp32-b:boot_b001:203",
+     "telemetry:fermentai-esp32-b:boot_b001:204",
+     "telemetry:fermentai-esp32-b:boot_b001:205"
+    ],
+    "claim": "Chamber B: 6 telemetry records over 1.7 h; starter 26.8 °C; chamber air 27.5 °C; usable now: chamber_temperature, door_open, peltier_mode, peltier_output_fraction, ph, pressure, relative_humidity, starter_height, starter_temperature, temperature_setpoint; proofing status: near_peak.",
+    "uncertainty": "Latest valid pH in chamber B: 4.05 (calibrated, method stated).",
+    "proposed_action": null
+   },
+   {
+    "id": "f_e9c440d3d908bde8",
+    "agent_id": "scientist_B",
+    "timestamp_utc": "2026-10-31T18:00:00Z",
+    "type": "proposed_intervention",
+    "content": "Current run, chamber B: Near peak expansion: do not keep holding 27 °C; propose stepping down to 20 °C or ending fermentation when the plateau is confirmed. (rise ratio 2.03× with recent slope 0.307/h (plateauing))",
+    "payload": {
+     "scope": "current_run",
+     "status": "near_peak",
+     "action": "step_down",
+     "suggested_setpoint_c": 20.0,
+     "rationale": "Near peak expansion: do not keep holding 27 °C; propose stepping down to 20 °C or ending fermentation when the plateau is confirmed. (rise ratio 2.03× with recent slope 0.307/h (plateauing))",
+     "evidence": {
+      "telemetry_points": 6,
+      "sources": [
+       "replay"
+      ],
+      "usable_height_points": 6,
+      "excluded_height_points": {},
+      "initial_mm": 20.0,
+      "peak_mm": 40.6,
+      "peak_at_h": 1.67,
+      "latest_mm": 40.6,
+      "rise_ratio": 2.03,
+      "peak_ratio": 2.03,
+      "recent_slope_per_h": 0.3075
+     },
+     "requires_human_confirmation": false,
+     "observation_quality": {
+      "n": 6,
+      "sources": [
+       "replay"
+      ],
+      "latest_age_s": 120.0,
+      "latest_stale": false,
+      "latest_usable": [
+       "chamber_temperature",
+       "door_open",
+       "peltier_mode",
+       "peltier_output_fraction",
+       "ph",
+       "pressure",
+       "relative_humidity",
+       "starter_height",
+       "starter_temperature",
+       "temperature_setpoint"
+      ],
+      "ph_valid": true,
+      "ph_reason": null
+     },
+     "additional_actions": []
+    },
+    "evidence_source": "replay",
+    "in_reply_to": null,
+    "chamber_id": "B",
+    "cycle_id": "cyc_296978a39787",
+    "schema_version": "1.0",
+    "recipients": [
+     "scientist_A"
+    ],
+    "experiment_id": "trial_001",
+    "evidence_refs": [
+     "telemetry:fermentai-esp32-b:boot_b001:201",
+     "telemetry:fermentai-esp32-b:boot_b001:202",
+     "telemetry:fermentai-esp32-b:boot_b001:203",
+     "telemetry:fermentai-esp32-b:boot_b001:204",
+     "telemetry:fermentai-esp32-b:boot_b001:205"
+    ],
+    "claim": "Near peak expansion: do not keep holding 27 °C; propose stepping down to 20 °C or ending fermentation when the plateau is confirmed. (rise ratio 2.03× with recent slope 0.307/h (plateauing))",
+    "uncertainty": null,
+    "proposed_action": {
+     "type": "step_down",
+     "chamber": "B",
+     "suggested_setpoint_c": 20.0,
+     "requires_human_confirmation": false
+    }
+   },
+   {
+    "id": "f_7e80b1979c4ab2e9",
+    "agent_id": "scientist_A",
+    "timestamp_utc": "2026-10-31T18:00:00Z",
+    "type": "sensory_feedback",
+    "content": "Judge feedback interpreted as: Loaf A: sourness mild (0.25), texture fairly open / soft (0.72); Loaf B: sourness sour (0.75), density dense / heavy (0.97), texture tight / gummy (0.16). Desired: More sour (moderate); keep crumb openness high; lower density; preferred Loaf B.",
+    "payload": {
+     "interpretation_method": "rule_based_lexicon_v1",
+     "desired_summary": "More sour (moderate); keep crumb openness high; lower density; preferred Loaf B."
+    },
+    "evidence_source": "replay",
+    "in_reply_to": null,
+    "chamber_id": "A",
+    "cycle_id": "cyc_296978a39787",
+    "schema_version": "1.0",
+    "recipients": [
+     "scientist_B"
+    ],
+    "experiment_id": "trial_002",
+    "evidence_refs": [],
+    "claim": "More sour (moderate); keep crumb openness high; lower density; preferred Loaf B.",
+    "uncertainty": null,
+    "proposed_action": null
+   },
+   {
+    "id": "f_fd621e62b4a8bba3",
+    "agent_id": "scientist_A",
+    "timestamp_utc": "2026-10-31T18:00:00Z",
+    "type": "hypothesis",
+    "content": "[scientist_A → scientist_B] Hypothesis: Running 'Hot 32 °C 5 h -> cool 18 °C' in chamber A will move the loaf toward the judge's target (More sour (moderate); keep crumb openness high; lower density; preferred Loaf B). LAB outpace yeast near 30-32 °C, so a short hot phase adds acid per unit of rise; the cool tail protects structure. Proposed for chamber A: 'Hot 32 °C 5 h -> cool 18 °C'. Predicted (simulator, anchored on judged loaves): sourness 0.39 ± 0.23, crumb openness 0.51 ± 0.23; rise progress 1.53× peak (overproof risk 68%), peak rise expected near 10.4 h, final pH ≈ 4.09 (simulated). Suggestion for chamber B: 'Steady 24 °C, 12 h'.",
+    "payload": {
+     "role": "proposer",
+     "decision_source": "offline_policy",
+     "reasoning_mode_label": "Offline Policy",
+     "lead_reason": "the operator asked scientist_A to open this round (lead_agent)",
+     "hypothesis": {
+      "statement": "Running 'Hot 32 °C 5 h -> cool 18 °C' in chamber A will move the loaf toward the judge's target (More sour (moderate); keep crumb openness high; lower density; preferred Loaf B). LAB outpace yeast near 30-32 °C, so a short hot phase adds acid per unit of rise; the cool tail protects structure.",
+      "mechanism": "LAB outpace yeast near 30-32 °C, so a short hot phase adds acid per unit of rise; the cool tail protects structure. (warm phase front-loads lactic acidification (total acid route))",
+      "independent_variable": "fermentation temperature schedule",
+      "dependent_variables": [
+       "perceived sourness",
+       "crumb openness",
+       "rise (starter height)",
+       "pH"
+      ],
+      "held_constant": [
+       "recipe (200 g flour, 135 g water, 40 g starter, 4.4 g salt)",
+       "starter feed",
+       "mixing and folds",
+       "bake"
+      ]
+     },
+     "own_decision": {
+      "chamber": "A",
+      "schedule_id": "warm_then_cool_32_18",
+      "name": "Hot 32 °C 5 h -> cool 18 °C",
+      "points": [
+       [
+        0.0,
+        32.0
+       ],
+       [
+        5.0,
+        32.0
+       ],
+       [
+        6.0,
+        18.0
+       ],
+       [
+        16.0,
+        18.0
+       ]
+      ],
+      "route": "total_acid_warm",
+      "family": "warm_then_cool",
+      "predicted": {
+       "sourness": 0.393,
+       "openness": 0.513,
+       "rise_progress": 1.531,
+       "overproof_risk": 0.677,
+       "time_to_peak_rise_h": 10.45,
+       "final_ph": 4.095,
+       "uncertainty": 0.23,
+       "provenance": "simulated"
+      }
+     },
+     "suggestion_for_peer": {
+      "chamber": "B",
+      "schedule_id": "steady_24_12h",
+      "name": "Steady 24 °C, 12 h",
+      "reason": "Chamber B could run 'Steady 24 °C, 12 h' (intermediate temperature) so the two chambers test different mechanisms instead of duplicating one."
+     },
+     "prediction": "Predicted (simulator, anchored on judged loaves): sourness 0.39 ± 0.23, crumb openness 0.51 ± 0.23; rise progress 1.53× peak (overproof risk 68%), peak rise expected near 10.4 h, final pH ≈ 4.09 (simulated).",
+     "uncertainty": "Predictions come from the fermentation simulator (uncalibrated against this starter); the judge-scale map rests on 2 judged loaf/loaves for sourness (anchored) and 2 for crumb (anchored); band ±0.23 grows with distance from the recorded conditions (widened by 0.05 for missing/invalid observations); one judge, one tasting, one shared pH probe; perceived sourness ≠ pH (lactic/acetic balance matters); No valid pH measurement for chamber A (no pH reading for this chamber (single shared electrode)); I rely on model predictions and widen the stated uncertainty by ±0.05.; no validated schedule is predicted to reach sourness 0.90 (best 0.39) without passing peak rise; this run tests how far the warm acid route can go.",
+     "proposed_measurement": "Side-camera starter height every 10 min (end at peak/plateau, not by the clock); pH spot checks on a separate non-edible sample at 0 h and at each temperature change (t≈5 h) and at the end (single shared probe); chamber temperature continuously; blind tasting for sourness, crumb texture and aroma plus a crumb photo.",
+     "rationale": "I lead because the operator asked scientist_A to open this round (lead_agent). Of 17 validated candidates, 'Hot 32 °C 5 h -> cool 18 °C' has the lowest cost 0.3391 against targets [sourness ≈0.90, openness ≥0.67] (runner-up 'Steady 27 °C, 10 h (capped)' 0.4034). Recorded conditions: A: assumed steady 22 °C for 14 h (from setpoints) -> model rise progress 1.47× peak; B: assumed steady 27 °C for 14 h (from setpoints) -> model rise progress 1.94× peak (exceeded the 10 h hot-hold guideline).",
+     "targets": {
+      "sourness": {
+       "target": 0.9,
+       "mode": "near",
+       "weight": 0.855,
+       "reason": "more sour than the sourest judged loaf (0.75)"
+      },
+      "openness": {
+       "target": 0.67,
+       "mode": "at_least",
+       "weight": 1.495,
+       "constraint": true,
+       "reason": "keep crumb as open as Loaf A (0.72)"
+      }
+     },
+     "ph_status": {
+      "valid": false,
+      "reason": "no pH reading for this chamber (single shared electrode)",
+      "latest": null
+     }
+    },
+    "evidence_source": "replay",
+    "in_reply_to": null,
+    "chamber_id": "A",
+    "cycle_id": "cyc_296978a39787",
+    "schema_version": "1.0",
+    "recipients": [
+     "scientist_B"
+    ],
+    "experiment_id": "trial_002",
+    "evidence_refs": [
+     "f_7e80b1979c4ab2e9",
+     "f_3e17ee49422ca69f"
+    ],
+    "claim": "Running 'Hot 32 °C 5 h -> cool 18 °C' in chamber A will move the loaf toward the judge's target (More sour (moderate); keep crumb openness high; lower density; preferred Loaf B). LAB outpace yeast near 30-32 °C, so a short hot phase adds acid per unit of rise; the cool tail protects structure.",
+    "uncertainty": "Predictions come from the fermentation simulator (uncalibrated against this starter); the judge-scale map rests on 2 judged loaf/loaves for sourness (anchored) and 2 for crumb (anchored); band ±0.23 grows with distance from the recorded conditions (widened by 0.05 for missing/invalid observations); one judge, one tasting, one shared pH probe; perceived sourness ≠ pH (lactic/acetic balance matters); No valid pH measurement for chamber A (no pH reading for this chamber (single shared electrode)); I rely on model predictions and widen the stated uncertainty by ±0.05.; no validated schedule is predicted to reach sourness 0.90 (best 0.39) without passing peak rise; this run tests how far the warm acid route can go.",
+    "proposed_action": {
+     "type": "set_schedule",
+     "chamber": "A",
+     "schedule_id": "warm_then_cool_32_18",
+     "validated_library_schedule": true,
+     "suggestion_for_peer": {
+      "chamber": "B",
+      "schedule_id": "steady_24_12h"
+     }
+    }
+   },
+   {
+    "id": "f_f397b3dc61c77965",
+    "agent_id": "scientist_A",
+    "timestamp_utc": "2026-10-31T18:00:00Z",
+    "type": "prediction",
+    "content": "Predicted (simulator, anchored on judged loaves): sourness 0.39 ± 0.23, crumb openness 0.51 ± 0.23; rise progress 1.53× peak (overproof risk 68%), peak rise expected near 10.4 h, final pH ≈ 4.09 (simulated).",
+    "payload": {
+     "schedule_id": "warm_then_cool_32_18",
+     "sourness": 0.393,
+     "openness": 0.513,
+     "rise_progress": 1.531,
+     "overproof_risk": 0.677,
+     "time_to_peak_rise_h": 10.45,
+     "final_ph": 4.095,
+     "uncertainty": 0.23,
+     "provenance": "simulated"
+    },
+    "evidence_source": "replay",
+    "in_reply_to": "f_fd621e62b4a8bba3",
+    "chamber_id": "A",
+    "cycle_id": "cyc_296978a39787",
+    "schema_version": "1.0",
+    "recipients": [
+     "scientist_B"
+    ],
+    "experiment_id": "trial_002",
+    "evidence_refs": [
+     "f_fd621e62b4a8bba3"
+    ],
+    "claim": "Predicted (simulator, anchored on judged loaves): sourness 0.39 ± 0.23, crumb openness 0.51 ± 0.23; rise progress 1.53× peak (overproof risk 68%), peak rise expected near 10.4 h, final pH ≈ 4.09 (simulated).",
+    "uncertainty": null,
+    "proposed_action": null
+   },
+   {
+    "id": "f_10851b8119bdc66f",
+    "agent_id": "scientist_A",
+    "timestamp_utc": "2026-10-31T18:00:00Z",
+    "type": "uncertainty",
+    "content": "Predictions come from the fermentation simulator (uncalibrated against this starter); the judge-scale map rests on 2 judged loaf/loaves for sourness (anchored) and 2 for crumb (anchored); band ±0.23 grows with distance from the recorded conditions (widened by 0.05 for missing/invalid observations); one judge, one tasting, one shared pH probe; perceived sourness ≠ pH (lactic/acetic balance matters); No valid pH measurement for chamber A (no pH reading for this chamber (single shared electrode)); I rely on model predictions and widen the stated uncertainty by ±0.05.; no validated schedule is predicted to reach sourness 0.90 (best 0.39) without passing peak rise; this run tests how far the warm acid route can go.",
+    "payload": {},
+    "evidence_source": "replay",
+    "in_reply_to": "f_fd621e62b4a8bba3",
+    "chamber_id": "A",
+    "cycle_id": "cyc_296978a39787",
+    "schema_version": "1.0",
+    "recipients": [
+     "scientist_B"
+    ],
+    "experiment_id": "trial_002",
+    "evidence_refs": [],
+    "claim": null,
+    "uncertainty": "Predictions come from the fermentation simulator (uncalibrated against this starter); the judge-scale map rests on 2 judged loaf/loaves for sourness (anchored) and 2 for crumb (anchored); band ±0.23 grows with distance from the recorded conditions (widened by 0.05 for missing/invalid observations); one judge, one tasting, one shared pH probe; perceived sourness ≠ pH (lactic/acetic balance matters); No valid pH measurement for chamber A (no pH reading for this chamber (single shared electrode)); I rely on model predictions and widen the stated uncertainty by ±0.05.; no validated schedule is predicted to reach sourness 0.90 (best 0.39) without passing peak rise; this run tests how far the warm acid route can go.",
+    "proposed_action": null
+   },
+   {
+    "id": "f_db8743194bcd0ab2",
+    "agent_id": "scientist_A",
+    "timestamp_utc": "2026-10-31T18:00:00Z",
+    "type": "proposed_intervention",
+    "content": "Next experiment, chamber A: 'Hot 32 °C 5 h -> cool 18 °C'.",
+    "payload": {
+     "scope": "next_experiment",
+     "chamber": "A",
+     "schedule_id": "warm_then_cool_32_18",
+     "name": "Hot 32 °C 5 h -> cool 18 °C",
+     "points": [
+      [
+       0.0,
+       32.0
+      ],
+      [
+       5.0,
+       32.0
+      ],
+      [
+       6.0,
+       18.0
+      ],
+      [
+       16.0,
+       18.0
+      ]
+     ],
+     "route": "total_acid_warm",
+     "family": "warm_then_cool",
+     "predicted": {
+      "sourness": 0.393,
+      "openness": 0.513,
+      "rise_progress": 1.531,
+      "overproof_risk": 0.677,
+      "time_to_peak_rise_h": 10.45,
+      "final_ph": 4.095,
+      "uncertainty": 0.23,
+      "provenance": "simulated"
+     }
+    },
+    "evidence_source": "replay",
+    "in_reply_to": "f_fd621e62b4a8bba3",
+    "chamber_id": "A",
+    "cycle_id": "cyc_296978a39787",
+    "schema_version": "1.0",
+    "recipients": [
+     "scientist_B"
+    ],
+    "experiment_id": "trial_002",
+    "evidence_refs": [],
+    "claim": null,
+    "uncertainty": null,
+    "proposed_action": {
+     "type": "set_schedule",
+     "chamber": "A",
+     "schedule_id": "warm_then_cool_32_18",
+     "validated_library_schedule": true,
+     "suggestion_for_peer": {
+      "chamber": "B",
+      "schedule_id": "steady_24_12h"
+     }
+    }
+   },
+   {
+    "id": "f_507bd28a7a2a8cf5",
+    "agent_id": "scientist_A",
+    "timestamp_utc": "2026-10-31T18:00:00Z",
+    "type": "proposed_measurement",
+    "content": "Side-camera starter height every 10 min (end at peak/plateau, not by the clock); pH spot checks on a separate non-edible sample at 0 h and at each temperature change (t≈5 h) and at the end (single shared probe); chamber temperature continuously; blind tasting for sourness, crumb texture and aroma plus a crumb photo.",
+    "payload": {},
+    "evidence_source": "replay",
+    "in_reply_to": "f_fd621e62b4a8bba3",
+    "chamber_id": "A",
+    "cycle_id": "cyc_296978a39787",
+    "schema_version": "1.0",
+    "recipients": [
+     "scientist_B"
+    ],
+    "experiment_id": "trial_002",
+    "evidence_refs": [],
+    "claim": null,
+    "uncertainty": null,
+    "proposed_action": {
+     "type": "measure",
+     "what": "Side-camera starter height every 10 min (end at peak/plateau, not by the clock); pH spot checks on a separate non-edible sample at 0 h and at each temperature change (t≈5 h) and at the end (single shared probe); chamber temperature continuously; blind tasting for sourness, crumb texture and aroma plus a crumb photo."
+    }
+   },
+   {
+    "id": "f_08866a7471699e02",
+    "agent_id": "scientist_B",
+    "timestamp_utc": "2026-10-31T18:00:00Z",
+    "type": "critique",
+    "content": "[scientist_B → scientist_A] Critique: I am not convinced yet: (1) My chamber B telemetry (6 rows, sources replay; usable now: chamber_temperature, door_open, peltier_mode, peltier_output_fraction, ph, pressure, relative_humidity, starter_height, starter_temperature, temperature_setpoint) shows proofing status 'near_peak': Near peak expansion: do not keep holding 27 °C; propose stepping down to 20 °C or ending fermentation when the plateau is confirmed. (rise ratio 2.03× with recent slope 0.307/h (plateauing)) (2) 'Hot 32 °C 5 h -> cool 18 °C' is predicted to reach 1.53× peak rise (overproof risk 68%) — the same failure mode that plausibly made the warm loaf dense; end at the plateau rather than the clock. (3) predicted crumb openness 0.51 misses the target ≥0.67. (4) predicted sourness 0.39 vs target ≈0.90: the requested change may not be reachable on this route alone. (5) timing sensitivity: at 32 °C each extra hour adds ≈0.22× of peak-rise progress (heuristic), so the step-down must happen on time. Alternative hypothesis: Perceived sourness may depend more on the acetic share than on total acid; a long cool phase could raise sharpness without pushing the dough past peak rise. I accept your suggestion for chamber B: 'Steady 24 °C, 12 h'. Decision for chamber B: 'Steady 24 °C, 12 h'. Without the proposer's message I would have chosen 'Hot 32 °C 5 h -> cool 18 °C'; I switched to 'Steady 24 °C, 12 h' because it would duplicate the proposer's arm. Latest valid pH in chamber B: 4.05 (calibrated, method stated).",
+    "payload": {
+     "role": "critic",
+     "decision_source": "offline_policy",
+     "reasoning_mode_label": "Offline Policy",
+     "message_kind": "peer_critique",
+     "agrees_with_hypothesis": false,
+     "concerns": [
+      "My chamber B telemetry (6 rows, sources replay; usable now: chamber_temperature, door_open, peltier_mode, peltier_output_fraction, ph, pressure, relative_humidity, starter_height, starter_temperature, temperature_setpoint) shows proofing status 'near_peak': Near peak expansion: do not keep holding 27 °C; propose stepping down to 20 °C or ending fermentation when the plateau is confirmed. (rise ratio 2.03× with recent slope 0.307/h (plateauing))",
+      "'Hot 32 °C 5 h -> cool 18 °C' is predicted to reach 1.53× peak rise (overproof risk 68%) — the same failure mode that plausibly made the warm loaf dense; end at the plateau rather than the clock.",
+      "predicted crumb openness 0.51 misses the target ≥0.67.",
+      "predicted sourness 0.39 vs target ≈0.90: the requested change may not be reachable on this route alone.",
+      "timing sensitivity: at 32 °C each extra hour adds ≈0.22× of peak-rise progress (heuristic), so the step-down must happen on time."
+     ],
+     "alternative_hypothesis": "Perceived sourness may depend more on the acetic share than on total acid; a long cool phase could raise sharpness without pushing the dough past peak rise.",
+     "own_decision": {
+      "chamber": "B",
+      "schedule_id": "steady_24_12h",
+      "name": "Steady 24 °C, 12 h",
+      "points": [
+       [
+        0.0,
+        24.0
+       ],
+       [
+        12.0,
+        24.0
+       ]
+      ],
+      "route": "dose_response",
+      "family": "steady",
+      "predicted": {
+       "sourness": 0.28,
+       "openness": 0.724,
+       "rise_progress": 1.463,
+       "overproof_risk": 0.747,
+       "time_to_peak_rise_h": 8.2,
+       "final_ph": 4.163,
+       "uncertainty": 0.16,
+       "provenance": "simulated"
+      }
+     },
+     "accepted_peer_suggestion": true,
+     "independent_choice": {
+      "chamber": "B",
+      "schedule_id": "warm_then_cool_32_18",
+      "name": "Hot 32 °C 5 h -> cool 18 °C",
+      "points": [
+       [
+        0.0,
+        32.0
+       ],
+       [
+        5.0,
+        32.0
+       ],
+       [
+        6.0,
+        18.0
+       ],
+       [
+        16.0,
+        18.0
+       ]
+      ],
+      "route": "total_acid_warm",
+      "family": "warm_then_cool",
+      "predicted": {
+       "sourness": 0.393,
+       "openness": 0.513,
+       "rise_progress": 1.531,
+       "overproof_risk": 0.677,
+       "time_to_peak_rise_h": 10.45,
+       "final_ph": 4.095,
+       "uncertainty": 0.18,
+       "provenance": "simulated"
+      }
+     },
+     "decision_changed_by_peer": true,
+     "decision_change_note": "Without the proposer's message I would have chosen 'Hot 32 °C 5 h -> cool 18 °C'; I switched to 'Steady 24 °C, 12 h' because it would duplicate the proposer's arm.",
+     "prediction": "Predicted (simulator, anchored on judged loaves): sourness 0.28 ± 0.16, crumb openness 0.72 ± 0.16; rise progress 1.46× peak (overproof risk 75%), peak rise expected near 8.2 h, final pH ≈ 4.16 (simulated).",
+     "uncertainty": "Predictions come from the fermentation simulator (uncalibrated against this starter); the judge-scale map rests on 2 judged loaf/loaves for sourness (anchored) and 2 for crumb (anchored); band ±0.16 grows with distance from the recorded conditions; one judge, one tasting, one shared pH probe; perceived sourness ≠ pH (lactic/acetic balance matters); Latest valid pH in chamber B: 4.05 (calibrated, method stated)..",
+     "proposed_measurement": "Side-camera starter height every 10 min (end at peak/plateau, not by the clock); pH spot checks on a separate non-edible sample at 0 h and at the end (single shared probe); chamber temperature continuously; blind tasting for sourness, crumb texture and aroma plus a crumb photo. Retain a slice of each loaf for a side-by-side re-taste.",
+     "rationale": "My chamber runs 'Steady 24 °C, 12 h' (intermediate temperature) so that, together with 'Hot 32 °C 5 h -> cool 18 °C' (warm acid route), the round discriminates between the two mechanisms. Targets: sourness ≈0.90, openness ≥0.67.",
+     "ph_status": {
+      "valid": true,
+      "reason": "",
+      "latest": 4.05
+     },
+     "challenged_finding_type": "hypothesis",
+     "challenged_agent_id": "scientist_A"
+    },
+    "evidence_source": "replay",
+    "in_reply_to": "f_fd621e62b4a8bba3",
+    "chamber_id": "B",
+    "cycle_id": "cyc_296978a39787",
+    "schema_version": "1.0",
+    "recipients": [
+     "scientist_A"
+    ],
+    "experiment_id": "trial_002",
+    "evidence_refs": [
+     "f_fd621e62b4a8bba3",
+     "f_17bdcb9e213e46b6"
+    ],
+    "claim": "Perceived sourness may depend more on the acetic share than on total acid; a long cool phase could raise sharpness without pushing the dough past peak rise.",
+    "uncertainty": "Predictions come from the fermentation simulator (uncalibrated against this starter); the judge-scale map rests on 2 judged loaf/loaves for sourness (anchored) and 2 for crumb (anchored); band ±0.16 grows with distance from the recorded conditions; one judge, one tasting, one shared pH probe; perceived sourness ≠ pH (lactic/acetic balance matters); Latest valid pH in chamber B: 4.05 (calibrated, method stated)..",
+    "proposed_action": {
+     "type": "set_schedule",
+     "chamber": "B",
+     "schedule_id": "steady_24_12h",
+     "validated_library_schedule": true
+    }
+   },
+   {
+    "id": "f_8899d4cea8051694",
+    "agent_id": "scientist_B",
+    "timestamp_utc": "2026-10-31T18:00:00Z",
+    "type": "prediction",
+    "content": "Predicted (simulator, anchored on judged loaves): sourness 0.28 ± 0.16, crumb openness 0.72 ± 0.16; rise progress 1.46× peak (overproof risk 75%), peak rise expected near 8.2 h, final pH ≈ 4.16 (simulated).",
+    "payload": {
+     "schedule_id": "steady_24_12h",
+     "sourness": 0.28,
+     "openness": 0.724,
+     "rise_progress": 1.463,
+     "overproof_risk": 0.747,
+     "time_to_peak_rise_h": 8.2,
+     "final_ph": 4.163,
+     "uncertainty": 0.16,
+     "provenance": "simulated"
+    },
+    "evidence_source": "replay",
+    "in_reply_to": "f_08866a7471699e02",
+    "chamber_id": "B",
+    "cycle_id": "cyc_296978a39787",
+    "schema_version": "1.0",
+    "recipients": [
+     "scientist_A"
+    ],
+    "experiment_id": "trial_002",
+    "evidence_refs": [
+     "f_08866a7471699e02"
+    ],
+    "claim": "Predicted (simulator, anchored on judged loaves): sourness 0.28 ± 0.16, crumb openness 0.72 ± 0.16; rise progress 1.46× peak (overproof risk 75%), peak rise expected near 8.2 h, final pH ≈ 4.16 (simulated).",
+    "uncertainty": null,
+    "proposed_action": null
+   },
+   {
+    "id": "f_0e3d1f37ee14ac00",
+    "agent_id": "scientist_B",
+    "timestamp_utc": "2026-10-31T18:00:00Z",
+    "type": "uncertainty",
+    "content": "Predictions come from the fermentation simulator (uncalibrated against this starter); the judge-scale map rests on 2 judged loaf/loaves for sourness (anchored) and 2 for crumb (anchored); band ±0.16 grows with distance from the recorded conditions; one judge, one tasting, one shared pH probe; perceived sourness ≠ pH (lactic/acetic balance matters); Latest valid pH in chamber B: 4.05 (calibrated, method stated)..",
+    "payload": {},
+    "evidence_source": "replay",
+    "in_reply_to": "f_08866a7471699e02",
+    "chamber_id": "B",
+    "cycle_id": "cyc_296978a39787",
+    "schema_version": "1.0",
+    "recipients": [
+     "scientist_A"
+    ],
+    "experiment_id": "trial_002",
+    "evidence_refs": [],
+    "claim": null,
+    "uncertainty": "Predictions come from the fermentation simulator (uncalibrated against this starter); the judge-scale map rests on 2 judged loaf/loaves for sourness (anchored) and 2 for crumb (anchored); band ±0.16 grows with distance from the recorded conditions; one judge, one tasting, one shared pH probe; perceived sourness ≠ pH (lactic/acetic balance matters); Latest valid pH in chamber B: 4.05 (calibrated, method stated)..",
+    "proposed_action": null
+   },
+   {
+    "id": "f_be43948bec91fac6",
+    "agent_id": "scientist_B",
+    "timestamp_utc": "2026-10-31T18:00:00Z",
+    "type": "proposed_intervention",
+    "content": "Next experiment, chamber B: 'Steady 24 °C, 12 h'.",
+    "payload": {
+     "scope": "next_experiment",
+     "chamber": "B",
+     "schedule_id": "steady_24_12h",
+     "name": "Steady 24 °C, 12 h",
+     "points": [
+      [
+       0.0,
+       24.0
+      ],
+      [
+       12.0,
+       24.0
+      ]
+     ],
+     "route": "dose_response",
+     "family": "steady",
+     "predicted": {
+      "sourness": 0.28,
+      "openness": 0.724,
+      "rise_progress": 1.463,
+      "overproof_risk": 0.747,
+      "time_to_peak_rise_h": 8.2,
+      "final_ph": 4.163,
+      "uncertainty": 0.16,
+      "provenance": "simulated"
+     }
+    },
+    "evidence_source": "replay",
+    "in_reply_to": "f_08866a7471699e02",
+    "chamber_id": "B",
+    "cycle_id": "cyc_296978a39787",
+    "schema_version": "1.0",
+    "recipients": [
+     "scientist_A"
+    ],
+    "experiment_id": "trial_002",
+    "evidence_refs": [],
+    "claim": null,
+    "uncertainty": null,
+    "proposed_action": {
+     "type": "set_schedule",
+     "chamber": "B",
+     "schedule_id": "steady_24_12h",
+     "validated_library_schedule": true
+    }
+   },
+   {
+    "id": "f_49d444e2ddc28d9e",
+    "agent_id": "scientist_B",
+    "timestamp_utc": "2026-10-31T18:00:00Z",
+    "type": "proposed_measurement",
+    "content": "Side-camera starter height every 10 min (end at peak/plateau, not by the clock); pH spot checks on a separate non-edible sample at 0 h and at the end (single shared probe); chamber temperature continuously; blind tasting for sourness, crumb texture and aroma plus a crumb photo. Retain a slice of each loaf for a side-by-side re-taste.",
+    "payload": {},
+    "evidence_source": "replay",
+    "in_reply_to": "f_08866a7471699e02",
+    "chamber_id": "B",
+    "cycle_id": "cyc_296978a39787",
+    "schema_version": "1.0",
+    "recipients": [
+     "scientist_A"
+    ],
+    "experiment_id": "trial_002",
+    "evidence_refs": [],
+    "claim": null,
+    "uncertainty": null,
+    "proposed_action": {
+     "type": "measure",
+     "what": "Side-camera starter height every 10 min (end at peak/plateau, not by the clock); pH spot checks on a separate non-edible sample at 0 h and at the end (single shared probe); chamber temperature continuously; blind tasting for sourness, crumb texture and aroma plus a crumb photo. Retain a slice of each loaf for a side-by-side re-taste."
+    }
+   },
+   {
+    "id": "f_98fe16a1711df042",
+    "agent_id": "scientist_A",
+    "timestamp_utc": "2026-10-31T18:00:00Z",
+    "type": "rationale",
+    "content": "[scientist_A → scientist_B] Thanks. Your overproofing concern stands (risk 68%), but no validated alternative lowers it without giving up most of the predicted gain, so I keep 'Hot 32 °C 5 h -> cool 18 °C' and will end at the rise plateau from the starter-height curve rather than the clock. I adopt your proposal to retain slices for a side-by-side re-taste. The round now contrasts warm acid route vs intermediate temperature.",
+    "payload": {
+     "role": "proposer_reply",
+     "decision_source": "offline_policy",
+     "revised": false,
+     "final_decision": {
+      "chamber": "A",
+      "schedule_id": "warm_then_cool_32_18",
+      "name": "Hot 32 °C 5 h -> cool 18 °C",
+      "points": [
+       [
+        0.0,
+        32.0
+       ],
+       [
+        5.0,
+        32.0
+       ],
+       [
+        6.0,
+        18.0
+       ],
+       [
+        16.0,
+        18.0
+       ]
+      ],
+      "route": "total_acid_warm",
+      "family": "warm_then_cool",
+      "predicted": {
+       "sourness": 0.393,
+       "openness": 0.513,
+       "rise_progress": 1.531,
+       "overproof_risk": 0.677,
+       "time_to_peak_rise_h": 10.45,
+       "final_ph": 4.095,
+       "uncertainty": 0.23,
+       "provenance": "simulated"
+      }
+     }
+    },
+    "evidence_source": "replay",
+    "in_reply_to": "f_08866a7471699e02",
+    "chamber_id": "A",
+    "cycle_id": "cyc_296978a39787",
+    "schema_version": "1.0",
+    "recipients": [
+     "scientist_B"
+    ],
+    "experiment_id": "trial_002",
+    "evidence_refs": [
+     "f_08866a7471699e02"
+    ],
+    "claim": "Thanks. Your overproofing concern stands (risk 68%), but no validated alternative lowers it without giving up most of the predicted gain, so I keep 'Hot 32 °C 5 h -> cool 18 °C' and will end at the rise plateau from the starter-height curve rather than the clock. I adopt your proposal to retain slices for a side-by-side re-taste. The round now contrasts warm acid route vs intermediate temperature.",
+    "uncertainty": null,
+    "proposed_action": {
+     "type": "set_schedule",
+     "chamber": "A",
+     "schedule_id": "warm_then_cool_32_18",
+     "validated_library_schedule": true
+    }
+   },
+   {
+    "id": "f_f872cbc18c56e274",
+    "agent_id": "scientist_A",
+    "timestamp_utc": "2026-10-31T18:00:00Z",
+    "type": "experiment_proposal",
+    "content": "[scientist_A → scientist_B, operator] Trial 002: A: warm acid route vs B: intermediate temperature. More sour (moderate); keep crumb openness high; lower density; preferred Loaf B. Test whether 'Hot 32 °C 5 h -> cool 18 °C' (warm acid route) or 'Steady 24 °C, 12 h' (intermediate temperature) better achieves it.",
+    "payload": {
+     "next_experiment": {
+      "id": "trial_002",
+      "title": "Trial 002: A: warm acid route vs B: intermediate temperature",
+      "objective": "More sour (moderate); keep crumb openness high; lower density; preferred Loaf B. Test whether 'Hot 32 °C 5 h -> cool 18 °C' (warm acid route) or 'Steady 24 °C, 12 h' (intermediate temperature) better achieves it.",
+      "status": "proposed",
+      "success_criteria": [
+       "Blind tasting: at least one loaf is judged closer to the requested sourness — target sourness ≈0.90 on the 0-1 scale (more sour than the sourest judged loaf (0.75)); the same feedback parser scores the new comments.",
+       "Crumb: judged crumb openness ≥0.67 (keep crumb as open as Loaf A (0.72)); crumb photo shows no collapse or gumminess.",
+       "Proofing: each chamber ends at its rise plateau — starter height must not fall >3% below its peak before ending (no overproofing).",
+       "Discrimination: the two loaves are distinguishable in blind tasting on the targeted attribute, so the two mechanisms can be told apart.",
+       "Model check: measured end-of-fermentation pH within ±0.15 of the simulated value."
+      ]
+     },
+     "schedules": {
+      "A": {
+       "schedule_id": "warm_then_cool_32_18",
+       "name": "Hot 32 °C 5 h -> cool 18 °C",
+       "points": [
+        [
+         0.0,
+         32.0
+        ],
+        [
+         5.0,
+         32.0
+        ],
+        [
+         6.0,
+         18.0
+        ],
+        [
+         16.0,
+         18.0
+        ]
+       ],
+       "route": "total_acid_warm"
+      },
+      "B": {
+       "schedule_id": "steady_24_12h",
+       "name": "Steady 24 °C, 12 h",
+       "points": [
+        [
+         0.0,
+         24.0
+        ],
+        [
+         12.0,
+         24.0
+        ]
+       ],
+       "route": "dose_response"
+      }
+     },
+     "reasoning_mode_label": "Offline Policy"
+    },
+    "evidence_source": "replay",
+    "in_reply_to": null,
+    "chamber_id": "A",
+    "cycle_id": "cyc_296978a39787",
+    "schema_version": "1.0",
+    "recipients": [
+     "scientist_B",
+     "operator"
+    ],
+    "experiment_id": "trial_002",
+    "evidence_refs": [
+     "f_fd621e62b4a8bba3",
+     "f_08866a7471699e02",
+     "f_98fe16a1711df042"
+    ],
+    "claim": "More sour (moderate); keep crumb openness high; lower density; preferred Loaf B. Test whether 'Hot 32 °C 5 h -> cool 18 °C' (warm acid route) or 'Steady 24 °C, 12 h' (intermediate temperature) better achieves it.",
+    "uncertainty": "Predictions come from the fermentation simulator (uncalibrated against this starter); the judge-scale map rests on 2 judged loaf/loaves for sourness (anchored) and 2 for crumb (anchored); band ±0.23 grows with distance from the recorded conditions (widened by 0.05 for missing/invalid observations); one judge, one tasting, one shared pH probe; perceived sourness ≠ pH (lactic/acetic balance matters); No valid pH measurement for chamber A (no pH reading for this chamber (single shared electrode)); I rely on model predictions and widen the stated uncertainty by ±0.05.; no validated schedule is predicted to reach sourness 0.90 (best 0.39) without passing peak rise; this run tests how far the warm acid route can go.",
+    "proposed_action": {
+     "type": "start_experiment",
+     "experiment_id": "trial_002",
+     "schedules": {
+      "A": "warm_then_cool_32_18",
+      "B": "steady_24_12h"
+     },
+     "requires_human_confirmation": true
+    }
+   }
+  ],
+  "provenance": {
+   "decision_source": "offline_policy",
+   "policy": "offline_policy_v1",
+   "sensory_interpretation": "rule_based_lexicon_v1 on judge free text (judge_feedback)",
+   "predictions": "simulated (fermentai.fermentation.simulation)",
+   "prediction_source": "simulated",
+   "simulator_available": true,
+   "calibration": {
+    "sourness": {
+     "status": "anchored",
+     "n_points": 2,
+     "note": "Linear map through both judged loaves (slope 2.98)."
+    },
+    "openness": {
+     "status": "anchored",
+     "n_points": 2,
+     "note": "Linear map through both judged loaves (slope 3.83)."
+    }
+   },
+   "recorded_schedules": {
+    "A": "assumed steady 22 °C for 14 h (from setpoints)",
+    "B": "assumed steady 27 °C for 14 h (from setpoints)"
+   },
+   "telemetry_sources": {
+    "A": [
+     "replay"
+    ],
+    "B": [
+     "replay"
+    ]
+   },
+   "replay": true,
+   "agents_communicated": true,
+   "observation_adapter": "fermentai.agents.observation (obs-1.0, quality-gated per PLAN_MASTER §9.1-9.2)",
+   "physical_observations_imputed": false,
+   "ph_status": {
+    "A": {
+     "valid": false,
+     "reason": "no pH reading for this chamber (single shared electrode)",
+     "latest": null
+    },
+    "B": {
+     "valid": true,
+     "reason": "",
+     "latest": 4.05
+    }
+   },
+   "proposer_reply": "offline_policy (rule-based)",
+   "data_labels": {
+    "judge feedback": "judge_feedback",
+    "predictions": "simulated",
+    "telemetry": {
+     "A": [
+      "replay"
+     ],
+     "B": [
+      "replay"
+     ]
+    },
+    "scripted demo": "replay"
+   },
+   "reasoning_mode_label": "Offline Policy"
+  },
+  "safety_note": "Recommended schedules are proposals selected only from a validated candidate library (4-35 °C, no hold at or above 27 °C longer than 10 h, ramps ≤ 20 °C/h). The local API clamps every setpoint and the ESP32 firmware independently enforces temperature limits, sensor-failure handling, fan protection and safe heating/cooling switching. Neither the LLM nor judge text can set power or bypass these checks, and ending fermentation/baking requires human confirmation.",
+  "mode_label": "offline:deterministic_fallback",
+  "reasoning_mode_label": "Offline Policy",
+  "findings_log": {
+   "path": null,
+   "persisted": false,
+   "appended": 16
+  }
+ },
+ "reasoning_mode_label": "Offline Policy",
+ "generated_with": {
+  "function": "fermentai.agents.pipeline.run_taste_feedback_cycle",
+  "mode": "offline",
+  "now_utc": "2026-10-31T18:00:00Z",
+  "prediction_source": "simulated",
+  "regenerate": "uv run python -m fermentai.agents.demos"
+ }
+}

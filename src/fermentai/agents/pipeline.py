@@ -35,6 +35,8 @@ from .scientist import ScientistAgent
 from .sensory import parse_feedback
 
 MODE_OFFLINE = "offline:deterministic_fallback"
+REASONING_ONLINE = "Online Agent"
+REASONING_OFFLINE = "Offline Policy"
 SAFETY_NOTE = (
     "Recommended schedules are proposals selected only from a validated candidate library "
     f"({S.MIN_TEMP_C:g}-{S.MAX_TEMP_C:g} °C, no hold at or above {S.HOT_THRESHOLD_C:g} °C longer than "
@@ -185,14 +187,24 @@ def run_taste_feedback_cycle(feedback_text: str, context: dict | None = None, mo
     if result is None:
         result = _run_cycle(interp, context, setpoints, cycle_id, now, history_log, None)
         result["mode_label"] = MODE_OFFLINE + (f" (live unavailable: {live_reason})" if live_reason else "")
+        result["reasoning_mode_label"] = REASONING_OFFLINE
     else:
         result["mode_label"] = f"live:{adapter.mode}"
+        result["reasoning_mode_label"] = REASONING_ONLINE
+    result["provenance"]["reasoning_mode_label"] = result["reasoning_mode_label"]
     staged: list[Finding] = result.pop("_staged")
     if persist:
         history_log.extend(staged)
     result["findings_log"] = {"path": str(history_log.path) if history_log.path else None, "persisted": bool(persist),
                               "appended": len(staged)}
     return result
+
+
+def _ensure_ph_statement(decision, agent: ScientistAgent):
+    """PLAN_MASTER §9.2: if there is no valid pH, the agent's text must say so (LLM output included)."""
+    if agent.state.ph_status.get("valid") or "ph" in decision.uncertainty.lower():
+        return decision
+    return decision.model_copy(update={"uncertainty": f"{decision.uncertainty} {agent.ph_statement()}"})
 
 
 def _run_cycle(interp: dict[str, Any], context: dict[str, Any], setpoints: dict[str, float], cycle_id: str, now: str,
@@ -206,12 +218,23 @@ def _run_cycle(interp: dict[str, Any], context: dict[str, Any], setpoints: dict[
     src_override = "replay" if context.get("replay") else None
     telemetry = _per_chamber(context, "telemetry")
     predictions = _per_chamber(context, "predictions")
+    next_id = _next_experiment_id(context)
+    current_exp = context.get("experiment_id") if isinstance(context.get("experiment_id"), str) else None
+    reasoning = REASONING_ONLINE if adapter is not None else REASONING_OFFLINE
     agents = {c: ScientistAgent(c, log=staging, cycle_id=cycle_id, timestamp_utc=now, setpoint_c=setpoints.get(c),
-                                evidence_source_override=src_override) for c in P.LOAVES}
+                                evidence_source_override=src_override, experiment_id=next_id,
+                                current_experiment_id=current_exp, reasoning_mode_label=reasoning)
+              for c in P.LOAVES}
+    limits = context.get("hardware_limits") if isinstance(context.get("hardware_limits"), dict) else None
     for c, ag in agents.items():
-        ag.observe(telemetry.get(c), predictions.get(c))
+        # quality-gated observation adapter (PLAN_MASTER §9.1-9.2); raw telemetry never reaches the policy/LLM
+        ag.observe(telemetry.get(c) if isinstance(telemetry.get(c), list) else None, predictions.get(c),
+                   now_utc=now, hardware_limits=limits)
         ag.build_evidence(interp, context, use_sim)  # each agent builds its own evidence view
     lead_id, lead_reason = P.choose_lead(interp, agents["A"].evidence, setpoints)
+    forced = str(context.get("lead_agent") or "").replace("scientist_", "").upper()
+    if forced in P.LOAVES:
+        lead_id, lead_reason = forced, f"the operator asked scientist_{forced} to open this round (lead_agent)"
     peer_id = "B" if lead_id == "A" else "A"
     lead, peer = agents[lead_id], agents[peer_id]
     ids = [c.id for c in S.LIBRARY]
@@ -219,7 +242,7 @@ def _run_cycle(interp: dict[str, Any], context: dict[str, Any], setpoints: dict[
 
     # 1) proposer publishes its hypothesis (from its own context only)
     if adapter is not None:
-        lead_dec = adapter.lead(lead.agent_id, lead_id, lead.llm_context(interp), ids)
+        lead_dec = _ensure_ph_statement(adapter.lead(lead.agent_id, lead_id, lead.llm_context(interp), ids), lead)
     else:
         lead_dec = lead.offline_lead(interp, lead_reason)
     lead_msg = lead.propose(interp, lead_dec, decision_source=decision_source, lead_reason=lead_reason)
@@ -230,7 +253,8 @@ def _run_cycle(interp: dict[str, Any], context: dict[str, Any], setpoints: dict[
         raise RuntimeError("peer could not read the proposer's message from the findings log")
     own_judged = bool(peer.evidence["targets"]["judged"][peer_id])
     if adapter is not None and communicate:
-        peer_dec = adapter.critique(peer.agent_id, peer_id, lead.agent_id, peer.llm_context(interp, seen), ids)
+        peer_dec = _ensure_ph_statement(
+            adapter.critique(peer.agent_id, peer_id, lead.agent_id, peer.llm_context(interp, seen), ids), peer)
         _, peer_extra = peer.offline_critique(interp, seen, communicate=False)  # for the "independent choice" record
         indep_id = peer_extra["independent_choice"]["id"]
     else:
@@ -249,13 +273,11 @@ def _run_cycle(interp: dict[str, Any], context: dict[str, Any], setpoints: dict[
             raise RuntimeError(f"invalid schedule for chamber {c}: {errs}")
 
     ev = lead.evidence
-    staged = [f for f in staging.read() if f.id not in already]
     hyp = lead_msg.payload["hypothesis"]
     t = ev["targets"]
     conf = "low"
     if ev["anchors"]["sourness"]["n_points"] >= 2 and interp["overall_confidence"] >= 0.7:
         conf = "moderate"
-    next_id = _next_experiment_id(context)
     if final["A"]["route"] != final["B"]["route"]:
         title_routes = " vs ".join(f"{c}: {P.ROUTE_SHORT[final[c]['route']]}" for c in P.LOAVES)
     else:
@@ -280,6 +302,21 @@ def _run_cycle(interp: dict[str, Any], context: dict[str, Any], setpoints: dict[
         "notes": ["End each chamber at its rise plateau, not by the clock (PLAN §5).",
                   "Schedules are setpoint proposals; API/firmware clamp and acknowledge every command."],
     }
+    # 4) the agreed plan is published as a structured experiment_proposal (PLAN_MASTER §9.4)
+    lead.publish("experiment_proposal", f"[{lead.agent_id} → {peer.agent_id}, operator] {next_experiment['title']}. "
+                 f"{objective}", {"next_experiment": {k: next_experiment[k] for k in
+                                                       ("id", "title", "objective", "status", "success_criteria")},
+                                  "schedules": {c: {k: final[c][k] for k in ("schedule_id", "name", "points", "route")}
+                                                for c in P.LOAVES},
+                                  "reasoning_mode_label": reasoning},
+                 evidence_source="simulated" if ev["prediction_source"] == "simulated" else "estimated",
+                 recipients=[peer.agent_id, "operator"], experiment_id=next_id,
+                 evidence_refs=[lead_msg.id, crit_msg.id, reply_msg.id], claim=objective,
+                 uncertainty=lead_msg.payload["uncertainty"],
+                 proposed_action={"type": "start_experiment", "experiment_id": next_id,
+                                  "schedules": {c: final[c]["schedule_id"] for c in P.LOAVES},
+                                  "requires_human_confirmation": True})
+    staged = [f for f in staging.read() if f.id not in already]
     comparison = {c: {"recorded_schedule": ev["recorded"][c]["points"], "recorded_source": ev["recorded"][c]["source"],
                       "recorded_violations": ev["recorded"][c]["violations"], "judged": ev["recorded"][c]["judged"],
                       "model_rise_progress": ev["recorded"][c]["model"]["rise_progress"],
@@ -299,6 +336,9 @@ def _run_cycle(interp: dict[str, Any], context: dict[str, Any], setpoints: dict[
         "telemetry_sources": tele_sources,
         "replay": bool(context.get("replay")),
         "agents_communicated": communicate,
+        "observation_adapter": "fermentai.agents.observation (obs-1.0, quality-gated per PLAN_MASTER §9.1-9.2)",
+        "physical_observations_imputed": False,
+        "ph_status": {c: agents[c].state.ph_status for c in P.LOAVES},
         "proposer_reply": "offline_policy (rule-based)",
         "data_labels": {"judge feedback": "judge_feedback", "predictions": ev["prediction_source"],
                         "telemetry": tele_sources, "scripted demo": "replay" if context.get("replay") else None},
@@ -334,6 +374,10 @@ def _run_cycle(interp: dict[str, Any], context: dict[str, Any], setpoints: dict[
         "next_experiment": next_experiment,
         "comparison_with_recorded": comparison,
         "current_run_actions": {c: agents[c].state.overproof for c in P.LOAVES},
+        "observations": {c: {"latest": agents[c].observations[-1].compact() if agents[c].observations else None,
+                             "quality": agents[c].state.observation_quality or {"n": 0, "note": "no telemetry"},
+                             "ph_status": agents[c].state.ph_status,
+                             "deviations_from_prediction": agents[c].state.deviations} for c in P.LOAVES},
         "candidate_ranking": [{"id": r["id"], "name": r["name"], "route": r["route"], "score": r["score"],
                                "pred_sourness": r["pred_sourness"], "pred_openness": r["pred_openness"],
                                "overproof_risk": r["model"]["overproof_risk"]}

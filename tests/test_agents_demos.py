@@ -20,3 +20,13 @@ def test_demo_is_reproducible_from_spec():
     spec = DEMOS[0]
     a, b = generate_demo(spec), generate_demo(spec)
     assert a == b
+
+
+def test_demo_04_plan_master_script():
+    d = next(x for x in load_demos() if x["id"] == "demo_04_master_plan_judge_script")
+    assert d["expected_interpretation"]["structured_preference"] == d["expected_structured_preference"]
+    assert d["resulting_experiment"]["proposed_by"] == "scientist_A"  # §14: A publishes, B reviews
+    assert d["resulting_experiment"]["reviewed_by"] == "scientist_B"
+    ph = d["result"]["provenance"]["ph_status"]
+    assert ph["A"]["valid"] is False and ph["B"]["valid"] is True  # single shared electrode
+    assert d["reasoning_mode_label"] == "Offline Policy"

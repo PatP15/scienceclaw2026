@@ -217,3 +217,23 @@ def test_schemas_are_strict():
     for sch in (L.lead_schema(ids), L.critic_schema(ids)):
         assert sch["additionalProperties"] is False
         assert set(sch["required"]) == set(sch["properties"])
+
+
+def test_live_reasoning_label_and_quality_gated_context():
+    rows = [{"schema_version": "1.1", "chamber_id": "B", "device_id": "fermentai-esp32-b", "boot_id": "b", "sequence_number": i,
+             "timestamp_utc": f"2026-10-31T17:{40 + 5 * i:02d}:00Z", "timestamp_quality": "synced",
+             "starter_temperature_c": 26.8, "temperature_setpoint_c": 27.0, "starter_height_mm": 20 + i,
+             "gas_resistance_ohms": 99000.0, "source": "measured", "raw_secret_field": "should-not-reach-llm"}
+            for i in range(4)]
+    client = FakeClient()
+    adapter = LLMAdapter("anthropic_api", client=client)
+    r = run_taste_feedback_cycle(PLAN_EXAMPLE, dict(CTX, llm_adapter=adapter, telemetry={"B": rows}), mode="live")
+    assert r["mode_label"] == "live:anthropic_api"
+    assert r["reasoning_mode_label"] == "Online Agent"
+    assert r["agent_messages"][0]["payload"]["reasoning_mode_label"] == "Online Agent"
+    prompts = " ".join(c["messages"][0]["content"] for c in client.messages.calls)
+    assert "your_observations" in prompts and '"quality"' in prompts
+    assert "raw_secret_field" not in prompts  # raw telemetry never reaches the LLM
+    assert "gas resistance is an uncalibrated headspace response, NOT" in client.messages.calls[0]["system"].replace("\n  ", " ")
+    # the LLM did not mention pH, so the agent's own statement is appended
+    assert "No valid pH measurement" in r["agent_messages"][0]["payload"]["uncertainty"]

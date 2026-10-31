@@ -19,8 +19,11 @@ def _f(agent="scientist_A", type_="observation", content="pH 4.3 at 10 h", ts="2
 
 
 def test_schema_fields_and_vocabularies():
-    assert set(FINDING_TYPES) == {"observation", "hypothesis", "prediction", "uncertainty", "proposed_measurement",
-                                  "proposed_intervention", "critique", "rationale"}
+    v10 = {"observation", "hypothesis", "prediction", "uncertainty", "proposed_measurement",
+           "proposed_intervention", "critique", "rationale"}
+    v94 = {"observation_summary", "hypothesis", "prediction", "anomaly", "experiment_proposal", "peer_critique",
+           "experiment_result", "model_update", "sensory_feedback"}
+    assert v10 <= set(FINDING_TYPES) and v94 <= set(FINDING_TYPES)  # additive: old types remain valid
     assert set(EVIDENCE_SOURCES) == {"real", "simulated", "replay", "estimated", "imported_human", "judge_feedback"}
     d = _f(payload={"ph": 4.3}, evidence_source="simulated").to_dict()
     for k in ("id", "agent_id", "timestamp_utc", "type", "content", "payload", "evidence_source", "in_reply_to"):

@@ -144,19 +144,23 @@ def test_recorded_experiments_used_and_next_id():
     assert r["provenance"]["recorded_schedules"]["A"] == "recorded experiment"
 
 
-def _telemetry(heights, setpoint, source="simulated"):
+def _telemetry(heights, setpoint, source="simulated", chamber="X", end_utc="2026-10-31T17:58:00Z", step_min=10):
+    """Synthetic rows ending at ``end_utc`` (fresh relative to NOW unless moved)."""
+    from datetime import datetime, timedelta
+    end = datetime.fromisoformat(end_utc.replace("Z", "+00:00"))
     rows = []
+    n = len(heights)
     for i, h in enumerate(heights):
-        hh, mm = divmod(i * 30, 60)
-        rows.append({"schema_version": "1.0", "chamber_id": "X", "timestamp_utc": f"2026-10-31T{8 + hh:02d}:{mm:02d}:00Z",
-                     "chamber_temperature_c": setpoint, "starter_height_mm": h, "temperature_setpoint_c": setpoint,
-                     "ph": None, "source": source})
+        t = end - timedelta(minutes=step_min * (n - 1 - i))
+        rows.append({"schema_version": "1.0", "chamber_id": chamber, "timestamp_utc": t.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                     "chamber_temperature_c": setpoint, "starter_temperature_c": setpoint - 0.3,
+                     "starter_height_mm": h, "temperature_setpoint_c": setpoint, "ph": None, "source": source})
     return rows
 
 
 def test_overproofing_rule_from_telemetry():
-    declining = _telemetry([20, 24, 29, 34, 38, 40, 40.5, 39, 37.5], 27.0)
-    rising = _telemetry([20, 21, 22.5, 24, 26], 22.0)
+    declining = _telemetry([20, 24, 29, 34, 38, 40, 40.5, 39, 37.5], 27.0, chamber="B", step_min=20)
+    rising = _telemetry([20, 21, 22.5, 24, 26], 22.0, chamber="A")
     r = run_taste_feedback_cycle(PLAN_EXAMPLE, ctx(telemetry={"A": rising, "B": declining}))
     act = r["current_run_actions"]
     assert act["B"]["status"] == "declining" and act["B"]["action"] == "end_fermentation"
@@ -200,8 +204,8 @@ def test_findings_log_persistence_is_append_only(tmp_path):
     assert second.startswith(first) and len(second.splitlines()) > len(first.splitlines())
     assert r2["findings_log"]["appended"] == len(second.splitlines()) - len(first.splitlines())
     types = {json.loads(l)["type"] for l in second.splitlines()}
-    assert {"observation", "hypothesis", "prediction", "uncertainty", "proposed_measurement",
-            "proposed_intervention", "critique", "rationale"} <= types
+    assert {"sensory_feedback", "hypothesis", "prediction", "uncertainty", "proposed_measurement",
+            "proposed_intervention", "critique", "rationale", "experiment_proposal"} <= types
     # re-running the identical cycle (same clock) is idempotent: no duplicate lines
     run_taste_feedback_cycle(PLAN_EXAMPLE, dict(c, now_utc="2026-10-31T18:00:00Z"))
     assert path.read_bytes() == second
@@ -211,3 +215,16 @@ def test_replay_labels():
     r = run_taste_feedback_cycle(PLAN_EXAMPLE, ctx(replay=True))
     assert all(f["evidence_source"] == "replay" for f in r["findings_logged"])
     assert r["provenance"]["replay"] is True
+
+
+def test_stale_or_foreign_telemetry_never_triggers_an_intervention():
+    old = _telemetry([20, 24, 29, 34, 38, 40, 40.5, 39, 37.5], 27.0, chamber="B", end_utc="2026-10-31T12:00:00Z")
+    r = run_taste_feedback_cycle(PLAN_EXAMPLE, ctx(telemetry={"B": old}))
+    assert r["current_run_actions"]["B"]["status"] == "stale_data"
+    assert r["current_run_actions"]["B"]["action"] == "monitor"
+    assert not [f for f in r["findings_logged"] if f["payload"].get("scope") == "current_run"]
+    foreign = _telemetry([20, 24, 29, 34, 38, 40, 40.5, 39, 37.5], 27.0, chamber="A", step_min=20)
+    r2 = run_taste_feedback_cycle(PLAN_EXAMPLE, ctx(telemetry={"B": foreign}))
+    assert r2["current_run_actions"]["B"]["action"] == "monitor"
+    anomalies = [f for f in r2["findings_logged"] if f["type"] == "anomaly"]
+    assert any(f["payload"]["anomaly"]["code"] == "wrong_chamber" for f in anomalies)

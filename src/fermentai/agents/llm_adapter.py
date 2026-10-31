@@ -64,6 +64,17 @@ Rules you must follow:
   never invent measurements or sensory observations.
 - Watch for overproofing: holding a warm setpoint for a long time can push a small dough past peak
   rise (denser crumb). Prefer ending at the rise plateau or stepping down.
+- Your chamber data arrive as quality-annotated observations (`your_observations`). Use only fields
+  with quality "ok" as evidence; treat low_confidence/uncalibrated values as weak hints and never use
+  stale, invalid, missing, wrong_chamber or unsynced_time values. Never fill a missing physical
+  observation with a simulated value.
+- Sensor meanings: starter temperature is the controlled variable; chamber air temperature is the
+  environment (thermal lag); heatsink temperatures are equipment safety only, never evidence about
+  microbes; humidity is environment; BME680 gas resistance is an uncalibrated headspace response, NOT
+  CO2; camera height is an expansion estimate, not CO2; door events are disturbances; Peltier mode and
+  setpoint are control inputs; the motor is decorative.
+- If `ph_status.valid` is false, say explicitly that no valid pH measurement exists for your chamber and
+  widen your stated uncertainty accordingly.
 - Write concise, concrete scientific prose: 1-3 sentences per text field.
 """
 

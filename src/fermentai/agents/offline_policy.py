@@ -466,19 +466,19 @@ def fmt_target(t: dict[str, Any]) -> str:
     return f"{sym}{t['target']:.2f}"
 
 
-def prediction_uncertainty(c: dict[str, Any], evidence: dict[str, Any]) -> float:
+def prediction_uncertainty(c: dict[str, Any], evidence: dict[str, Any], widen: float = 0.0) -> float:
     """Heuristic ± band on the judge scale: grows with extrapolation from recorded loaves."""
     rec_feats = [(r["pred_sourness"], r["pred_openness"], r["model"]["mean_temp_c"] / 10.0, r["model"]["acetic_index"])
                  for r in evidence["recorded"].values()]
     d = min(_dist(_features(c), rf) for rf in rec_feats)
     n = min(evidence["anchors"]["sourness"]["n_points"], evidence["anchors"]["openness"]["n_points"])
     base = 0.12 if n >= 2 else 0.18 if n == 1 else 0.25
-    return round(min(0.35, base + 0.2 * d), 2)
+    return round(min(0.4, base + 0.2 * d + widen), 2)
 
 
-def describe_prediction(c: dict[str, Any], evidence: dict[str, Any]) -> str:
+def describe_prediction(c: dict[str, Any], evidence: dict[str, Any], widen: float = 0.0) -> str:
     m = c["model"]
-    u = prediction_uncertainty(c, evidence)
+    u = prediction_uncertainty(c, evidence, widen)
     src = "simulator" if m["provenance"] == "simulated" else "degree-hour heuristic"
     s = (f"Predicted ({src}, anchored on judged loaves): sourness {c['pred_sourness']:.2f} ± {u:.2f}, "
          f"crumb openness {c['pred_openness']:.2f} ± {u:.2f}; rise progress {m['rise_progress']:.2f}× peak "
@@ -539,7 +539,8 @@ ROUTE_SHORT = {
 }
 
 
-def uncertainty_text(c: dict[str, Any], evidence: dict[str, Any], extra: list[str] | None = None) -> str:
+def uncertainty_text(c: dict[str, Any], evidence: dict[str, Any], extra: list[str] | None = None,
+                     widen: float = 0.0) -> str:
     a = evidence["anchors"]
     parts = []
     src = evidence["prediction_source"]
@@ -551,7 +552,8 @@ def uncertainty_text(c: dict[str, Any], evidence: dict[str, Any], extra: list[st
         parts.append("Predictions mix simulator and heuristic outputs")
     parts.append(f"the judge-scale map rests on {a['sourness']['n_points']} judged loaf/loaves for sourness "
                  f"({a['sourness']['status']}) and {a['openness']['n_points']} for crumb ({a['openness']['status']})")
-    parts.append(f"band ±{prediction_uncertainty(c, evidence):.2f} grows with distance from the recorded conditions")
+    parts.append(f"band ±{prediction_uncertainty(c, evidence, widen):.2f} grows with distance from the recorded "
+                 f"conditions" + (f" (widened by {widen:.2f} for missing/invalid observations)" if widen else ""))
     parts.append("one judge, one tasting, one shared pH probe; perceived sourness ≠ pH (lactic/acetic balance matters)")
     if extra:
         parts.extend(extra)
@@ -570,7 +572,8 @@ def measurement_plan(c: dict[str, Any]) -> str:
 # Decisions
 # ---------------------------------------------------------------------------
 def lead_decision(interp: dict[str, Any], evidence: dict[str, Any], chamber: str, *, risk_weight: float,
-                  lead_reason: str) -> tuple[LeadDecision, dict[str, Any]]:
+                  lead_reason: str, obs_notes: list[str] | None = None,
+                  widen: float = 0.0) -> tuple[LeadDecision, dict[str, Any]]:
     ranked = rank_candidates(evidence, risk_weight=risk_weight)
     best = ranked[0]
     # suggestion for the peer chamber: best candidate testing a different route (complementary arm)
@@ -605,8 +608,8 @@ def lead_decision(interp: dict[str, Any], evidence: dict[str, Any], chamber: str
         peer_suggestion_schedule_id=sugg["id"],
         peer_suggestion_reason=(f"Chamber {peer} could run '{sugg['name']}' ({ROUTE_SHORT[sugg['route']]}) so the two "
                                 f"chambers test different mechanisms instead of duplicating one."),
-        prediction=describe_prediction(best, evidence),
-        uncertainty=uncertainty_text(best, evidence, shortfalls),
+        prediction=describe_prediction(best, evidence, widen),
+        uncertainty=uncertainty_text(best, evidence, list(obs_notes or []) + shortfalls, widen),
         proposed_measurement=measurement_plan(best),
         rationale=rationale,
     )
@@ -659,7 +662,8 @@ def critique_points(lead_choice: dict[str, Any], evidence: dict[str, Any], own_o
 
 def peer_decision(interp: dict[str, Any], evidence: dict[str, Any], chamber: str, lead_msg_payload: dict[str, Any],
                   *, risk_weight: float, own_obs: str | None = None, communicate: bool = True,
-                  own_has_judged_outcome: bool = True) -> tuple[PeerDecision, dict[str, Any]]:
+                  own_has_judged_outcome: bool = True, obs_notes: list[str] | None = None,
+                  widen: float = 0.0) -> tuple[PeerDecision, dict[str, Any]]:
     lead_choice = _find(evidence, lead_msg_payload["own_decision"]["schedule_id"])
     sugg_id = (lead_msg_payload.get("suggestion_for_peer") or {}).get("schedule_id")
     independent = rank_candidates(evidence, risk_weight=risk_weight)
@@ -707,8 +711,8 @@ def peer_decision(interp: dict[str, Any], evidence: dict[str, Any], chamber: str
         own_schedule_id=choice["id"],
         accepted_peer_suggestion=accepted,
         decision_change_note=note,
-        prediction=describe_prediction(choice, evidence),
-        uncertainty=uncertainty_text(choice, evidence),
+        prediction=describe_prediction(choice, evidence, widen),
+        uncertainty=uncertainty_text(choice, evidence, list(obs_notes or []), widen),
         proposed_measurement=measurement_plan(choice) + " Retain a slice of each loaf for a side-by-side re-taste.",
         rationale=(f"My chamber runs '{choice['name']}' ({ROUTE_SHORT[choice['route']]}) so that, together with "
                    f"'{lead_choice['name']}' ({ROUTE_SHORT[lead_choice['route']]}), the round discriminates between "

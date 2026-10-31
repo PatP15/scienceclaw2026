@@ -28,8 +28,12 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_LOG_PATH = REPO_ROOT / "data" / "experiments" / "findings_log.jsonl"
 
 FindingType = Literal[
+    # PLAN §10 (v1.0)
     "observation", "hypothesis", "prediction", "uncertainty",
     "proposed_measurement", "proposed_intervention", "critique", "rationale",
+    # PLAN_MASTER §9.4 (added; v1.0 types remain valid)
+    "observation_summary", "anomaly", "experiment_proposal", "peer_critique",
+    "experiment_result", "model_update", "sensory_feedback",
 ]
 EvidenceSource = Literal["real", "simulated", "replay", "estimated", "imported_human", "judge_feedback"]
 FINDING_TYPES: tuple[str, ...] = FindingType.__args__  # type: ignore[attr-defined]
@@ -50,6 +54,13 @@ class Finding(BaseModel):
     chamber_id: str | None = None
     cycle_id: str | None = None
     schema_version: str = SCHEMA_VERSION
+    # PLAN_MASTER §9.4 fields (optional, additive)
+    recipients: list[str] = Field(default_factory=list)
+    experiment_id: str | None = None
+    evidence_refs: list[str] = Field(default_factory=list)
+    claim: str | None = None
+    uncertainty: str | None = None
+    proposed_action: dict[str, Any] | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return self.model_dump(mode="json")
@@ -75,6 +86,12 @@ def new_finding(
     chamber_id: str | None = None,
     cycle_id: str | None = None,
     timestamp_utc: str | None = None,
+    recipients: list[str] | None = None,
+    experiment_id: str | None = None,
+    evidence_refs: list[str] | None = None,
+    claim: str | None = None,
+    uncertainty: str | None = None,
+    proposed_action: dict[str, Any] | None = None,
 ) -> Finding:
     ts = timestamp_utc or utc_now_iso()
     return Finding(
@@ -88,6 +105,12 @@ def new_finding(
         in_reply_to=in_reply_to,
         chamber_id=chamber_id,
         cycle_id=cycle_id,
+        recipients=list(recipients or []),
+        experiment_id=experiment_id,
+        evidence_refs=list(evidence_refs or []),
+        claim=claim,
+        uncertainty=uncertainty,
+        proposed_action=proposed_action,
     )
 
 
@@ -165,9 +188,15 @@ class FindingsLog:
         exclude_agent: str | None = None,
         since_utc: str | None = None,
         limit: int | None = None,
+        recipient: str | None = None,
+        experiment_id: str | None = None,
     ) -> list[Finding]:
         res = []
         for f in self._all():
+            if recipient and recipient not in f.recipients:
+                continue
+            if experiment_id and f.experiment_id != experiment_id:
+                continue
             if agent_id and f.agent_id != agent_id:
                 continue
             if exclude_agent and f.agent_id == exclude_agent:
@@ -216,6 +245,11 @@ def challenge(
     chamber_id: str | None = None,
     cycle_id: str | None = None,
     timestamp_utc: str | None = None,
+    experiment_id: str | None = None,
+    claim: str | None = None,
+    uncertainty: str | None = None,
+    proposed_action: dict[str, Any] | None = None,
+    evidence_refs: list[str] | None = None,
 ) -> Finding:
     """Post a ``critique`` of a peer finding (appended to ``log`` when given)."""
     if critic_agent_id == finding.agent_id:
@@ -229,6 +263,12 @@ def challenge(
         chamber_id=chamber_id,
         cycle_id=cycle_id or finding.cycle_id,
         timestamp_utc=timestamp_utc,
+        recipients=[finding.agent_id],
+        experiment_id=experiment_id or finding.experiment_id,
+        evidence_refs=[finding.id, *(evidence_refs or [])],
+        claim=claim,
+        uncertainty=uncertainty,
+        proposed_action=proposed_action,
     )
     if log is not None:
         log.append(crit)

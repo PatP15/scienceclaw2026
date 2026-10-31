@@ -109,6 +109,9 @@ LEXICON: dict[str, Term] = {
     "big holes": T(0.8, texture=0.85, density=0.25),
     "bubbly": T(0.6, texture=0.75),
     "custardy": T(0.6, texture=0.65),
+    "nice texture": T(0.6, texture=0.72), "good texture": T(0.6, texture=0.72),
+    "great texture": T(0.65, texture=0.75), "lovely texture": T(0.65, texture=0.75),
+    "nice crumb": T(0.6, texture=0.72), "good crumb": T(0.6, texture=0.72), "great crumb": T(0.65, texture=0.75),
     "well risen": T(0.7, texture=0.7, density=0.25),
     "well-risen": T(0.7, texture=0.7, density=0.25),
     "good rise": T(0.7, texture=0.7, density=0.25),
@@ -280,6 +283,7 @@ PREF_POS_RE = re.compile(
     r"winner|superior|the one i liked)\b"
 )
 TOO_RE = re.compile(r"\btoo\b")
+STILL_RE = re.compile(r"\bstill\b")  # "a more sour loaf that's still fluffy" -> preserve
 INDIFFERENT_RE = re.compile(
     r"\b(?:doesn'?t|does not|don'?t|do not|didn'?t) (?:really )?matter|\b(?:don'?t|do not) (?:really )?care|"
     r"\bnot (?:that |very )?important|\bunimportant|\birrelevant|\bwhatever\b|\bi'?m (?:not fussed|easy)"
@@ -735,6 +739,8 @@ def parse_feedback(text: str, setpoints: dict[str, float] | None = None) -> dict
                     mode = "avoid"
                     if "too" in avoid.group(0) or "overly" in avoid.group(0):
                         mods["too"] = False
+                elif in_desire_clause and t_start >= desire_pos and STILL_RE.search(low, desire_pos, t_start):
+                    mode = "maintain"
                 elif in_desire_clause and t_start >= desire_pos or in_desire_clause and comparative and t_start < desire_pos and desire_pos - t_end < 15:
                     mode = "desire"
                 if mode == "describe" and in_desire_clause and t_start >= (desire_pos or 0):
@@ -993,6 +999,8 @@ def _assemble(text, refs, records, preferences, dislikes, notes) -> dict[str, An
             "anchor_loaf": anchors[0] if anchors else None,
             "implied": all(v["rule"].startswith("implied") for v in chosen),
             "conflicting_votes": conflict,
+            "votes": {k: round(w, 3) for k, w in sorted(weights.items())},
+            "poles": sorted({v["pole"] for v in pool if v["pole"]}),
             "evidence": [v["evidence"] for v in chosen],
         }
     # texture and density are two views of the crumb; keep both but warn on contradictions
@@ -1031,6 +1039,7 @@ def _assemble(text, refs, records, preferences, dislikes, notes) -> dict[str, An
         "desired": desired,
         "desired_aroma_tags": sorted(tags["desired"]),
         "desired_summary": summarize_desired(desired, preferred),
+        "structured_preference": structured_preference(desired),
         "primary_dimension": primary,
         "preferred_loaf": preferred,
         "preference_evidence": [p["evidence"] for p in preferences + dislikes],
@@ -1078,7 +1087,8 @@ def summarize_desired(desired: dict[str, Any], preferred: str | None = None) -> 
         else:
             pole = v.get("preferred_pole")
             if dim == "density":
-                parts.append("keep density low" if pole == "low" else "keep density")
+                lower = pole == "low" and "decrease" in (v.get("votes") or {})
+                parts.append("lower density" if lower else "keep density low" if pole == "low" else "keep density")
             elif dim == "sourness" and pole == "low":
                 parts.append("don't let it get too sour")
             else:
@@ -1089,3 +1099,43 @@ def summarize_desired(desired: dict[str, Any], preferred: str | None = None) -> 
         return "No explicit preference stated."
     s = "; ".join(parts)
     return s[0].upper() + s[1:] + "."
+
+
+def structured_preference(desired: dict[str, Any]) -> list[str]:
+    """Plain preference list in the PLAN_MASTER §14 style ("More sourness", "Lower density", ...).
+
+    Uses every vote (not only the winning direction), so "Loaf B is too dense ... still fluffy"
+    yields both "Lower density" and "Preserve good rise".
+    """
+    def votes(dim):
+        return (desired.get(dim) or {}).get("votes") or {}
+
+    def poles(dim):
+        return set((desired.get(dim) or {}).get("poles") or [])
+
+    out = []
+    sv = votes("sourness")
+    if "increase" in sv and sv.get("increase", 0) >= sv.get("decrease", 0):
+        out.append("More sourness")
+    elif "decrease" in sv:
+        out.append("Less sourness")
+    elif "sourness" in desired and "low" in poles("sourness"):
+        out.append("Do not increase sourness")
+    if "decrease" in votes("density") or "increase" in votes("texture"):
+        out.append("Lower density")
+    elif "increase" in votes("density") or "decrease" in votes("texture"):
+        out.append("Denser / chewier crumb")
+    if ("maintain" in votes("texture") and "high" in poles("texture")) or (
+            "maintain" in votes("density") and "low" in poles("density")):
+        out.append("Preserve good rise (airy/fluffy crumb)")
+    av = votes("aroma")
+    if "increase" in av:
+        out.append("Stronger aroma")
+    elif "decrease" in av:
+        out.append("Subtler aroma")
+    fv = votes("flavor_intensity")
+    if "increase" in fv:
+        out.append("More flavor")
+    elif "decrease" in fv:
+        out.append("Milder overall flavor")
+    return out

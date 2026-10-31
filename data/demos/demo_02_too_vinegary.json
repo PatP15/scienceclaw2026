@@ -66,6 +66,11 @@
    }
   },
   "desired_summary": "Milder (strong); subtler aroma (strong); stronger flavor (moderate); preferred Loaf A.",
+  "structured_preference": [
+   "Less sourness",
+   "Subtler aroma",
+   "More flavor"
+  ],
   "preferred_loaf": "A",
   "flags": [
    "possible_overproofing_B"
@@ -114,6 +119,7 @@
    }
   },
   "proposed_by": "scientist_A",
+  "reviewed_by": "scientist_B",
   "hypothesis": "Running 'Hot 32 °C 5 h -> cool 18 °C' in chamber A will move the loaf toward the judge's target (Milder (strong); subtler aroma (strong); stronger flavor (moderate); preferred Loaf A). LAB outpace yeast near 30-32 °C, so a short hot phase adds acid per unit of rise; the cool tail protects structure."
  },
  "result": {
@@ -271,6 +277,10 @@
      "anchor_loaf": "B",
      "implied": false,
      "conflicting_votes": false,
+     "votes": {
+      "decrease": 1.31
+     },
+     "poles": [],
      "evidence": [
       {
        "text": "way too vinegary",
@@ -297,6 +307,10 @@
      "anchor_loaf": "B",
      "implied": true,
      "conflicting_votes": false,
+     "votes": {
+      "decrease": 0.63
+     },
+     "poles": [],
      "evidence": [
       {
        "text": "way too vinegary",
@@ -317,6 +331,10 @@
      "anchor_loaf": "A",
      "implied": false,
      "conflicting_votes": false,
+     "votes": {
+      "increase": 0.48
+     },
+     "poles": [],
      "evidence": [
       {
        "text": "more flavor",
@@ -329,6 +347,11 @@
    },
    "desired_aroma_tags": [],
    "desired_summary": "Milder (strong); subtler aroma (strong); stronger flavor (moderate); preferred Loaf A.",
+   "structured_preference": [
+    "Less sourness",
+    "Subtler aroma",
+    "More flavor"
+   ],
    "primary_dimension": "sourness",
    "preferred_loaf": "A",
    "preference_evidence": [
@@ -397,7 +420,7 @@
      "overproof_risk": 0.677,
      "time_to_peak_rise_h": 10.45,
      "final_ph": 4.095,
-     "uncertainty": 0.24,
+     "uncertainty": 0.29,
      "provenance": "simulated"
     },
     "B": {
@@ -407,11 +430,11 @@
      "overproof_risk": 0.658,
      "time_to_peak_rise_h": 7.2,
      "final_ph": 4.119,
-     "uncertainty": 0.29,
+     "uncertainty": 0.34,
      "provenance": "simulated"
     }
    },
-   "uncertainty": "Predictions come from the fermentation simulator (uncalibrated against this starter); the judge-scale map rests on 2 judged loaf/loaves for sourness (anchored) and 1 for crumb (offset_only); band ±0.24 grows with distance from the recorded conditions; one judge, one tasting, one shared pH probe; perceived sourness ≠ pH (lactic/acetic balance matters); no validated schedule is predicted to reach sourness 0.56 (best 0.39) without passing peak rise; this run tests how far the warm acid route can go.",
+   "uncertainty": "Predictions come from the fermentation simulator (uncalibrated against this starter); the judge-scale map rests on 2 judged loaf/loaves for sourness (anchored) and 1 for crumb (offset_only); band ±0.29 grows with distance from the recorded conditions (widened by 0.05 for missing/invalid observations); one judge, one tasting, one shared pH probe; perceived sourness ≠ pH (lactic/acetic balance matters); No valid pH measurement for chamber A (no telemetry this cycle); I rely on model predictions and widen the stated uncertainty by ±0.05.; no validated schedule is predicted to reach sourness 0.56 (best 0.39) without passing peak rise; this run tests how far the warm acid route can go.",
    "confidence": "moderate",
    "status": "proposed"
   },
@@ -447,14 +470,15 @@
   },
   "agent_messages": [
    {
-    "id": "f_f39b082a3a762f70",
+    "id": "f_80b35a6ee111f24c",
     "agent_id": "scientist_A",
     "timestamp_utc": "2026-10-31T18:00:00Z",
     "type": "hypothesis",
-    "content": "[scientist_A → scientist_B] Hypothesis: Running 'Hot 32 °C 5 h -> cool 18 °C' in chamber A will move the loaf toward the judge's target (Milder (strong); subtler aroma (strong); stronger flavor (moderate); preferred Loaf A). LAB outpace yeast near 30-32 °C, so a short hot phase adds acid per unit of rise; the cool tail protects structure. Proposed for chamber A: 'Hot 32 °C 5 h -> cool 18 °C'. Predicted (simulator, anchored on judged loaves): sourness 0.39 ± 0.24, crumb openness 0.36 ± 0.24; rise progress 1.53× peak (overproof risk 68%), peak rise expected near 10.4 h, final pH ≈ 4.09 (simulated). Suggestion for chamber B: 'Steady 24 °C, 12 h'.",
+    "content": "[scientist_A → scientist_B] Hypothesis: Running 'Hot 32 °C 5 h -> cool 18 °C' in chamber A will move the loaf toward the judge's target (Milder (strong); subtler aroma (strong); stronger flavor (moderate); preferred Loaf A). LAB outpace yeast near 30-32 °C, so a short hot phase adds acid per unit of rise; the cool tail protects structure. Proposed for chamber A: 'Hot 32 °C 5 h -> cool 18 °C'. Predicted (simulator, anchored on judged loaves): sourness 0.39 ± 0.29, crumb openness 0.36 ± 0.29; rise progress 1.53× peak (overproof risk 68%), peak rise expected near 10.4 h, final pH ≈ 4.09 (simulated). Suggestion for chamber B: 'Steady 24 °C, 12 h'.",
     "payload": {
      "role": "proposer",
      "decision_source": "offline_policy",
+     "reasoning_mode_label": "Offline Policy",
      "lead_reason": "Loaf A was judged closest to the requested less sour direction",
      "hypothesis": {
       "statement": "Running 'Hot 32 °C 5 h -> cool 18 °C' in chamber A will move the loaf toward the judge's target (Milder (strong); subtler aroma (strong); stronger flavor (moderate); preferred Loaf A). LAB outpace yeast near 30-32 °C, so a short hot phase adds acid per unit of rise; the cool tail protects structure.",
@@ -504,7 +528,7 @@
        "overproof_risk": 0.677,
        "time_to_peak_rise_h": 10.45,
        "final_ph": 4.095,
-       "uncertainty": 0.24,
+       "uncertainty": 0.29,
        "provenance": "simulated"
       }
      },
@@ -514,8 +538,8 @@
       "name": "Steady 24 °C, 12 h",
       "reason": "Chamber B could run 'Steady 24 °C, 12 h' (intermediate temperature) so the two chambers test different mechanisms instead of duplicating one."
      },
-     "prediction": "Predicted (simulator, anchored on judged loaves): sourness 0.39 ± 0.24, crumb openness 0.36 ± 0.24; rise progress 1.53× peak (overproof risk 68%), peak rise expected near 10.4 h, final pH ≈ 4.09 (simulated).",
-     "uncertainty": "Predictions come from the fermentation simulator (uncalibrated against this starter); the judge-scale map rests on 2 judged loaf/loaves for sourness (anchored) and 1 for crumb (offset_only); band ±0.24 grows with distance from the recorded conditions; one judge, one tasting, one shared pH probe; perceived sourness ≠ pH (lactic/acetic balance matters); no validated schedule is predicted to reach sourness 0.56 (best 0.39) without passing peak rise; this run tests how far the warm acid route can go.",
+     "prediction": "Predicted (simulator, anchored on judged loaves): sourness 0.39 ± 0.29, crumb openness 0.36 ± 0.29; rise progress 1.53× peak (overproof risk 68%), peak rise expected near 10.4 h, final pH ≈ 4.09 (simulated).",
+     "uncertainty": "Predictions come from the fermentation simulator (uncalibrated against this starter); the judge-scale map rests on 2 judged loaf/loaves for sourness (anchored) and 1 for crumb (offset_only); band ±0.29 grows with distance from the recorded conditions (widened by 0.05 for missing/invalid observations); one judge, one tasting, one shared pH probe; perceived sourness ≠ pH (lactic/acetic balance matters); No valid pH measurement for chamber A (no telemetry this cycle); I rely on model predictions and widen the stated uncertainty by ±0.05.; no validated schedule is predicted to reach sourness 0.56 (best 0.39) without passing peak rise; this run tests how far the warm acid route can go.",
      "proposed_measurement": "Side-camera starter height every 10 min (end at peak/plateau, not by the clock); pH spot checks on a separate non-edible sample at 0 h and at each temperature change (t≈5 h) and at the end (single shared probe); chamber temperature continuously; blind tasting for sourness, crumb texture and aroma plus a crumb photo.",
      "rationale": "I lead because Loaf A was judged closest to the requested less sour direction. Of 17 validated candidates, 'Hot 32 °C 5 h -> cool 18 °C' has the lowest cost 0.1940 against targets [sourness ≈0.56, acetic ≤0.25] (runner-up 'Steady 27 °C, 10 h (capped)' 0.2708). Recorded conditions: A: assumed steady 22 °C for 14 h (from setpoints) -> model rise progress 1.47× peak; B: assumed steady 27 °C for 14 h (from setpoints) -> model rise progress 1.94× peak (exceeded the 10 h hot-hold guideline).",
      "targets": {
@@ -531,23 +555,49 @@
        "weight": 0.3,
        "reason": "less vinegary: avoid long cool (acetic-leaning) phases"
       }
+     },
+     "ph_status": {
+      "valid": false,
+      "reason": "no telemetry this cycle",
+      "latest": null
      }
     },
     "evidence_source": "replay",
     "in_reply_to": null,
     "chamber_id": "A",
     "cycle_id": "cyc_9d646099d99d",
-    "schema_version": "1.0"
+    "schema_version": "1.0",
+    "recipients": [
+     "scientist_B"
+    ],
+    "experiment_id": "trial_002",
+    "evidence_refs": [
+     "f_a70adf2ec8c8a736"
+    ],
+    "claim": "Running 'Hot 32 °C 5 h -> cool 18 °C' in chamber A will move the loaf toward the judge's target (Milder (strong); subtler aroma (strong); stronger flavor (moderate); preferred Loaf A). LAB outpace yeast near 30-32 °C, so a short hot phase adds acid per unit of rise; the cool tail protects structure.",
+    "uncertainty": "Predictions come from the fermentation simulator (uncalibrated against this starter); the judge-scale map rests on 2 judged loaf/loaves for sourness (anchored) and 1 for crumb (offset_only); band ±0.29 grows with distance from the recorded conditions (widened by 0.05 for missing/invalid observations); one judge, one tasting, one shared pH probe; perceived sourness ≠ pH (lactic/acetic balance matters); No valid pH measurement for chamber A (no telemetry this cycle); I rely on model predictions and widen the stated uncertainty by ±0.05.; no validated schedule is predicted to reach sourness 0.56 (best 0.39) without passing peak rise; this run tests how far the warm acid route can go.",
+    "proposed_action": {
+     "type": "set_schedule",
+     "chamber": "A",
+     "schedule_id": "warm_then_cool_32_18",
+     "validated_library_schedule": true,
+     "suggestion_for_peer": {
+      "chamber": "B",
+      "schedule_id": "steady_24_12h"
+     }
+    }
    },
    {
-    "id": "f_e262374cc04b6678",
+    "id": "f_9230114bc8f2ad97",
     "agent_id": "scientist_B",
     "timestamp_utc": "2026-10-31T18:00:00Z",
     "type": "critique",
-    "content": "[scientist_B → scientist_A] Critique: I am not convinced yet: (1) 'Hot 32 °C 5 h -> cool 18 °C' is predicted to reach 1.53× peak rise (overproof risk 68%) — the same failure mode that plausibly made the warm loaf dense; end at the plateau rather than the clock. (2) predicted sourness 0.39 vs target ≈0.56: the requested change may not be reachable on this route alone. (3) only two judged loaves calibrate the sourness scale and the fitted slope is steep (×4.9), so small model errors become large predicted sourness differences. (4) timing sensitivity: at 32 °C each extra hour adds ≈0.22× of peak-rise progress (heuristic), so the step-down must happen on time. (5) From my own chamber (B) I have no telemetry this cycle, so this critique relies on the judge feedback and model predictions (simulated). Alternative hypothesis: Perceived sourness may depend more on the acetic share than on total acid; a long cool phase could raise sharpness without pushing the dough past peak rise. I decline your suggestion 'Steady 24 °C, 12 h' for chamber B; from my own ranking 'Steady 27 °C, 10 h (capped)' scores better (0.2339) as a complementary arm. Decision for chamber B: 'Steady 27 °C, 10 h (capped)'. Without the proposer's message I would have chosen 'Hot 32 °C 5 h -> cool 18 °C'; I switched to 'Steady 27 °C, 10 h (capped)' because it would duplicate the proposer's arm.",
+    "content": "[scientist_B → scientist_A] Critique: I am not convinced yet: (1) 'Hot 32 °C 5 h -> cool 18 °C' is predicted to reach 1.53× peak rise (overproof risk 68%) — the same failure mode that plausibly made the warm loaf dense; end at the plateau rather than the clock. (2) predicted sourness 0.39 vs target ≈0.56: the requested change may not be reachable on this route alone. (3) only two judged loaves calibrate the sourness scale and the fitted slope is steep (×4.9), so small model errors become large predicted sourness differences. (4) timing sensitivity: at 32 °C each extra hour adds ≈0.22× of peak-rise progress (heuristic), so the step-down must happen on time. (5) From my own chamber (B) I have no telemetry this cycle, so this critique relies on the judge feedback and model predictions (simulated). Alternative hypothesis: Perceived sourness may depend more on the acetic share than on total acid; a long cool phase could raise sharpness without pushing the dough past peak rise. I decline your suggestion 'Steady 24 °C, 12 h' for chamber B; from my own ranking 'Steady 27 °C, 10 h (capped)' scores better (0.2339) as a complementary arm. Decision for chamber B: 'Steady 27 °C, 10 h (capped)'. Without the proposer's message I would have chosen 'Hot 32 °C 5 h -> cool 18 °C'; I switched to 'Steady 27 °C, 10 h (capped)' because it would duplicate the proposer's arm. No valid pH measurement for chamber B (no telemetry this cycle); I rely on model predictions and widen the stated uncertainty by ±0.05.",
     "payload": {
      "role": "critic",
      "decision_source": "offline_policy",
+     "reasoning_mode_label": "Offline Policy",
+     "message_kind": "peer_critique",
      "agrees_with_hypothesis": false,
      "concerns": [
       "'Hot 32 °C 5 h -> cool 18 °C' is predicted to reach 1.53× peak rise (overproof risk 68%) — the same failure mode that plausibly made the warm loaf dense; end at the plateau rather than the clock.",
@@ -580,7 +630,7 @@
        "overproof_risk": 0.658,
        "time_to_peak_rise_h": 7.2,
        "final_ph": 4.119,
-       "uncertainty": 0.29,
+       "uncertainty": 0.34,
        "provenance": "simulated"
       }
      },
@@ -616,24 +666,44 @@
        "overproof_risk": 0.677,
        "time_to_peak_rise_h": 10.45,
        "final_ph": 4.095,
-       "uncertainty": 0.24,
+       "uncertainty": 0.29,
        "provenance": "simulated"
       }
      },
      "decision_changed_by_peer": true,
      "decision_change_note": "Without the proposer's message I would have chosen 'Hot 32 °C 5 h -> cool 18 °C'; I switched to 'Steady 27 °C, 10 h (capped)' because it would duplicate the proposer's arm.",
-     "prediction": "Predicted (simulator, anchored on judged loaves): sourness 0.20 ± 0.29, crumb openness 0.43 ± 0.29; rise progress 1.39× peak (overproof risk 66%), peak rise expected near 7.2 h, final pH ≈ 4.12 (simulated).",
-     "uncertainty": "Predictions come from the fermentation simulator (uncalibrated against this starter); the judge-scale map rests on 2 judged loaf/loaves for sourness (anchored) and 1 for crumb (offset_only); band ±0.29 grows with distance from the recorded conditions; one judge, one tasting, one shared pH probe; perceived sourness ≠ pH (lactic/acetic balance matters).",
+     "prediction": "Predicted (simulator, anchored on judged loaves): sourness 0.20 ± 0.34, crumb openness 0.43 ± 0.34; rise progress 1.39× peak (overproof risk 66%), peak rise expected near 7.2 h, final pH ≈ 4.12 (simulated).",
+     "uncertainty": "Predictions come from the fermentation simulator (uncalibrated against this starter); the judge-scale map rests on 2 judged loaf/loaves for sourness (anchored) and 1 for crumb (offset_only); band ±0.34 grows with distance from the recorded conditions (widened by 0.05 for missing/invalid observations); one judge, one tasting, one shared pH probe; perceived sourness ≠ pH (lactic/acetic balance matters); No valid pH measurement for chamber B (no telemetry this cycle); I rely on model predictions and widen the stated uncertainty by ±0.05..",
      "proposed_measurement": "Side-camera starter height every 10 min (end at peak/plateau, not by the clock); pH spot checks on a separate non-edible sample at 0 h and at the end (single shared probe); chamber temperature continuously; blind tasting for sourness, crumb texture and aroma plus a crumb photo. Retain a slice of each loaf for a side-by-side re-taste.",
      "rationale": "My chamber runs 'Steady 27 °C, 10 h (capped)' (warm acid route) so that, together with 'Hot 32 °C 5 h -> cool 18 °C' (warm acid route), the round discriminates between the two mechanisms. Targets: sourness ≈0.56, acetic ≤0.25.",
+     "ph_status": {
+      "valid": false,
+      "reason": "no telemetry this cycle",
+      "latest": null
+     },
      "challenged_finding_type": "hypothesis",
      "challenged_agent_id": "scientist_A"
     },
     "evidence_source": "replay",
-    "in_reply_to": "f_f39b082a3a762f70",
+    "in_reply_to": "f_80b35a6ee111f24c",
     "chamber_id": "B",
     "cycle_id": "cyc_9d646099d99d",
-    "schema_version": "1.0"
+    "schema_version": "1.0",
+    "recipients": [
+     "scientist_A"
+    ],
+    "experiment_id": "trial_002",
+    "evidence_refs": [
+     "f_80b35a6ee111f24c"
+    ],
+    "claim": "Perceived sourness may depend more on the acetic share than on total acid; a long cool phase could raise sharpness without pushing the dough past peak rise.",
+    "uncertainty": "Predictions come from the fermentation simulator (uncalibrated against this starter); the judge-scale map rests on 2 judged loaf/loaves for sourness (anchored) and 1 for crumb (offset_only); band ±0.34 grows with distance from the recorded conditions (widened by 0.05 for missing/invalid observations); one judge, one tasting, one shared pH probe; perceived sourness ≠ pH (lactic/acetic balance matters); No valid pH measurement for chamber B (no telemetry this cycle); I rely on model predictions and widen the stated uncertainty by ±0.05..",
+    "proposed_action": {
+     "type": "set_schedule",
+     "chamber": "B",
+     "schedule_id": "steady_27_10h",
+     "validated_library_schedule": true
+    }
    },
    {
     "id": "f_0c290e263becb470",
@@ -676,16 +746,31 @@
        "overproof_risk": 0.677,
        "time_to_peak_rise_h": 10.45,
        "final_ph": 4.095,
-       "uncertainty": 0.24,
+       "uncertainty": 0.29,
        "provenance": "simulated"
       }
      }
     },
     "evidence_source": "replay",
-    "in_reply_to": "f_e262374cc04b6678",
+    "in_reply_to": "f_9230114bc8f2ad97",
     "chamber_id": "A",
     "cycle_id": "cyc_9d646099d99d",
-    "schema_version": "1.0"
+    "schema_version": "1.0",
+    "recipients": [
+     "scientist_B"
+    ],
+    "experiment_id": "trial_002",
+    "evidence_refs": [
+     "f_9230114bc8f2ad97"
+    ],
+    "claim": "Thanks. Your overproofing concern stands (risk 68%), but no validated alternative lowers it without giving up most of the predicted gain, so I keep 'Hot 32 °C 5 h -> cool 18 °C' and will end at the rise plateau from the starter-height curve rather than the clock. I adopt your proposal to retain slices for a side-by-side re-taste. The round now contrasts two variants of the warm acid route ('Hot 32 °C 5 h -> cool 18 °C' vs 'Steady 27 °C, 10 h (capped)').",
+    "uncertainty": null,
+    "proposed_action": {
+     "type": "set_schedule",
+     "chamber": "A",
+     "schedule_id": "warm_then_cool_32_18",
+     "validated_library_schedule": true
+    }
    }
   ],
   "next_experiment": {
@@ -726,7 +811,7 @@
       "overproof_risk": 0.677,
       "time_to_peak_rise_h": 10.45,
       "final_ph": 4.095,
-      "uncertainty": 0.24,
+      "uncertainty": 0.29,
       "provenance": "simulated"
      },
      "owner_agent": "scientist_A",
@@ -755,7 +840,7 @@
       "overproof_risk": 0.658,
       "time_to_peak_rise_h": 7.2,
       "final_ph": 4.119,
-      "uncertainty": 0.29,
+      "uncertainty": 0.34,
       "provenance": "simulated"
      },
      "owner_agent": "scientist_B",
@@ -865,23 +950,81 @@
     "status": "insufficient_data",
     "action": "monitor",
     "suggested_setpoint_c": null,
-    "rationale": "Not enough rise data to judge proofing; keep logging starter height. (fewer than 3 starter-height readings)",
+    "rationale": "Not enough reliable rise data to judge proofing; keep logging starter height. (fewer than 3 quality-approved starter-height readings)",
     "evidence": {
      "telemetry_points": 0,
-     "sources": []
+     "sources": [],
+     "usable_height_points": 0,
+     "excluded_height_points": {}
     },
-    "requires_human_confirmation": false
+    "requires_human_confirmation": false,
+    "deviations": null,
+    "observation_quality": {
+     "n": 0,
+     "sources": null,
+     "latest_age_s": null,
+     "latest_stale": null,
+     "latest_usable": null,
+     "ph_valid": false,
+     "ph_reason": "no telemetry this cycle"
+    },
+    "additional_actions": []
    },
    "B": {
     "status": "insufficient_data",
     "action": "monitor",
     "suggested_setpoint_c": null,
-    "rationale": "Not enough rise data to judge proofing; keep logging starter height. (fewer than 3 starter-height readings)",
+    "rationale": "Not enough reliable rise data to judge proofing; keep logging starter height. (fewer than 3 quality-approved starter-height readings)",
     "evidence": {
      "telemetry_points": 0,
-     "sources": []
+     "sources": [],
+     "usable_height_points": 0,
+     "excluded_height_points": {}
     },
-    "requires_human_confirmation": false
+    "requires_human_confirmation": false,
+    "deviations": null,
+    "observation_quality": {
+     "n": 0,
+     "sources": null,
+     "latest_age_s": null,
+     "latest_stale": null,
+     "latest_usable": null,
+     "ph_valid": false,
+     "ph_reason": "no telemetry this cycle"
+    },
+    "additional_actions": []
+   }
+  },
+  "observations": {
+   "A": {
+    "latest": null,
+    "quality": {
+     "n": 0,
+     "note": "no telemetry",
+     "ph_valid": false,
+     "ph_reason": "no telemetry this cycle"
+    },
+    "ph_status": {
+     "valid": false,
+     "reason": "no telemetry this cycle",
+     "latest": null
+    },
+    "deviations_from_prediction": null
+   },
+   "B": {
+    "latest": null,
+    "quality": {
+     "n": 0,
+     "note": "no telemetry",
+     "ph_valid": false,
+     "ph_reason": "no telemetry this cycle"
+    },
+    "ph_status": {
+     "valid": false,
+     "reason": "no telemetry this cycle",
+     "latest": null
+    },
+    "deviations_from_prediction": null
    }
   },
   "candidate_ranking": [
@@ -942,29 +1085,39 @@
   ],
   "findings_logged": [
    {
-    "id": "f_45a9fcdc5c9352f6",
+    "id": "f_a70adf2ec8c8a736",
     "agent_id": "scientist_A",
     "timestamp_utc": "2026-10-31T18:00:00Z",
-    "type": "observation",
+    "type": "sensory_feedback",
     "content": "Judge feedback interpreted as: Loaf A: sourness very mild (0.15), aroma faint / bland (0.15); Loaf B: sourness very sour / sharp (0.98), aroma strong / complex (0.77), density dense / heavy (0.75). Desired: Milder (strong); subtler aroma (strong); stronger flavor (moderate); preferred Loaf A.",
     "payload": {
-     "interpretation_method": "rule_based_lexicon_v1"
+     "interpretation_method": "rule_based_lexicon_v1",
+     "desired_summary": "Milder (strong); subtler aroma (strong); stronger flavor (moderate); preferred Loaf A."
     },
     "evidence_source": "replay",
     "in_reply_to": null,
     "chamber_id": "A",
     "cycle_id": "cyc_9d646099d99d",
-    "schema_version": "1.0"
+    "schema_version": "1.0",
+    "recipients": [
+     "scientist_B"
+    ],
+    "experiment_id": "trial_002",
+    "evidence_refs": [],
+    "claim": "Milder (strong); subtler aroma (strong); stronger flavor (moderate); preferred Loaf A.",
+    "uncertainty": null,
+    "proposed_action": null
    },
    {
-    "id": "f_f39b082a3a762f70",
+    "id": "f_80b35a6ee111f24c",
     "agent_id": "scientist_A",
     "timestamp_utc": "2026-10-31T18:00:00Z",
     "type": "hypothesis",
-    "content": "[scientist_A → scientist_B] Hypothesis: Running 'Hot 32 °C 5 h -> cool 18 °C' in chamber A will move the loaf toward the judge's target (Milder (strong); subtler aroma (strong); stronger flavor (moderate); preferred Loaf A). LAB outpace yeast near 30-32 °C, so a short hot phase adds acid per unit of rise; the cool tail protects structure. Proposed for chamber A: 'Hot 32 °C 5 h -> cool 18 °C'. Predicted (simulator, anchored on judged loaves): sourness 0.39 ± 0.24, crumb openness 0.36 ± 0.24; rise progress 1.53× peak (overproof risk 68%), peak rise expected near 10.4 h, final pH ≈ 4.09 (simulated). Suggestion for chamber B: 'Steady 24 °C, 12 h'.",
+    "content": "[scientist_A → scientist_B] Hypothesis: Running 'Hot 32 °C 5 h -> cool 18 °C' in chamber A will move the loaf toward the judge's target (Milder (strong); subtler aroma (strong); stronger flavor (moderate); preferred Loaf A). LAB outpace yeast near 30-32 °C, so a short hot phase adds acid per unit of rise; the cool tail protects structure. Proposed for chamber A: 'Hot 32 °C 5 h -> cool 18 °C'. Predicted (simulator, anchored on judged loaves): sourness 0.39 ± 0.29, crumb openness 0.36 ± 0.29; rise progress 1.53× peak (overproof risk 68%), peak rise expected near 10.4 h, final pH ≈ 4.09 (simulated). Suggestion for chamber B: 'Steady 24 °C, 12 h'.",
     "payload": {
      "role": "proposer",
      "decision_source": "offline_policy",
+     "reasoning_mode_label": "Offline Policy",
      "lead_reason": "Loaf A was judged closest to the requested less sour direction",
      "hypothesis": {
       "statement": "Running 'Hot 32 °C 5 h -> cool 18 °C' in chamber A will move the loaf toward the judge's target (Milder (strong); subtler aroma (strong); stronger flavor (moderate); preferred Loaf A). LAB outpace yeast near 30-32 °C, so a short hot phase adds acid per unit of rise; the cool tail protects structure.",
@@ -1014,7 +1167,7 @@
        "overproof_risk": 0.677,
        "time_to_peak_rise_h": 10.45,
        "final_ph": 4.095,
-       "uncertainty": 0.24,
+       "uncertainty": 0.29,
        "provenance": "simulated"
       }
      },
@@ -1024,8 +1177,8 @@
       "name": "Steady 24 °C, 12 h",
       "reason": "Chamber B could run 'Steady 24 °C, 12 h' (intermediate temperature) so the two chambers test different mechanisms instead of duplicating one."
      },
-     "prediction": "Predicted (simulator, anchored on judged loaves): sourness 0.39 ± 0.24, crumb openness 0.36 ± 0.24; rise progress 1.53× peak (overproof risk 68%), peak rise expected near 10.4 h, final pH ≈ 4.09 (simulated).",
-     "uncertainty": "Predictions come from the fermentation simulator (uncalibrated against this starter); the judge-scale map rests on 2 judged loaf/loaves for sourness (anchored) and 1 for crumb (offset_only); band ±0.24 grows with distance from the recorded conditions; one judge, one tasting, one shared pH probe; perceived sourness ≠ pH (lactic/acetic balance matters); no validated schedule is predicted to reach sourness 0.56 (best 0.39) without passing peak rise; this run tests how far the warm acid route can go.",
+     "prediction": "Predicted (simulator, anchored on judged loaves): sourness 0.39 ± 0.29, crumb openness 0.36 ± 0.29; rise progress 1.53× peak (overproof risk 68%), peak rise expected near 10.4 h, final pH ≈ 4.09 (simulated).",
+     "uncertainty": "Predictions come from the fermentation simulator (uncalibrated against this starter); the judge-scale map rests on 2 judged loaf/loaves for sourness (anchored) and 1 for crumb (offset_only); band ±0.29 grows with distance from the recorded conditions (widened by 0.05 for missing/invalid observations); one judge, one tasting, one shared pH probe; perceived sourness ≠ pH (lactic/acetic balance matters); No valid pH measurement for chamber A (no telemetry this cycle); I rely on model predictions and widen the stated uncertainty by ±0.05.; no validated schedule is predicted to reach sourness 0.56 (best 0.39) without passing peak rise; this run tests how far the warm acid route can go.",
      "proposed_measurement": "Side-camera starter height every 10 min (end at peak/plateau, not by the clock); pH spot checks on a separate non-edible sample at 0 h and at each temperature change (t≈5 h) and at the end (single shared probe); chamber temperature continuously; blind tasting for sourness, crumb texture and aroma plus a crumb photo.",
      "rationale": "I lead because Loaf A was judged closest to the requested less sour direction. Of 17 validated candidates, 'Hot 32 °C 5 h -> cool 18 °C' has the lowest cost 0.1940 against targets [sourness ≈0.56, acetic ≤0.25] (runner-up 'Steady 27 °C, 10 h (capped)' 0.2708). Recorded conditions: A: assumed steady 22 °C for 14 h (from setpoints) -> model rise progress 1.47× peak; B: assumed steady 27 °C for 14 h (from setpoints) -> model rise progress 1.94× peak (exceeded the 10 h hot-hold guideline).",
      "targets": {
@@ -1041,20 +1194,44 @@
        "weight": 0.3,
        "reason": "less vinegary: avoid long cool (acetic-leaning) phases"
       }
+     },
+     "ph_status": {
+      "valid": false,
+      "reason": "no telemetry this cycle",
+      "latest": null
      }
     },
     "evidence_source": "replay",
     "in_reply_to": null,
     "chamber_id": "A",
     "cycle_id": "cyc_9d646099d99d",
-    "schema_version": "1.0"
+    "schema_version": "1.0",
+    "recipients": [
+     "scientist_B"
+    ],
+    "experiment_id": "trial_002",
+    "evidence_refs": [
+     "f_a70adf2ec8c8a736"
+    ],
+    "claim": "Running 'Hot 32 °C 5 h -> cool 18 °C' in chamber A will move the loaf toward the judge's target (Milder (strong); subtler aroma (strong); stronger flavor (moderate); preferred Loaf A). LAB outpace yeast near 30-32 °C, so a short hot phase adds acid per unit of rise; the cool tail protects structure.",
+    "uncertainty": "Predictions come from the fermentation simulator (uncalibrated against this starter); the judge-scale map rests on 2 judged loaf/loaves for sourness (anchored) and 1 for crumb (offset_only); band ±0.29 grows with distance from the recorded conditions (widened by 0.05 for missing/invalid observations); one judge, one tasting, one shared pH probe; perceived sourness ≠ pH (lactic/acetic balance matters); No valid pH measurement for chamber A (no telemetry this cycle); I rely on model predictions and widen the stated uncertainty by ±0.05.; no validated schedule is predicted to reach sourness 0.56 (best 0.39) without passing peak rise; this run tests how far the warm acid route can go.",
+    "proposed_action": {
+     "type": "set_schedule",
+     "chamber": "A",
+     "schedule_id": "warm_then_cool_32_18",
+     "validated_library_schedule": true,
+     "suggestion_for_peer": {
+      "chamber": "B",
+      "schedule_id": "steady_24_12h"
+     }
+    }
    },
    {
-    "id": "f_70d05d6e1484efc5",
+    "id": "f_6f47c40dd8c69c2d",
     "agent_id": "scientist_A",
     "timestamp_utc": "2026-10-31T18:00:00Z",
     "type": "prediction",
-    "content": "Predicted (simulator, anchored on judged loaves): sourness 0.39 ± 0.24, crumb openness 0.36 ± 0.24; rise progress 1.53× peak (overproof risk 68%), peak rise expected near 10.4 h, final pH ≈ 4.09 (simulated).",
+    "content": "Predicted (simulator, anchored on judged loaves): sourness 0.39 ± 0.29, crumb openness 0.36 ± 0.29; rise progress 1.53× peak (overproof risk 68%), peak rise expected near 10.4 h, final pH ≈ 4.09 (simulated).",
     "payload": {
      "schedule_id": "warm_then_cool_32_18",
      "sourness": 0.387,
@@ -1063,27 +1240,45 @@
      "overproof_risk": 0.677,
      "time_to_peak_rise_h": 10.45,
      "final_ph": 4.095,
-     "uncertainty": 0.24,
+     "uncertainty": 0.29,
      "provenance": "simulated"
     },
     "evidence_source": "replay",
-    "in_reply_to": "f_f39b082a3a762f70",
+    "in_reply_to": "f_80b35a6ee111f24c",
     "chamber_id": "A",
     "cycle_id": "cyc_9d646099d99d",
-    "schema_version": "1.0"
+    "schema_version": "1.0",
+    "recipients": [
+     "scientist_B"
+    ],
+    "experiment_id": "trial_002",
+    "evidence_refs": [
+     "f_80b35a6ee111f24c"
+    ],
+    "claim": "Predicted (simulator, anchored on judged loaves): sourness 0.39 ± 0.29, crumb openness 0.36 ± 0.29; rise progress 1.53× peak (overproof risk 68%), peak rise expected near 10.4 h, final pH ≈ 4.09 (simulated).",
+    "uncertainty": null,
+    "proposed_action": null
    },
    {
-    "id": "f_e88b9dfcfdd9054e",
+    "id": "f_fbed3fc3ec75ab90",
     "agent_id": "scientist_A",
     "timestamp_utc": "2026-10-31T18:00:00Z",
     "type": "uncertainty",
-    "content": "Predictions come from the fermentation simulator (uncalibrated against this starter); the judge-scale map rests on 2 judged loaf/loaves for sourness (anchored) and 1 for crumb (offset_only); band ±0.24 grows with distance from the recorded conditions; one judge, one tasting, one shared pH probe; perceived sourness ≠ pH (lactic/acetic balance matters); no validated schedule is predicted to reach sourness 0.56 (best 0.39) without passing peak rise; this run tests how far the warm acid route can go.",
+    "content": "Predictions come from the fermentation simulator (uncalibrated against this starter); the judge-scale map rests on 2 judged loaf/loaves for sourness (anchored) and 1 for crumb (offset_only); band ±0.29 grows with distance from the recorded conditions (widened by 0.05 for missing/invalid observations); one judge, one tasting, one shared pH probe; perceived sourness ≠ pH (lactic/acetic balance matters); No valid pH measurement for chamber A (no telemetry this cycle); I rely on model predictions and widen the stated uncertainty by ±0.05.; no validated schedule is predicted to reach sourness 0.56 (best 0.39) without passing peak rise; this run tests how far the warm acid route can go.",
     "payload": {},
     "evidence_source": "replay",
-    "in_reply_to": "f_f39b082a3a762f70",
+    "in_reply_to": "f_80b35a6ee111f24c",
     "chamber_id": "A",
     "cycle_id": "cyc_9d646099d99d",
-    "schema_version": "1.0"
+    "schema_version": "1.0",
+    "recipients": [
+     "scientist_B"
+    ],
+    "experiment_id": "trial_002",
+    "evidence_refs": [],
+    "claim": null,
+    "uncertainty": "Predictions come from the fermentation simulator (uncalibrated against this starter); the judge-scale map rests on 2 judged loaf/loaves for sourness (anchored) and 1 for crumb (offset_only); band ±0.29 grows with distance from the recorded conditions (widened by 0.05 for missing/invalid observations); one judge, one tasting, one shared pH probe; perceived sourness ≠ pH (lactic/acetic balance matters); No valid pH measurement for chamber A (no telemetry this cycle); I rely on model predictions and widen the stated uncertainty by ±0.05.; no validated schedule is predicted to reach sourness 0.56 (best 0.39) without passing peak rise; this run tests how far the warm acid route can go.",
+    "proposed_action": null
    },
    {
     "id": "f_fffba108c280cf33",
@@ -1123,15 +1318,32 @@
       "overproof_risk": 0.677,
       "time_to_peak_rise_h": 10.45,
       "final_ph": 4.095,
-      "uncertainty": 0.24,
+      "uncertainty": 0.29,
       "provenance": "simulated"
      }
     },
     "evidence_source": "replay",
-    "in_reply_to": "f_f39b082a3a762f70",
+    "in_reply_to": "f_80b35a6ee111f24c",
     "chamber_id": "A",
     "cycle_id": "cyc_9d646099d99d",
-    "schema_version": "1.0"
+    "schema_version": "1.0",
+    "recipients": [
+     "scientist_B"
+    ],
+    "experiment_id": "trial_002",
+    "evidence_refs": [],
+    "claim": null,
+    "uncertainty": null,
+    "proposed_action": {
+     "type": "set_schedule",
+     "chamber": "A",
+     "schedule_id": "warm_then_cool_32_18",
+     "validated_library_schedule": true,
+     "suggestion_for_peer": {
+      "chamber": "B",
+      "schedule_id": "steady_24_12h"
+     }
+    }
    },
    {
     "id": "f_4ca2ff9065201a44",
@@ -1141,20 +1353,33 @@
     "content": "Side-camera starter height every 10 min (end at peak/plateau, not by the clock); pH spot checks on a separate non-edible sample at 0 h and at each temperature change (t≈5 h) and at the end (single shared probe); chamber temperature continuously; blind tasting for sourness, crumb texture and aroma plus a crumb photo.",
     "payload": {},
     "evidence_source": "replay",
-    "in_reply_to": "f_f39b082a3a762f70",
+    "in_reply_to": "f_80b35a6ee111f24c",
     "chamber_id": "A",
     "cycle_id": "cyc_9d646099d99d",
-    "schema_version": "1.0"
+    "schema_version": "1.0",
+    "recipients": [
+     "scientist_B"
+    ],
+    "experiment_id": "trial_002",
+    "evidence_refs": [],
+    "claim": null,
+    "uncertainty": null,
+    "proposed_action": {
+     "type": "measure",
+     "what": "Side-camera starter height every 10 min (end at peak/plateau, not by the clock); pH spot checks on a separate non-edible sample at 0 h and at each temperature change (t≈5 h) and at the end (single shared probe); chamber temperature continuously; blind tasting for sourness, crumb texture and aroma plus a crumb photo."
+    }
    },
    {
-    "id": "f_e262374cc04b6678",
+    "id": "f_9230114bc8f2ad97",
     "agent_id": "scientist_B",
     "timestamp_utc": "2026-10-31T18:00:00Z",
     "type": "critique",
-    "content": "[scientist_B → scientist_A] Critique: I am not convinced yet: (1) 'Hot 32 °C 5 h -> cool 18 °C' is predicted to reach 1.53× peak rise (overproof risk 68%) — the same failure mode that plausibly made the warm loaf dense; end at the plateau rather than the clock. (2) predicted sourness 0.39 vs target ≈0.56: the requested change may not be reachable on this route alone. (3) only two judged loaves calibrate the sourness scale and the fitted slope is steep (×4.9), so small model errors become large predicted sourness differences. (4) timing sensitivity: at 32 °C each extra hour adds ≈0.22× of peak-rise progress (heuristic), so the step-down must happen on time. (5) From my own chamber (B) I have no telemetry this cycle, so this critique relies on the judge feedback and model predictions (simulated). Alternative hypothesis: Perceived sourness may depend more on the acetic share than on total acid; a long cool phase could raise sharpness without pushing the dough past peak rise. I decline your suggestion 'Steady 24 °C, 12 h' for chamber B; from my own ranking 'Steady 27 °C, 10 h (capped)' scores better (0.2339) as a complementary arm. Decision for chamber B: 'Steady 27 °C, 10 h (capped)'. Without the proposer's message I would have chosen 'Hot 32 °C 5 h -> cool 18 °C'; I switched to 'Steady 27 °C, 10 h (capped)' because it would duplicate the proposer's arm.",
+    "content": "[scientist_B → scientist_A] Critique: I am not convinced yet: (1) 'Hot 32 °C 5 h -> cool 18 °C' is predicted to reach 1.53× peak rise (overproof risk 68%) — the same failure mode that plausibly made the warm loaf dense; end at the plateau rather than the clock. (2) predicted sourness 0.39 vs target ≈0.56: the requested change may not be reachable on this route alone. (3) only two judged loaves calibrate the sourness scale and the fitted slope is steep (×4.9), so small model errors become large predicted sourness differences. (4) timing sensitivity: at 32 °C each extra hour adds ≈0.22× of peak-rise progress (heuristic), so the step-down must happen on time. (5) From my own chamber (B) I have no telemetry this cycle, so this critique relies on the judge feedback and model predictions (simulated). Alternative hypothesis: Perceived sourness may depend more on the acetic share than on total acid; a long cool phase could raise sharpness without pushing the dough past peak rise. I decline your suggestion 'Steady 24 °C, 12 h' for chamber B; from my own ranking 'Steady 27 °C, 10 h (capped)' scores better (0.2339) as a complementary arm. Decision for chamber B: 'Steady 27 °C, 10 h (capped)'. Without the proposer's message I would have chosen 'Hot 32 °C 5 h -> cool 18 °C'; I switched to 'Steady 27 °C, 10 h (capped)' because it would duplicate the proposer's arm. No valid pH measurement for chamber B (no telemetry this cycle); I rely on model predictions and widen the stated uncertainty by ±0.05.",
     "payload": {
      "role": "critic",
      "decision_source": "offline_policy",
+     "reasoning_mode_label": "Offline Policy",
+     "message_kind": "peer_critique",
      "agrees_with_hypothesis": false,
      "concerns": [
       "'Hot 32 °C 5 h -> cool 18 °C' is predicted to reach 1.53× peak rise (overproof risk 68%) — the same failure mode that plausibly made the warm loaf dense; end at the plateau rather than the clock.",
@@ -1187,7 +1412,7 @@
        "overproof_risk": 0.658,
        "time_to_peak_rise_h": 7.2,
        "final_ph": 4.119,
-       "uncertainty": 0.29,
+       "uncertainty": 0.34,
        "provenance": "simulated"
       }
      },
@@ -1223,31 +1448,51 @@
        "overproof_risk": 0.677,
        "time_to_peak_rise_h": 10.45,
        "final_ph": 4.095,
-       "uncertainty": 0.24,
+       "uncertainty": 0.29,
        "provenance": "simulated"
       }
      },
      "decision_changed_by_peer": true,
      "decision_change_note": "Without the proposer's message I would have chosen 'Hot 32 °C 5 h -> cool 18 °C'; I switched to 'Steady 27 °C, 10 h (capped)' because it would duplicate the proposer's arm.",
-     "prediction": "Predicted (simulator, anchored on judged loaves): sourness 0.20 ± 0.29, crumb openness 0.43 ± 0.29; rise progress 1.39× peak (overproof risk 66%), peak rise expected near 7.2 h, final pH ≈ 4.12 (simulated).",
-     "uncertainty": "Predictions come from the fermentation simulator (uncalibrated against this starter); the judge-scale map rests on 2 judged loaf/loaves for sourness (anchored) and 1 for crumb (offset_only); band ±0.29 grows with distance from the recorded conditions; one judge, one tasting, one shared pH probe; perceived sourness ≠ pH (lactic/acetic balance matters).",
+     "prediction": "Predicted (simulator, anchored on judged loaves): sourness 0.20 ± 0.34, crumb openness 0.43 ± 0.34; rise progress 1.39× peak (overproof risk 66%), peak rise expected near 7.2 h, final pH ≈ 4.12 (simulated).",
+     "uncertainty": "Predictions come from the fermentation simulator (uncalibrated against this starter); the judge-scale map rests on 2 judged loaf/loaves for sourness (anchored) and 1 for crumb (offset_only); band ±0.34 grows with distance from the recorded conditions (widened by 0.05 for missing/invalid observations); one judge, one tasting, one shared pH probe; perceived sourness ≠ pH (lactic/acetic balance matters); No valid pH measurement for chamber B (no telemetry this cycle); I rely on model predictions and widen the stated uncertainty by ±0.05..",
      "proposed_measurement": "Side-camera starter height every 10 min (end at peak/plateau, not by the clock); pH spot checks on a separate non-edible sample at 0 h and at the end (single shared probe); chamber temperature continuously; blind tasting for sourness, crumb texture and aroma plus a crumb photo. Retain a slice of each loaf for a side-by-side re-taste.",
      "rationale": "My chamber runs 'Steady 27 °C, 10 h (capped)' (warm acid route) so that, together with 'Hot 32 °C 5 h -> cool 18 °C' (warm acid route), the round discriminates between the two mechanisms. Targets: sourness ≈0.56, acetic ≤0.25.",
+     "ph_status": {
+      "valid": false,
+      "reason": "no telemetry this cycle",
+      "latest": null
+     },
      "challenged_finding_type": "hypothesis",
      "challenged_agent_id": "scientist_A"
     },
     "evidence_source": "replay",
-    "in_reply_to": "f_f39b082a3a762f70",
+    "in_reply_to": "f_80b35a6ee111f24c",
     "chamber_id": "B",
     "cycle_id": "cyc_9d646099d99d",
-    "schema_version": "1.0"
+    "schema_version": "1.0",
+    "recipients": [
+     "scientist_A"
+    ],
+    "experiment_id": "trial_002",
+    "evidence_refs": [
+     "f_80b35a6ee111f24c"
+    ],
+    "claim": "Perceived sourness may depend more on the acetic share than on total acid; a long cool phase could raise sharpness without pushing the dough past peak rise.",
+    "uncertainty": "Predictions come from the fermentation simulator (uncalibrated against this starter); the judge-scale map rests on 2 judged loaf/loaves for sourness (anchored) and 1 for crumb (offset_only); band ±0.34 grows with distance from the recorded conditions (widened by 0.05 for missing/invalid observations); one judge, one tasting, one shared pH probe; perceived sourness ≠ pH (lactic/acetic balance matters); No valid pH measurement for chamber B (no telemetry this cycle); I rely on model predictions and widen the stated uncertainty by ±0.05..",
+    "proposed_action": {
+     "type": "set_schedule",
+     "chamber": "B",
+     "schedule_id": "steady_27_10h",
+     "validated_library_schedule": true
+    }
    },
    {
-    "id": "f_a5080f360844de6d",
+    "id": "f_f7d9a374a1d4131d",
     "agent_id": "scientist_B",
     "timestamp_utc": "2026-10-31T18:00:00Z",
     "type": "prediction",
-    "content": "Predicted (simulator, anchored on judged loaves): sourness 0.20 ± 0.29, crumb openness 0.43 ± 0.29; rise progress 1.39× peak (overproof risk 66%), peak rise expected near 7.2 h, final pH ≈ 4.12 (simulated).",
+    "content": "Predicted (simulator, anchored on judged loaves): sourness 0.20 ± 0.34, crumb openness 0.43 ± 0.34; rise progress 1.39× peak (overproof risk 66%), peak rise expected near 7.2 h, final pH ≈ 4.12 (simulated).",
     "payload": {
      "schedule_id": "steady_27_10h",
      "sourness": 0.204,
@@ -1256,27 +1501,45 @@
      "overproof_risk": 0.658,
      "time_to_peak_rise_h": 7.2,
      "final_ph": 4.119,
-     "uncertainty": 0.29,
+     "uncertainty": 0.34,
      "provenance": "simulated"
     },
     "evidence_source": "replay",
-    "in_reply_to": "f_e262374cc04b6678",
+    "in_reply_to": "f_9230114bc8f2ad97",
     "chamber_id": "B",
     "cycle_id": "cyc_9d646099d99d",
-    "schema_version": "1.0"
+    "schema_version": "1.0",
+    "recipients": [
+     "scientist_A"
+    ],
+    "experiment_id": "trial_002",
+    "evidence_refs": [
+     "f_9230114bc8f2ad97"
+    ],
+    "claim": "Predicted (simulator, anchored on judged loaves): sourness 0.20 ± 0.34, crumb openness 0.43 ± 0.34; rise progress 1.39× peak (overproof risk 66%), peak rise expected near 7.2 h, final pH ≈ 4.12 (simulated).",
+    "uncertainty": null,
+    "proposed_action": null
    },
    {
-    "id": "f_aa1c07bf734b7747",
+    "id": "f_1fa976a71a633452",
     "agent_id": "scientist_B",
     "timestamp_utc": "2026-10-31T18:00:00Z",
     "type": "uncertainty",
-    "content": "Predictions come from the fermentation simulator (uncalibrated against this starter); the judge-scale map rests on 2 judged loaf/loaves for sourness (anchored) and 1 for crumb (offset_only); band ±0.29 grows with distance from the recorded conditions; one judge, one tasting, one shared pH probe; perceived sourness ≠ pH (lactic/acetic balance matters).",
+    "content": "Predictions come from the fermentation simulator (uncalibrated against this starter); the judge-scale map rests on 2 judged loaf/loaves for sourness (anchored) and 1 for crumb (offset_only); band ±0.34 grows with distance from the recorded conditions (widened by 0.05 for missing/invalid observations); one judge, one tasting, one shared pH probe; perceived sourness ≠ pH (lactic/acetic balance matters); No valid pH measurement for chamber B (no telemetry this cycle); I rely on model predictions and widen the stated uncertainty by ±0.05..",
     "payload": {},
     "evidence_source": "replay",
-    "in_reply_to": "f_e262374cc04b6678",
+    "in_reply_to": "f_9230114bc8f2ad97",
     "chamber_id": "B",
     "cycle_id": "cyc_9d646099d99d",
-    "schema_version": "1.0"
+    "schema_version": "1.0",
+    "recipients": [
+     "scientist_A"
+    ],
+    "experiment_id": "trial_002",
+    "evidence_refs": [],
+    "claim": null,
+    "uncertainty": "Predictions come from the fermentation simulator (uncalibrated against this starter); the judge-scale map rests on 2 judged loaf/loaves for sourness (anchored) and 1 for crumb (offset_only); band ±0.34 grows with distance from the recorded conditions (widened by 0.05 for missing/invalid observations); one judge, one tasting, one shared pH probe; perceived sourness ≠ pH (lactic/acetic balance matters); No valid pH measurement for chamber B (no telemetry this cycle); I rely on model predictions and widen the stated uncertainty by ±0.05..",
+    "proposed_action": null
    },
    {
     "id": "f_ff1aace4804b5fb6",
@@ -1308,15 +1571,28 @@
       "overproof_risk": 0.658,
       "time_to_peak_rise_h": 7.2,
       "final_ph": 4.119,
-      "uncertainty": 0.29,
+      "uncertainty": 0.34,
       "provenance": "simulated"
      }
     },
     "evidence_source": "replay",
-    "in_reply_to": "f_e262374cc04b6678",
+    "in_reply_to": "f_9230114bc8f2ad97",
     "chamber_id": "B",
     "cycle_id": "cyc_9d646099d99d",
-    "schema_version": "1.0"
+    "schema_version": "1.0",
+    "recipients": [
+     "scientist_A"
+    ],
+    "experiment_id": "trial_002",
+    "evidence_refs": [],
+    "claim": null,
+    "uncertainty": null,
+    "proposed_action": {
+     "type": "set_schedule",
+     "chamber": "B",
+     "schedule_id": "steady_27_10h",
+     "validated_library_schedule": true
+    }
    },
    {
     "id": "f_c11a30e6d61e4253",
@@ -1326,10 +1602,21 @@
     "content": "Side-camera starter height every 10 min (end at peak/plateau, not by the clock); pH spot checks on a separate non-edible sample at 0 h and at the end (single shared probe); chamber temperature continuously; blind tasting for sourness, crumb texture and aroma plus a crumb photo. Retain a slice of each loaf for a side-by-side re-taste.",
     "payload": {},
     "evidence_source": "replay",
-    "in_reply_to": "f_e262374cc04b6678",
+    "in_reply_to": "f_9230114bc8f2ad97",
     "chamber_id": "B",
     "cycle_id": "cyc_9d646099d99d",
-    "schema_version": "1.0"
+    "schema_version": "1.0",
+    "recipients": [
+     "scientist_A"
+    ],
+    "experiment_id": "trial_002",
+    "evidence_refs": [],
+    "claim": null,
+    "uncertainty": null,
+    "proposed_action": {
+     "type": "measure",
+     "what": "Side-camera starter height every 10 min (end at peak/plateau, not by the clock); pH spot checks on a separate non-edible sample at 0 h and at the end (single shared probe); chamber temperature continuously; blind tasting for sourness, crumb texture and aroma plus a crumb photo. Retain a slice of each loaf for a side-by-side re-taste."
+    }
    },
    {
     "id": "f_0c290e263becb470",
@@ -1372,16 +1659,119 @@
        "overproof_risk": 0.677,
        "time_to_peak_rise_h": 10.45,
        "final_ph": 4.095,
-       "uncertainty": 0.24,
+       "uncertainty": 0.29,
        "provenance": "simulated"
       }
      }
     },
     "evidence_source": "replay",
-    "in_reply_to": "f_e262374cc04b6678",
+    "in_reply_to": "f_9230114bc8f2ad97",
     "chamber_id": "A",
     "cycle_id": "cyc_9d646099d99d",
-    "schema_version": "1.0"
+    "schema_version": "1.0",
+    "recipients": [
+     "scientist_B"
+    ],
+    "experiment_id": "trial_002",
+    "evidence_refs": [
+     "f_9230114bc8f2ad97"
+    ],
+    "claim": "Thanks. Your overproofing concern stands (risk 68%), but no validated alternative lowers it without giving up most of the predicted gain, so I keep 'Hot 32 °C 5 h -> cool 18 °C' and will end at the rise plateau from the starter-height curve rather than the clock. I adopt your proposal to retain slices for a side-by-side re-taste. The round now contrasts two variants of the warm acid route ('Hot 32 °C 5 h -> cool 18 °C' vs 'Steady 27 °C, 10 h (capped)').",
+    "uncertainty": null,
+    "proposed_action": {
+     "type": "set_schedule",
+     "chamber": "A",
+     "schedule_id": "warm_then_cool_32_18",
+     "validated_library_schedule": true
+    }
+   },
+   {
+    "id": "f_32b4e53756ac0093",
+    "agent_id": "scientist_A",
+    "timestamp_utc": "2026-10-31T18:00:00Z",
+    "type": "experiment_proposal",
+    "content": "[scientist_A → scientist_B, operator] Trial 002: A: Hot 32 °C 5 h -> cool 18 °C vs B: Steady 27 °C, 10 h (capped). Milder (strong); subtler aroma (strong); stronger flavor (moderate); preferred Loaf A. Test whether 'Hot 32 °C 5 h -> cool 18 °C' (warm acid route) or 'Steady 27 °C, 10 h (capped)' (warm acid route) better achieves it.",
+    "payload": {
+     "next_experiment": {
+      "id": "trial_002",
+      "title": "Trial 002: A: Hot 32 °C 5 h -> cool 18 °C vs B: Steady 27 °C, 10 h (capped)",
+      "objective": "Milder (strong); subtler aroma (strong); stronger flavor (moderate); preferred Loaf A. Test whether 'Hot 32 °C 5 h -> cool 18 °C' (warm acid route) or 'Steady 27 °C, 10 h (capped)' (warm acid route) better achieves it.",
+      "status": "proposed",
+      "success_criteria": [
+       "Blind tasting: at least one loaf is judged closer to the requested sourness — target sourness ≈0.56 on the 0-1 scale (between the two judged loaves (sourness and overall flavor requested in opposite directions)); the same feedback parser scores the new comments.",
+       "Aroma: less vinegary: avoid long cool (acetic-leaning) phases — judged aroma notes move in the requested direction.",
+       "Proofing: each chamber ends at its rise plateau — starter height must not fall >3% below its peak before ending (no overproofing).",
+       "Model check: measured end-of-fermentation pH within ±0.15 of the simulated value."
+      ]
+     },
+     "schedules": {
+      "A": {
+       "schedule_id": "warm_then_cool_32_18",
+       "name": "Hot 32 °C 5 h -> cool 18 °C",
+       "points": [
+        [
+         0.0,
+         32.0
+        ],
+        [
+         5.0,
+         32.0
+        ],
+        [
+         6.0,
+         18.0
+        ],
+        [
+         16.0,
+         18.0
+        ]
+       ],
+       "route": "total_acid_warm"
+      },
+      "B": {
+       "schedule_id": "steady_27_10h",
+       "name": "Steady 27 °C, 10 h (capped)",
+       "points": [
+        [
+         0.0,
+         27.0
+        ],
+        [
+         10.0,
+         27.0
+        ]
+       ],
+       "route": "total_acid_warm"
+      }
+     },
+     "reasoning_mode_label": "Offline Policy"
+    },
+    "evidence_source": "replay",
+    "in_reply_to": null,
+    "chamber_id": "A",
+    "cycle_id": "cyc_9d646099d99d",
+    "schema_version": "1.0",
+    "recipients": [
+     "scientist_B",
+     "operator"
+    ],
+    "experiment_id": "trial_002",
+    "evidence_refs": [
+     "f_80b35a6ee111f24c",
+     "f_9230114bc8f2ad97",
+     "f_0c290e263becb470"
+    ],
+    "claim": "Milder (strong); subtler aroma (strong); stronger flavor (moderate); preferred Loaf A. Test whether 'Hot 32 °C 5 h -> cool 18 °C' (warm acid route) or 'Steady 27 °C, 10 h (capped)' (warm acid route) better achieves it.",
+    "uncertainty": "Predictions come from the fermentation simulator (uncalibrated against this starter); the judge-scale map rests on 2 judged loaf/loaves for sourness (anchored) and 1 for crumb (offset_only); band ±0.29 grows with distance from the recorded conditions (widened by 0.05 for missing/invalid observations); one judge, one tasting, one shared pH probe; perceived sourness ≠ pH (lactic/acetic balance matters); No valid pH measurement for chamber A (no telemetry this cycle); I rely on model predictions and widen the stated uncertainty by ±0.05.; no validated schedule is predicted to reach sourness 0.56 (best 0.39) without passing peak rise; this run tests how far the warm acid route can go.",
+    "proposed_action": {
+     "type": "start_experiment",
+     "experiment_id": "trial_002",
+     "schedules": {
+      "A": "warm_then_cool_32_18",
+      "B": "steady_27_10h"
+     },
+     "requires_human_confirmation": true
+    }
    }
   ],
   "provenance": {
@@ -1413,6 +1803,20 @@
    },
    "replay": true,
    "agents_communicated": true,
+   "observation_adapter": "fermentai.agents.observation (obs-1.0, quality-gated per PLAN_MASTER §9.1-9.2)",
+   "physical_observations_imputed": false,
+   "ph_status": {
+    "A": {
+     "valid": false,
+     "reason": "no telemetry this cycle",
+     "latest": null
+    },
+    "B": {
+     "valid": false,
+     "reason": "no telemetry this cycle",
+     "latest": null
+    }
+   },
    "proposer_reply": "offline_policy (rule-based)",
    "data_labels": {
     "judge feedback": "judge_feedback",
@@ -1422,16 +1826,19 @@
      "B": []
     },
     "scripted demo": "replay"
-   }
+   },
+   "reasoning_mode_label": "Offline Policy"
   },
   "safety_note": "Recommended schedules are proposals selected only from a validated candidate library (4-35 °C, no hold at or above 27 °C longer than 10 h, ramps ≤ 20 °C/h). The local API clamps every setpoint and the ESP32 firmware independently enforces temperature limits, sensor-failure handling, fan protection and safe heating/cooling switching. Neither the LLM nor judge text can set power or bypass these checks, and ending fermentation/baking requires human confirmation.",
   "mode_label": "offline:deterministic_fallback",
+  "reasoning_mode_label": "Offline Policy",
   "findings_log": {
    "path": null,
    "persisted": false,
-   "appended": 12
+   "appended": 13
   }
  },
+ "reasoning_mode_label": "Offline Policy",
  "generated_with": {
   "function": "fermentai.agents.pipeline.run_taste_feedback_cycle",
   "mode": "offline",
