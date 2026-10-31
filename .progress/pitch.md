@@ -2,13 +2,13 @@
 
 Owner scope: docs/pitch/, docs/demo_script.md, scripts/make_pitch_figures.py, data/figures/, this file.
 
-## Status: COMPLETE — investor framing (4 slides) + 7 figures
-- [x] scripts/make_pitch_figures.py — 7 figures (PNG 3200x1800 + SVG); numbers read from data files;
-      byte-identical reruns; ruff clean; no matplotlib warnings
-- [x] tech_highlights (new): NVIDIA ALCHEMI | Formlabs PreForm panels, text wordmarks only
-- [x] docs/pitch/slides.md — investor deck: 405 spoken words = 2:54 @140 wpm
-- [x] docs/demo_script.md — investor intro; ~274 spoken words
-- [x] docs/pitch/figure_sources.md
+## Status: COMPLETE — few-words figures (7) + investor deck
+- [x] scripts/make_pitch_figures.py — few-words rule (<= ~15-21 visible words incl. ticks, text >= 22 pt,
+      one-word badges, no sentences/footers); byte-identical reruns; ruff clean
+- [x] docs/pitch/slides.md — short on-slide bullets; notes 407 words = 2:54 @140 wpm; numbers table
+- [x] docs/pitch/deck/slides/*.html — on-slide text matches slides.md; asides = notes; data-file attrs
+      (re-upload all four images before republishing; partners img src is a repo path)
+- [x] docs/pitch/figure_sources.md, docs/demo_script.md
 
 ## Pending placeholders
 - none (relative pKa filled from c2_summary.json; ask filled on slide 4)

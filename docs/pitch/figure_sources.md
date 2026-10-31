@@ -2,32 +2,51 @@
 
 To rebuild everything, run `uv run python scripts/make_pitch_figures.py`. For one figure, add
 `--only <name>`. The output is deterministic: two runs give byte-identical PNG and SVG files. Every
-number on a figure is read from the data files at build time. The Brev counts, hours and cost are
-parsed from `data/alchemi/environment/report.md`.
+number on a figure is read from the data files at build time.
 
-All figures are 16 × 9 in. The PNGs are 3200 × 1800 px, which is 2× a 1600 × 900 slide. The SVGs keep
-text as outlines, so they render the same in Keynote, Google Slides or a browser. The font is DejaVu
-Sans, which ships with matplotlib, so other machines produce the same output.
+**Few-words rule.** The figures carry the slides:
 
-| Figure | Slide | What it shows | Data it reads |
+- about 15 visible words per figure or fewer;
+- names of 2 words or fewer;
+- one number per tile;
+- one-word badges (REAL / SIMULATED / EXAMPLE);
+- no sentences, footers or sources, all of which live in `docs/pitch/slides.md`;
+- text of at least 22 pt on the 16 × 9 in canvas, so at least ~37 px when a figure spans 1920 px.
+
+The PNGs are 3200 × 1800. The SVGs keep text as outlines. The font is DejaVu Sans, which ships with
+matplotlib.
+
+| Figure | Slide | Visible text (words, incl. tick labels) | Data it reads |
 |---|---|---|---|
-| `architecture` | 2 (inset or backup) | The Mac hub connects over a local Wi-Fi AP to two ESP32 chambers and the iPad. Brev GPU and Claude sit in a dashed "internet · optional" band. Banner: "Demo needs no internet". | none (PLAN §2, §8) |
-| `closed_loop` | 1 | An eight-step loop: Bake → Judge tastes → Parse → Compare → Agents debate → Publish (chef-hats) → Ferment + measure → Recalibrate. The judge node is larger and crimson. Each node has a HUMAN, AI AGENT, SIMULATED or PHYSICAL badge. | none (conceptual) |
-| `agents_exchange` | backup / Q&A | A mock-up of hypothesis (A) → critique (B) → agreed schedules, using the real `Finding` field names. Badged **EXAMPLE · illustrative, not a logged run**. | none; B's critique quotes the simulated "cool at 6 h" result in `docs/scientific_assumptions.md` §5 |
-| `evidence_pipeline` | 2 | Five stages: ALCHEMI (REAL·GPU, real kcal/mol numbers) → kinetics (SIMULATED) → morphology map (SIMULATED, assumed mapping) → chamber specimens A/B (SIMULATED, crops of the real renders) → loaf photos (REAL·AFTER BAKE, dashed because still pending). A bracket says it "constrains the acid chemistry (…) — does not drive the bread". The text in the parentheses is generated from `molecular_coupling_report.json`. Three footer lines give ALCHEMI provenance with the totals for both campaigns, the relative pKa (−3.9 ± 1.7 vs −0.9, cluster-phase), and the mild/sour baseline. | `data/alchemi/analysis/{association_energies.csv, deprotonation_energies.csv, analysis_summary.json}`, `data/predictions/{chamber_*_summary.json, molecular_coupling_report.json}`, `data/stl/{chain_summary.json, crumb_chamber_comparison.png, crumb_summary.json}` |
-| `results_ab` | 4 (backup) | A two-panel A vs B plot: pH with 5–95 % bands and the 16 h values, and rise with peak and overproof markers plus the dashed "B cooled to 22 °C at 6 h" curve. Badged **SIMULATED**. | `data/predictions/chamber_{A,B}_{prediction,uncertainty}.csv`, `*_summary.json`. The intervention curve is re-simulated with `fermentai.fermentation.simulation`. |
-| `benchmark_summary` | 4 | Four tiles: 3.9/4 rounds changed, 3.1 → 0 same-round duplicates, +0.68 nats (24/30 worlds), and "no change" in the final recommendation. Below them, a dot + 95 % CI plot of pooled information (talking − independent) for the deployed policy (+0.68) and the info-aware selector (−0.13). Badged **IN-SILICO BENCHMARK**. | `data/benchmarks/summary.json` (`well_specified`, `paired_final`), `data/benchmarks/benchmark_results.csv` (final round) |
-| `tech_highlights` | 3 | Two panels with text wordmarks only, no logos. **NVIDIA ALCHEMI** (REAL · GPU) shows the totals across both campaigns (1,066 optimisations · 79 vibrational analyses · 80 MD runs) and an inset re-plot of relative pKa (lactic − acetic) against cluster size n = 0/3/6/10, with the −3.9 ± 1.7 estimate band and the −0.9 experimental line. Below that: the acetic dimer −15.3 kcal/mol vs literature −14…−16; tiles for ~10 h / ~$6 / offline; and a data-driven "model nudge only" line (potency, pKa shift, max pH Δ). **Formlabs PreForm API** has GEOMETRY · SIMULATED and PRINT PREP · REAL badges; the step chips; "426 real PreForm API calls recorded; /v1/scene/print never called"; the hero render next to PreForm's render with rafts; tiles for 1.36 h, 150 mL, 185 layers and 7 checks (cup warnings A 1 · B 3); and a footer for printer, material and SDK/server. | NVIDIA: `data/alchemi/analysis/{c2_summary.json, analysis_summary.json}` (ΔpKa by n = `thermo_cycles.dd_boltzmann_kcal` × the analysis's own 1/(RT ln 10)), counts, hours and cost parsed from `data/alchemi/environment/report.md`, and `data/predictions/molecular_coupling_report.json`. Formlabs: `data/stl/hero_chamber_AB.png` (cropped) and `data/stl/print/{print_manifest.json, preform_api_transcript.json, crumb_chambers_AB_form4-grey-v5_iso.png}`. |
+| `closed_loop` | 1 | Bake · Taste · Parse · Compare · Debate · Publish · Ferment · Recalibrate, plus the centre "Taste → next experiment" (13). Ring colours: green physical, purple simulated, slate AI, crimson human | none (conceptual) |
+| `evidence_pipeline` | 2 | NVIDIA ALCHEMI / Kinetics model / Crumb map / Printed specimens / Loaf photos, with badges REAL / SIMULATED ×3 / REAL (dashed = after bake), "acid terms only", and A / B (21) | `data/stl/crumb_chamber_comparison.png` (specimen crops) |
+| `architecture` | 2 (backup) | optional · Brev GPU · Claude · Mac · no internet needed · Wi-Fi AP · Chamber A · iPad · Chamber B (18) | none |
+| `tech_highlights` | 3 | NVIDIA ALCHEMI REAL + ΔpKa-vs-waters plot with "experiment" + "1,066 runs", "~$6"; Formlabs PreForm API REAL + SIMULATED (on the hero render) + "2.4 h", "239 mL", "Clear V5" (20) | `data/alchemi/analysis/c2_summary.json`, `data/alchemi/environment/report.md` (runs, cost), `data/stl/hero_chamber_AB.png`, `data/stl/print/clear_form4_build1_{manifest.json, iso.png}` |
+| `benchmark_summary` | 4 | SIMULATED + "3.9 / 4 choices changed", "3.1 → 0 duplicate experiments", "+0.68 nats more information", "same final pick" (17) | `data/benchmarks/summary.json`, `benchmark_results.csv` |
+| `results_ab` | 4 (backup) | SIMULATED, panel titles pH / Rise, line labels A / B, "B more acidic", "B overproofs ~3 h earlier", "hours" (17) | `data/predictions/chamber_{A,B}_{prediction,uncertainty}.csv`, `*_summary.json` |
+| `agents_exchange` | Q&A | EXAMPLE, "A proposes" / "B critiques" / "Agreed", "27 °C", "27 → 22 °C", A / B, with mini schedules (13) | none (illustrative; numbers from `docs/scientific_assumptions.md` §5) |
+
+## What the figures no longer say
+
+These are in `docs/pitch/slides.md`, either in the speaker notes or in the numbers table:
+
+- **ALCHEMI:** −3.9 ± 1.7 vs −0.9, the dimer −15.3 kcal/mol, 79 vibrational analyses, 80 MD runs,
+  ~10 GPU-hours, and the model nudge (potency 0.10 → 0.127, pKa ±0.025, pH Δ ≤ 0.013).
+- **PreForm:** 800 API calls and no print call, cups A 1 / B 2, and that the Clear V5 plate includes
+  the two chef hats.
+- **Simulation:** the pH values 4.13 / 3.90, lactic 4.7 / 6.5 g/kg, the cooled-B intervention, and
+  the info-aware selector's −0.13.
+- **Specimens:** the porosity and pore counts, and the mild/sour baseline.
+- **Safety:** live/offline modes and setpoint clamping.
 
 ## Visual rules
 
-- Chamber A is `#1f77b4` (blue) and Chamber B is `#ff7f0e` (orange). The pair passes the dataviz
-  palette validator for CVD separation. Orange has low contrast against white, so every orange mark
-  also has a direct text label.
+- Chamber A is `#1f77b4` (blue) and Chamber B is `#ff7f0e` (orange), with direct text labels on every
+  orange mark.
 - Badges are defined once, in `BADGES` in the script:
   - REAL / PHYSICAL is green.
-  - SIMULATED / IN-SILICO is purple.
-  - REPLAY / EXAMPLE is grey.
-  - AI AGENT is slate.
+  - SIMULATED is purple.
+  - EXAMPLE is grey.
+  - AI is slate.
   - HUMAN is crimson.
-  - A dashed, hollow badge means the evidence is real but not collected yet.
+  - A dashed, hollow badge means real but not yet collected.
