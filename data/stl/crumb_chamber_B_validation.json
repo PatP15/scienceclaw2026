@@ -2,7 +2,7 @@
   "name": "chamber_B",
   "provenance": "simulated",
   "passed": true,
-  "min_thickness_mm": 1.0494,
+  "min_thickness_mm": 1.0461,
   "checks": {
     "watertight": {
       "passed": true,
@@ -20,7 +20,7 @@
     },
     "positive_volume": {
       "passed": true,
-      "value": 61827.967,
+      "value": 61685.76,
       "method": "signed volume (mm^3) > 0 and trimesh is_volume",
       "exact": true,
       "note": ""
@@ -30,7 +30,7 @@
       "value": {
         "status": "Error.NoError",
         "genus": 4,
-        "volume": 61827.9673378268
+        "volume": 61685.75953020292
       },
       "method": "manifold3d.Manifold accepts mesh as 2-manifold; volume agrees with trimesh",
       "exact": true,
@@ -39,7 +39,7 @@
     "self_intersections": {
       "passed": true,
       "value": {
-        "pairs_tested": 135602,
+        "pairs_tested": 137884,
         "intersecting_pairs": 0,
         "examples": []
       },
@@ -57,8 +57,8 @@
     "voxel_volume_agreement": {
       "passed": true,
       "value": {
-        "voxel_volume": 61833.68,
-        "relative_error": 9e-05,
+        "voxel_volume": 61692.02,
+        "relative_error": 0.0001,
         "pitch_mm": 0.15
       },
       "method": "parity re-voxelisation volume vs mesh volume",
@@ -68,19 +68,19 @@
     "min_thickness": {
       "passed": true,
       "value": {
-        "thin_volume_fraction": 0.000166,
+        "thin_volume_fraction": 0.000177,
         "thin_clusters_gt_1mm3": 0,
-        "ball_radius_mm": 0.3747,
+        "ball_radius_mm": 0.373,
         "pitch_mm": 0.15,
         "ray_thickness_informational": {
           "samples": 2000,
           "hits": 2000,
-          "p01_mm": 1.941744002831199,
-          "p05_mm": 3.0323932593079883,
-          "median_mm": 11.999755134981335
+          "p01_mm": 1.627470592177276,
+          "p05_mm": 2.992953747363209,
+          "median_mm": 11.999711994868989
         }
       },
-      "method": "solid volume not covered by inscribed balls of diameter ~1.0494 mm (minus 1 voxel tolerance) on a 0.15 mm re-voxelisation; pass if < 1%",
+      "method": "solid volume not covered by inscribed balls of diameter ~1.0461 mm (minus 1 voxel tolerance) on a 0.15 mm re-voxelisation; pass if < 1%",
       "exact": false,
       "note": "approximate (voxel resolution); ray thickness is informational only"
     },

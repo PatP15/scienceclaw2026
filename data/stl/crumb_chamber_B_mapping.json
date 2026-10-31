@@ -3,23 +3,23 @@
   "provenance": "simulated",
   "kinetics_variant": "alchemi_informed",
   "inputs": {
-    "co2_retained_g_per_kg": 1.2608528445792662,
-    "co2_retained_peak_g_per_kg": 1.6879045601645464,
-    "expansion_ratio_peak": 2.085758369193451,
-    "expansion_ratio_final": 1.81105387154701,
-    "max_expansion_rate_per_h": 0.26331998729577144,
+    "co2_retained_g_per_kg": 1.258442292717743,
+    "co2_retained_peak_g_per_kg": 1.6870584460737332,
+    "expansion_ratio_peak": 2.0852140994064774,
+    "expansion_ratio_final": 1.8095032644097386,
+    "max_expansion_rate_per_h": 0.2629470924295827,
     "overproof_flag": true,
-    "expansion_fall_from_peak_fraction": 0.25300702756774857,
-    "final_ph": 3.8994309876922952,
-    "gluten_weakening_index": 0.7682497243417044,
-    "final_fermentation_quotient": 4.076453061479612,
+    "expansion_fall_from_peak_fraction": 0.2540612356101251,
+    "final_ph": 3.8879008579938983,
+    "gluten_weakening_index": 0.7716004789234595,
+    "final_fermentation_quotient": 4.075403581666047,
     "t_end_h": 16.0
   },
   "input_source": "fermentation.simulate(params + apply_molecular_descriptors)",
   "fallback_fields": [],
   "drivers": {
     "gas_fraction": {
-      "value": 0.44783530975486896,
+      "value": 0.4473621464694064,
       "formula": "1 - 1/expansion_ratio_final",
       "inputs": [
         "expansion_ratio_final"
@@ -27,7 +27,7 @@
       "source": "volume identity (assumes the rise is all gas)"
     },
     "s_gas": {
-      "value": 0.49131681420991435,
+      "value": 0.49002356677681674,
       "formula": "w*u(gas_fraction) + (1-w)*u(co2_retained)",
       "inputs": [
         "expansion_ratio_final",
@@ -35,21 +35,21 @@
       ]
     },
     "s_rate": {
-      "value": 0.6532799491830859,
+      "value": 0.6517883697183309,
       "formula": "u(max_expansion_rate_per_h; rate_lo, rate_hi)",
       "inputs": [
         "max_expansion_rate_per_h"
       ]
     },
     "s_gwi": {
-      "value": 0.7682497243417044,
+      "value": 0.7716004789234595,
       "formula": "gluten_weakening_index (already 0..1)",
       "inputs": [
         "gluten_weakening_index"
       ]
     },
     "s_collapse": {
-      "value": 0.7611364197975914,
+      "value": 0.7628495078664532,
       "formula": "overproof_step*[overproof] + (1-overproof_step)*u(fall; 0, fall_hi)",
       "inputs": [
         "overproof_flag",
@@ -57,14 +57,14 @@
       ]
     },
     "s_acid": {
-      "value": 0.7337126748718031,
+      "value": 0.7413994280040678,
       "formula": "u(ph_hi - final_ph; 0, ph_hi - ph_lo)",
       "inputs": [
         "final_ph"
       ]
     },
     "s_size": {
-      "value": 0.7204834881422287,
+      "value": 0.7214878924771564,
       "formula": "(w_rate*s_rate + w_gwi*s_gwi + w_col*s_collapse)/sum(w)",
       "inputs": [
         "s_rate",
@@ -73,7 +73,7 @@
       ]
     },
     "s_irreg": {
-      "value": 0.7107648367623951,
+      "value": 0.7116944243208951,
       "formula": "(s_rate + s_gwi)/2",
       "inputs": [
         "s_rate",
@@ -81,7 +81,7 @@
       ]
     },
     "s_weak": {
-      "value": 0.7509811996067537,
+      "value": 0.7564999534637636,
       "formula": "(s_acid + s_gwi)/2",
       "inputs": [
         "s_acid",
@@ -91,7 +91,7 @@
   },
   "outputs": {
     "porosity_target": {
-      "value": 0.3474,
+      "value": 0.347,
       "formula": "porosity_min + (porosity_max - porosity_min)*s_gas",
       "inputs": [
         "expansion_ratio_final",
@@ -104,18 +104,21 @@
       "direction": "increases with expansion_ratio_final and co2_retained",
       "provenance_chain": {
         "alchemi": [
-          "acetic.assoc_energy_per_water_kcal",
-          "acetic.hbond_min_A",
+          "campaign",
+          "cluster_dpka",
+          "d_assoc_campaign",
           "d_assoc_per_water_kcal",
+          "d_hbond_campaign",
           "d_hbond_min_A",
-          "lactic.assoc_energy_per_water_kcal",
-          "lactic.deprot_energy_n6_kcal",
-          "lactic.hbond_min_A",
-          "-> kinetics parameter undissociated_lactic_rel_potency"
+          "experimental_dpka",
+          "field",
+          "-> kinetics parameter undissociated_lactic_rel_potency",
+          "-> kinetics parameter pka_lactic",
+          "-> kinetics parameter pka_acetic"
         ],
         "simulated": [
-          "expansion_ratio_final=1.81105387154701",
-          "co2_retained_g_per_kg=1.2608528445792662"
+          "expansion_ratio_final=1.8095032644097386",
+          "co2_retained_g_per_kg=1.258442292717743"
         ],
         "assumption": [
           "gas_fraction_lo=0.25 (assumption)",
@@ -129,7 +132,7 @@
       }
     },
     "pore_diam_median_mm": {
-      "value": 2.5571,
+      "value": 2.5594,
       "formula": "pore_median_min + (pore_median_max - pore_median_min)*s_size",
       "inputs": [
         "max_expansion_rate_per_h",
@@ -144,20 +147,23 @@
       "direction": "increases with max rise rate, GWI, overproof and fall-from-peak",
       "provenance_chain": {
         "alchemi": [
-          "acetic.assoc_energy_per_water_kcal",
-          "acetic.hbond_min_A",
+          "campaign",
+          "cluster_dpka",
+          "d_assoc_campaign",
           "d_assoc_per_water_kcal",
+          "d_hbond_campaign",
           "d_hbond_min_A",
-          "lactic.assoc_energy_per_water_kcal",
-          "lactic.deprot_energy_n6_kcal",
-          "lactic.hbond_min_A",
-          "-> kinetics parameter undissociated_lactic_rel_potency"
+          "experimental_dpka",
+          "field",
+          "-> kinetics parameter undissociated_lactic_rel_potency",
+          "-> kinetics parameter pka_lactic",
+          "-> kinetics parameter pka_acetic"
         ],
         "simulated": [
-          "max_expansion_rate_per_h=0.26331998729577144",
-          "gluten_weakening_index=0.7682497243417044",
+          "max_expansion_rate_per_h=0.2629470924295827",
+          "gluten_weakening_index=0.7716004789234595",
           "overproof_flag=True",
-          "expansion_fall_from_peak_fraction=0.25300702756774857"
+          "expansion_fall_from_peak_fraction=0.2540612356101251"
         ],
         "assumption": [
           "rate_lo=0.1 (assumption)",
@@ -173,7 +179,7 @@
       }
     },
     "pore_diam_cv": {
-      "value": 0.6806,
+      "value": 0.6814,
       "formula": "cv_min + cv_span*s_collapse",
       "inputs": [
         "overproof_flag",
@@ -186,18 +192,21 @@
       "direction": "increases with collapse",
       "provenance_chain": {
         "alchemi": [
-          "acetic.assoc_energy_per_water_kcal",
-          "acetic.hbond_min_A",
+          "campaign",
+          "cluster_dpka",
+          "d_assoc_campaign",
           "d_assoc_per_water_kcal",
+          "d_hbond_campaign",
           "d_hbond_min_A",
-          "lactic.assoc_energy_per_water_kcal",
-          "lactic.deprot_energy_n6_kcal",
-          "lactic.hbond_min_A",
-          "-> kinetics parameter undissociated_lactic_rel_potency"
+          "experimental_dpka",
+          "field",
+          "-> kinetics parameter undissociated_lactic_rel_potency",
+          "-> kinetics parameter pka_lactic",
+          "-> kinetics parameter pka_acetic"
         ],
         "simulated": [
           "overproof_flag=True",
-          "expansion_fall_from_peak_fraction=0.25300702756774857"
+          "expansion_fall_from_peak_fraction=0.2540612356101251"
         ],
         "assumption": [
           "fall_hi=0.4 (assumption)",
@@ -208,7 +217,7 @@
       }
     },
     "pore_diam_mean_mm": {
-      "value": 3.0931,
+      "value": 3.0972,
       "formula": "median*sqrt(1+cv^2) (lognormal)",
       "inputs": [
         "max_expansion_rate_per_h",
@@ -220,20 +229,23 @@
       "direction": "follows median and cv",
       "provenance_chain": {
         "alchemi": [
-          "acetic.assoc_energy_per_water_kcal",
-          "acetic.hbond_min_A",
+          "campaign",
+          "cluster_dpka",
+          "d_assoc_campaign",
           "d_assoc_per_water_kcal",
+          "d_hbond_campaign",
           "d_hbond_min_A",
-          "lactic.assoc_energy_per_water_kcal",
-          "lactic.deprot_energy_n6_kcal",
-          "lactic.hbond_min_A",
-          "-> kinetics parameter undissociated_lactic_rel_potency"
+          "experimental_dpka",
+          "field",
+          "-> kinetics parameter undissociated_lactic_rel_potency",
+          "-> kinetics parameter pka_lactic",
+          "-> kinetics parameter pka_acetic"
         ],
         "simulated": [
-          "max_expansion_rate_per_h=0.26331998729577144",
-          "gluten_weakening_index=0.7682497243417044",
+          "max_expansion_rate_per_h=0.2629470924295827",
+          "gluten_weakening_index=0.7716004789234595",
           "overproof_flag=True",
-          "expansion_fall_from_peak_fraction=0.25300702756774857"
+          "expansion_fall_from_peak_fraction=0.2540612356101251"
         ],
         "assumption": [
           "rate_lo=0.1 (assumption)",
@@ -247,7 +259,7 @@
       }
     },
     "pore_diam_sd_mm": {
-      "value": 2.1051,
+      "value": 2.1105,
       "formula": "cv*mean",
       "inputs": [
         "max_expansion_rate_per_h",
@@ -259,20 +271,23 @@
       "direction": "follows mean and cv",
       "provenance_chain": {
         "alchemi": [
-          "acetic.assoc_energy_per_water_kcal",
-          "acetic.hbond_min_A",
+          "campaign",
+          "cluster_dpka",
+          "d_assoc_campaign",
           "d_assoc_per_water_kcal",
+          "d_hbond_campaign",
           "d_hbond_min_A",
-          "lactic.assoc_energy_per_water_kcal",
-          "lactic.deprot_energy_n6_kcal",
-          "lactic.hbond_min_A",
-          "-> kinetics parameter undissociated_lactic_rel_potency"
+          "experimental_dpka",
+          "field",
+          "-> kinetics parameter undissociated_lactic_rel_potency",
+          "-> kinetics parameter pka_lactic",
+          "-> kinetics parameter pka_acetic"
         ],
         "simulated": [
-          "max_expansion_rate_per_h=0.26331998729577144",
-          "gluten_weakening_index=0.7682497243417044",
+          "max_expansion_rate_per_h=0.2629470924295827",
+          "gluten_weakening_index=0.7716004789234595",
           "overproof_flag=True",
-          "expansion_fall_from_peak_fraction=0.25300702756774857"
+          "expansion_fall_from_peak_fraction=0.2540612356101251"
         ],
         "assumption": [
           "rate_lo=0.1 (assumption)",
@@ -286,7 +301,7 @@
       }
     },
     "pore_diam_max_mm": {
-      "value": 10.0891,
+      "value": 10.1028,
       "formula": "min(cap, max(pore_max_base + pore_max_span*s_collapse, 2.5*median))",
       "inputs": [
         "max_expansion_rate_per_h",
@@ -301,20 +316,23 @@
       "direction": "increases with collapse and median",
       "provenance_chain": {
         "alchemi": [
-          "acetic.assoc_energy_per_water_kcal",
-          "acetic.hbond_min_A",
+          "campaign",
+          "cluster_dpka",
+          "d_assoc_campaign",
           "d_assoc_per_water_kcal",
+          "d_hbond_campaign",
           "d_hbond_min_A",
-          "lactic.assoc_energy_per_water_kcal",
-          "lactic.deprot_energy_n6_kcal",
-          "lactic.hbond_min_A",
-          "-> kinetics parameter undissociated_lactic_rel_potency"
+          "experimental_dpka",
+          "field",
+          "-> kinetics parameter undissociated_lactic_rel_potency",
+          "-> kinetics parameter pka_lactic",
+          "-> kinetics parameter pka_acetic"
         ],
         "simulated": [
-          "max_expansion_rate_per_h=0.26331998729577144",
-          "gluten_weakening_index=0.7682497243417044",
+          "max_expansion_rate_per_h=0.2629470924295827",
+          "gluten_weakening_index=0.7716004789234595",
           "overproof_flag=True",
-          "expansion_fall_from_peak_fraction=0.25300702756774857"
+          "expansion_fall_from_peak_fraction=0.2540612356101251"
         ],
         "assumption": [
           "pore_max_base=4 (assumption)",
@@ -324,7 +342,7 @@
       }
     },
     "eccentricity": {
-      "value": 0.5975,
+      "value": 0.5982,
       "formula": "ecc_min + ecc_span*s_irreg",
       "inputs": [
         "max_expansion_rate_per_h",
@@ -337,18 +355,21 @@
       "direction": "increases with max rise rate and GWI",
       "provenance_chain": {
         "alchemi": [
-          "acetic.assoc_energy_per_water_kcal",
-          "acetic.hbond_min_A",
+          "campaign",
+          "cluster_dpka",
+          "d_assoc_campaign",
           "d_assoc_per_water_kcal",
+          "d_hbond_campaign",
           "d_hbond_min_A",
-          "lactic.assoc_energy_per_water_kcal",
-          "lactic.deprot_energy_n6_kcal",
-          "lactic.hbond_min_A",
-          "-> kinetics parameter undissociated_lactic_rel_potency"
+          "experimental_dpka",
+          "field",
+          "-> kinetics parameter undissociated_lactic_rel_potency",
+          "-> kinetics parameter pka_lactic",
+          "-> kinetics parameter pka_acetic"
         ],
         "simulated": [
-          "max_expansion_rate_per_h=0.26331998729577144",
-          "gluten_weakening_index=0.7682497243417044"
+          "max_expansion_rate_per_h=0.2629470924295827",
+          "gluten_weakening_index=0.7716004789234595"
         ],
         "assumption": [
           "rate_lo=0.1 (assumption)",
@@ -359,7 +380,7 @@
       }
     },
     "eccentricity_jitter": {
-      "value": 0.4988,
+      "value": 0.4991,
       "formula": "jitter_min + jitter_span*s_irreg",
       "inputs": [
         "max_expansion_rate_per_h",
@@ -372,18 +393,21 @@
       "direction": "increases with max rise rate and GWI",
       "provenance_chain": {
         "alchemi": [
-          "acetic.assoc_energy_per_water_kcal",
-          "acetic.hbond_min_A",
+          "campaign",
+          "cluster_dpka",
+          "d_assoc_campaign",
           "d_assoc_per_water_kcal",
+          "d_hbond_campaign",
           "d_hbond_min_A",
-          "lactic.assoc_energy_per_water_kcal",
-          "lactic.deprot_energy_n6_kcal",
-          "lactic.hbond_min_A",
-          "-> kinetics parameter undissociated_lactic_rel_potency"
+          "experimental_dpka",
+          "field",
+          "-> kinetics parameter undissociated_lactic_rel_potency",
+          "-> kinetics parameter pka_lactic",
+          "-> kinetics parameter pka_acetic"
         ],
         "simulated": [
-          "max_expansion_rate_per_h=0.26331998729577144",
-          "gluten_weakening_index=0.7682497243417044"
+          "max_expansion_rate_per_h=0.2629470924295827",
+          "gluten_weakening_index=0.7716004789234595"
         ],
         "assumption": [
           "rate_lo=0.1 (assumption)",
@@ -394,7 +418,7 @@
       }
     },
     "clustering": {
-      "value": 0.5828,
+      "value": 0.584,
       "formula": "clustering_min + clustering_span*s_collapse",
       "inputs": [
         "overproof_flag",
@@ -407,18 +431,21 @@
       "direction": "increases with overproof and fall-from-peak (merged cells)",
       "provenance_chain": {
         "alchemi": [
-          "acetic.assoc_energy_per_water_kcal",
-          "acetic.hbond_min_A",
+          "campaign",
+          "cluster_dpka",
+          "d_assoc_campaign",
           "d_assoc_per_water_kcal",
+          "d_hbond_campaign",
           "d_hbond_min_A",
-          "lactic.assoc_energy_per_water_kcal",
-          "lactic.deprot_energy_n6_kcal",
-          "lactic.hbond_min_A",
-          "-> kinetics parameter undissociated_lactic_rel_potency"
+          "experimental_dpka",
+          "field",
+          "-> kinetics parameter undissociated_lactic_rel_potency",
+          "-> kinetics parameter pka_lactic",
+          "-> kinetics parameter pka_acetic"
         ],
         "simulated": [
           "overproof_flag=True",
-          "expansion_fall_from_peak_fraction=0.25300702756774857"
+          "expansion_fall_from_peak_fraction=0.2540612356101251"
         ],
         "assumption": [
           "fall_hi=0.4 (assumption)",
@@ -429,7 +456,7 @@
       }
     },
     "cluster_radius_mm": {
-      "value": 4.5223,
+      "value": 4.5257,
       "formula": "cluster_radius_min + cluster_radius_span*s_collapse",
       "inputs": [
         "overproof_flag",
@@ -442,18 +469,21 @@
       "direction": "increases with collapse",
       "provenance_chain": {
         "alchemi": [
-          "acetic.assoc_energy_per_water_kcal",
-          "acetic.hbond_min_A",
+          "campaign",
+          "cluster_dpka",
+          "d_assoc_campaign",
           "d_assoc_per_water_kcal",
+          "d_hbond_campaign",
           "d_hbond_min_A",
-          "lactic.assoc_energy_per_water_kcal",
-          "lactic.deprot_energy_n6_kcal",
-          "lactic.hbond_min_A",
-          "-> kinetics parameter undissociated_lactic_rel_potency"
+          "experimental_dpka",
+          "field",
+          "-> kinetics parameter undissociated_lactic_rel_potency",
+          "-> kinetics parameter pka_lactic",
+          "-> kinetics parameter pka_acetic"
         ],
         "simulated": [
           "overproof_flag=True",
-          "expansion_fall_from_peak_fraction=0.25300702756774857"
+          "expansion_fall_from_peak_fraction=0.2540612356101251"
         ],
         "assumption": [
           "fall_hi=0.4 (assumption)",
@@ -464,7 +494,7 @@
       }
     },
     "cluster_spacing_mm": {
-      "value": 17.0445,
+      "value": 17.0514,
       "formula": "cluster_spacing_min + cluster_spacing_span*s_collapse",
       "inputs": [
         "overproof_flag",
@@ -477,18 +507,21 @@
       "direction": "increases with collapse",
       "provenance_chain": {
         "alchemi": [
-          "acetic.assoc_energy_per_water_kcal",
-          "acetic.hbond_min_A",
+          "campaign",
+          "cluster_dpka",
+          "d_assoc_campaign",
           "d_assoc_per_water_kcal",
+          "d_hbond_campaign",
           "d_hbond_min_A",
-          "lactic.assoc_energy_per_water_kcal",
-          "lactic.deprot_energy_n6_kcal",
-          "lactic.hbond_min_A",
-          "-> kinetics parameter undissociated_lactic_rel_potency"
+          "experimental_dpka",
+          "field",
+          "-> kinetics parameter undissociated_lactic_rel_potency",
+          "-> kinetics parameter pka_lactic",
+          "-> kinetics parameter pka_acetic"
         ],
         "simulated": [
           "overproof_flag=True",
-          "expansion_fall_from_peak_fraction=0.25300702756774857"
+          "expansion_fall_from_peak_fraction=0.2540612356101251"
         ],
         "assumption": [
           "fall_hi=0.4 (assumption)",
@@ -499,7 +532,7 @@
       }
     },
     "min_wall_mm": {
-      "value": 1.0494,
+      "value": 1.0461,
       "formula": "max(0.9, wall_floor + wall_span*(1 - s_weak))",
       "inputs": [
         "final_ph",
@@ -512,18 +545,21 @@
       "direction": "decreases with lower pH and higher GWI; never below 0.9 mm",
       "provenance_chain": {
         "alchemi": [
-          "acetic.assoc_energy_per_water_kcal",
-          "acetic.hbond_min_A",
+          "campaign",
+          "cluster_dpka",
+          "d_assoc_campaign",
           "d_assoc_per_water_kcal",
+          "d_hbond_campaign",
           "d_hbond_min_A",
-          "lactic.assoc_energy_per_water_kcal",
-          "lactic.deprot_energy_n6_kcal",
-          "lactic.hbond_min_A",
-          "-> kinetics parameter undissociated_lactic_rel_potency"
+          "experimental_dpka",
+          "field",
+          "-> kinetics parameter undissociated_lactic_rel_potency",
+          "-> kinetics parameter pka_lactic",
+          "-> kinetics parameter pka_acetic"
         ],
         "simulated": [
-          "final_ph=3.8994309876922952",
-          "gluten_weakening_index=0.7682497243417044"
+          "final_ph=3.8879008579938983",
+          "gluten_weakening_index=0.7716004789234595"
         ],
         "assumption": [
           "ph_hi=5 (configs/kinetics.yaml GWI pH onset (assumption))",
@@ -751,92 +787,92 @@
   "alchemi_attribution": {
     "available": true,
     "input_deltas_alchemi_minus_literature": {
-      "co2_retained_g_per_kg": -3.936228644696449e-05,
-      "co2_retained_peak_g_per_kg": -0.0004098442777702438,
-      "expansion_ratio_peak": -0.000263635672985707,
-      "expansion_ratio_final": -2.532011166311854e-05,
-      "max_expansion_rate_per_h": -0.0002458729828891393,
+      "co2_retained_g_per_kg": -0.0024499141479701336,
+      "co2_retained_peak_g_per_kg": -0.0012559583685833875,
+      "expansion_ratio_peak": -0.0008079054599594571,
+      "expansion_ratio_final": -0.0015759272489344056,
+      "max_expansion_rate_per_h": -0.0006187678490778836,
       "overproof_flag": 0.0,
-      "expansion_fall_from_peak_fraction": -0.00015802063178338432,
-      "final_ph": -0.0013810358306241,
-      "gluten_weakening_index": 7.332536152337976e-05,
-      "final_fermentation_quotient": 0.00033515559197105915
+      "expansion_fall_from_peak_fraction": 0.0008961874105931633,
+      "final_ph": -0.012911165529021051,
+      "gluten_weakening_index": 0.003424079943278535,
+      "final_fermentation_quotient": -0.0007143242215938983
     },
     "crumb_param_deltas": {
       "porosity_target": {
-        "alchemi_informed": 0.3474,
+        "alchemi_informed": 0.347,
         "literature": 0.3474,
-        "delta": 0.0,
-        "relative": 0.0
+        "delta": -0.00040000000000001146,
+        "relative": -0.0011514104778353814
       },
       "pore_diam_median_mm": {
-        "alchemi_informed": 2.5571,
+        "alchemi_informed": 2.5594,
         "literature": 2.5581,
-        "delta": -0.0009999999999998899,
-        "relative": -0.0003909151323247292
+        "delta": 0.0013000000000000789,
+        "relative": 0.0005081896720222348
       },
       "pore_diam_cv": {
-        "alchemi_informed": 0.6806,
+        "alchemi_informed": 0.6814,
         "literature": 0.6807,
-        "delta": -9.999999999998899e-05,
-        "relative": -0.00014690759512265167
+        "delta": 0.0007000000000000339,
+        "relative": 0.0010283531658587248
       },
       "pore_diam_mean_mm": {
-        "alchemi_informed": 3.0931,
+        "alchemi_informed": 3.0972,
         "literature": 3.0945,
-        "delta": -0.0013999999999998458,
-        "relative": -0.0004524155760219246
+        "delta": 0.0026999999999999247,
+        "relative": 0.0008725157537566407
       },
       "pore_diam_sd_mm": {
-        "alchemi_informed": 2.1051,
+        "alchemi_informed": 2.1105,
         "literature": 2.1064,
-        "delta": -0.0012999999999996348,
-        "relative": -0.0006171667299656452
+        "delta": 0.004100000000000215,
+        "relative": 0.0019464489175846063
       },
       "pore_diam_max_mm": {
-        "alchemi_informed": 10.0891,
+        "alchemi_informed": 10.1028,
         "literature": 10.0911,
-        "delta": -0.002000000000000668,
-        "relative": -0.00019819444857356163
+        "delta": 0.011699999999999378,
+        "relative": 0.0011594375241548867
       },
       "eccentricity": {
-        "alchemi_informed": 0.5975,
+        "alchemi_informed": 0.5982,
         "literature": 0.5979,
-        "delta": -0.00039999999999995595,
-        "relative": -0.0006690081953503194
+        "delta": 0.00029999999999996696,
+        "relative": 0.0005017561465127396
       },
       "eccentricity_jitter": {
-        "alchemi_informed": 0.4988,
+        "alchemi_informed": 0.4991,
         "literature": 0.4989,
-        "delta": -9.999999999998899e-05,
-        "relative": -0.00020044097013427337
+        "delta": 0.00019999999999997797,
+        "relative": 0.00040088194026854674
       },
       "clustering": {
-        "alchemi_informed": 0.5828,
+        "alchemi_informed": 0.584,
         "literature": 0.583,
-        "delta": -0.00019999999999997797,
-        "relative": -0.00034305317324181473
+        "delta": 0.0010000000000000009,
+        "relative": 0.0017152658662092641
       },
       "cluster_radius_mm": {
-        "alchemi_informed": 4.5223,
+        "alchemi_informed": 4.5257,
         "literature": 4.5228,
-        "delta": -0.0004999999999997229,
-        "relative": -0.00011055098611473488
+        "delta": 0.0028999999999994586,
+        "relative": 0.0006411957194656978
       },
       "cluster_spacing_mm": {
-        "alchemi_informed": 17.0445,
+        "alchemi_informed": 17.0514,
         "literature": 17.0456,
-        "delta": -0.001100000000000989,
-        "relative": -6.453278265364605e-05
+        "delta": 0.0058000000000006935,
+        "relative": 0.0003402637630825957
       },
       "min_wall_mm": {
-        "alchemi_informed": 1.0494,
+        "alchemi_informed": 1.0461,
         "literature": 1.0497,
-        "delta": -0.00029999999999996696,
-        "relative": -0.0002857959416975964
+        "delta": -0.0036000000000000476,
+        "relative": -0.00342955130037158
       }
     },
     "geometry_identical_after_rounding": false,
-    "max_abs_relative_param_change": 0.0006690081953503194
+    "max_abs_relative_param_change": 0.00342955130037158
   }
 }

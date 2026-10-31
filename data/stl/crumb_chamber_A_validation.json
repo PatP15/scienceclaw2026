@@ -2,7 +2,7 @@
   "name": "chamber_A",
   "provenance": "simulated",
   "passed": true,
-  "min_thickness_mm": 1.1785,
+  "min_thickness_mm": 1.1757,
   "checks": {
     "watertight": {
       "passed": true,
@@ -20,7 +20,7 @@
     },
     "positive_volume": {
       "passed": true,
-      "value": 63998.472,
+      "value": 63986.011,
       "method": "signed volume (mm^3) > 0 and trimesh is_volume",
       "exact": true,
       "note": ""
@@ -30,7 +30,7 @@
       "value": {
         "status": "Error.NoError",
         "genus": 1,
-        "volume": 63998.47259303434
+        "volume": 63986.011220338434
       },
       "method": "manifold3d.Manifold accepts mesh as 2-manifold; volume agrees with trimesh",
       "exact": true,
@@ -39,7 +39,7 @@
     "self_intersections": {
       "passed": true,
       "value": {
-        "pairs_tested": 859638,
+        "pairs_tested": 859595,
         "intersecting_pairs": 0,
         "examples": []
       },
@@ -57,7 +57,7 @@
     "voxel_volume_agreement": {
       "passed": true,
       "value": {
-        "voxel_volume": 64007.18,
+        "voxel_volume": 63995.08,
         "relative_error": 0.00014,
         "pitch_mm": 0.15
       },
@@ -68,19 +68,19 @@
     "min_thickness": {
       "passed": true,
       "value": {
-        "thin_volume_fraction": 0.000457,
+        "thin_volume_fraction": 0.000458,
         "thin_clusters_gt_1mm3": 0,
-        "ball_radius_mm": 0.4393,
+        "ball_radius_mm": 0.4379,
         "pitch_mm": 0.15,
         "ray_thickness_informational": {
           "samples": 2000,
           "hits": 2000,
-          "p01_mm": 1.8001924304355201,
-          "p05_mm": 4.2849540334022445,
+          "p01_mm": 1.4958908493900915,
+          "p05_mm": 3.4196639162315656,
           "median_mm": 11.9999
         }
       },
-      "method": "solid volume not covered by inscribed balls of diameter ~1.1785 mm (minus 1 voxel tolerance) on a 0.15 mm re-voxelisation; pass if < 1%",
+      "method": "solid volume not covered by inscribed balls of diameter ~1.1757 mm (minus 1 voxel tolerance) on a 0.15 mm re-voxelisation; pass if < 1%",
       "exact": false,
       "note": "approximate (voxel resolution); ray thickness is informational only"
     },
