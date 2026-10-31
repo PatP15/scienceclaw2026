@@ -1,6 +1,6 @@
 // Section 1: Live Laboratories - chamber A and B side by side, fed by REST snapshots + SSE.
 import { get, post, del, getToken, ApiError } from "./api.js";
-import { h, clear, fmt, fmtOhms, timeAgo, hhmmss, statusBadge, sparkline, agentSide, toast, COLORS, num, normProv, tfield, demoMode, deviceBadge, PROV_LABEL, chefLabel, brigadeText } from "./util.js";
+import { h, clear, fmt, fmtOhms, timeAgo, hhmmss, statusBadge, sparkline, agentSide, toast, COLORS, num, normProv, tfield, demoMode, deviceBadge, PROV_LABEL, chefLabel, brigadeText, icon, emptyCard } from "./util.js";
 import { messageText, messageSender } from "./messages.js";
 
 const CHAMBERS = ["A", "B"];
@@ -181,7 +181,11 @@ export class LivePanel {
     const raw = fp[field] || (tel ? tel.source : null);
     if (!raw) return null;
     const n = normProv(raw, "device");
-    return h("span", { class: `badge mini prov-${n}`, title: `provenance of this value: ${raw} → ${PROV_LABEL[n] || n}${fp[field] ? " (field_provenance)" : " (record source)"}` }, PROV_SHORT[n] || raw);
+    const title = `provenance of this value: ${raw} → ${PROV_LABEL[n] || n}${fp[field] ? " (field_provenance)" : " (record source)"}`;
+    // Same as the record source (already badged once in the card header): a quiet coloured dot.
+    // Different (e.g. pH entered manually on a simulated-device record): spelled out.
+    if (normProv(tel?.source, "device") === n) return h("span", { class: `pdot prov-${n}`, title, "aria-label": title });
+    return h("span", { class: `badge mini prov-${n}`, title }, PROV_SHORT[n] || raw);
   }
   /** A value cell: real number, or an explicit "unavailable" state - never an invented value. */
   val(tel, field, format) {
@@ -205,33 +209,34 @@ export class LivePanel {
     const diag = tfield(tel, "diagnostics") || {};
     const unsynced = tel && (tel.timestamp_utc === null || tel.timestamp_utc === undefined || tfield(tel, "timestamp_quality") === "unsynced");
 
-    const modeBadge = mode ? h("span", { class: `badge prov-${mode === "live" ? "measured" : mode === "replay" ? "replay" : "simulated_device"}`, title: "demonstration mode from this chamber's record source" },
-      mode === "live" ? "LIVE" : mode === "replay" ? "REPLAY" : "SIMULATION") : null;
     const head = h("div", { class: "ch-head" },
-      h("div", null,
-        h("div", { class: "ch-title" }, "Chamber ", h("span", { class: "letter" }, c)),
-        h("div", { class: "ch-sub" }, h("b", null, `Station ${c}`), " · ", (st.label || "").replace(/^Chamber [AB]\s*[-–]\s*/, ""))),
+      h("div", { class: "ch-id" },
+        h("span", { class: "ch-ico" }, icon("station", { size: 26 })),
+        h("div", null,
+          h("div", { class: "ch-title" }, "Chamber ", h("span", { class: "letter" }, c)),
+          h("div", { class: "ch-sub" }, h("b", null, `Station ${c}`), " · ", (st.label || "").replace(/^Chamber [AB]\s*[-–]\s*/, "")))),
       h("div", { class: "ch-badges" },
-        modeBadge, prov ? deviceBadge(prov) : statusBadge("no data", "info"),
-        stale ? statusBadge("stale", "bad") : statusBadge("fresh", "good"),
+        prov ? deviceBadge(prov) : statusBadge("no device", "info"),
+        tel ? (stale ? statusBadge("stale", "bad") : statusBadge("fresh", "good")) : null,
         st.experiment_id ? h("span", { class: "badge status-info", title: "current experiment" }, st.experiment_id) : null));
 
     const devId = tfield(tel, "device_id") || st.device_id;
     const boot = tfield(tel, "boot_id"), seq = tfield(tel, "sequence_number"), up = tfield(tel, "device_uptime_ms");
-    const devLine = h("div", { class: "dev-line tiny" },
-      h("span", null, "📟 ", h("b", null, devId || "no device")),
-      boot ? h("span", { title: `boot_id ${boot}` }, `boot ${String(boot).slice(0, 8)}`) : null,
-      seq !== null ? h("span", null, `seq #${seq}`) : null,
-      up !== null ? h("span", null, `up ${fmtUptime(up)}`) : null,
-      diag.firmware_version || tfield(tel, "firmware_version") ? h("span", null, `fw ${diag.firmware_version || tfield(tel, "firmware_version")}`) : null,
-      unsynced ? statusBadge("device clock unsynced", "warn") : tel ? statusBadge("device clock synced", "good") : null);
-
-    const staleBanner = stale
-      ? h("div", { class: "stale-banner" }, tel
-        ? `⚠ Telemetry stale — last reading received ${timeAgo(tel.received_at_utc, this.serverNow())}. Values below are the last known, not live.`
-        : "⚠ No telemetry received from this chamber yet. Start the ESP32 (or scripts/start_demo.sh --with-simulated-devices).")
+    const staleBanner = stale && tel
+      ? h("div", { class: "stale-banner" }, `⚠ Telemetry stale — last reading received ${timeAgo(tel.received_at_utc, this.serverNow())}. Values below are the last known, not live.`)
       : null;
-
+    if (!tel) {
+      // Intentional empty state: nothing measured yet, so nothing is shown as a number.
+      const m0 = this.motor[c];
+      clear(card, head,
+        emptyCard({ icon: "plug", title: "No device · USB bridge pending",
+          detail: `Waiting for the first telemetry from Station ${c}${devId ? ` (${devId})` : ""}. Connect the ESP32 over the USB serial bridge, or run scripts/start_demo.sh --with-simulated-devices.` }),
+        h("div", { class: "sec-row" },
+          h("div", null, h("span", { class: "sec-lbl" }, "Setpoint (server)"), h("b", null, fmt(st.desired_setpoint_c, 1, " °C"))),
+          h("div", null, h("span", { class: "sec-lbl" }, "Readings"), h("b", { class: "faint" }, "unavailable"))),
+        this.agentBox(c, st), this.motorRow(c, m0));
+      return;
+    }
     const hist = this.history[c];
     const spark = sparkline([
       { values: hist.map((p) => ({ t: p.t, v: p.sp })), color: COLORS.muted, dash: true },
@@ -239,25 +244,27 @@ export class LivePanel {
     ]);
     const span = hist.length > 1 ? Math.round((hist[hist.length - 1].t - hist[0].t) / 60000) : 0;
     const tempNow = tfield(tel, "chamber_temperature_c");
+    const starter = num(tfield(tel, "starter_temperature_c"));
     const hero = h("div", { class: "hero-temp" },
-      h("div", { class: "lbl small muted" }, "Chamber air temperature ", this.provMini(tel, "chamber_temperature_c")),
-      num(tempNow) === null ? h("div", { class: "big na" }, "unavailable") : h("div", { class: "big" }, fmt(tempNow, 1), h("span", { class: "unit" }, " °C")),
-      h("div", { class: "sp" }, "Setpoint ", h("b", null, fmt(st.desired_setpoint_c, 1, " °C")),
-        num(st.device_reported_setpoint_c) !== null ? ` · device using ${fmt(st.device_reported_setpoint_c, 1, " °C")}` : ""),
-      h("div", { class: "sp small" }, "Starter ", num(tfield(tel, "starter_temperature_c")) === null ? h("b", { class: "faint" }, "unavailable") : h("b", null, fmt(tfield(tel, "starter_temperature_c"), 1, " °C")), " ", this.provMini(tel, "starter_temperature_c")),
+      h("div", { class: "lbl" }, "Chamber air temperature ", this.provMini(tel, "chamber_temperature_c")),
+      num(tempNow) === null ? h("div", { class: "big na" }, "unavailable") : h("div", { class: "big" }, fmt(tempNow, 1), h("span", { class: "unit" }, "°C")),
+      h("div", { class: "sec-row" },
+        h("div", null, h("span", { class: "sec-lbl" }, "Setpoint"), h("b", null, fmt(st.desired_setpoint_c, 1, " °C")),
+          num(st.device_reported_setpoint_c) !== null && Math.abs(st.device_reported_setpoint_c - st.desired_setpoint_c) > 0.05 ? h("span", { class: "tiny faint" }, ` device ${fmt(st.device_reported_setpoint_c, 1)}`) : null),
+        h("div", null, h("span", { class: "sec-lbl" }, "Starter ", this.provMini(tel, "starter_temperature_c")), starter === null ? h("b", { class: "faint" }, "unavailable") : h("b", null, fmt(starter, 1, " °C")))),
       spark,
       h("div", { class: "spark-legend" },
-        h("span", null, h("i", { style: { background: c === "A" ? COLORS.A : COLORS.B } }), "air temperature"),
-        h("span", null, h("i", { style: { background: COLORS.muted } }), "setpoint (device)"),
-        h("span", null, span ? `last ${span} min${unsynced ? " (server receipt time)" : ""}` : "")));
+        h("span", null, h("i", { style: { background: c === "A" ? COLORS.A : COLORS.B } }), "air"),
+        h("span", null, h("i", { class: "dashed" }), "setpoint (device)"),
+        h("span", null, span ? `${span} min${unsynced ? " · receipt time" : ""}` : "")));
 
     const img = st.latest_image;
     let snap = card.querySelector(".snap");
     const imgKey = img ? img.url : "none";
     if (!snap || snap.dataset.key !== imgKey) {
       snap = h("div", { class: "snap", dataset: { key: imgKey } },
-        img ? h("img", { src: img.url, alt: `Chamber ${c} camera snapshot`, loading: "lazy" }) : h("div", { class: "snap-empty" }, "No camera snapshot yet"),
-        img ? h("div", { class: "snap-cap" }, h("span", null, `📷 ${hhmmss(img.timestamp_utc)}`), deviceBadge(img.source)) : null);
+        img ? h("img", { src: img.url, alt: `Chamber ${c} camera snapshot`, loading: "lazy" }) : emptyCard({ icon: "camera", title: "No camera frame yet", detail: "The station camera has not uploaded a snapshot.", compact: true }),
+        img ? h("div", { class: "snap-cap" }, h("span", null, `${hhmmss(img.timestamp_utc)}`), deviceBadge(img.source)) : null);
     } else {
       const cap = snap.querySelector(".snap-cap span");
       if (cap && img) cap.textContent = `📷 ${hhmmss(img.timestamp_utc)}`;
@@ -286,29 +293,40 @@ export class LivePanel {
       metric("Door", "door_open", doorOpen === true ? h("div", { class: "val", style: { color: "#ffb0b0" } }, "OPEN") : doorOpen === false ? h("div", { class: "val" }, "closed") : this.val(tel, "door_open", String)),
       metric("Chef-hat motor", "motor_running", h("div", { class: motorRunning === null ? "val na" : "val" }, motorRunning === true ? "running" : motorRunning === false ? "idle" : "unavailable",
         h("span", { class: "tiny faint" }, st.motor_ran ? " · last cmd ran" : ""))),
-      metric("Last valid update", null, h("div", { class: tel ? "val small-val" : "val na" }, tel ? timeAgo(tel.received_at_utc, this.serverNow()) : "never",
-        h("span", { class: "tiny faint" }, tel ? (unsynced ? " (server receipt)" : ` (device ${hhmmss(tel.timestamp_utc)})`) : ""))));
+      metric("Last valid update", null, h("div", { class: tel ? "val" : "val na" }, tel ? timeAgo(tel.received_at_utc, this.serverNow()) : "never",
+        h("span", { class: "tiny faint" }, tel ? (unsynced ? " · receipt" : ` · device ${hhmmss(tel.timestamp_utc)}`) : ""))));
 
-    // Equipment safety (heatsinks): shown separately - never fermentation evidence.
-    const safety = h("div", { class: "safety-strip" },
-      h("div", { class: "tiny faint" }, "Equipment safety — not fermentation evidence"),
-      h("div", { class: "safety-vals" },
-        h("span", null, "Heatsink internal ", this.provMini(tel, "internal_heatsink_temperature_c"), " ", this.inline(tel, "internal_heatsink_temperature_c", (x) => fmt(x, 1, " °C"))),
-        h("span", null, "external ", this.provMini(tel, "external_heatsink_temperature_c"), " ", this.inline(tel, "external_heatsink_temperature_c", (x) => fmt(x, 1, " °C"))),
-        tfield(tel, "fan_running") !== null ? h("span", null, `fan ${tfield(tel, "fan_running") ? "on" : "off"}`) : null));
+    // Equipment safety (heatsinks): compact, separate - never fermentation evidence.
+    const safety = h("div", { class: "safety-line", title: "Heatsink temperatures protect the Peltier module; they are not fermentation evidence." },
+      icon("shield", { size: 14 }), h("span", { class: "safety-lbl" }, "Equipment safety · not fermentation evidence"),
+      h("span", null, "heatsink in ", this.inline(tel, "internal_heatsink_temperature_c", (x) => fmt(x, 1, " °C"))),
+      h("span", null, "out ", this.inline(tel, "external_heatsink_temperature_c", (x) => fmt(x, 1, " °C"))),
+      tfield(tel, "fan_running") !== null ? h("span", null, `fan ${tfield(tel, "fan_running") ? "on" : "off"}`) : null);
 
-    // Diagnostics
+    // Device drawer: identity + diagnostics, collapsed by default (tap to open).
     const health = diag.sensor_health || {};
     const hb = (k, v) => h("span", { class: `badge ${v === "ok" ? "status-good" : /missing|absent|not_installed/.test(v) ? "status-info" : "status-bad"}`, title: `sensor_health.${k} = ${v}` }, `${k.replace(/_/g, " ")}: ${v}`);
     const rssi = num(diag.wifi_rssi_dbm ?? tfield(tel, "wifi_rssi_dbm"));
     const flags = (tel?.quality_flags || []).filter((f) => f);
-    const diagEl = h("details", { class: "diag" },
-      h("summary", null, "Diagnostics\u00a0\u00a0", h("span", { class: "tiny faint" },
-        rssi !== null ? `RSSI ${rssi.toFixed(0)} dBm · ` : "", num(diag.free_heap_bytes) !== null ? `heap ${(diag.free_heap_bytes / 1024).toFixed(0)} kB · ` : "",
-        `${Object.values(health).filter((v) => v === "ok").length}/${Object.keys(health).length} sensors ok`)),
-      h("div", { class: "health-badges" }, Object.entries(health).map(([k, v]) => hb(k, String(v)))),
-      flags.length ? h("div", { class: "tiny faint" }, "Quality flags: ", flags.join(", ")) : null,
-      tfield(tel, "time_basis") ? h("div", { class: "tiny faint" }, `time basis: ${tfield(tel, "time_basis")}`) : null);
+    const nOk = Object.values(health).filter((v) => v === "ok").length, nH = Object.keys(health).length;
+    const fw = diag.firmware_version || tfield(tel, "firmware_version");
+    const drawer = h("details", { class: "device-drawer" },
+      h("summary", null, icon("device", { size: 16 }), h("b", null, devId || "device"),
+        unsynced ? h("span", { class: "chip-mini warn" }, "device clock unsynced") : h("span", { class: "chip-mini ok" }, "device clock synced"),
+        nH ? h("span", { class: `chip-mini ${nOk === nH ? "ok" : "warn"}` }, `${nOk}/${nH} sensors ok`) : null,
+        h("span", { class: "drawer-hint" }, "details")),
+      h("div", { class: "drawer-body" },
+        h("div", { class: "dev-line tiny" },
+          boot ? h("span", { title: `boot_id ${boot}` }, `boot ${String(boot).slice(0, 8)}`) : null,
+          seq !== null ? h("span", null, `seq #${seq}`) : null,
+          up !== null ? h("span", null, `up ${fmtUptime(up)}`) : null,
+          fw ? h("span", null, `fw ${fw}`) : null,
+          rssi !== null ? h("span", null, `RSSI ${rssi.toFixed(0)} dBm`) : null,
+          num(diag.free_heap_bytes) !== null ? h("span", null, `heap ${(diag.free_heap_bytes / 1024).toFixed(0)} kB`) : null,
+          tfield(tel, "time_basis") ? h("span", null, `time basis ${tfield(tel, "time_basis")}`) : null),
+        unsynced ? h("div", { class: "tiny warn-text" }, "Device clock unsynced: times shown are the server's receipt time.") : null,
+        nH ? h("div", { class: "health-badges" }, Object.entries(health).map(([k, v]) => hb(k, String(v)))) : null,
+        flags.length ? h("div", { class: "tiny faint" }, "Quality flags: ", flags.join(", ")) : null));
 
     const agent = this.agentBox(c, st);
 
@@ -316,17 +334,18 @@ export class LivePanel {
     const pend = Array.isArray(st.pending_commands) ? st.pending_commands : [];
     const pendEl = pend.length ? h("div", { class: "tiny faint" }, `Pending device commands: ${pend.map((p) => p.action || p.command_type).join(", ")}`) : null;
 
-    const m = this.motor[c];
+    const mainRow = h("div", { class: "ch-main" }, hero, snap);
+    clear(card, head, staleBanner, mainRow, metrics, safety, drawer, agent, pendEl, this.motorRow(c, this.motor[c]));
+  }
+
+  motorRow(c, m) {
     const active = m && !MOTOR_TERMINAL.has(m.status);
-    const motor = h("div", { class: "motor-row" },
+    return h("div", { class: "motor-row" },
       h("button", { class: "btn btn-motor", type: "button", disabled: this.busy[c] || !getToken(), onclick: () => this.startMotor(c),
         title: getToken() ? "Run the decorative chef-hat automaton for 5 s (separate from the Peltier controller)" : "Needs the API token" },
         this.busy[c] ? "Sending…" : h("span", { class: "btn-2line" }, h("span", null, "▶ Start automaton animation"), h("span", { class: "btn-sub" }, "Hat bobs · new assignment"))),
       m ? motorTrack(m) : h("span", { class: "tiny faint" }, "no motor command yet"),
       active ? h("button", { class: "btn btn-danger btn-sm", type: "button", onclick: () => this.cancelMotor(c) }, "Cancel") : null);
-
-    const mainRow = h("div", { class: "ch-main" }, hero, snap);
-    clear(card, head, devLine, staleBanner, mainRow, metrics, safety, diagEl, agent, pendEl, motor);
   }
 
   inline(tel, field, format) {
@@ -344,7 +363,7 @@ export class LivePanel {
       st.setpoint_rationale ? ` — ${String(st.setpoint_rationale).slice(0, 120)}` : "");
     if (!as || as.available === false || as.stub) {
       return h("div", { class: "agent-box" },
-        h("div", { class: "agent-head" }, chefLabel(`scientist_${c}`), h("span", { class: "tiny faint" }, am ? `last message ${timeAgo(am.created_at_utc, this.serverNow())}` : "idle — waiting for taste feedback")),
+        h("div", { class: "agent-head" }, h("span", { class: "who" }, icon("toque", { size: 18, cls: "toque" }), chefLabel(`scientist_${c}`)), h("span", { class: "tiny faint" }, am ? `last message ${timeAgo(am.created_at_utc, this.serverNow())}` : "idle — waiting for taste feedback")),
         as?.objective ? h("div", { class: "small" }, h("b", null, "Objective: "), as.objective) : null,
         h("div", { class: "agent-text" }, am ? [am.kind ? h("b", null, `${am.kind}: `) : "", brigadeText(stripArrow(messageText(am.content ?? am)))] : "No findings yet — the agent publishes its hypothesis and decisions after taste feedback."),
         setpointLine);
@@ -358,7 +377,7 @@ export class LivePanel {
     if (obs) phText = obs.ph_valid ? "pH: valid observation" : `no valid pH${obs.ph_reason ? ` — ${obs.ph_reason}` : ""}`;
     return h("div", { class: "agent-box" },
       h("div", { class: "agent-head" },
-        h("span", null, chefLabel(`scientist_${c}`), " ", reasoning ? statusBadge(reasoning, /online/i.test(reasoning) ? "good" : "info") : null),
+        h("span", { class: "who" }, icon("toque", { size: 18, cls: "toque" }), chefLabel(`scientist_${c}`), " ", reasoning ? statusBadge(reasoning, /online/i.test(reasoning) ? "good" : "info") : null),
         h("span", { class: "tiny faint" }, as.last_activity_utc ? `active ${timeAgo(as.last_activity_utc, this.serverNow())}` : "no activity yet")),
       hyp ? h("div", { class: "agent-text" }, h("b", null, "Hypothesis: "), brigadeText(hyp.statement || "—")) : h("div", { class: "agent-text faint" }, "No hypothesis yet — waiting for taste feedback."),
       dec ? h("div", { class: "small", style: { marginTop: "3px" } }, h("b", null, "Last decision: "), dec.name || dec.schedule_id || "—",

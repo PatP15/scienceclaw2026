@@ -174,7 +174,7 @@ export class MolecularPanel {
     const traces = acids.map((a) => {
       const rows = clusters.filter((r) => r.acid === a && num(r.dE_assoc_kcal_mol) !== null).sort((x, y) => x.n_water - y.n_water);
       return { type: "bar", name: pretty(a), x: rows.map((r) => `${r.n_water} H₂O`), y: rows.map((r) => r.dE_assoc_kcal_mol),
-        marker: { color: ACID_COLORS[a] || COLORS.accent, line: { color: "#1a1a19", width: 2 } },
+        marker: { color: ACID_COLORS[a] || COLORS.accent, line: { color: COLORS.surface, width: 2 } },
         hovertemplate: `${pretty(a)} · %{x}: %{y:.2f} kcal/mol<extra></extra>` };
     });
     await Plotly.react(el, traces, plotLayout({ barmode: "group", showlegend: true, hovermode: "closest",
@@ -211,7 +211,7 @@ export class MolecularPanel {
       return { x: Ts.map((T) => T - 273.15), y: mean, type: "scatter", mode: "lines+markers", name,
         error_y: { type: "data", symmetric: false, array: hi, arrayminus: lo, color: ACID_COLORS[acid], thickness: 1, width: 3 },
         line: { color: ACID_COLORS[acid], width: 2, dash: anion ? "dot" : n === "3" ? "solid" : "dash" },
-        marker: { size: 8, color: ACID_COLORS[acid], line: { color: "#1a1a19", width: 2 }, symbol: anion ? "diamond" : "circle" },
+        marker: { size: 8, color: ACID_COLORS[acid], line: { color: COLORS.surface, width: 2 }, symbol: anion ? "diamond" : "circle" },
         hovertemplate: `${name}: %{y:.2f} H-bonds at %{x:.0f} °C<extra></extra>` };
     });
     await Plotly.react(el, traces, plotLayout({ showlegend: true, hovermode: "closest", legend: { orientation: "h", y: -0.32, font: { size: 9, color: COLORS.text2 } },

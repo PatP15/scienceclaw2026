@@ -3,7 +3,7 @@
 export const COLORS = {
   A: "#3987e5", B: "#d95926",
   Aband: "rgba(57,135,229,0.18)", Bband: "rgba(217,89,38,0.18)",
-  text: "#f0efec", text2: "#c3c2b7", muted: "#8f8e86", grid: "#2e2e2b", border: "#383835",
+  text: "#f3efe6", text2: "#cdc6b8", muted: "#a39d92", grid: "#2b3038", border: "#353a43", surface: "#1e2126",
   acetic: "#199e70", lactic: "#9085e9", accent: "#e8b45a",
 };
 export const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
@@ -196,7 +196,7 @@ export function plotLayout(extra = {}) {
     yaxis: { gridcolor: COLORS.grid, zerolinecolor: COLORS.grid, linecolor: COLORS.border, tickcolor: COLORS.border, ...(extra.yaxis || {}) },
     legend: { orientation: "h", x: 0, y: 1.02, yanchor: "bottom", font: { size: 10, color: COLORS.text2 }, bgcolor: "rgba(0,0,0,0)" },
     hovermode: "x unified",
-    hoverlabel: { bgcolor: "#2c2c29", bordercolor: COLORS.border, font: { family: FONT, color: COLORS.text, size: 12 } },
+    hoverlabel: { bgcolor: "#2d323a", bordercolor: COLORS.border, font: { family: FONT, color: COLORS.text, size: 12 } },
     ...Object.fromEntries(Object.entries(extra).filter(([k]) => k !== "xaxis" && k !== "yaxis")),
   };
 }
@@ -312,4 +312,44 @@ export function chefLabel(id, cls = "") {
 /** Replace agent ids inside free text (e.g. "scientist_B → scientist_A") with brigade names. */
 export function brigadeText(t) {
   return String(t ?? "").replace(/\bscientist[_\s-]?([AB])\b/gi, (_, s) => `Sous Chef ${s.toUpperCase()}`);
+}
+
+// ---------------------------------------------------------------- brigade icons (inline SVG, currentColor)
+const ICON_PATHS = {
+  // sous chef: classic toque
+  toque: '<path d="M7 18h10v3H7z"/><path d="M6.5 16.5c-2.2-.4-3.5-2.2-3.5-4.2 0-2.4 2-4.3 4.4-4.2C8 5.7 9.8 4 12 4s4 1.7 4.6 4.1c2.4-.1 4.4 1.8 4.4 4.2 0 2-1.3 3.8-3.5 4.2V17h-11z"/>',
+  // head chef: tall toque with a band
+  headchef: '<path d="M6.5 18.5h11V21h-11z"/><path d="M7 15.6C4.7 15 3.4 13 3.4 10.8c0-2.6 2.1-4.6 4.6-4.5C8.6 3.6 10.1 2 12 2s3.4 1.6 4 4.3c2.5-.1 4.6 1.9 4.6 4.5 0 2.2-1.3 4.2-3.6 4.8V17H7z"/><path d="M8 13.2h8v1.4H8z" fill="#15171a"/>',
+  // line cook: pan
+  pan: '<path d="M3 11h13a0 0 0 0 1 0 0v1a5 5 0 0 1-5 5H8a5 5 0 0 1-5-5v-1z"/><path d="M16 11.4h5.2a.8.8 0 0 1 0 1.6H16z"/><path d="M7 6.5c0-1 1-1.2 1-2.2M10 6.5c0-1 1-1.2 1-2.2" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/>',
+  // guest: fork & knife
+  guest: '<path d="M7 3v6a2 2 0 0 0 1.2 1.8V21h1.6V10.8A2 2 0 0 0 11 9V3h-1v5H9.4V3H8.6v5H8V3z"/><path d="M15.5 3c-1.8 1.3-2.5 3.6-2.5 6.5V13h2.2v8h1.6V3z"/>',
+  // station: proofing chamber
+  station: '<rect x="4" y="3" width="16" height="18" rx="3"/><rect x="7" y="6" width="10" height="8" rx="1.5" fill="#15171a"/><circle cx="9" cy="17.5" r="1.1" fill="#15171a"/><circle cx="15" cy="17.5" r="1.1" fill="#15171a"/>',
+  device: '<rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 3v3M12 3v3M15 3v3M9 18v3M12 18v3M15 18v3M3 9h3M3 12h3M3 15h3M18 9h3M18 12h3M18 15h3" stroke="currentColor" stroke-width="1.4"/>',
+  shield: '<path d="M12 3l7 3v5c0 4.6-3 8.4-7 10-4-1.6-7-5.4-7-10V6z"/>',
+  chart: '<path d="M4 19h16v1.6H4z"/><path d="M5 16l4.5-5 3.5 3 6-7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+  atom: '<circle cx="12" cy="12" r="2"/><ellipse cx="12" cy="12" rx="9" ry="3.6" fill="none" stroke="currentColor" stroke-width="1.5"/><ellipse cx="12" cy="12" rx="9" ry="3.6" fill="none" stroke="currentColor" stroke-width="1.5" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="3.6" fill="none" stroke="currentColor" stroke-width="1.5" transform="rotate(-60 12 12)"/>',
+  plug: '<path d="M9 2v5M15 2v5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M6 7h12v3a6 6 0 0 1-5 5.9V22h-2v-6.1A6 6 0 0 1 6 10z"/>',
+  camera: '<path d="M4 7h3.5L9 5h6l1.5 2H20a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.2" fill="#15171a"/>',
+};
+/** Inline SVG icon (no external assets). */
+export function icon(name, { size = 18, cls = "", title = null } = {}) {
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("width", size);
+  svg.setAttribute("height", size);
+  svg.setAttribute("fill", "currentColor");
+  svg.setAttribute("class", `ico ${cls}`.trim());
+  if (title) { svg.setAttribute("role", "img"); svg.setAttribute("aria-label", title); } else svg.setAttribute("aria-hidden", "true");
+  svg.innerHTML = ICON_PATHS[name] || ICON_PATHS.toque;
+  return svg;
+}
+
+/** Intentional empty state: icon, short title, one-line hint. */
+export function emptyCard({ icon: ic = "plug", title, detail = "", compact = false } = {}) {
+  return h("div", { class: `empty-card${compact ? " compact" : ""}` },
+    h("span", { class: "empty-ico" }, icon(ic, { size: compact ? 20 : 28 })),
+    h("div", null, h("div", { class: "empty-title" }, title), detail ? h("div", { class: "empty-detail" }, detail) : null));
 }

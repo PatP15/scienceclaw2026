@@ -44,6 +44,14 @@ dispatches); candidate_ranking -> "Line cooks · candidate simulations" (chosen 
 judge -> Guest; chamber subtitle "Station A/B"; motor button subtitle "Hat bobs · new assignment"; legend line.
 Taste flow is now 12 steps (added goal + cooks). Tests: test_kitchen_brigade_display_names, test_brigade_legend_*.
 
+## v5: visual polish pass (CSS polish layer at end of dashboard.css + small JS structure changes)
+Theme #15171a/#1e2126, cream #f3efe6, crust #b86b3a (large headings/dividers only), accent #d9895a; 4-step type
+scale (12/14/18/36 px) via --fs-*; one gutter --gap 12px; inline SVG brigade icons (util.icon); emptyCard();
+Live: one hero number + secondary row, provenance dots (badge only when field != record source), compact safety
+line, device drawer (identity+diagnostics), no-device empty state; Taste: conversation avatars, A left / B right,
+reasoning details folded, "plated" kitchen ticket. Before/after: data/demos/{before,after}_*.png,
+data/demos/polish_contact_sheet.png.
+
 ## Open items for other areas
 - API: /molecular/summary -> HTTP 500 (NaN in analysis_summary.json; jsonable() the summaries).
 - API/agents: build_context passes `recent_telemetry` (reduced keys, no received_at_utc/v1.1 fields) but the

@@ -131,11 +131,12 @@ export class TwinPanel {
     if (!this.chartsEl.dataset.built) {
       clear(this.chartsEl,
         h("div", { class: "card", style: { gridColumn: "1 / -1", padding: "6px 12px" } },
-          h("span", { class: "small" },
-            h("span", { style: { color: COLORS.A, fontWeight: 700 } }, "━ Chamber A predicted"), "   ",
-            h("span", { style: { color: COLORS.B, fontWeight: 700 } }, "━ Chamber B predicted"), "   ",
-            h("span", { class: "muted" }, "▒ 5–95 % Monte-Carlo band   ● observed telemetry, measured or simulated device (hours since first record)  "),
-            provBadge("simulated"), " predictions ")),
+          h("span", { class: "small legend-strip" },
+            h("span", { style: { color: "#8cbcf5", fontWeight: 700 } }, "━ A predicted"),
+            h("span", { style: { color: "#f6a17c", fontWeight: 700 } }, "━ B predicted"),
+            h("span", { class: "muted" }, "▒ 5–95 % band"),
+            h("span", { class: "muted" }, "● observed (h since first record)"),
+            provBadge("simulated"))),
         CHARTS.map((s) => h("div", { class: "chart-card" },
           h("h4", null, s.title), h("div", { class: "chart-sub" }, s.sub || s.unit),
           h("div", { class: "chart", id: `twin-${s.key}` }))));
@@ -160,7 +161,7 @@ export class TwinPanel {
         const obs = this.observedSeries(c, spec);
         if (obs) {
           traces.push({ x: obs.xs, y: obs.ys, type: "scatter", mode: "markers", name: `${c} observed (${obs.label})`,
-            marker: { color: col, size: 8, line: { color: "#1a1a19", width: 2 }, symbol: "circle" },
+            marker: { color: col, size: 8, line: { color: COLORS.surface, width: 2 }, symbol: "circle" },
             hovertemplate: `${c} observed %{y:.2f} (${obs.label})<extra></extra>` });
         }
       }

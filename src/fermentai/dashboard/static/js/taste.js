@@ -1,25 +1,34 @@
 // Section 4: "What did the bread taste like?" -> interpretation -> hypothesis -> agents -> next experiment.
 import { get, post, getToken, ApiError } from "./api.js";
-import { h, clear, fmt, num, provBadge, statusBadge, plotLayout, PLOT_CONFIG, whenPlotly, COLORS, agentSide, normSchedule, renderValue, toast, sleep, timeAgo, hhmmss, chefLabel, chefName, brigadeText } from "./util.js";
+import { h, clear, fmt, num, provBadge, statusBadge, plotLayout, PLOT_CONFIG, whenPlotly, COLORS, agentSide, normSchedule, renderValue, toast, sleep, timeAgo, hhmmss, chefLabel, chefName, brigadeText, icon, emptyCard } from "./util.js";
 import { messageText, messageSender, messageRecipient, messageKind, messageBody } from "./messages.js";
 import { motorTrack } from "./live.js";
 
 // Kitchen-brigade naming (display only): Head Chef = orchestrator, Sous Chef A/B = scientist agents,
 // Line cooks = candidate schedule simulations, Guest = judge, Station A/B = chambers.
 const STEP_DEFS = [
-  { id: "saved", title: "Guest feedback saved" },
-  { id: "interp", title: "Head Chef reads the guest's notes", wide: true },
-  { id: "goal", title: "Head Chef sets the goal" },
-  { id: "compare", title: "Comparison with recorded experiments" },
-  { id: "cooks", title: "Line cooks · candidate simulations", wide: true },
-  { id: "hyp", title: "Hypothesis" },
-  { id: "sched", title: "Recommended temperature schedules · Station A / B" },
-  { id: "lead", title: "Sous Chef proposes" },
-  { id: "peer", title: "Second Sous Chef: critique / counter-proposal" },
-  { id: "next", title: "Head Chef calls the plan" },
-  { id: "motor", title: "Head Chef dispatches · hats bob at both stations" },
-  { id: "plan", title: "Updated experiment plan" },
+  { id: "saved", title: "Guest feedback saved", speaker: "guest" },
+  { id: "interp", title: "Head Chef reads the guest's notes", speaker: "head" },
+  { id: "goal", title: "Head Chef sets the goal", speaker: "head" },
+  { id: "compare", title: "Comparison with recorded experiments", speaker: "head" },
+  { id: "cooks", title: "Line cooks · candidate simulations", speaker: "cooks" },
+  { id: "hyp", title: "Hypothesis", speaker: "lead" },
+  { id: "sched", title: "Recommended temperature schedules · Station A / B", speaker: "both" },
+  { id: "lead", title: "Sous Chef proposes", speaker: "lead" },
+  { id: "peer", title: "Second Sous Chef: critique / counter-proposal", speaker: "peer" },
+  { id: "next", title: "Head Chef calls the plan", speaker: "head" },
+  { id: "motor", title: "Head Chef dispatches · hats bob at both stations", speaker: "head" },
+  { id: "plan", title: "Updated experiment plan", speaker: "head" },
 ];
+// Conversation avatars (display only).
+const SPEAKERS = {
+  guest: { icon: "guest", name: "Guest" },
+  head: { icon: "headchef", name: "Head Chef" },
+  cooks: { icon: "pan", name: "Line cooks" },
+  A: { icon: "toque", name: "Sous Chef A" },
+  B: { icon: "toque", name: "Sous Chef B" },
+  both: { icon: "toque", name: "Sous Chefs A & B" },
+};
 const DIM_LABEL = { sourness: "Sourness", texture: "Crumb openness", density: "Density", aroma: "Aroma", flavor_intensity: "Flavour intensity" };
 const STEP_DELAY_MS = 560;
 
@@ -123,16 +132,28 @@ export class TastePanel {
   buildSteps() {
     this.steps = {};
     clear(this.stepsEl, STEP_DEFS.map((d) => {
-      const body = h("div", { class: "step-body muted small" }, "Waiting for feedback…");
+      const body = h("div", { class: "step-body muted small" }, "Waiting for the guest's feedback…");
       const title = h("h3", null, d.title);
-      const li = h("li", { class: `step${d.wide ? " wide" : ""}`, id: `step-${d.id}` }, title, body);
-      this.steps[d.id] = { li, body, title, def: d };
+      const avatar = h("div", { class: "avatar" });
+      const who = h("div", { class: "who-line" });
+      const li = h("li", { class: "step", id: `step-${d.id}` }, avatar, h("div", { class: "bubble" }, who, title, body));
+      this.steps[d.id] = { li, body, title, avatar, who, def: d };
+      this.setSpeaker(d.id, d.speaker === "lead" ? "A" : d.speaker === "peer" ? "B" : d.speaker);
       return li;
     }));
   }
+  setSpeaker(id, key) {
+    const s = this.steps[id];
+    const spk = SPEAKERS[key] || SPEAKERS.head;
+    s.speaker = key;
+    ["guest", "head", "cooks", "A", "B", "both"].forEach((k) => s.li.classList.toggle(`spk-${k}`, k === key));
+    clear(s.avatar, icon(spk.icon, { size: 22, title: spk.name }));
+    s.avatar.title = key === "A" || key === "B" ? `${spk.name} (agent id: scientist_${key})` : spk.name;
+    clear(s.who, spk.name);
+  }
   resetSteps() {
     for (const s of Object.values(this.steps)) {
-      s.li.className = `step${s.def.wide ? " wide" : ""}`;
+      s.li.classList.remove("shown", "active", "error");
       clear(s.title, s.def.title);
       clear(s.body, h("span", { class: "muted small" }, "…"));
     }
@@ -270,6 +291,8 @@ export class TastePanel {
       let spec;
       try { spec = make(); } catch (e) { console.error(e); spec = { body: h("div", { class: "empty" }, `Could not render this step (${e.message}).`) }; }
       this.setStep(id, { ...spec, state: animate ? "active" : "shown" });
+      const sp = STEP_DEFS.find((d) => d.id === id)?.speaker;
+      this.setSpeaker(id, sp === "lead" ? lead : sp === "peer" ? peer : sp);
       if (id === "sched") this.drawSched(r.recommended_schedules);
       if (id === "motor") this.renderMotor();
       if (id === "plan") { await this.loadPlan(); this.renderPlanStep(resp); }
@@ -375,7 +398,8 @@ export class TastePanel {
         h("tbody", null, shown.map((c, i) => h("tr", null,
           h("td", null, h("span", { class: "cook-tag" }, `👨‍🍳 #${rank.indexOf(c) + 1}`), h("b", null, cookLabel(c)),
             (plated[c.id] || (!anyPlated && i === 0 ? ["?"] : null))
-              ? h("span", { class: "plated", title: "chosen for the next experiment" }, plated[c.id] ? `plated · Station ${plated[c.id].join(" & ")}` : "plated") : null,
+              ? h("span", { class: `plated ticket${plated[c.id] && plated[c.id].length === 1 ? ` st-${plated[c.id][0]}` : ""}`, title: "chosen for the next experiment" },
+                h("span", { class: "ticket-hd" }, "PLATED"), plated[c.id] ? h("span", { class: "ticket-st" }, `Station ${plated[c.id].join(" & ")}`) : null) : null,
             h("div", { class: "tiny faint" }, c.name || c.id, c.route ? ` · ${c.route.replace(/_/g, " ")}` : "")),
           h("td", { class: "num" }, fmt(c.score, 3)), h("td", { class: "num" }, fmt(c.pred_sourness, 2)), h("td", { class: "num" }, fmt(c.pred_openness, 2)),
           h("td", { class: "num" }, num(c.overproof_risk) === null ? "—" : `${Math.round(c.overproof_risk * 100)} %`)))))));
@@ -511,7 +535,7 @@ export class TastePanel {
       let pts = n.points.slice();
       if (pts.length === 1) pts = [pts[0], [Math.max(pts[0][0] + 12, 12), pts[0][1]]]; // constant hold drawn over 12 h
       return { x: pts.map((p) => p[0]), y: pts.map((p) => p[1]), type: "scatter", mode: "lines+markers", name: `Chamber ${cid}`,
-        line: { color: side === "B" ? COLORS.B : COLORS.A, width: 2, shape: n.mode === "hv" ? "hv" : "linear" }, marker: { size: 8, line: { color: "#1a1a19", width: 2 } },
+        line: { color: side === "B" ? COLORS.B : COLORS.A, width: 2, shape: n.mode === "hv" ? "hv" : "linear" }, marker: { size: 8, line: { color: COLORS.surface, width: 2 } },
         hovertemplate: `${cid}: %{y:.1f} °C at %{x:.1f} h<extra></extra>` };
     });
     await Plotly.react(el, traces, plotLayout({ showlegend: true, margin: { l: 40, r: 10, t: 22, b: 30 },
@@ -519,7 +543,7 @@ export class TastePanel {
   }
 
   chat(msgs, emptyText) {
-    if (!msgs.length) return h("div", { class: "empty" }, emptyText);
+    if (!msgs.length) return emptyCard({ icon: "toque", title: emptyText, compact: true });
     return h("div", { class: "chat" }, msgs.map((m) => {
       const sender = m.sender ?? messageSender(m.content ?? m);
       const side = agentSide(sender);
@@ -538,8 +562,9 @@ export class TastePanel {
           kind ? statusBadge(kind, kind === "critique" ? "warn" : "info") : null,
           body.evidence_source ? provBadge(body.evidence_source) : null),
         h("div", null, text ? brigadeText(text) : renderValue(body)),
-        concerns.length ? h("ul", { class: "desired-list small" }, concerns.map((c) => h("li", null, typeof c === "string" ? c : messageText(c)))) : null,
-        extra);
+        concerns.length || extra.length ? h("details", { class: "msg-more" }, h("summary", null, `Reasoning details (${[concerns.length ? "concerns" : null, ...extra.map((e) => e.querySelector("b")?.textContent.replace(/:\s*$/, ""))].filter(Boolean).join(", ")})`),
+          concerns.length ? h("ul", { class: "desired-list small" }, concerns.map((c) => h("li", null, brigadeText(typeof c === "string" ? c : messageText(c))))) : null,
+          extra) : null);
     }));
   }
 

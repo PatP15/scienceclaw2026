@@ -1,6 +1,6 @@
 // Entry point: token capture, tabs, global banner (mode + SSE state), panel wiring.
 import { get, captureTokenFromURL, getToken, setToken, EventStream } from "./api.js";
-import { $, $$, toast } from "./util.js";
+import { $, $$, toast, icon } from "./util.js";
 import { LivePanel } from "./live.js";
 import { TwinPanel } from "./twin.js";
 import { MolecularPanel } from "./molecular.js";
@@ -106,8 +106,20 @@ function wireTabs(panels) {
   window.addEventListener("resize", () => Object.values(panels).forEach((p) => p?.resize?.()));
 }
 
+// ------------------------------------------------------------------ icons for tabs / section headers
+function decorate() {
+  const tabIcons = { live: "station", twin: "chart", molecular: "atom", taste: "headchef" };
+  for (const b of $$(".tab")) if (!b.querySelector(".ico")) b.prepend(icon(tabIcons[b.dataset.tab] || "toque", { size: 18 }));
+  const secIcons = { "tab-twin": "chart", "tab-molecular": "atom" };
+  for (const [id, ic] of Object.entries(secIcons)) {
+    const h2 = document.querySelector(`#${id} .section-head h2`);
+    if (h2 && !h2.querySelector(".ico")) h2.prepend(icon(ic, { size: 20 }));
+  }
+}
+
 // ------------------------------------------------------------------ boot
 async function boot() {
+  decorate();
   setTokenPill();
   wireTokenDialog();
   startClock();
