@@ -1,0 +1,42 @@
+parameter,nominal,min,max,units,reference,ph_12h_at_min,ph_12h_at_max,ph_12h_swing,ph_12h_abs_swing,peak_expansion_at_min,peak_expansion_at_max,peak_expansion_swing,peak_expansion_abs_swing,peak_time_h_at_min,peak_time_h_at_max,peak_time_h_swing,peak_time_h_abs_swing,provenance
+mu_max_yeast,0.22,0.1,0.4,1/h,order-of-magnitude estimate,4.3019,4.3135,0.011626,0.011626,2.0598,2.145,0.085123,0.085123,11.1,7.95,-3.15,3.15,simulated
+t_min_yeast,8,3,12,degC,assumption,4.3062,4.3042,-0.0020675,0.0020675,2.1138,2.0965,-0.017263,0.017263,9.15,9.85,0.7,0.7,simulated
+t_opt_yeast,27,25,30,degC,"Gänzle, Ehmann & Hammes (1998) Appl Environ Microbiol 64:2616-2623",4.309,4.3006,-0.0084141,0.0084141,2.1292,2.0398,-0.089423,0.089423,8.55,11.95,3.4,3.4,simulated
+t_max_yeast,36,33,40,degC,assumption,4.3038,4.3068,0.0030438,0.0030438,2.0926,2.1178,0.025164,0.025164,10,9,-1,1,simulated
+ks_yeast,1,0.3,3,g/kg dough,order-of-magnitude estimate,4.3059,4.3037,-0.0022269,0.0022269,2.1116,2.0915,-0.020097,0.020097,9.25,10,0.75,0.75,simulated
+xmax_yeast,6,3,12,relative to inoculum,assumption,4.3032,4.3071,0.0039018,0.0039018,2.0825,2.1184,0.035941,0.035941,10.25,9.05,-1.2,1.2,simulated
+qs_yeast,0.6,0.35,0.95,g hexose / kg dough / h per unit relative yeast biomass,order-of-magnitude estimate,4.3002,4.3166,0.016331,0.016331,2.0383,2.1539,0.11561,0.11561,12.1,7.45,-4.65,4.65,simulated
+hac_inhib_yeast,150,100,200,mmol/L undissociated acetic acid (aqueous phase),"Gänzle, Ehmann & Hammes (1998) Appl Environ Microbiol 64:2616-2623",4.3047,4.3055,0.00082672,0.00082672,2.1016,2.1086,0.0070054,0.0070054,9.6,9.4,-0.2,0.2,simulated
+ph_min_yeast,2.8,2.5,3.3,pH,"assumption, consistent with Gänzle et al. (1998): yeast growth unaffected by pH 3.5-7",4.3054,4.3047,-0.00061145,0.00061145,2.1073,2.1021,-0.0052308,0.0052308,9.4,9.6,0.2,0.2,simulated
+mu_max_lab,0.5,0.3,0.8,1/h,order-of-magnitude estimate,4.5201,4.1269,-0.39328,0.39328,2.1139,2.0967,-0.017176,0.017176,9.8,9.05,-0.75,0.75,simulated
+t_min_lab,8,3,12,degC,assumption,4.2063,4.44,0.23364,0.23364,2.1024,2.1114,0.0089819,0.0089819,9.25,9.7,0.45,0.45,simulated
+t_opt_lab,32,30,34,degC,"Gänzle, Ehmann & Hammes (1998) Appl Environ Microbiol 64:2616-2623",4.1449,4.4834,0.33851,0.33851,2.0998,2.1129,0.013109,0.013109,9.1,9.75,0.65,0.65,simulated
+t_max_lab,39,36,41,degC,assumption,4.4066,4.2495,-0.1571,0.1571,2.1102,2.1041,-0.0060182,0.0060182,9.65,9.35,-0.3,0.3,simulated
+ks_lab,1.5,0.5,4,g/kg dough,order-of-magnitude estimate,4.2734,4.3774,0.10405,0.10405,2.1054,2.1085,0.0031089,0.0031089,9.4,9.55,0.15,0.15,simulated
+xmax_lab,8,4,15,relative to inoculum,assumption,4.4909,4.1898,-0.30116,0.30116,2.1101,2.105,-0.005052,0.005052,9.75,9.3,-0.45,0.45,simulated
+ph_min_growth_lab,3.9,3.7,4.1,pH,"Gänzle, Ehmann & Hammes (1998) Appl Environ Microbiol 64:2616-2623",4.2762,4.351,0.074802,0.074802,2.106,2.107,0.0010235,0.0010235,9.4,9.5,0.1,0.1,simulated
+ph_min_acid_lab,3.45,3.25,3.65,pH,assumption,4.297,4.3181,0.021144,0.021144,2.1063,2.1064,0.00013543,0.00013543,9.45,9.45,0,0,simulated
+alpha_lactic,0.3,0.15,0.6,g lactic / kg dough per unit relative LAB growth,Luedeking & Piret (1959) model form; value is an order-of-magnitude estimate,4.4121,4.1581,-0.25401,0.25401,2.1121,2.0972,-0.01493,0.01493,9.65,9.1,-0.55,0.55,simulated
+beta_lactic,0.1,0.05,0.16,g lactic / kg dough / h per unit relative LAB biomass,Luedeking & Piret (1959) model form; value is an order-of-magnitude estimate,4.4528,4.1749,-0.27795,0.27795,2.1112,2.1016,-0.0096127,0.0096127,9.7,9.2,-0.5,0.5,simulated
+lab_hetero_fraction,0.6,0.3,1,fraction of lactate formed via heterofermentation,assumption (obligately heterofermentative F. sanfranciscensis is typical of type I sourdough; De Vuyst & Neysens 2005; mixed communities assumed),4.3042,4.3067,0.0025209,0.0025209,2.0961,2.1183,0.022164,0.022164,9.85,8.95,-0.9,0.9,simulated
+fq_ref,4,2,8,mol lactic / mol acetic (fermentation quotient),assumption (FQ of roughly 2-5 is the range usually discussed for wheat sourdough bread; not taken from a specific dataset),4.2704,4.3251,0.054745,0.054745,2.0974,2.1106,0.013289,0.013289,9.6,9.4,-0.2,0.2,simulated
+fq_temp_coeff,0.03,0,0.08,1/degC,assumption (baking-practice heuristic that warmer fermentation favours lactic over acetic acid; experimental support is mixed),4.3085,4.2992,-0.0093401,0.0093401,2.1071,2.1049,-0.0021679,0.0021679,9.45,9.45,0,0,simulated
+ph_flour,6,5.8,6.3,pH,order-of-magnitude estimate (unacidified wheat flour/water dough is typically pH ~5.8-6.3),4.2554,4.3849,0.1295,0.1295,2.0953,2.119,0.023638,0.023638,9.45,9.45,0,0,simulated
+buffer_b1,40,25,60,mmol/kg dough,"assumption (lumped acidic-range flour buffer: proteins, phosphate/phytate); tuned so a 10% ripe-starter dough starts near pH 5.2-5.5",4.1191,4.4966,0.37756,0.37756,2.0819,2.1223,0.040347,0.040347,9.4,9.5,0.1,0.1,simulated
+buffer_pka1,4.6,4.3,4.9,pKa,assumption,4.2181,4.3725,0.1544,0.1544,2.0862,2.1197,0.033458,0.033458,9.45,9.45,0,0,simulated
+buffer_b2,25,12,40,mmol/kg dough,assumption (lumped near-neutral flour buffer),4.2382,4.3855,0.14733,0.14733,2.0921,2.1181,0.025999,0.025999,9.45,9.45,0,0,simulated
+buffer_pka2,6.3,6,6.8,pKa,assumption,4.3704,4.2294,-0.14096,0.14096,2.1156,2.0901,-0.025501,0.025501,9.45,9.45,0,0,simulated
+co2_dissolved_capacity,0.6,0.3,1.2,g CO2 / kg dough,"order-of-magnitude estimate from CO2 solubility in water (~1.5 g/L at 25 degC, 1 atm; standard physical-chemistry data) x 0.41 L water/kg dough",4.3052,4.3052,-1.5263e-09,1.5263e-09,2.1159,2.0878,-0.028096,0.028096,9,10.3,1.3,1.3,simulated
+dough_specific_volume,0.87,0.8,0.95,"L/kg (fresh mixed dough, incl. occluded air)",order-of-magnitude estimate (mixed dough density ~1.05-1.25 g/mL),4.3052,4.3052,-2.2378e-08,2.2378e-08,2.1158,2.0959,-0.01995,0.01995,9.1,9.85,0.75,0.75,simulated
+gas_volume_factor,1,0.8,1.3,dimensionless,assumption (lumps water/ethanol vapour and non-ideal bubble pressure),4.3052,4.3052,2.1938e-08,2.1938e-08,2.0786,2.1343,0.05576,0.05576,10.5,8.35,-2.15,2.15,simulated
+expansion_max,2.3,1.9,3,V/V0,assumption (fresh gluten network gas-holding limit for a 70% hydration bread-flour dough),4.3052,4.3052,6.2244e-08,6.2244e-08,1.7842,2.6364,0.85224,0.85224,8.35,11.15,2.8,2.8,simulated
+k_gas_leak,0.02,0.005,0.06,1/h,assumption,4.3052,4.3052,-2.1763e-08,2.1763e-08,2.125,2.0572,-0.067842,0.067842,9.3,9.8,0.5,0.5,simulated
+k_rupture,3,1,6,1/h per unit fractional over-capacity,assumption,4.3052,4.3052,-1.4891e-08,1.4891e-08,2.1063,2.1063,0,0,9.45,9.45,0,0,simulated
+rupture_exponent,6,3,10,dimensionless,assumption,4.3052,4.3052,-5.8717e-08,5.8717e-08,2.0463,2.1346,0.088251,0.088251,11.4,8.5,-2.9,2.9,simulated
+k_gluten_decay,0.015,0.004,0.03,1/h at 25 degC,"assumption; mechanism per Gänzle, Loponen & Gobbetti (2008) Trends Food Sci Technol 19:513-521 and Thiele, Gänzle & Vogel (2002) Cereal Chem 79:45-51",4.3052,4.3052,1.747e-08,1.747e-08,2.2172,1.9966,-0.2206,0.2206,11.1,8.5,-2.6,2.6,simulated
+q10_gluten,2,1.5,3,dimensionless,assumption (typical enzymatic Q10),4.3052,4.3052,-1.5906e-08,1.5906e-08,2.095,2.1213,0.02633,0.02633,9.35,9.6,0.25,0.25,simulated
+gluten_acid_sensitivity,1.2,0.3,2.5,per pH unit below gluten_ph_onset,"assumption; qualitative basis: cereal aspartic proteases are activated by acidification (Gänzle, Loponen & Gobbetti 2008)",4.3052,4.3052,1.0628e-08,1.0628e-08,2.1236,2.0849,-0.038727,0.038727,9.8,9.1,-0.7,0.7,simulated
+gluten_ph_onset,5,4.6,5.4,pH,assumption,4.3052,4.3052,4.7299e-08,4.7299e-08,2.1284,2.0617,-0.066724,0.066724,9.85,9.05,-0.8,0.8,simulated
+substrate_0,28,18,40,g hexose-equivalent / kg dough,order-of-magnitude estimate,4.3513,4.2876,-0.063687,0.063687,2.1009,2.1085,0.0076877,0.0076877,9.7,9.35,-0.35,0.35,simulated
+lactic_acid_0,1,0.5,1.6,g/kg dough,assumption (carry-over from a ripe starter with ~8-12 g lactic/kg diluted by 0.105),4.3707,4.2381,-0.13257,0.13257,2.1191,2.0844,-0.034687,0.034687,9.45,9.45,0,0,simulated
+acetic_acid_0,0.2,0.08,0.35,g/kg dough,assumption (carry-over from a ripe starter with ~1-3 g acetic/kg diluted by 0.105),4.3115,4.2976,-0.013921,0.013921,2.112,2.0985,-0.013435,0.013435,9.35,9.6,0.25,0.25,simulated

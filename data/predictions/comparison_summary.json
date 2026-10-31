@@ -1,0 +1,13 @@
+{
+  "provenance": "simulated",
+  "description": "Paired Monte-Carlo comparison (same parameter draws for A and B); in-silico only.",
+  "n_samples": 128,
+  "ph_12h_B_minus_A_median": -0.24521516645049646,
+  "ph_12h_B_minus_A_p05_p95": [
+    -0.4002435948657209,
+    -0.1411029210474728
+  ],
+  "fraction_samples_B_lower_ph_at_12h": 1.0,
+  "peak_time_B_minus_A_median_h": -2.3,
+  "fraction_samples_B_peaks_earlier": 1.0
+}

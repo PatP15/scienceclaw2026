@@ -1,0 +1,78 @@
+# FermentAI sourdough experiment specification (PLAN.md §5)
+#
+# The chamber setpoints are HYPOTHESES, not guaranteed flavour outcomes. Agents may revise the
+# schedules based on predicted and observed fermentation progress and must not hold an
+# elevated temperature blindly if overproofing signs appear. Bake readiness is confirmed by a
+# human.
+
+schema_version: "1.0"
+experiment_id: trial_001
+
+recipe:
+  per_loaf:
+    bread_flour_g: 200.0
+    water_g: 135.0
+    starter_g: 40.0
+    starter_hydration_percent: 100.0
+    salt_g: 4.4
+  derived:
+    total_dough_g: 379.4
+    total_flour_g: 220.0  # 200 + 20 from starter
+    total_water_g: 155.0  # 135 + 20 from starter
+    baker_hydration_percent: 70.5  # 155 / 220
+    salt_percent_of_flour: 2.0  # 4.4 / 220
+    starter_inoculation_percent_of_dough: 10.54  # 40 / 379.4
+    water_fraction_of_dough: 0.409  # 155 / 379.4 (used by the kinetic model)
+  notes:
+    - "Identical flour, hydration, starter, feeding history, inoculation and mixing for both chambers."
+    - "Rest 20-30 min after mixing, then several folds over the first 1-2 h."
+
+window:
+  observation_window_h: [12.0, 16.0]
+  prediction_horizon_h: 24.0
+  note: "The 12-16 h window includes fermentation and proofing as appropriate; predictions run to 24 h to show late behaviour (e.g. collapse)."
+
+chambers:
+  A:
+    name: "Chamber A - mild hypothesis"
+    hypothesis: "Cooler fermentation (22 degC start) gives relatively mild acidity with sufficient expansion."
+    objective: mild
+    temperature_schedule:
+      mode: piecewise_constant
+      breakpoints:  # [time_h, temperature_c]
+        - [0.0, 22.0]
+    caveat: "Long cool fermentations can still develop pronounced (often sharper, more acetic) sourness; mildness is not guaranteed."
+  B:
+    name: "Chamber B - more-acidic hypothesis"
+    hypothesis: "Warmer fermentation (27 degC start) gives faster acidification and a detectably more acidic loaf."
+    objective: acidic
+    temperature_schedule:
+      mode: piecewise_constant
+      breakpoints:
+        - [0.0, 27.0]
+    caveat: "12-16 h at 27 degC can overproof a small dough; end fermentation or lower the temperature when the rise peaks or starts to fall, rather than holding 27 degC blindly."
+
+measurements:
+  - "pH (single probe; periodic, separate non-edible sample if the probe is not food-contact certified; calibrate and clean before trusting readings in thick dough)"
+  - "rise (side camera, relative height of a representative sample)"
+  - "temperature (chamber and dough/starter)"
+  - "BME680 gas resistance is logged as an environmental VOC response only: it is NOT a CO2 measurement and is not mapped to the model's CO2."
+
+starter_readiness_checklist:
+  starter_age_days: "4-5 (young; may not yet be mature)"
+  criteria:
+    - id: doubles_reliably
+      description: "Reliably doubles within approximately 6-8 h after feeding (check over at least 2 consecutive feeds)."
+    - id: abundant_bubbles
+      description: "Contains abundant bubbles throughout, not just on the surface."
+    - id: clean_aroma
+      description: "Clean fermented aroma (yeasty / lactic / mildly acetic), no nail-polish or putrid odour."
+    - id: no_mold
+      description: "No visible mold or abnormal discoloration (pink, orange or fuzzy growth means discard)."
+  if_not_ready:
+    risk: "An immature starter gives slow, unpredictable rise and acidification; the kinetic model's starter-carry-over assumptions (yeast/LAB inoculum, initial acids) would not hold."
+    contingency:
+      label: "CONTINGENCY - disclose in all reports"
+      options:
+        - "Use a mature starter from another source (preferred; keeps the experiment a sourdough comparison)."
+        - "Spike both doughs identically with a small amount of commercial yeast; must be disclosed and labelled, because it changes leavening kinetics and the yeast:LAB balance."

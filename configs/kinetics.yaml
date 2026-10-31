@@ -1,0 +1,368 @@
+# FermentAI sourdough kinetic model — parameters (PLAN.md §6)
+#
+# Provenance: every output of this model is "simulated". These values are NOT fitted to our
+# own dough; they are literature-anchored where a source is given and otherwise explicit
+# assumptions / order-of-magnitude estimates chosen so the model reproduces typical, widely
+# reported sourdough behaviour (dough pH ~5.2-5.6 after inoculation with a ripe starter, final
+# pH ~3.6-4.3, rise of ~1.5-2.5x over an overnight bulk). Calibrate against observations with
+# fermentai.fermentation.calibration.calibrate().
+#
+# Basis: per kg of fresh dough unless noted. Biomass states are dimensionless proxies,
+# normalised to the inoculated level (initial value 1).
+#
+# Fields: value, units, min/max (uncertainty range used for Monte-Carlo sampling and as
+# calibration bounds), optional sd (then sampling is a truncated normal; otherwise triangular
+# with mode = value), sampled (false = treated as a fixed physical constant), reference
+# (a real citation, or "assumption" / "order-of-magnitude estimate"), note.
+#
+# Literature used (all verified to exist; numbers taken from them are flagged in `note`):
+#   Gänzle MG, Ehmann M, Hammes WP (1998) Appl Environ Microbiol 64:2616-2623.
+#     "Modeling of growth of Lactobacillus sanfranciscensis and Candida milleri in response to
+#     process parameters of sourdough fermentation." (abstract: C. milleri optimum 27 °C,
+#     lower than the lactobacilli; L. sanfranciscensis growth pH range 3.9-6.7; yeast growth
+#     unaffected by pH 3.5-7; yeast completely inhibited by 150 mmol/L undissociated acetic
+#     acid; lactobacilli tolerate >160 mmol/L.)
+#   Rosso L, Lobry JR, Flandrois JP (1993) J Theor Biol 162:447-463 (CTMI model).
+#   Presser KA, Ratkowsky DA, Ross T (1997) Appl Environ Microbiol 63:2355-2360 (pH term).
+#   Luedeking R, Piret EL (1959) J Biochem Microbiol Technol Eng 1:393-412 (growth- and
+#     non-growth-associated product formation).
+#   Gänzle MG, Loponen J, Gobbetti M (2008) Trends Food Sci Technol 19:513-521 (proteolysis
+#     in sourdough, acid-activated cereal proteases).
+#   Thiele C, Gänzle MG, Vogel RF (2002) Cereal Chem 79:45-51 (cereal enzymes dominate
+#     proteolysis in dough).
+#   Gänzle MG (2014) Food Microbiol 37:2-10 (sourdough enzymatic/bacterial conversions;
+#     heterofermentative metabolism, acetate formation needs electron acceptors).
+#   De Vuyst L, Neysens P (2005) Trends Food Sci Technol 16:43-56 (sourdough microflora).
+
+schema_version: "1.0"
+provenance: simulated
+basis: "per kg fresh dough"
+
+parameters:
+  # ------------------------------------------------------------------ yeast
+  mu_max_yeast:
+    value: 0.22
+    units: "1/h"
+    min: 0.10
+    max: 0.40
+    reference: "order-of-magnitude estimate"
+    note: "Max specific growth rate of sourdough yeast (K. humilis / S. cerevisiae) in dough at T_opt. Salt (2% on flour) effect folded in."
+  t_min_yeast:
+    value: 8.0
+    units: "degC"
+    min: 3.0
+    max: 12.0
+    reference: "assumption"
+    note: "CTMI theoretical minimum (an extrapolated fitting parameter, not the lowest temperature at which any activity occurs)."
+  t_opt_yeast:
+    value: 27.0
+    units: "degC"
+    min: 25.0
+    max: 30.0
+    reference: "Gänzle, Ehmann & Hammes (1998) Appl Environ Microbiol 64:2616-2623"
+    note: "C. milleri (now Kazachstania humilis) optimum 27 degC per abstract. Strain dependent; S. cerevisiae optima are higher."
+  t_max_yeast:
+    value: 36.0
+    units: "degC"
+    min: 33.0
+    max: 40.0
+    reference: "assumption"
+  ks_yeast:
+    value: 1.0
+    units: "g/kg dough"
+    min: 0.3
+    max: 3.0
+    reference: "order-of-magnitude estimate"
+  xmax_yeast:
+    value: 6.0
+    units: "relative to inoculum"
+    min: 3.0
+    max: 12.0
+    reference: "assumption"
+    note: "Yeast cell counts rise roughly 0.5-1 log over a bulk ferment."
+  qs_yeast:
+    value: 0.60
+    units: "g hexose / kg dough / h per unit relative yeast biomass"
+    min: 0.35
+    max: 0.95
+    reference: "order-of-magnitude estimate"
+    note: "Specific sugar fermentation rate at T_opt; sets gas production and hence rise time."
+  yield_co2_yeast:
+    value: 0.44
+    units: "g CO2 / g hexose"
+    min: 0.40
+    max: 0.489
+    sampled: false
+    reference: "Stoichiometry of alcoholic fermentation (C6H12O6 -> 2 C2H5OH + 2 CO2; theoretical 0.489 g/g) with ~90% of sugar routed to ethanol (assumption)"
+  hac_inhib_yeast:
+    value: 150.0
+    units: "mmol/L undissociated acetic acid (aqueous phase)"
+    min: 100.0
+    max: 200.0
+    reference: "Gänzle, Ehmann & Hammes (1998) Appl Environ Microbiol 64:2616-2623"
+    note: "Complete inhibition of C. milleri at 150 mmol/L undissociated acetic acid (abstract). Linear inhibition term is an assumption."
+  ph_min_yeast:
+    value: 2.8
+    units: "pH"
+    min: 2.5
+    max: 3.3
+    reference: "assumption, consistent with Gänzle et al. (1998): yeast growth unaffected by pH 3.5-7"
+
+  # ------------------------------------------------------------------ lactic acid bacteria
+  mu_max_lab:
+    value: 0.50
+    units: "1/h"
+    min: 0.30
+    max: 0.80
+    reference: "order-of-magnitude estimate"
+    note: "Sourdough lactobacilli double roughly every 1-2 h near their optimum."
+  t_min_lab:
+    value: 8.0
+    units: "degC"
+    min: 3.0
+    max: 12.0
+    reference: "assumption"
+    note: "CTMI theoretical minimum (extrapolated fitting parameter)."
+  t_opt_lab:
+    value: 32.0
+    units: "degC"
+    min: 30.0
+    max: 34.0
+    reference: "Gänzle, Ehmann & Hammes (1998) Appl Environ Microbiol 64:2616-2623"
+    note: "Abstract states the lactobacilli optimum is above the yeast's 27 degC; ~32-33 degC is the commonly quoted value for F. sanfranciscensis (exact value strain dependent)."
+  t_max_lab:
+    value: 39.0
+    units: "degC"
+    min: 36.0
+    max: 41.0
+    reference: "assumption"
+  ks_lab:
+    value: 1.5
+    units: "g/kg dough"
+    min: 0.5
+    max: 4.0
+    reference: "order-of-magnitude estimate"
+  xmax_lab:
+    value: 8.0
+    units: "relative to inoculum"
+    min: 4.0
+    max: 15.0
+    reference: "assumption"
+    note: "~1 log increase from ~1e8 CFU/g after 10% ripe-starter inoculation toward ~1e9 CFU/g."
+  ph_min_growth_lab:
+    value: 3.9
+    units: "pH"
+    min: 3.7
+    max: 4.1
+    reference: "Gänzle, Ehmann & Hammes (1998) Appl Environ Microbiol 64:2616-2623"
+    note: "L. sanfranciscensis growth pH range 3.9-6.7 (abstract). Used as pH_min in a Presser et al. (1997)-type factor."
+  ph_min_acid_lab:
+    value: 3.45
+    units: "pH"
+    min: 3.25
+    max: 3.65
+    reference: "assumption"
+    note: "Non-growth (maintenance) acidification continues below the growth limit and stops near pH ~3.3-3.6; this bounds the final pH."
+  alpha_lactic:
+    value: 0.30
+    units: "g lactic / kg dough per unit relative LAB growth"
+    min: 0.15
+    max: 0.60
+    reference: "Luedeking & Piret (1959) model form; value is an order-of-magnitude estimate"
+  beta_lactic:
+    value: 0.10
+    units: "g lactic / kg dough / h per unit relative LAB biomass"
+    min: 0.05
+    max: 0.16
+    reference: "Luedeking & Piret (1959) model form; value is an order-of-magnitude estimate"
+    note: "Non-growth-associated acid production; dominant term once growth stops."
+  lab_hetero_fraction:
+    value: 0.6
+    units: "fraction of lactate formed via heterofermentation"
+    min: 0.3
+    max: 1.0
+    reference: "assumption (obligately heterofermentative F. sanfranciscensis is typical of type I sourdough; De Vuyst & Neysens 2005; mixed communities assumed)"
+    note: "Heterofermentation: 1 hexose -> 1 lactate + 1 CO2 + ethanol/acetate; homofermentation: 1 hexose -> 2 lactate."
+  fq_ref:
+    value: 4.0
+    units: "mol lactic / mol acetic (fermentation quotient)"
+    min: 2.0
+    max: 8.0
+    reference: "assumption (FQ of roughly 2-5 is the range usually discussed for wheat sourdough bread; not taken from a specific dataset)"
+    note: "Acetate formation by heterofermentative LAB requires electron acceptors (fructose, O2; Gänzle 2014); not modelled mechanistically."
+  fq_ref_temp:
+    value: 25.0
+    units: "degC"
+    min: 25.0
+    max: 25.0
+    sampled: false
+    reference: "definition (reference temperature for fq_ref)"
+  fq_temp_coeff:
+    value: 0.03
+    units: "1/degC"
+    min: 0.0
+    max: 0.08
+    reference: "assumption (baking-practice heuristic that warmer fermentation favours lactic over acetic acid; experimental support is mixed)"
+
+  # ------------------------------------------------------------------ pH / buffering
+  pka_lactic:
+    value: 3.86
+    units: "pKa"
+    min: 3.86
+    max: 3.86
+    sampled: false
+    reference: "Standard dissociation constant of lactic acid at 25 degC (e.g. CRC Handbook of Chemistry and Physics)"
+  pka_acetic:
+    value: 4.76
+    units: "pKa"
+    min: 4.76
+    max: 4.76
+    sampled: false
+    reference: "Standard dissociation constant of acetic acid at 25 degC (e.g. CRC Handbook of Chemistry and Physics)"
+  ph_flour:
+    value: 6.0
+    units: "pH"
+    min: 5.8
+    max: 6.3
+    sd: 0.1
+    reference: "order-of-magnitude estimate (unacidified wheat flour/water dough is typically pH ~5.8-6.3)"
+  buffer_b1:
+    value: 40.0
+    units: "mmol/kg dough"
+    min: 25.0
+    max: 60.0
+    reference: "assumption (lumped acidic-range flour buffer: proteins, phosphate/phytate); tuned so a 10% ripe-starter dough starts near pH 5.2-5.5"
+  buffer_pka1:
+    value: 4.6
+    units: "pKa"
+    min: 4.3
+    max: 4.9
+    reference: "assumption"
+  buffer_b2:
+    value: 25.0
+    units: "mmol/kg dough"
+    min: 12.0
+    max: 40.0
+    reference: "assumption (lumped near-neutral flour buffer)"
+  buffer_pka2:
+    value: 6.3
+    units: "pKa"
+    min: 6.0
+    max: 6.8
+    reference: "assumption"
+  water_fraction:
+    value: 0.409
+    units: "kg water / kg dough"
+    min: 0.409
+    max: 0.409
+    sampled: false
+    reference: "recipe (155 g total water / 379.4 g dough; configs/experiments.yaml)"
+
+  # ------------------------------------------------------------------ expansion (phenomenological)
+  co2_dissolved_capacity:
+    value: 0.6
+    units: "g CO2 / kg dough"
+    min: 0.3
+    max: 1.2
+    reference: "order-of-magnitude estimate from CO2 solubility in water (~1.5 g/L at 25 degC, 1 atm; standard physical-chemistry data) x 0.41 L water/kg dough"
+    note: "CO2 first saturates the dough liquor before inflating gas cells."
+  dough_specific_volume:
+    value: 0.87
+    units: "L/kg (fresh mixed dough, incl. occluded air)"
+    min: 0.80
+    max: 0.95
+    reference: "order-of-magnitude estimate (mixed dough density ~1.05-1.25 g/mL)"
+  gas_volume_factor:
+    value: 1.0
+    units: "dimensionless"
+    min: 0.8
+    max: 1.3
+    reference: "assumption (lumps water/ethanol vapour and non-ideal bubble pressure)"
+  expansion_max:
+    value: 2.3
+    units: "V/V0"
+    min: 1.9
+    max: 3.0
+    reference: "assumption (fresh gluten network gas-holding limit for a 70% hydration bread-flour dough)"
+  k_gas_leak:
+    value: 0.02
+    units: "1/h"
+    min: 0.005
+    max: 0.06
+    reference: "assumption"
+    note: "Baseline gas loss (diffusion to headspace, coalescence)."
+  k_rupture:
+    value: 3.0
+    units: "1/h per unit fractional over-capacity"
+    min: 1.0
+    max: 6.0
+    reference: "assumption"
+    note: "Active gas-cell rupture rate, applied only when the rise exceeds the current gas-holding capacity (collapse after the peak as the network weakens)."
+  rupture_exponent:
+    value: 6.0
+    units: "dimensionless"
+    min: 3.0
+    max: 10.0
+    reference: "assumption"
+    note: "Crowding exponent: fraction of newly produced gas retained = 1 - (rise/capacity)^n. Sets how sharply the rise saturates at capacity."
+  k_gluten_decay:
+    value: 0.015
+    units: "1/h at 25 degC"
+    min: 0.004
+    max: 0.03
+    reference: "assumption; mechanism per Gänzle, Loponen & Gobbetti (2008) Trends Food Sci Technol 19:513-521 and Thiele, Gänzle & Vogel (2002) Cereal Chem 79:45-51"
+    note: "Loss of gas-holding capacity (proteolysis/acidification-induced gluten weakening)."
+  q10_gluten:
+    value: 2.0
+    units: "dimensionless"
+    min: 1.5
+    max: 3.0
+    reference: "assumption (typical enzymatic Q10)"
+  gluten_acid_sensitivity:
+    value: 1.2
+    units: "per pH unit below gluten_ph_onset"
+    min: 0.3
+    max: 2.5
+    reference: "assumption; qualitative basis: cereal aspartic proteases are activated by acidification (Gänzle, Loponen & Gobbetti 2008)"
+  gluten_ph_onset:
+    value: 5.0
+    units: "pH"
+    min: 4.6
+    max: 5.4
+    reference: "assumption"
+
+initial_conditions:
+  # Dough at t = 0 (after mixing). Starter fraction = 40 g / 379.4 g = 0.1054.
+  substrate_0:
+    value: 28.0
+    units: "g hexose-equivalent / kg dough"
+    min: 18.0
+    max: 40.0
+    reference: "order-of-magnitude estimate"
+    note: "Lumps free flour sugars plus maltose/glucose released by flour amylases over the window (amylolysis not modelled as a separate state)."
+  yeast_0:
+    value: 1.0
+    units: "relative"
+    min: 1.0
+    max: 1.0
+    sampled: false
+    reference: "definition (normalisation)"
+  lab_0:
+    value: 1.0
+    units: "relative"
+    min: 1.0
+    max: 1.0
+    sampled: false
+    reference: "definition (normalisation)"
+  lactic_acid_0:
+    value: 1.0
+    units: "g/kg dough"
+    min: 0.5
+    max: 1.6
+    reference: "assumption (carry-over from a ripe starter with ~8-12 g lactic/kg diluted by 0.105)"
+  acetic_acid_0:
+    value: 0.2
+    units: "g/kg dough"
+    min: 0.08
+    max: 0.35
+    reference: "assumption (carry-over from a ripe starter with ~1-3 g acetic/kg diluted by 0.105)"
