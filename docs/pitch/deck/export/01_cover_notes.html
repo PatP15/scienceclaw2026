@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>cover notes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400..700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap">
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+h1, h2, h3, p, ul, ol { margin: 0; }
+section.slide { width: 1920px; height: 1080px; overflow: hidden; position: relative; }
+/* A figure with a fixed height in a flex column would overflow the canvas when the headline
+   wraps (partners); let it shrink instead (object-fit: contain keeps its aspect ratio). */
+section.slide img { min-height: 0; min-width: 0; flex-shrink: 1; }
+
+@page { size: 1120px 1440px; margin: 0; }
+html, body { width: 1120px; height: 1440px; background: #ffffff; }
+.wrap { padding: 80px; font-family: 'IBM Plex Sans', Arial, sans-serif; color: #1b1f24; }
+.thumb { width: 960px; height: 540px; overflow: hidden; border: 1px solid #c9c3b8; box-sizing: content-box; }
+.thumb section.slide { transform: scale(0.5); transform-origin: 0 0; }
+.meta { margin-top: 40px; font-family: 'Rubik', Arial, sans-serif; font-size: 22px; font-weight: 600;
+        letter-spacing: 1.5px; text-transform: uppercase; color: #1f77b4; }
+.notes { margin-top: 20px; font-size: 27px; line-height: 1.5; }
+</style></head>
+<body><div class="wrap">
+<div class="thumb"><section class="slide" id="cover" data-transition="fade" style="background:#f8f5ef;color:#1b1f24;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:row;gap:56px;align-items:center">
+<div style="flex:1;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:28px;font-weight:600;color:#1f77b4;letter-spacing:2px;text-transform:uppercase">FermentAI · ScienceClaw 2026</p>
+<h1 style="font-family:'Rubik', Arial, sans-serif;font-size:84px;font-weight:700;line-height:1.05">Every kitchen can become a food‑science lab</h1>
+<ul style="display:flex;flex-direction:column;gap:20px;font-size:34px;line-height:1.3;color:#1b1f24;padding-left:36px"><li><b>Problem:</b> flavour by guesswork</li><li><b>Vision:</b> every kitchen a lab</li><li><b>Why now:</b> cheap GPU chemistry + AI agents</li></ul>
+</div>
+<img src="file:///Users/patrickpuma/Github/scienceclaw2026/data/figures/closed_loop.png" alt="The FermentAI loop: bake, taste, parse, compare, debate, publish, ferment, recalibrate, around taste to next experiment. Dashed green rings are physical steps (measured, pending); purple rings are modeled" style="width:880px;height:495px;object-fit:contain;border-radius:16px;background:#ffffff;border:1px solid #e3ded4">
+</section></div>
+<p class="meta">Slide 1 / 4 · cover · speaker notes</p>
+<p class="notes">Every sourdough baker runs an experiment every day, then throws the data away. Flavour depends on temperature over a twelve-to-sixteen-hour ferment, and people tune it by feel. Our vision is that every kitchen becomes a lab, with AI scientists that run experiments, share evidence and learn from the people who eat the result. Why now? Molecular chemistry on a GPU costs cents, sensors cost dollars, and AI agents can reason and argue. This loop is the product. You bake, you taste, you tell the system what you think, and it designs the next experiment.</p>
+</div></body></html>

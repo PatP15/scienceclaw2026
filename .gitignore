@@ -13,3 +13,4 @@ data/alchemi/**/*.pt
 data/experiments/findings_log.jsonl
 data/images/*/
 data/experiments/chat_sessions.jsonl
+docs/pitch/deck/export/

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>traction</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400..700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap">
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+h1, h2, h3, p, ul, ol { margin: 0; }
+section.slide { width: 1920px; height: 1080px; overflow: hidden; position: relative; }
+/* A figure with a fixed height in a flex column would overflow the canvas when the headline
+   wraps (partners); let it shrink instead (object-fit: contain keeps its aspect ratio). */
+section.slide img { min-height: 0; min-width: 0; flex-shrink: 1; }
+@page { size: 1920px 1080px; margin: 0; } html, body { width: 1920px; height: 1080px; }</style></head>
+<body><section class="slide" id="traction" data-transition="fade" style="background:#1b1f24;color:#f8f5ef;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 128px;display:flex;flex-direction:column;gap:40px">
+<h2 style="font-family:'Rubik', Arial, sans-serif;font-size:64px;font-weight:700;line-height:1.1;color:#f8f5ef">Working today, and what we need next</h2>
+<div style="display:flex;flex-direction:row;gap:56px;align-items:center">
+<div style="flex:1">
+<ul style="display:flex;flex-direction:column;gap:20px;font-size:36px;line-height:1.3;color:#f8f5ef;padding-left:36px"><li><b>Computed:</b> GPU chemistry · print prep</li><li><b>Modeled:</b> forecasts · crumb · benchmark</li><li><b style="color:#8fc3ec">Ask:</b> 3 pilot kitchens + GPU &amp; printer credits</li></ul>
+</div>
+<img src="file:///Users/patrickpuma/Github/scienceclaw2026/data/figures/benchmark_summary.png" alt="Modeled, in-silico benchmark: choices changed 3.9 of 4 rounds; duplicate experiments 3.1 to 0; +0.68 nats more information; same final pick" style="width:880px;height:495px;object-fit:contain;background:#ffffff;border-radius:12px">
+</div>
+</section></body></html>

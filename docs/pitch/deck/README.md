@@ -10,6 +10,6 @@ are uploaded copies of earlier versions of those files.
 few-words rule, so the existing blobs are stale:
 
 - cover → `data/figures/closed_loop.png`
-- pipeline → `data/figures/evidence_pipeline.png`
+- pipeline → `data/figures/architecture.png`
 - partners → `data/figures/tech_highlights.png` (new; its `src` is still the repo path)
 - traction → `data/figures/benchmark_summary.png`
