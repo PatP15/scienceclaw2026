@@ -28,8 +28,8 @@ EXAMPLE is grey. The figures live in
 every number from the data files. Partner names appear as plain-text wordmarks only. The deck
 sources in `docs/pitch/deck/slides/*.html` mirror this file.
 
-Timing assumes about 140 words per minute. The spoken notes total 410 words, which is
-2 min 56 s (see the table at the end).
+Timing assumes about 140 words per minute. The spoken notes total 409 words, which is
+2 min 55 s (see the table at the end).
 
 ---
 
@@ -58,29 +58,32 @@ slate = AI agent, crimson = the human judge.
 
 ---
 
-## Slide 2: the pipeline, step by step
+## Slide 2: two AI scientists
 
-**Headline:** Seven steps from sensors to printed crumb
+**Headline:** Two AI scientists, one experiment at a time
 
-**Figure:** `data/figures/evidence_pipeline.png`. It shows five stages with one-word badges and a
-bracket reading "acid terms only". `data/figures/architecture.png` is the backup slide. It shows
-Scientist A and Scientist B, one per chamber, exchanging hypothesis → critique → "trial 002 agreed".
-Both are fed by NVIDIA ALCHEMI (COMPUTED, "acid evidence"), the fermentation model (MODELED,
-"forecasts") and judge feedback. Each sends a "new schedule" to its own chamber, behind firmware
-"safety limits". `data/figures/dataflow.png` (what passes along each arrow) is for Q&A only and is
-not in the deck.
+**Figure:** `data/figures/architecture.png`, three rows and 3 arrows.
+
+- **Top:** one evidence strip with three chips: NVIDIA ALCHEMI · COMPUTED, Fermentation model ·
+  MODELED, and Judge feedback. One wide arrow runs down from it.
+- **Middle:** Scientist A (blue) and Scientist B (orange), with three stacked bubbles between them:
+  "32 °C, then cool →", "← overproof risk: 24 °C" and "trial 002 agreed".
+- **Bottom:** "new schedule" arrows go straight down to Chamber A and Chamber B. Each chamber is
+  dashed (measured, pending) and has a lock glyph for the firmware safety limits.
+
+**Backups:** `data/figures/evidence_pipeline.png` (the five-stage pipeline) and
+`data/figures/dataflow.png` (what passes along each arrow). Both are for Q&A.
 
 **On-slide bullets:** none. The figure carries the slide.
 
-**Speaker notes (98 words, 42 s)**
+**Speaker notes (97 words, 42 s)**
 
-> Here's the pipeline, step by step, and each step is labelled measured, computed or modeled. One: two chambers
-> sense temperature, humidity, gas and rise. Two: a fermentation model forecasts acidity and rise.
-> Three: NVIDIA ALCHEMI adds computed molecular evidence about the acids. Four: two AI agents debate what
-> to try next. Five: a person tastes and types plain feedback. Six: the agreed experiment goes to
-> the chambers, with safety limits enforced in firmware. Seven: each prediction becomes a printed
-> crumb hypothesis, which we check against photos of the actual loaf. All of it runs on a laptop,
-> offline.
+> Each chamber has its own AI scientist. Both read the same evidence: computed molecular chemistry
+> from NVIDIA ALCHEMI, forecasts from our fermentation model, and whatever the judges said about the
+> last loaf. Then they argue. A proposes a hot start and a cool finish; B objects that it overproofs
+> and counters with a steady twenty-four. They settle on trial two, and each sends a new temperature
+> schedule down to its own chamber. The chamber firmware clamps every setpoint, so no model and no
+> judge can push the hardware past its limits. Everything runs on a laptop, offline.
 
 ---
 
@@ -152,10 +155,10 @@ not in the deck.
 | Slide | Spoken words | At 140 wpm |
 |---|---|---|
 | 1 | 94 | 40 s |
-| 2 | 98 | 42 s |
+| 2 | 97 | 42 s |
 | 3 | 110 | 47 s |
 | 4 | 108 | 46 s |
-| **Total** | **410** | **2 min 56 s** |
+| **Total** | **409** | **2 min 55 s** |
 
 Recount with `sed -n '/^> /p' docs/pitch/slides.md | sed 's/^> //' | wc -w`.
 

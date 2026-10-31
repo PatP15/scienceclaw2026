@@ -549,59 +549,48 @@ def icon_lock(ax, cx, cy, s, color=INK):
 
 
 def fig_architecture():
-    """Two scientist agents, one per chamber, debating; fed by ALCHEMI + the model and by judge feedback."""
+    """Three clean rows: shared evidence -> two scientists debating -> their chambers. <= 5 arrows."""
     fig, ax = canvas()
-    # evidence sources (top corners) and the judge (top centre)
-    for x, name, kind, word, icon in ((3, "NVIDIA ALCHEMI", "computed", "COMPUTED", lambda a, cx, cy: icon_gpu(a, cx, cy, 3.4)),
-                                      (98, "Fermentation model", "modeled", "MODELED",
-                                       lambda a, cx, cy: icon_curves(a, cx, cy, 3.6))):
+    # row 1: one evidence strip with three chips
+    rbox(ax, 4.0, 72.0, 152.0, 15.0, fc=PANEL, ec="none", r=3.0, zorder=0)
+    chips = [("NVIDIA ALCHEMI", "computed", "COMPUTED"), ("Fermentation model", "modeled", "MODELED"),
+             ("Judge feedback", "human", None)]
+    cw = 46.0
+    for k, (name, kind, word) in enumerate(chips):
+        x = 8.0 + k * (cw + 4.0)
         col = BADGES[kind][1]
-        rbox(ax, x, 74.0, 59.0, 14.0, fc="white", ec=col, lw=3, r=2.0, zorder=2)
-        icon(ax, x + 6.5, 81.0)
-        ax.text(x + 12.5, 84.0, name, fontsize=LBL, fontweight="bold", color=INK, va="center", zorder=4)
-        _b(ax, x + 12.5, 77.6, word, kind, ha="left")
-    icon_person(ax, 80.0, 83.0, 4.2)
-    # buses: ALCHEMI (teal) and the model (purple) each feed BOTH agents
-    for src_x, y_bus, col, lab, lab_x, ha, drops in ((29.0, 69.0, TEAL, "acid evidence", 31.0, "left", (26.0, 122.0)),
-                                                       (131.0, 65.0, PURPLE, "forecasts", 133.0, "left", (38.0, 134.0))):
-        ax.plot([src_x, src_x], [74.0, y_bus], color=col, lw=3.5, zorder=1)
-        ax.plot([drops[0], drops[1]], [y_bus, y_bus], color=col, lw=3.5, zorder=1)
-        for dx in drops:
-            arrow(ax, (dx, y_bus), (dx, 58.6), color=col, lw=3.5, head=18, zorder=1)
-        ax.text(lab_x, y_bus + (0.9 if col == TEAL else 4.5), lab, fontsize=SMALL, fontweight="bold", color=col, ha=ha,
-                va="bottom")
-    arrow(ax, (80.0, 77.0), (80.0, 57.2), color=HUMAN, lw=3.5, head=20, zorder=1)
-    ax.text(81.5, 72.0, "judge feedback", fontsize=SMALL, fontweight="bold", color=HUMAN, ha="left", va="center")
-    # the two scientist agents (speech-bubble style)
-    for x, name, col, tail in ((6, "Scientist A", A_COL, 1), (104, "Scientist B", B_COL, -1)):
-        rbox(ax, x, 46.0, 50.0, 12.5, fc=col, ec=col, r=3.0, zorder=3)
-        tx = x + 50.0 if tail > 0 else x
-        ax.add_patch(Polygon([(tx, 50.0), (tx + tail * 3.2, 47.5), (tx, 54.0)], fc=col, ec=col, zorder=3))
-        ax.text(x + 25.0, 52.25, name, fontsize=30, fontweight="bold", color="white", ha="center", va="center",
-                zorder=4)
-    # the exchange between them
-    bubbles = [("32 °C, then cool →", "#e3eef8", A_COL, 54.0), ("← overproof risk: 24 °C", "#fde9d8", "#d4660a", 47.0),
-               ("trial 002 agreed", INK, "white", 40.0)]
-    for text, fc, tc, by in bubbles:
-        rbox(ax, 58.5, by - 2.8, 43.0, 5.6, fc=fc, ec="none", r=2.4, zorder=3)
-        ax.text(80.0, by, text, fontsize=SMALL, fontweight="bold", color=tc, ha="center", va="center", zorder=4)
-    # thin local backend bar
-    rbox(ax, 3, 31.0, 154.0, 4.2, fc=PANEL, ec=LINE, lw=1.5, r=1.2, zorder=0)
-    ax.text(80.0, 33.1, "local backend", fontsize=SMALL, color=MUTED, ha="center", va="center", zorder=1)
-    # each agent sends its own chamber a new schedule; firmware clamps it
-    for ax_x, lab_x, ha in ((31.0, 32.5, "left"), (129.0, 127.5, "right")):
-        arrow(ax, (ax_x, 46.0), (ax_x, 24.6), color=INK, lw=3.5, head=20, zorder=2)
-        ax.text(lab_x, 39.5, "new schedule", fontsize=SMALL, fontweight="bold", color=INK, ha=ha, va="center")
-    for x, name, col, (cx_, hx_, lx_) in ((6, "Chamber A · ESP32", A_COL, (12.0, 27.0, 44.0)),
-                                          (104, "Chamber B · ESP32", B_COL, (38.0, 23.0, 6.0))):
-        rbox(ax, x, 3.0, 50.0, 21.0, fc="white", ec=col, lw=3.5, ls=(0, (5, 3)), r=2.0, zorder=2)
-        ax.text(x + 25.0, 19.5, name, fontsize=LBL, fontweight="bold", color=INK, ha="center", va="center", zorder=4)
-        icon_chamber(ax, x + cx_, 9.5, 4.6)
-        icon_chefhat(ax, x + hx_, 9.5, 4.0)
-        icon_lock(ax, x + lx_, 9.0, 3.6, color=INK)
-    ax.plot([52.5, 107.5], [9.0, 9.0], color=FAINT, lw=1.6, ls=(0, (2, 3)), zorder=1)
-    ax.text(80.0, 10.4, "safety limits", fontsize=SMALL, fontweight="bold", color=INK, ha="center", va="bottom")
+        rbox(ax, x, 74.5, cw, 10.0, fc="white", ec=col, lw=3, r=2.0, zorder=2)
+        if word:
+            ax.text(x + 2.5, 82.0, name, fontsize=24, fontweight="bold", color=INK, va="center", zorder=3)
+            _b(ax, x + 2.5, 77.2, word, kind, size=18, ha="left")
+        else:
+            ax.text(x + cw / 2, 79.5, name, fontsize=LBL, fontweight="bold", color=HUMAN, ha="center", va="center",
+                    zorder=3)
+    # one wide arrow into the agents row
+    ax.add_patch(Polygon([(62, 70.5), (98, 70.5), (98, 66.0), (104, 66.0), (80, 59.5), (56, 66.0), (62, 66.0)],
+                         fc="#e4e2dc", ec="none", zorder=0))
+    # row 2: the two scientists with the exchange between them
+    for x, name, col in ((4.0, "Scientist A", A_COL), (112.0, "Scientist B", B_COL)):
+        rbox(ax, x, 38.0, 44.0, 16.0, fc=col, ec=col, r=3.0, zorder=2)
+        ax.text(x + 22.0, 46.0, name, fontsize=32, fontweight="bold", color="white", ha="center", va="center",
+                zorder=3)
+    bubbles = [("32 °C, then cool →", "#e3eef8", A_COL), ("← overproof risk: 24 °C", "#fde9d8", "#d4660a"),
+               ("trial 002 agreed", INK, "white")]
+    for k, (text, fc, tc) in enumerate(bubbles):
+        by = 53.0 - k * 7.0
+        rbox(ax, 53.0, by - 2.9, 54.0, 5.8, fc=fc, ec="none", r=2.6, zorder=2)
+        ax.text(80.0, by, text, fontsize=24, fontweight="bold", color=tc, ha="center", va="center", zorder=3)
+    # row 3: one straight arrow per scientist down to its own chamber
+    for cx, lab_x, ha in ((26.0, 28.0, "left"), (134.0, 132.0, "right")):
+        arrow(ax, (cx, 37.6), (cx, 22.4), color=INK, lw=4, head=24)
+        ax.text(lab_x, 30.0, "new schedule", fontsize=SMALL, fontweight="bold", color=INK, ha=ha, va="center")
+    for x, name, col in ((4.0, "Chamber A", A_COL), (112.0, "Chamber B", B_COL)):
+        rbox(ax, x, 4.0, 44.0, 18.0, fc="white", ec=col, lw=3.5, ls=(0, (5, 3)), r=2.0, zorder=2)
+        ax.text(x + 4.0, 13.0, name, fontsize=LBL + 2, fontweight="bold", color=INK, ha="left", va="center", zorder=3)
+        icon_lock(ax, x + 37.0, 12.6, 4.2, color=INK)
     return save(fig, "architecture")
+
+
 
 
 def fig_dataflow():
