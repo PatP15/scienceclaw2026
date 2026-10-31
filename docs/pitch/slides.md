@@ -28,8 +28,8 @@ EXAMPLE is grey. The figures live in
 every number from the data files. Partner names appear as plain-text wordmarks only. The deck
 sources in `docs/pitch/deck/slides/*.html` mirror this file.
 
-Timing assumes about 140 words per minute. The spoken notes total 410 words, which is
-2 min 56 s (see the table at the end).
+Timing assumes about 140 words per minute. The spoken notes total 414 words, which is
+2 min 57 s (see the table at the end).
 
 ---
 
@@ -92,7 +92,7 @@ and is not in the deck yet.
 
 | Brigade | System |
 |---|---|
-| Guest | The judge (free-text taste feedback on the iPad) |
+| Guest | The judge (tells the Sous Chef at the laptop how it tasted, in the dashboard chat on the Mac) |
 | Head Chef | The orchestrator: `fermentai.agents.pipeline`, the taste-feedback cycle that sets the goal, assigns the agents and calls the plan |
 | Sous Chef A · B | The scientist agents, Scientist A / B (`ScientistAgent`, `agent_id` `scientist_A` / `scientist_B`) |
 | Line cooks | Candidate simulations: the schedule library run through the kinetics model |
@@ -162,7 +162,7 @@ and is not in the deck yet.
 - Modeled: forecasts · crumb · benchmark
 - Ask: 3 pilot kitchens + GPU & printer credits
 
-**Speaker notes (108 words, 46 s)**
+**Speaker notes (112 words, 48 s)**
 
 > Working today: the software, two agents and a fully offline demo. The NVIDIA and PreForm results
 > are computed. The forecasts and crumb shapes are modeled, not yet validated against a bake, and
@@ -170,7 +170,7 @@ and is not in the deck yet.
 > modeled benchmark, agents that talk change their choice almost every round, with a modest
 > information gain and the same final pick. Next come measured bakes, photo validation and a network
 > of kitchens. We're looking for three pilot kitchens or bakeries, plus GPU and printer credits, to
-> run the first multi-kitchen experiment. Please taste, and tell the iPad what you think.
+> run the first multi-kitchen experiment. Please taste, and tell the Sous Chef at the laptop what you think.
 
 ---
 
@@ -181,8 +181,8 @@ and is not in the deck yet.
 | 1 | 94 | 40 s |
 | 2 | 98 | 42 s |
 | 3 | 110 | 47 s |
-| 4 | 108 | 46 s |
-| **Total** | **410** | **2 min 56 s** |
+| 4 | 112 | 48 s |
+| **Total** | **414** | **2 min 57 s** |
 
 Recount with `sed -n '/^> /p' docs/pitch/slides.md | sed 's/^> //' | wc -w`.
 
