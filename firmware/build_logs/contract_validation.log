@@ -1,0 +1,15 @@
+OK    ControlAckIn ack_v1_0.json (8 keys)
+OK    ControlAckIn ack_v1_1_motor_completed.json (12 keys)
+OK    ControlAckIn ack_v1_1_setpoint.json (12 keys)
+OK    TelemetryIn  telemetry_v1_0.json (27 keys)
+OK    TelemetryIn  telemetry_v1_0_real_unsynced.json (27 keys)
+OK    TelemetryIn  telemetry_v1_1.json (37 keys)
+OK    TelemetryIn  telemetry_v1_1_empty.json (37 keys)
+OK    TelemetryIn  telemetry_v1_1_measured_unsynced.json (37 keys)
+8/8 samples valid
+--- frozen v1.0 models (git d506d57^:src/fermentai/api/schemas.py) ---
+v1.0-server OK   telemetry_v1_0.json
+v1.0-server OK   telemetry_v1_0_real_unsynced.json
+v1.0-server OK   ack_v1_0.json
+v1.0-server REJECTS telemetry_v1_1.json -> 10 validation errors for TelemetryIn
+v1.0-server REJECTS ack_v1_1_setpoint.json -> 4 validation errors for ControlAckIn

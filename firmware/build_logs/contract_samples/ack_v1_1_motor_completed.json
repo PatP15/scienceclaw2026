@@ -1,0 +1,1 @@
+{"schema_version":"1.0","command_id":"b2c4d6e8-1a3b-4c5d-8e9f-0a1b2c3d4e5f","chamber_id":"A","status":"completed","sequence_number":null,"timestamp_utc":null,"applied_setpoint_c":null,"message":"ran 3.0 s","device_id":"fermentai-esp32-a","device_uptime_ms":123456,"detail":"ran 3.0 s","result":{"ran_ms":3000}}

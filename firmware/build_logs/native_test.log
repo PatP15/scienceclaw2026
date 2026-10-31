@@ -1,0 +1,143 @@
+Verbosity level can be increased via `-v, -vv, or -vvv` option
+Collected 6 tests
+
+Processing test_sensors in native environment
+--------------------------------------------------------------------------------
+Building...
+Testing...
+test/test_sensors/test_main.cpp:409: test_ds_rom_parse_format_roundtrip	[PASSED]
+test/test_sensors/test_main.cpp:410: test_ds_roles_by_address_not_order	[PASSED]
+test/test_sensors/test_main.cpp:411: test_ds_mapping_persists_across_reboot	[PASSED]
+test/test_sensors/test_main.cpp:412: test_ds_reassign_moves_rom_between_roles	[PASSED]
+test/test_sensors/test_main.cpp:413: test_ds_disconnect_goes_missing_after_stale	[PASSED]
+test/test_sensors/test_main.cpp:414: test_ds_rejects_85_and_minus127_and_crc	[PASSED]
+test/test_sensors/test_main.cpp:415: test_ph_disabled_is_null_and_not_reported	[PASSED]
+test/test_sensors/test_main.cpp:416: test_ph_enabled_missing_adc	[PASSED]
+test/test_sensors/test_main.cpp:417: test_ph_uncalibrated_is_null_but_voltage_published	[PASSED]
+test/test_sensors/test_main.cpp:418: test_ph_two_point_calibration_and_persistence	[PASSED]
+test/test_sensors/test_main.cpp:419: test_ph_tiny_span_calibration_invalid	[PASSED]
+test/test_sensors/test_main.cpp:420: test_bme680_valid_reading	[PASSED]
+test/test_sensors/test_main.cpp:421: test_bme680_invalid_readings_flagged	[PASSED]
+test/test_sensors/test_main.cpp:422: test_bme680_read_failure_and_stale	[PASSED]
+test/test_sensors/test_main.cpp:423: test_bme680_absent	[PASSED]
+test/test_sensors/test_main.cpp:424: test_stuck_value_becomes_stale	[PASSED]
+test/test_sensors/test_main.cpp:425: test_door_debounce_and_count	[PASSED]
+test/test_sensors/test_main.cpp:426: test_door_polarity_configurable	[PASSED]
+---------------- native:test_sensors [PASSED] Took 3.31 seconds ----------------
+
+Processing test_commands in native environment
+--------------------------------------------------------------------------------
+Building...
+Testing...
+test/test_commands/test_main.cpp:555: test_parse_contract_fixture_command_example	[PASSED]
+test/test_commands/test_main.cpp:556: test_parse_contract_fixture_no_motor	[PASSED]
+test/test_commands/test_main.cpp:557: test_parse_garbage_rejected	[PASSED]
+test/test_commands/test_main.cpp:558: test_fixture_flat_and_array_execute_once	[PASSED]
+test/test_commands/test_main.cpp:559: test_v11_array_sequence_le_highest_ignored	[PASSED]
+test/test_commands/test_main.cpp:560: test_new_command_applied_and_acked_once	[PASSED]
+test/test_commands/test_main.cpp:561: test_setpoint_clamped_to_local_limits	[PASSED]
+test/test_commands/test_main.cpp:562: test_expiry_relative_to_receipt	[PASSED]
+test/test_commands/test_main.cpp:563: test_expired_ack_sent_once	[PASSED]
+test/test_commands/test_main.cpp:564: test_lower_sequence_ignored	[PASSED]
+test/test_commands/test_main.cpp:565: test_epoch_change_resets_sequence	[PASSED]
+test/test_commands/test_main.cpp:566: test_wrong_chamber_rejected	[PASSED]
+test/test_commands/test_main.cpp:567: test_ring_buffer_bounded_and_replay	[PASSED]
+test/test_commands/test_main.cpp:568: test_motor_not_replayed_after_reboot	[PASSED]
+test/test_commands/test_main.cpp:569: test_motor_rejected_reason_propagates	[PASSED]
+test/test_commands/test_main.cpp:570: test_v11_array_all_actions	[PASSED]
+test/test_commands/test_main.cpp:571: test_v11_server_relative_ttl_without_device_clock	[PASSED]
+test/test_commands/test_main.cpp:572: test_v11_no_expiry_reference_rejected	[PASSED]
+test/test_commands/test_main.cpp:573: test_v11_array_reack_rate_limited	[PASSED]
+test/test_commands/test_main.cpp:574: test_v11_motor_duration_from_seconds_or_ms	[PASSED]
+test/test_commands/test_main.cpp:575: test_ack_v10_keys_match_frozen_list_exactly	[PASSED]
+test/test_commands/test_main.cpp:576: test_ack_keys_within_schema	[PASSED]
+test/test_commands/test_main.cpp:577: test_ack_v11_superset	[PASSED]
+--------------- native:test_commands [PASSED] Took 1.63 seconds ---------------
+
+Processing test_telemetry in native environment
+--------------------------------------------------------------------------------
+Building...
+Testing...
+test/test_telemetry/test_main.cpp:381: test_v10_keys_equal_fixture	[PASSED]
+test/test_telemetry/test_main.cpp:382: test_v10_enum_values	[PASSED]
+test/test_telemetry/test_main.cpp:383: test_v11_superset_and_values	[PASSED]
+test/test_telemetry/test_main.cpp:384: test_v11_keys_within_published_schema_if_present	[PASSED]
+test/test_telemetry/test_main.cpp:385: test_missing_values_are_null_never_nan	[PASSED]
+test/test_telemetry/test_main.cpp:386: test_ph_method_only_with_valid_ph_and_faults_listed	[PASSED]
+test/test_telemetry/test_main.cpp:387: test_quality_flags_bounded_and_short	[PASSED]
+test/test_telemetry/test_main.cpp:388: test_telemetry_fits_small_buffer_or_fails_cleanly	[PASSED]
+test/test_telemetry/test_main.cpp:389: test_emit_contract_samples	[PASSED]
+test/test_telemetry/test_main.cpp:390: test_iso8601_roundtrip	[PASSED]
+test/test_telemetry/test_main.cpp:391: test_clock_sync_quality	[PASSED]
+test/test_telemetry/test_main.cpp:392: test_scheduler_rates_nonblocking	[PASSED]
+test/test_telemetry/test_main.cpp:393: test_backoff_sequence	[PASSED]
+--------------- native:test_telemetry [PASSED] Took 1.79 seconds ---------------
+
+Processing test_network in native environment
+--------------------------------------------------------------------------------
+Building...
+Testing...
+test/test_network/test_main.cpp:190: test_telemetry_sequence_starts_at_1_and_increments	[PASSED]
+test/test_network/test_main.cpp:191: test_telemetry_retry_resends_identical_payload_with_backoff	[PASSED]
+test/test_network/test_main.cpp:192: test_telemetry_offline_queue_bounded_drops_oldest	[PASSED]
+test/test_network/test_main.cpp:193: test_telemetry_422_dropped_not_retried	[PASSED]
+test/test_network/test_main.cpp:194: test_telemetry_server_time_syncs_clock	[PASSED]
+test/test_network/test_main.cpp:195: test_poll_parses_and_backs_off	[PASSED]
+test/test_network/test_main.cpp:196: test_acks_retry_then_drop	[PASSED]
+test/test_network/test_main.cpp:197: test_ack_queue_bounded	[PASSED]
+---------------- native:test_network [PASSED] Took 1.73 seconds ----------------
+
+Processing test_motor in native environment
+--------------------------------------------------------------------------------
+Building...
+Testing...
+test/test_motor/test_main.cpp:259: test_motor_safe_off_on_boot	[PASSED]
+test/test_motor/test_main.cpp:260: test_motor_refused_when_disarmed_or_zero	[PASSED]
+test/test_motor/test_main.cpp:261: test_motor_duration_clamped_to_max	[PASSED]
+test/test_motor/test_main.cpp:262: test_motor_auto_timeout_exact	[PASSED]
+test/test_motor/test_main.cpp:263: test_motor_hw_timer_cuts_gate_if_loop_stalls	[PASSED]
+test/test_motor/test_main.cpp:264: test_motor_never_on_when_not_running	[PASSED]
+test/test_motor/test_main.cpp:265: test_motor_no_double_start_and_stop	[PASSED]
+test/test_motor/test_main.cpp:266: test_motor_wiggle_pattern_pulses_but_bounded	[PASSED]
+test/test_motor/test_main.cpp:267: test_csm_animate_motor_accepted_then_completed	[PASSED]
+test/test_motor/test_main.cpp:268: test_csm_motor_rejected_when_door_open	[PASSED]
+test/test_motor/test_main.cpp:269: test_csm_door_opening_stops_running_motor	[PASSED]
+test/test_motor/test_main.cpp:270: test_csm_v10_stop_directive_cancels	[PASSED]
+----------------- native:test_motor [PASSED] Took 1.64 seconds -----------------
+
+Processing test_control in native environment
+--------------------------------------------------------------------------------
+Building...
+Testing...
+test/test_control/test_main.cpp:443: test_hysteresis_band	[PASSED]
+test/test_control/test_main.cpp:444: test_hysteresis_minimum_enforced	[PASSED]
+test/test_control/test_main.cpp:445: test_proportional_fraction_limited	[PASSED]
+test/test_control/test_main.cpp:446: test_peltier_boot_off	[PASSED]
+test/test_control/test_main.cpp:447: test_peltier_ramp_and_pwm_limit	[PASSED]
+test/test_control/test_main.cpp:448: test_peltier_heat_to_cool_dead_time	[PASSED]
+test/test_control/test_main.cpp:449: test_peltier_same_direction_no_dead_time	[PASSED]
+test/test_control/test_main.cpp:450: test_peltier_disarmed_outputs_zero	[PASSED]
+test/test_control/test_main.cpp:451: test_peltier_fault_immediate_off	[PASSED]
+test/test_control/test_main.cpp:452: test_safety_sensor_stale_after_30s	[PASSED]
+test/test_control/test_main.cpp:453: test_safety_implausible_counts_as_invalid	[PASSED]
+test/test_control/test_main.cpp:454: test_safety_overtemp_latch_60s	[PASSED]
+test/test_control/test_main.cpp:455: test_safety_heatsink_overtemp_and_missing	[PASSED]
+test/test_control/test_main.cpp:456: test_chamber_no_control_before_command	[PASSED]
+test/test_control/test_main.cpp:457: test_chamber_heats_toward_setpoint	[PASSED]
+test/test_control/test_main.cpp:458: test_chamber_fault_on_sensor_loss	[PASSED]
+test/test_control/test_main.cpp:459: test_chamber_fault_on_heatsink_overtemp	[PASSED]
+test/test_control/test_main.cpp:460: test_chamber_fault_on_heatsink_probe_disconnect	[PASSED]
+test/test_control/test_main.cpp:461: test_chamber_door_open_idles_peltier	[PASSED]
+test/test_control/test_main.cpp:462: test_chamber_offline_hold_goes_idle	[PASSED]
+---------------- native:test_control [PASSED] Took 1.79 seconds ----------------
+
+=================================== SUMMARY ===================================
+Environment    Test            Status    Duration
+-------------  --------------  --------  ------------
+native         test_sensors    PASSED    00:00:03.313
+native         test_commands   PASSED    00:00:01.626
+native         test_telemetry  PASSED    00:00:01.790
+native         test_network    PASSED    00:00:01.732
+native         test_motor      PASSED    00:00:01.636
+native         test_control    PASSED    00:00:01.789
+================= 94 test cases: 94 succeeded in 00:00:11.887 =================
