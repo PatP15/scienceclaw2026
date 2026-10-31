@@ -345,7 +345,9 @@ def _clean(mesh: trimesh.Trimesh) -> trimesh.Trimesh:
     trimesh.repair.fix_normals(mesh)
     if mesh.volume < 0:
         mesh.invert()
-    return mesh
+    # trimesh.repair.fix_normals can flip the winding without invalidating the cached
+    # face_normals (seen with trimesh 5.2): rebuild so normals (and STL facet normals) match it.
+    return trimesh.Trimesh(mesh.vertices, mesh.faces, process=False)
 
 
 def _simplify(mesh: trimesh.Trimesh, tol: float) -> trimesh.Trimesh:

@@ -1,6 +1,12 @@
 """Regenerate the Formlabs crumb models deterministically.
 
-Outputs (data/stl/):
+Two families of models (both by default):
+
+* baseline presets (mild / sour): hand-picked illustrative parameters (crumb.MILD / crumb.SOUR)
+* simulation-derived chamber specimens (A / B): ALCHEMI descriptors -> kinetics at 16 h ->
+  morphology_map.map_to_crumb_params -> STL (see docs/morphology_coupling.md)
+
+Outputs (data/stl/), baseline presets:
   crumb_mild.stl, crumb_sour.stl                 binary STL, millimetres
   crumb_<name>_validation.json                   ValidationReport per model
   crumb_<name>.png                               per-model render (top-down, oblique, histogram)
@@ -8,7 +14,18 @@ Outputs (data/stl/):
   crumb_summary.json / crumb_summary.csv         geometric summary statistics
   crumb_params.json                              exact generator parameters + disclaimer
 
+Outputs (data/stl/), simulation-derived chamber specimens:
+  crumb_chamber_{A,B}.stl                        binary STL, millimetres
+  crumb_chamber_{A,B}_validation.json            ValidationReport per model
+  crumb_chamber_{A,B}_mapping.json               MappingReport (inputs, formulas, provenance)
+  crumb_chamber_comparison.png                   side-by-side render
+  chain_summary.json                             STL <-> kinetics numbers <-> ALCHEMI provenance
+
 Usage:  uv run python scripts/generate_stls.py [--out data/stl] [--skip-validation]
+                                               [--from-simulation | --presets-only]
+                                               [--predictions data/predictions]
+  (default: both families; --from-simulation: chamber specimens only;
+   --presets-only: the original mild/sour baseline only)
 """
 
 from __future__ import annotations
@@ -32,10 +49,44 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default=str(ROOT / "data" / "stl"))
     ap.add_argument("--skip-validation", action="store_true")
+    ap.add_argument("--predictions", default=str(ROOT / "data" / "predictions"),
+                    help="directory with chamber_<id>_morphology.json (simulation mode)")
+    mode = ap.add_mutually_exclusive_group()
+    mode.add_argument("--from-simulation", action="store_true",
+                      help="only the simulation-derived chamber specimens (A, B)")
+    mode.add_argument("--presets-only", action="store_true",
+                      help="only the original mild/sour baseline presets")
     args = ap.parse_args()
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
 
+    ok = True
+    if not args.from_simulation:
+        ok &= run_presets(out, args.skip_validation)
+    if not args.presets_only:
+        ok &= run_simulation(out, Path(args.predictions), args.skip_validation)
+    return 0 if ok else 1
+
+
+def run_simulation(out: Path, predictions: Path, skip_validation: bool) -> bool:
+    """Chamber A/B specimens derived from the kinetics chain (morphology_map)."""
+    from fermentai.geometry.morphology_map import generate_chain
+
+    t0 = time.time()
+    res = generate_chain(("A", "B"), predictions, out, validate=not skip_validation)
+    print(f"[chain] {time.time() - t0:.1f}s -> {res['render']}, {res['chain_summary']}")
+    if skip_validation:
+        return True
+    ok = all(sp.validation.passed for sp in res["specimens"])
+    for sp in res["specimens"]:
+        failed = [k for k, c in sp.validation.checks.items() if c.passed is False]
+        print(f"   chamber {sp.chamber_id}: {'PASS' if not failed else 'FAIL ' + str(failed)}")
+    print("CHAMBER VALIDATION PASSED" if ok else "CHAMBER VALIDATION FAILURES - see JSON reports")
+    return ok
+
+
+def run_presets(out: Path, skip_validation: bool) -> bool:
+    """Original baseline: hand-picked mild/sour illustrative presets (unchanged outputs)."""
     items, summaries, all_ok = [], [], True
     for params in (MILD, SOUR):
         t0 = time.time()
@@ -54,7 +105,7 @@ def main() -> int:
              "eq_diameter_mm": s["cut_face_eq_diameter_mm"], "provenance": "simulated"},
             params,
         )
-        if not args.skip_validation:
+        if not skip_validation:
             rep = validate_mesh(mesh, params.min_wall_mm, name=params.name)
             rep.save(out / f"crumb_{params.name}_validation.json")
             s["validation_passed"] = rep.passed
@@ -92,11 +143,11 @@ def main() -> int:
         {"provenance": "simulated", "disclaimer": DISCLAIMER,
          "models": {p.name: p.to_dict() for p, _ in items}}, indent=2))
     print("summary:", out / "crumb_summary.csv")
-    if args.skip_validation:
+    if skip_validation:
         print("validation skipped")
     else:
         print("ALL VALIDATION PASSED" if all_ok else "VALIDATION FAILURES - see JSON reports")
-    return 0 if all_ok else 1
+    return all_ok
 
 
 if __name__ == "__main__":

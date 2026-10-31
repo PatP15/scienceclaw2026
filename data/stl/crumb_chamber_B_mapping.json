@@ -1,0 +1,830 @@
+{
+  "chamber_id": "B",
+  "provenance": "simulated",
+  "kinetics_variant": "alchemi_informed",
+  "inputs": {
+    "co2_retained_g_per_kg": 1.2608528445792662,
+    "co2_retained_peak_g_per_kg": 1.6879045601645464,
+    "expansion_ratio_peak": 2.085758369193451,
+    "expansion_ratio_final": 1.81105387154701,
+    "max_expansion_rate_per_h": 0.26331998729577144,
+    "overproof_flag": true,
+    "expansion_fall_from_peak_fraction": 0.25300702756774857,
+    "final_ph": 3.8994309876922952,
+    "gluten_weakening_index": 0.7682497243417044,
+    "final_fermentation_quotient": 4.076453061479612,
+    "t_end_h": 16.0
+  },
+  "input_source": "fermentation.simulate(params + apply_molecular_descriptors)",
+  "fallback_fields": [],
+  "drivers": {
+    "gas_fraction": {
+      "value": 0.44783530975486896,
+      "formula": "1 - 1/expansion_ratio_final",
+      "inputs": [
+        "expansion_ratio_final"
+      ],
+      "source": "volume identity (assumes the rise is all gas)"
+    },
+    "s_gas": {
+      "value": 0.49131681420991435,
+      "formula": "w*u(gas_fraction) + (1-w)*u(co2_retained)",
+      "inputs": [
+        "expansion_ratio_final",
+        "co2_retained_g_per_kg"
+      ]
+    },
+    "s_rate": {
+      "value": 0.6532799491830859,
+      "formula": "u(max_expansion_rate_per_h; rate_lo, rate_hi)",
+      "inputs": [
+        "max_expansion_rate_per_h"
+      ]
+    },
+    "s_gwi": {
+      "value": 0.7682497243417044,
+      "formula": "gluten_weakening_index (already 0..1)",
+      "inputs": [
+        "gluten_weakening_index"
+      ]
+    },
+    "s_collapse": {
+      "value": 0.7611364197975914,
+      "formula": "overproof_step*[overproof] + (1-overproof_step)*u(fall; 0, fall_hi)",
+      "inputs": [
+        "overproof_flag",
+        "expansion_fall_from_peak_fraction"
+      ]
+    },
+    "s_acid": {
+      "value": 0.7337126748718031,
+      "formula": "u(ph_hi - final_ph; 0, ph_hi - ph_lo)",
+      "inputs": [
+        "final_ph"
+      ]
+    },
+    "s_size": {
+      "value": 0.7204834881422287,
+      "formula": "(w_rate*s_rate + w_gwi*s_gwi + w_col*s_collapse)/sum(w)",
+      "inputs": [
+        "s_rate",
+        "s_gwi",
+        "s_collapse"
+      ]
+    },
+    "s_irreg": {
+      "value": 0.7107648367623951,
+      "formula": "(s_rate + s_gwi)/2",
+      "inputs": [
+        "s_rate",
+        "s_gwi"
+      ]
+    },
+    "s_weak": {
+      "value": 0.7509811996067537,
+      "formula": "(s_acid + s_gwi)/2",
+      "inputs": [
+        "s_acid",
+        "s_gwi"
+      ]
+    }
+  },
+  "outputs": {
+    "porosity_target": {
+      "value": 0.3474,
+      "formula": "porosity_min + (porosity_max - porosity_min)*s_gas",
+      "inputs": [
+        "expansion_ratio_final",
+        "co2_retained_g_per_kg"
+      ],
+      "bounds": [
+        0.2,
+        0.5
+      ],
+      "direction": "increases with expansion_ratio_final and co2_retained",
+      "provenance_chain": {
+        "alchemi": [
+          "acetic.assoc_energy_per_water_kcal",
+          "acetic.hbond_min_A",
+          "d_assoc_per_water_kcal",
+          "d_hbond_min_A",
+          "lactic.assoc_energy_per_water_kcal",
+          "lactic.hbond_min_A",
+          "-> kinetics parameter undissociated_lactic_rel_potency"
+        ],
+        "simulated": [
+          "expansion_ratio_final=1.81105387154701",
+          "co2_retained_g_per_kg=1.2608528445792662"
+        ],
+        "assumption": [
+          "gas_fraction_lo=0.25 (assumption)",
+          "gas_fraction_hi=0.6 (assumption)",
+          "co2_retained_lo=0.5 (assumption)",
+          "co2_retained_hi=2.5 (assumption)",
+          "w_gas_expansion=0.6 (assumption)",
+          "porosity_min=0.2 (assumption)",
+          "porosity_max=0.5 (assumption)"
+        ]
+      }
+    },
+    "pore_diam_median_mm": {
+      "value": 2.5571,
+      "formula": "pore_median_min + (pore_median_max - pore_median_min)*s_size",
+      "inputs": [
+        "max_expansion_rate_per_h",
+        "gluten_weakening_index",
+        "overproof_flag",
+        "expansion_fall_from_peak_fraction"
+      ],
+      "bounds": [
+        0.9,
+        3.2
+      ],
+      "direction": "increases with max rise rate, GWI, overproof and fall-from-peak",
+      "provenance_chain": {
+        "alchemi": [
+          "acetic.assoc_energy_per_water_kcal",
+          "acetic.hbond_min_A",
+          "d_assoc_per_water_kcal",
+          "d_hbond_min_A",
+          "lactic.assoc_energy_per_water_kcal",
+          "lactic.hbond_min_A",
+          "-> kinetics parameter undissociated_lactic_rel_potency"
+        ],
+        "simulated": [
+          "max_expansion_rate_per_h=0.26331998729577144",
+          "gluten_weakening_index=0.7682497243417044",
+          "overproof_flag=True",
+          "expansion_fall_from_peak_fraction=0.25300702756774857"
+        ],
+        "assumption": [
+          "rate_lo=0.1 (assumption)",
+          "rate_hi=0.35 (assumption)",
+          "fall_hi=0.4 (assumption)",
+          "overproof_step=0.35 (assumption)",
+          "w_size_rate=0.4 (direction only: Scanlon & Zghal (2001) Food Res Int 34:841-864 (bread crumb structure review); Gan, Ellis & Schofield (1995) J Cereal Sci 21:215-230 (gas-cell stabilisation, coalescence, disproportionation). Magnitude: assumption)",
+          "w_size_gwi=0.35 (direction only: Gaenzle, Loponen & Gobbetti (2008) Trends Food Sci Technol 19:513-521 (acid-activated proteolysis weakens gluten). Magnitude: assumption)",
+          "w_size_collapse=0.25 (direction only: Scanlon & Zghal (2001) Food Res Int 34:841-864 (bread crumb structure review); Gan, Ellis & Schofield (1995) J Cereal Sci 21:215-230 (gas-cell stabilisation, coalescence, disproportionation). Magnitude: assumption)",
+          "pore_median_min=0.9 (assumption)",
+          "pore_median_max=3.2 (assumption)"
+        ]
+      }
+    },
+    "pore_diam_cv": {
+      "value": 0.6806,
+      "formula": "cv_min + cv_span*s_collapse",
+      "inputs": [
+        "overproof_flag",
+        "expansion_fall_from_peak_fraction"
+      ],
+      "bounds": [
+        0.3,
+        0.8
+      ],
+      "direction": "increases with collapse",
+      "provenance_chain": {
+        "alchemi": [
+          "acetic.assoc_energy_per_water_kcal",
+          "acetic.hbond_min_A",
+          "d_assoc_per_water_kcal",
+          "d_hbond_min_A",
+          "lactic.assoc_energy_per_water_kcal",
+          "lactic.hbond_min_A",
+          "-> kinetics parameter undissociated_lactic_rel_potency"
+        ],
+        "simulated": [
+          "overproof_flag=True",
+          "expansion_fall_from_peak_fraction=0.25300702756774857"
+        ],
+        "assumption": [
+          "fall_hi=0.4 (assumption)",
+          "overproof_step=0.35 (assumption)",
+          "cv_min=0.3 (assumption)",
+          "cv_span=0.5 (assumption)"
+        ]
+      }
+    },
+    "pore_diam_mean_mm": {
+      "value": 3.0931,
+      "formula": "median*sqrt(1+cv^2) (lognormal)",
+      "inputs": [
+        "max_expansion_rate_per_h",
+        "gluten_weakening_index",
+        "overproof_flag",
+        "expansion_fall_from_peak_fraction"
+      ],
+      "bounds": null,
+      "direction": "follows median and cv",
+      "provenance_chain": {
+        "alchemi": [
+          "acetic.assoc_energy_per_water_kcal",
+          "acetic.hbond_min_A",
+          "d_assoc_per_water_kcal",
+          "d_hbond_min_A",
+          "lactic.assoc_energy_per_water_kcal",
+          "lactic.hbond_min_A",
+          "-> kinetics parameter undissociated_lactic_rel_potency"
+        ],
+        "simulated": [
+          "max_expansion_rate_per_h=0.26331998729577144",
+          "gluten_weakening_index=0.7682497243417044",
+          "overproof_flag=True",
+          "expansion_fall_from_peak_fraction=0.25300702756774857"
+        ],
+        "assumption": [
+          "rate_lo=0.1 (assumption)",
+          "rate_hi=0.35 (assumption)",
+          "fall_hi=0.4 (assumption)",
+          "overproof_step=0.35 (assumption)",
+          "w_size_rate=0.4 (direction only: Scanlon & Zghal (2001) Food Res Int 34:841-864 (bread crumb structure review); Gan, Ellis & Schofield (1995) J Cereal Sci 21:215-230 (gas-cell stabilisation, coalescence, disproportionation). Magnitude: assumption)",
+          "w_size_gwi=0.35 (direction only: Gaenzle, Loponen & Gobbetti (2008) Trends Food Sci Technol 19:513-521 (acid-activated proteolysis weakens gluten). Magnitude: assumption)",
+          "w_size_collapse=0.25 (direction only: Scanlon & Zghal (2001) Food Res Int 34:841-864 (bread crumb structure review); Gan, Ellis & Schofield (1995) J Cereal Sci 21:215-230 (gas-cell stabilisation, coalescence, disproportionation). Magnitude: assumption)"
+        ]
+      }
+    },
+    "pore_diam_sd_mm": {
+      "value": 2.1051,
+      "formula": "cv*mean",
+      "inputs": [
+        "max_expansion_rate_per_h",
+        "gluten_weakening_index",
+        "overproof_flag",
+        "expansion_fall_from_peak_fraction"
+      ],
+      "bounds": null,
+      "direction": "follows mean and cv",
+      "provenance_chain": {
+        "alchemi": [
+          "acetic.assoc_energy_per_water_kcal",
+          "acetic.hbond_min_A",
+          "d_assoc_per_water_kcal",
+          "d_hbond_min_A",
+          "lactic.assoc_energy_per_water_kcal",
+          "lactic.hbond_min_A",
+          "-> kinetics parameter undissociated_lactic_rel_potency"
+        ],
+        "simulated": [
+          "max_expansion_rate_per_h=0.26331998729577144",
+          "gluten_weakening_index=0.7682497243417044",
+          "overproof_flag=True",
+          "expansion_fall_from_peak_fraction=0.25300702756774857"
+        ],
+        "assumption": [
+          "rate_lo=0.1 (assumption)",
+          "rate_hi=0.35 (assumption)",
+          "fall_hi=0.4 (assumption)",
+          "overproof_step=0.35 (assumption)",
+          "w_size_rate=0.4 (direction only: Scanlon & Zghal (2001) Food Res Int 34:841-864 (bread crumb structure review); Gan, Ellis & Schofield (1995) J Cereal Sci 21:215-230 (gas-cell stabilisation, coalescence, disproportionation). Magnitude: assumption)",
+          "w_size_gwi=0.35 (direction only: Gaenzle, Loponen & Gobbetti (2008) Trends Food Sci Technol 19:513-521 (acid-activated proteolysis weakens gluten). Magnitude: assumption)",
+          "w_size_collapse=0.25 (direction only: Scanlon & Zghal (2001) Food Res Int 34:841-864 (bread crumb structure review); Gan, Ellis & Schofield (1995) J Cereal Sci 21:215-230 (gas-cell stabilisation, coalescence, disproportionation). Magnitude: assumption)"
+        ]
+      }
+    },
+    "pore_diam_max_mm": {
+      "value": 10.0891,
+      "formula": "min(cap, max(pore_max_base + pore_max_span*s_collapse, 2.5*median))",
+      "inputs": [
+        "max_expansion_rate_per_h",
+        "gluten_weakening_index",
+        "overproof_flag",
+        "expansion_fall_from_peak_fraction"
+      ],
+      "bounds": [
+        4.0,
+        12.0
+      ],
+      "direction": "increases with collapse and median",
+      "provenance_chain": {
+        "alchemi": [
+          "acetic.assoc_energy_per_water_kcal",
+          "acetic.hbond_min_A",
+          "d_assoc_per_water_kcal",
+          "d_hbond_min_A",
+          "lactic.assoc_energy_per_water_kcal",
+          "lactic.hbond_min_A",
+          "-> kinetics parameter undissociated_lactic_rel_potency"
+        ],
+        "simulated": [
+          "max_expansion_rate_per_h=0.26331998729577144",
+          "gluten_weakening_index=0.7682497243417044",
+          "overproof_flag=True",
+          "expansion_fall_from_peak_fraction=0.25300702756774857"
+        ],
+        "assumption": [
+          "pore_max_base=4 (assumption)",
+          "pore_max_span=8 (assumption)",
+          "pore_max_cap=12 (printable geometry (12 mm slab))"
+        ]
+      }
+    },
+    "eccentricity": {
+      "value": 0.5975,
+      "formula": "ecc_min + ecc_span*s_irreg",
+      "inputs": [
+        "max_expansion_rate_per_h",
+        "gluten_weakening_index"
+      ],
+      "bounds": [
+        0.1,
+        0.7999999999999999
+      ],
+      "direction": "increases with max rise rate and GWI",
+      "provenance_chain": {
+        "alchemi": [
+          "acetic.assoc_energy_per_water_kcal",
+          "acetic.hbond_min_A",
+          "d_assoc_per_water_kcal",
+          "d_hbond_min_A",
+          "lactic.assoc_energy_per_water_kcal",
+          "lactic.hbond_min_A",
+          "-> kinetics parameter undissociated_lactic_rel_potency"
+        ],
+        "simulated": [
+          "max_expansion_rate_per_h=0.26331998729577144",
+          "gluten_weakening_index=0.7682497243417044"
+        ],
+        "assumption": [
+          "rate_lo=0.1 (assumption)",
+          "rate_hi=0.35 (assumption)",
+          "ecc_min=0.1 (assumption)",
+          "ecc_span=0.7 (direction only: Scanlon & Zghal (2001) Food Res Int 34:841-864 (bread crumb structure review); Gan, Ellis & Schofield (1995) J Cereal Sci 21:215-230 (gas-cell stabilisation, coalescence, disproportionation). Magnitude: assumption)"
+        ]
+      }
+    },
+    "eccentricity_jitter": {
+      "value": 0.4988,
+      "formula": "jitter_min + jitter_span*s_irreg",
+      "inputs": [
+        "max_expansion_rate_per_h",
+        "gluten_weakening_index"
+      ],
+      "bounds": [
+        0.25,
+        0.6
+      ],
+      "direction": "increases with max rise rate and GWI",
+      "provenance_chain": {
+        "alchemi": [
+          "acetic.assoc_energy_per_water_kcal",
+          "acetic.hbond_min_A",
+          "d_assoc_per_water_kcal",
+          "d_hbond_min_A",
+          "lactic.assoc_energy_per_water_kcal",
+          "lactic.hbond_min_A",
+          "-> kinetics parameter undissociated_lactic_rel_potency"
+        ],
+        "simulated": [
+          "max_expansion_rate_per_h=0.26331998729577144",
+          "gluten_weakening_index=0.7682497243417044"
+        ],
+        "assumption": [
+          "rate_lo=0.1 (assumption)",
+          "rate_hi=0.35 (assumption)",
+          "jitter_min=0.25 (assumption)",
+          "jitter_span=0.35 (assumption)"
+        ]
+      }
+    },
+    "clustering": {
+      "value": 0.5828,
+      "formula": "clustering_min + clustering_span*s_collapse",
+      "inputs": [
+        "overproof_flag",
+        "expansion_fall_from_peak_fraction"
+      ],
+      "bounds": [
+        0.05,
+        0.75
+      ],
+      "direction": "increases with overproof and fall-from-peak (merged cells)",
+      "provenance_chain": {
+        "alchemi": [
+          "acetic.assoc_energy_per_water_kcal",
+          "acetic.hbond_min_A",
+          "d_assoc_per_water_kcal",
+          "d_hbond_min_A",
+          "lactic.assoc_energy_per_water_kcal",
+          "lactic.hbond_min_A",
+          "-> kinetics parameter undissociated_lactic_rel_potency"
+        ],
+        "simulated": [
+          "overproof_flag=True",
+          "expansion_fall_from_peak_fraction=0.25300702756774857"
+        ],
+        "assumption": [
+          "fall_hi=0.4 (assumption)",
+          "overproof_step=0.35 (assumption)",
+          "clustering_min=0.05 (assumption)",
+          "clustering_span=0.7 (direction only: Scanlon & Zghal (2001) Food Res Int 34:841-864 (bread crumb structure review); Gan, Ellis & Schofield (1995) J Cereal Sci 21:215-230 (gas-cell stabilisation, coalescence, disproportionation). Magnitude: assumption)"
+        ]
+      }
+    },
+    "cluster_radius_mm": {
+      "value": 4.5223,
+      "formula": "cluster_radius_min + cluster_radius_span*s_collapse",
+      "inputs": [
+        "overproof_flag",
+        "expansion_fall_from_peak_fraction"
+      ],
+      "bounds": [
+        3.0,
+        5.0
+      ],
+      "direction": "increases with collapse",
+      "provenance_chain": {
+        "alchemi": [
+          "acetic.assoc_energy_per_water_kcal",
+          "acetic.hbond_min_A",
+          "d_assoc_per_water_kcal",
+          "d_hbond_min_A",
+          "lactic.assoc_energy_per_water_kcal",
+          "lactic.hbond_min_A",
+          "-> kinetics parameter undissociated_lactic_rel_potency"
+        ],
+        "simulated": [
+          "overproof_flag=True",
+          "expansion_fall_from_peak_fraction=0.25300702756774857"
+        ],
+        "assumption": [
+          "fall_hi=0.4 (assumption)",
+          "overproof_step=0.35 (assumption)",
+          "cluster_radius_min=3 (assumption)",
+          "cluster_radius_span=2 (assumption)"
+        ]
+      }
+    },
+    "cluster_spacing_mm": {
+      "value": 17.0445,
+      "formula": "cluster_spacing_min + cluster_spacing_span*s_collapse",
+      "inputs": [
+        "overproof_flag",
+        "expansion_fall_from_peak_fraction"
+      ],
+      "bounds": [
+        14.0,
+        18.0
+      ],
+      "direction": "increases with collapse",
+      "provenance_chain": {
+        "alchemi": [
+          "acetic.assoc_energy_per_water_kcal",
+          "acetic.hbond_min_A",
+          "d_assoc_per_water_kcal",
+          "d_hbond_min_A",
+          "lactic.assoc_energy_per_water_kcal",
+          "lactic.hbond_min_A",
+          "-> kinetics parameter undissociated_lactic_rel_potency"
+        ],
+        "simulated": [
+          "overproof_flag=True",
+          "expansion_fall_from_peak_fraction=0.25300702756774857"
+        ],
+        "assumption": [
+          "fall_hi=0.4 (assumption)",
+          "overproof_step=0.35 (assumption)",
+          "cluster_spacing_min=14 (assumption)",
+          "cluster_spacing_span=4 (assumption)"
+        ]
+      }
+    },
+    "min_wall_mm": {
+      "value": 1.0494,
+      "formula": "max(0.9, wall_floor + wall_span*(1 - s_weak))",
+      "inputs": [
+        "final_ph",
+        "gluten_weakening_index"
+      ],
+      "bounds": [
+        0.9,
+        1.5
+      ],
+      "direction": "decreases with lower pH and higher GWI; never below 0.9 mm",
+      "provenance_chain": {
+        "alchemi": [
+          "acetic.assoc_energy_per_water_kcal",
+          "acetic.hbond_min_A",
+          "d_assoc_per_water_kcal",
+          "d_hbond_min_A",
+          "lactic.assoc_energy_per_water_kcal",
+          "lactic.hbond_min_A",
+          "-> kinetics parameter undissociated_lactic_rel_potency"
+        ],
+        "simulated": [
+          "final_ph=3.8994309876922952",
+          "gluten_weakening_index=0.7682497243417044"
+        ],
+        "assumption": [
+          "ph_hi=5 (configs/kinetics.yaml GWI pH onset (assumption))",
+          "ph_lo=3.5 (assumption)",
+          "wall_floor=0.9 (Formlabs printability floor (hard lower bound))",
+          "wall_span=0.6 (direction only: Gaenzle, Loponen & Gobbetti (2008) Trends Food Sci Technol 19:513-521 (acid-activated proteolysis weakens gluten). Magnitude: assumption)"
+        ]
+      }
+    },
+    "seed": {
+      "value": 20261031,
+      "formula": "fixed; identical for both chambers",
+      "inputs": [],
+      "bounds": null,
+      "direction": "n/a",
+      "provenance_chain": {
+        "alchemi": [],
+        "simulated": [],
+        "assumption": [
+          "common random numbers across chambers"
+        ]
+      }
+    }
+  },
+  "unmapped": {
+    "final_fermentation_quotient": "recorded, not mapped: CrumbParams has no anisotropy/orientation parameter and the lactic:acetic ratio is a flavour/acidity descriptor with no established direct crumb-geometry effect at this resolution",
+    "co2_retained_peak_g_per_kg": "recorded; only the end-of-window value drives porosity",
+    "expansion_ratio_peak": "recorded; enters only via expansion_fall_from_peak_fraction"
+  },
+  "config": {
+    "gas_fraction_lo": {
+      "value": 0.25,
+      "unit": "-",
+      "source": "assumption",
+      "note": "gas volume fraction 1-1/E that maps to driver 0"
+    },
+    "gas_fraction_hi": {
+      "value": 0.6,
+      "unit": "-",
+      "source": "assumption",
+      "note": "gas volume fraction that maps to driver 1"
+    },
+    "co2_retained_lo": {
+      "value": 0.5,
+      "unit": "g CO2/kg dough",
+      "source": "assumption"
+    },
+    "co2_retained_hi": {
+      "value": 2.5,
+      "unit": "g CO2/kg dough",
+      "source": "assumption",
+      "note": "~ upper end of the model's gas-holding capacity"
+    },
+    "w_gas_expansion": {
+      "value": 0.6,
+      "unit": "-",
+      "source": "assumption",
+      "note": "weight of rise vs retained CO2 in the gas driver"
+    },
+    "rate_lo": {
+      "value": 0.1,
+      "unit": "(V/V0)/h",
+      "source": "assumption"
+    },
+    "rate_hi": {
+      "value": 0.35,
+      "unit": "(V/V0)/h",
+      "source": "assumption"
+    },
+    "fall_hi": {
+      "value": 0.4,
+      "unit": "fraction of peak rise",
+      "source": "assumption"
+    },
+    "overproof_step": {
+      "value": 0.35,
+      "unit": "-",
+      "source": "assumption",
+      "note": "collapse driver contribution of the overproof flag"
+    },
+    "ph_hi": {
+      "value": 5.0,
+      "unit": "pH",
+      "source": "configs/kinetics.yaml GWI pH onset (assumption)",
+      "note": "pH at which acid weakening of walls starts (driver 0)"
+    },
+    "ph_lo": {
+      "value": 3.5,
+      "unit": "pH",
+      "source": "assumption",
+      "note": "driver 1"
+    },
+    "porosity_min": {
+      "value": 0.2,
+      "unit": "cut-face area fraction",
+      "source": "assumption",
+      "note": "bound; typical image-analysis crumb pore fractions ~0.2-0.5"
+    },
+    "porosity_max": {
+      "value": 0.5,
+      "unit": "cut-face area fraction",
+      "source": "assumption"
+    },
+    "w_size_rate": {
+      "value": 0.4,
+      "unit": "-",
+      "source": "direction only: Scanlon & Zghal (2001) Food Res Int 34:841-864 (bread crumb structure review); Gan, Ellis & Schofield (1995) J Cereal Sci 21:215-230 (gas-cell stabilisation, coalescence, disproportionation). Magnitude: assumption"
+    },
+    "w_size_gwi": {
+      "value": 0.35,
+      "unit": "-",
+      "source": "direction only: Gaenzle, Loponen & Gobbetti (2008) Trends Food Sci Technol 19:513-521 (acid-activated proteolysis weakens gluten). Magnitude: assumption"
+    },
+    "w_size_collapse": {
+      "value": 0.25,
+      "unit": "-",
+      "source": "direction only: Scanlon & Zghal (2001) Food Res Int 34:841-864 (bread crumb structure review); Gan, Ellis & Schofield (1995) J Cereal Sci 21:215-230 (gas-cell stabilisation, coalescence, disproportionation). Magnitude: assumption"
+    },
+    "pore_median_min": {
+      "value": 0.9,
+      "unit": "mm",
+      "source": "assumption",
+      "note": "bound; equivalent-sphere diameter median"
+    },
+    "pore_median_max": {
+      "value": 3.2,
+      "unit": "mm",
+      "source": "assumption"
+    },
+    "cv_min": {
+      "value": 0.3,
+      "unit": "-",
+      "source": "assumption",
+      "note": "sd/mean of pore diameter"
+    },
+    "cv_span": {
+      "value": 0.5,
+      "unit": "-",
+      "source": "assumption"
+    },
+    "pore_max_base": {
+      "value": 4.0,
+      "unit": "mm",
+      "source": "assumption"
+    },
+    "pore_max_span": {
+      "value": 8.0,
+      "unit": "mm",
+      "source": "assumption",
+      "note": "long tail of merged cells under collapse"
+    },
+    "pore_max_cap": {
+      "value": 12.0,
+      "unit": "mm",
+      "source": "printable geometry (12 mm slab)"
+    },
+    "ecc_min": {
+      "value": 0.1,
+      "unit": "-",
+      "source": "assumption"
+    },
+    "ecc_span": {
+      "value": 0.7,
+      "unit": "-",
+      "source": "direction only: Scanlon & Zghal (2001) Food Res Int 34:841-864 (bread crumb structure review); Gan, Ellis & Schofield (1995) J Cereal Sci 21:215-230 (gas-cell stabilisation, coalescence, disproportionation). Magnitude: assumption"
+    },
+    "jitter_min": {
+      "value": 0.25,
+      "unit": "-",
+      "source": "assumption"
+    },
+    "jitter_span": {
+      "value": 0.35,
+      "unit": "-",
+      "source": "assumption"
+    },
+    "clustering_min": {
+      "value": 0.05,
+      "unit": "-",
+      "source": "assumption"
+    },
+    "clustering_span": {
+      "value": 0.7,
+      "unit": "-",
+      "source": "direction only: Scanlon & Zghal (2001) Food Res Int 34:841-864 (bread crumb structure review); Gan, Ellis & Schofield (1995) J Cereal Sci 21:215-230 (gas-cell stabilisation, coalescence, disproportionation). Magnitude: assumption"
+    },
+    "cluster_radius_min": {
+      "value": 3.0,
+      "unit": "mm",
+      "source": "assumption"
+    },
+    "cluster_radius_span": {
+      "value": 2.0,
+      "unit": "mm",
+      "source": "assumption"
+    },
+    "cluster_spacing_min": {
+      "value": 14.0,
+      "unit": "mm",
+      "source": "assumption"
+    },
+    "cluster_spacing_span": {
+      "value": 4.0,
+      "unit": "mm",
+      "source": "assumption"
+    },
+    "wall_floor": {
+      "value": 0.9,
+      "unit": "mm",
+      "source": "Formlabs printability floor (hard lower bound)"
+    },
+    "wall_span": {
+      "value": 0.6,
+      "unit": "mm",
+      "source": "direction only: Gaenzle, Loponen & Gobbetti (2008) Trends Food Sci Technol 19:513-521 (acid-activated proteolysis weakens gluten). Magnitude: assumption"
+    }
+  },
+  "seed": 20261031,
+  "notes": [
+    "Simulation-derived crumb HYPOTHESIS: kinetics (and sourness) do not uniquely determine crumb structure. Mapping coefficients are assumptions; ALCHEMI descriptors only nudge one kinetic parameter upstream. Test against real loaf photographs.",
+    "u(x; lo, hi) = clip((x - lo)/(hi - lo), 0, 1); all drivers in [0, 1], so every output is bounded by construction and monotone in each input.",
+    "Mapped CrumbParams are rounded to 1e-4 so the geometry is robust to ~1e-6 ODE noise.",
+    "literature re-run reproduces the morphology JSON: {'max_abs_diff': 0.0, 'ok': True}"
+  ],
+  "alchemi_attribution": {
+    "available": true,
+    "input_deltas_alchemi_minus_literature": {
+      "co2_retained_g_per_kg": -3.936228644696449e-05,
+      "co2_retained_peak_g_per_kg": -0.0004098442777702438,
+      "expansion_ratio_peak": -0.000263635672985707,
+      "expansion_ratio_final": -2.532011166311854e-05,
+      "max_expansion_rate_per_h": -0.0002458729828891393,
+      "overproof_flag": 0.0,
+      "expansion_fall_from_peak_fraction": -0.00015802063178338432,
+      "final_ph": -0.0013810358306241,
+      "gluten_weakening_index": 7.332536152337976e-05,
+      "final_fermentation_quotient": 0.00033515559197105915
+    },
+    "crumb_param_deltas": {
+      "porosity_target": {
+        "alchemi_informed": 0.3474,
+        "literature": 0.3474,
+        "delta": 0.0,
+        "relative": 0.0
+      },
+      "pore_diam_median_mm": {
+        "alchemi_informed": 2.5571,
+        "literature": 2.5581,
+        "delta": -0.0009999999999998899,
+        "relative": -0.0003909151323247292
+      },
+      "pore_diam_cv": {
+        "alchemi_informed": 0.6806,
+        "literature": 0.6807,
+        "delta": -9.999999999998899e-05,
+        "relative": -0.00014690759512265167
+      },
+      "pore_diam_mean_mm": {
+        "alchemi_informed": 3.0931,
+        "literature": 3.0945,
+        "delta": -0.0013999999999998458,
+        "relative": -0.0004524155760219246
+      },
+      "pore_diam_sd_mm": {
+        "alchemi_informed": 2.1051,
+        "literature": 2.1064,
+        "delta": -0.0012999999999996348,
+        "relative": -0.0006171667299656452
+      },
+      "pore_diam_max_mm": {
+        "alchemi_informed": 10.0891,
+        "literature": 10.0911,
+        "delta": -0.002000000000000668,
+        "relative": -0.00019819444857356163
+      },
+      "eccentricity": {
+        "alchemi_informed": 0.5975,
+        "literature": 0.5979,
+        "delta": -0.00039999999999995595,
+        "relative": -0.0006690081953503194
+      },
+      "eccentricity_jitter": {
+        "alchemi_informed": 0.4988,
+        "literature": 0.4989,
+        "delta": -9.999999999998899e-05,
+        "relative": -0.00020044097013427337
+      },
+      "clustering": {
+        "alchemi_informed": 0.5828,
+        "literature": 0.583,
+        "delta": -0.00019999999999997797,
+        "relative": -0.00034305317324181473
+      },
+      "cluster_radius_mm": {
+        "alchemi_informed": 4.5223,
+        "literature": 4.5228,
+        "delta": -0.0004999999999997229,
+        "relative": -0.00011055098611473488
+      },
+      "cluster_spacing_mm": {
+        "alchemi_informed": 17.0445,
+        "literature": 17.0456,
+        "delta": -0.001100000000000989,
+        "relative": -6.453278265364605e-05
+      },
+      "min_wall_mm": {
+        "alchemi_informed": 1.0494,
+        "literature": 1.0497,
+        "delta": -0.00029999999999996696,
+        "relative": -0.0002857959416975964
+      }
+    },
+    "geometry_identical_after_rounding": false,
+    "max_abs_relative_param_change": 0.0006690081953503194
+  }
+}
