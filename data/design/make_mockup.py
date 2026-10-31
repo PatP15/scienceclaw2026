@@ -257,17 +257,21 @@ def hat(d: Defs, ch, motion=True, puck_ry=2.6, k=1.18):
     return f'<g transform="scale({k})">{_hat(d, ch, motion, puck_ry)}</g>'
 
 
-def _hat(d: Defs, ch, motion, puck_ry):
+def _hat(d: Defs, ch, motion, puck_ry, soft=False):
     col = C[ch]
+    pk0, pk1 = (("#B9654A", [(0, "#D98263"), (1, "#B05C40")]) if soft else ("#1B1917", [(0, "#55504A"), (1, "#2A2724")]))
     hg = d.rad("hat", [(0, "#FFFFFF"), (0.5, "#F6F1E8"), (1, "#D8CDBB")], cx=-3.5, cy=-22, r=17, user=True)
-    o = [f'<ellipse cx="0" cy="0.4" rx="9.2" ry="{puck_ry + 0.4}" fill="#1B1917"/>',
-         f'<ellipse cx="0" cy="-0.9" rx="8.6" ry="{puck_ry}" fill="{d.lin("puck", [(0, "#55504A"), (1, "#2A2724")])}"/>',
+    o = [f'<ellipse cx="0" cy="0.4" rx="9.2" ry="{puck_ry + 0.4}" fill="{pk0}"/>',
+         f'<ellipse cx="0" cy="-0.9" rx="8.6" ry="{puck_ry}" fill="{d.lin("puck" + ("s" if soft else ""), pk1)}"/>',
          f'<rect x="-6.6" y="-11" width="13.2" height="10" fill="{d.lin("band", [(0, "#DCD2C2"), (0.3, "#FFFDF8"), (0.75, "#E6DDCF"), (1, "#C9BDA9")], 0, 0, 1, 0)}"/>',
          f'<ellipse cx="0" cy="-1" rx="6.6" ry="{max(puck_ry * 0.7, 0.5)}" fill="{d.lin("band2", [(0, "#DCD2C2"), (0.3, "#FFFDF8"), (0.75, "#E6DDCF"), (1, "#C9BDA9")], 0, 0, 1, 0)}"/>']
     for x in (-3.6, 0, 3.6):
         o.append(f'<line x1="{x}" y1="-10.5" x2="{x}" y2="-1.5" stroke="#C7BBA7" stroke-width="0.3" opacity="0.7"/>')
     o.append(f'<ellipse cx="0" cy="-11" rx="7.3" ry="1.9" fill="#E3DACB"/>')
-    for (x, y, r) in ((-6.0, -14.8, 5.4), (6.0, -14.8, 5.4), (-3.2, -19.6, 5.6), (3.4, -19.9, 5.6), (0, -15.6, 6.2)):
+    puffs = ((-6.0, -14.8, 5.4), (6.0, -14.8, 5.4), (-3.2, -19.6, 5.6), (3.4, -19.9, 5.6), (0, -15.6, 6.2))
+    for (x, y, r) in puffs:
+        o.append(f'<circle cx="{x}" cy="{y}" r="{r}" fill="none" stroke="#D3C5AF" stroke-width="0.7"/>')
+    for (x, y, r) in puffs:
         o.append(f'<circle cx="{x}" cy="{y}" r="{r}" fill="{hg}"/>')
     o.append('<path d="M -2.4 -12.2 Q -1.2 -16.5 -2.6 -20.3 M 2.6 -12.2 Q 1.4 -16.7 2.8 -20.6 M -6 -20 Q 0 -18.2 6.4 -20.3" '
              'fill="none" stroke="#CFC4B2" stroke-width="0.35" opacity="0.75" stroke-linecap="round"/>')
@@ -289,7 +293,7 @@ def cable(d: Defs, path, w, col, hi="#FFFFFF", hi_op=0.28, shadow=True):
     return "".join(o)
 
 
-def probe(d: Defs, x, y, ang, ch, needle=36):
+def probe(d: Defs, x, y, ang, ch, needle=36, capped=False):
     """Starter probe: strain relief, cream food-safe silicone sleeve, stainless needle. Local +x = tip."""
     col = C[ch]
     st = d.lin("steel", [(0, "#F4F4F1"), (0.35, "#C9CBCA"), (0.7, "#8C9090"), (1, "#C2C4C3")])
@@ -300,8 +304,9 @@ def probe(d: Defs, x, y, ang, ch, needle=36):
          rrect(6.0, -2.95, 1.6, 5.9, 0.4, fill=col),
          f'<line x1="11" y1="-2.4" x2="11" y2="2.4" stroke="{T["sleeve_line"]}" stroke-width="0.25"/>',
          f'<line x1="13" y1="-2.4" x2="13" y2="2.4" stroke="{T["sleeve_line"]}" stroke-width="0.25"/>',
-         f'<path d="M 18.1 -1.55 L {18.1 + needle - 3} -1.2 L {18.1 + needle} 0 L {18.1 + needle - 3} 1.2 L 18.1 1.55 Z" fill="{st}"/>',
-         f'<line x1="18.4" y1="-0.75" x2="{18.1 + needle - 3}" y2="-0.6" stroke="#FFFFFF" stroke-width="0.35" opacity="{T["groove_hi"]}"/>',
+         (rrect(18.1, -1.5, needle, 3.0, 1.5, fill=st) + rrect(18.1 + needle - 6, -2.6, 11, 5.2, 2.6, fill=d.lin("pcap", [(0, "#FFFCF5"), (1, "#E3D3BB")]))
+          if capped else f'<path d="M 18.1 -1.55 L {18.1 + needle - 3} -1.2 L {18.1 + needle} 0 L {18.1 + needle - 3} 1.2 L 18.1 1.55 Z" fill="{st}"/>'),
+         f'<line x1="18.4" y1="-0.75" x2="{18.1 + needle - 3}" y2="-0.6" stroke="#FFFFFF" stroke-width="0.35" opacity="0.7"/>',
          "</g>"]
     return "".join(o)
 
@@ -313,7 +318,7 @@ def bnc_side_plug(d: Defs, x, y):
          f'<ellipse cx="{x + 0.3}" cy="{y}" rx="1.9" ry="4.3" fill="{m}"/>',
          rrect(x + 0.4, y - 3.6, 6.4, 7.2, 0.6, fill=m),
          f'<ellipse cx="{x + 6.8}" cy="{y}" rx="1.4" ry="3.6" fill="#9A9C9B"/>',
-         f'<path d="M {x + 6.8} {y - 3.4} L {x + 13.5} {y - 1.7} L {x + 13.5} {y + 1.7} L {x + 6.8} {y + 3.4} Z" fill="#2B2825"/>',
+         rrect(x + 6.4, y - 3.1, 8.2, 6.2, 2.8, fill="#3A302B"),
          f'<line x1="{x + 2.3}" y1="{y - 3.6}" x2="{x + 2.3}" y2="{y + 3.6}" stroke="#6E7272" stroke-width="0.3"/>',
          f'<line x1="{x + 4.3}" y1="{y - 3.6}" x2="{x + 4.3}" y2="{y + 3.6}" stroke="#6E7272" stroke-width="0.3"/>']
     return "".join(o)
@@ -590,7 +595,7 @@ def composite(ch="B"):
 CTX_W, CTX_H = 1640, 1040
 
 
-def proofing_box(d: Defs, ch, ox=110, oy=150):
+def proofing_box(d: Defs, ch, ox=110, oy=150, char=False):
     """Countertop proofing box with glass door; module on the back wall, jar on a wire shelf."""
     col = C[ch]
     bw, bh, br = 900, 760, 34
@@ -635,11 +640,20 @@ def proofing_box(d: Defs, ch, ox=110, oy=150):
     # module on the back wall (front view, small) + probe cable into the jar
     ms = 2.3
     mx, my = ix + 120, iy + 110
-    o.append(cable(d, f"M {mx + 16 * ms} {my + 78 * ms} C {mx + 16 * ms} {my + 200} {jx + 70} {jy - 80} {jx + 70} {jy + 40}", 4.5, T["cable"]))
+    if char:   # the character stands on the shelf next to the jar; its tail probe goes into the dough
+        ms = 2.15
+        mx, my = ix + 150, sy - (80 + LEG_H) * ms
+        o.append(f'<ellipse cx="{mx + 60 * ms}" cy="{sy + 2}" rx="{70 * ms}" ry="10" fill="#2A1C10" opacity="0.22" filter="{d.blur(5)}"/>')
+        o.append(cable(d, f"M {mx + 100 * ms} {sy - 3} L {jx - 14} {sy - 3} C {jx - 30} {sy - 3} {jx - 26} {jy + 20} {jx - 20} {jy - 20} C {jx - 12} {jy - 70} {jx + 70} {jy - 90} {jx + 70} {jy - 40}", 4.5, CH["cable"]))
+    else:
+        o.append(cable(d, f"M {mx + 16 * ms} {my + 78 * ms} C {mx + 16 * ms} {my + 200} {jx + 70} {jy - 80} {jx + 70} {jy + 40}", 4.5, T["cable"]))
     o.append(rrect(jx + 66, jy - 30, 9, 190, 4, fill=d.lin("steelv", [(0, "#F4F4F1"), (0.5, "#B9BBBB"), (1, "#8C9090")], 0, 0, 1, 0)))
-    o.append(rrect(jx + 62, jy - 70, 17, 46, 7, fill=T["sleeve_flat"]))
+    o.append(rrect(jx + 62, jy - 70, 17, 46, 7, fill=CH["cream"] if char else T["sleeve_flat"]))
     o.append(rrect(jx + 62, jy - 60, 17, 5, 1, fill=col))
-    o.append(f'<g transform="translate({mx} {my}) scale({ms})">{module_front_ortho(d, ch)}</g>')
+    if char:
+        o.append(f'<g transform="translate({mx} {my}) scale({ms})">{char_front(d, ch, tail=False, cables=False)}</g>')
+    else:
+        o.append(f'<g transform="translate({mx} {my}) scale({ms})">{module_front_ortho(d, ch)}</g>')
     o.append("</g>")
     # glass door + frame
     o.append(rrect(ix, iy, iw, ih, 14, fill="#BFD3DC", opacity="0.10"))
@@ -693,18 +707,19 @@ def phone(d: Defs, ch, x, y):
     return "".join(o)
 
 
-def context_doc(ch="B"):
+def context_doc(ch="B", char=False):
     d = Defs("c")
+    title = "In context · a little buddy for the box you already have" if char else "In context · drops into the box you already have"
     o = [rrect(0, 0, CTX_W, CTX_H, 36, fill=d.lin("ctxbg", [(0, "#F4EEE4"), (1, "#E8DFD0")])),
-         proofing_box(d, ch),
+         proofing_box(d, ch, char=char),
          phone(d, ch, 1150, 170),
-         text(70, 86, "In context · drops into the box you already have", 30, C["ink"], 600)]
+         text(70, 86, title, 30, C["ink"], 600)]
     return svg_doc(CTX_W, CTX_H, d, "".join(o), bg=C["page"])
 
 
-def context_asset(ch="B"):
+def context_asset(ch="B", char=False):
     d = Defs("c")
-    body = rrect(0, 0, 1100, CTX_H, 0, fill="none") + proofing_box(d, ch)
+    body = rrect(0, 0, 1100, CTX_H, 0, fill="none") + proofing_box(d, ch, char=char)
     return svg_doc(1100, CTX_H, d, body)
 
 
@@ -751,38 +766,359 @@ def variants_doc(labels=True):
             f'{defs}<rect width="{VAR_W}" height="{VAR_H}" fill="{C["page"]}"/>{body}</svg>')
 
 
+
+# =========================================================================== v3: the character
+# The Node as a little Clawd-style critter wearing the chef hat. Same 120 x 80 x 35 mm body, same ports.
+CH = {"eye": "#2B2522", "cream": "#FBF3E6", "stitch": "#D8BE9A", "blush": "#FFBFB4", "cable": "#7A655A",
+      "foot": [(0, "#D9805F"), (1, "#B05C40")]}
+BODY_R, LEG_H = 24, 6.5
+LEGS = [(10, 22), (26, 38), (82, 94), (98, 110)]
+EYE_L, EYE_R = (42, 30), (78, 30)
+CLAY_SIDE = [(0, "#F4AC8C"), (0.08, "#EE9F7E"), (0.5, "#D98263"), (1, "#BC674C")]
+
+
+def qpt(p0, p1, p2, t):
+    return tuple((1 - t) ** 2 * a + 2 * (1 - t) * t * b + t ** 2 * c for a, b, c in zip(p0, p1, p2))
+
+
+def sparkles(cx, cy):
+    return (f'<circle cx="{cx - 2.4}" cy="{cy - 4.8}" r="2.0" fill="#FFFFFF" opacity="0.95"/>'
+            f'<circle cx="{cx + 2.4}" cy="{cy + 6.2}" r="0.9" fill="#FFFFFF" opacity="0.6"/>')
+
+
+def char_eyes(d: Defs, ch, wink=False):
+    col = C[ch]
+    sock = d.lin("sock", [(0, "#44392F"), (1, "#1C1715")])
+    cx, cy = EYE_L                      # camera eye: smoked lens + soft ring light
+    o = [rrect(cx - 7.5, cy - 11, 15, 22, 7.5, fill=sock),
+         f'<circle cx="{cx}" cy="{cy + 1}" r="6.1" fill="none" stroke="#F4E9DA" stroke-width="1.2" opacity="0.75"/>',
+         f'<circle cx="{cx}" cy="{cy + 1}" r="4.9" fill="{d.rad("cglass", [(0, "#3B4A5A"), (0.5, "#141A21"), (1, "#050607")], cx=0.45, cy=0.42, r=0.6)}"/>',
+         f'<circle cx="{cx}" cy="{cy + 1}" r="2.9" fill="none" stroke="#4E6C86" stroke-width="0.45" opacity="0.8"/>',
+         f'<circle cx="{cx}" cy="{cy + 1}" r="1.5" fill="#030405"/>', sparkles(cx, cy)]
+    cx, cy = EYE_R                      # status eye: LED ring in chamber colour, winks while thinking
+    if wink:
+        pth = f"M {cx - 7} {cy + 3.5} Q {cx} {cy - 7.5} {cx + 7} {cy + 3.5}"
+        o += [f'<path d="{pth}" fill="none" stroke="{col}" stroke-width="4.5" stroke-linecap="round" opacity="0.6" filter="{d.blur(1.2)}"/>',
+              f'<path d="{pth}" fill="none" stroke="{CH["eye"]}" stroke-width="4.6" stroke-linecap="round"/>',
+              f'<path d="{pth}" fill="none" stroke="{col}" stroke-width="2.2" stroke-linecap="round"/>']
+    else:
+        o += [rrect(cx - 7.5, cy - 11, 15, 22, 7.5, fill=sock),
+              rrect(cx - 5.2, cy - 8.7, 10.4, 17.4, 5.2, fill=col, opacity="0.18"),
+              rrect(cx - 5.2, cy - 8.7, 10.4, 17.4, 5.2, fill="none", stroke=col, stroke_width="2.6", opacity="0.75", filter=d.blur(0.8)),
+              rrect(cx - 5.2, cy - 8.7, 10.4, 17.4, 5.2, fill="none", stroke=col, stroke_width="1.4"),
+              sparkles(cx, cy)]
+    return "".join(o)
+
+
+def char_face(d: Defs, ch, wink=False):
+    temp, ph, rise = READ[ch]
+    cl = d.clip("cbody", rrect(0.9, 0.9, 118.2, 78.2, BODY_R - 0.9))
+    apron = "M 31 84 L 33.4 55 Q 33.9 50 39 50 L 81 50 Q 86.1 50 86.6 55 L 89 84 Z"
+    stitch = "M 33.3 84 L 35.5 56 Q 35.9 52 39.6 52 L 80.4 52 Q 84.1 52 84.5 56 L 86.7 84"
+    o = [rrect(0, 0, 120, 80, BODY_R, fill=d.lin("cedge", [(0, "#FBC9B0"), (0.5, "#E99474"), (1, "#C26A4C")])),
+         rrect(0.9, 0.9, 118.2, 78.2, BODY_R - 0.9, fill=d.rad("cface", [(0, "#F9C0A4"), (0.5, "#EC9877"), (1, "#D67D5C")], cx=0.26, cy=0.14, r=0.95)),
+         f'<g clip-path="{cl}">',
+         f'<ellipse cx="38" cy="9" rx="30" ry="4.5" fill="#FFFFFF" opacity="0.22" filter="{d.blur(2)}"/>',
+         f'<path d="{apron}" transform="translate(0 0.8)" fill="#8A4A32" opacity="0.18" filter="{d.blur(0.8)}"/>',
+         f'<path d="{apron}" fill="{d.lin("apron", [(0, "#FFFAF1"), (1, "#F1E3CD")])}"/>',
+         f'<path d="{stitch}" fill="none" stroke="{CH["stitch"]}" stroke-width="0.4" stroke-dasharray="1.1 0.9" stroke-linecap="round"/>',
+         "</g>",
+         # e-ink pocket on the apron
+         rrect(39.5, 55, 41, 19.5, 4, fill="#F7EFE3", stroke="#D9C3A3", stroke_width="0.5"),
+         rrect(41.3, 56.8, 37.4, 15.9, 2.6, fill=d.lin("cpaper", [(0, "#F3F0E9"), (1, "#E2DED4")])),
+         text(43.4, 69.3, temp.split(".")[0] + "°", 10.5, "#2B2522", 600, ls=-0.3),
+         text(61.8, 63.4, ph, 3.2, "#3A3632", 600),
+         text(61.8, 69.6, rise, 3.2, "#3A3632", 600),
+         f'<circle cx="76.4" cy="59.3" r="0.95" fill="{C[ch]}"/>']
+    for x in (24.5, 95.5):           # blush
+        o.append(f'<ellipse cx="{x}" cy="42.5" rx="7" ry="3.6" fill="{CH["blush"]}" opacity="0.8" filter="{d.blur(0.6)}"/>')
+    o.append(char_eyes(d, ch, wink))
+    for k in range(8):               # smile = air vent (BME680 behind it)
+        x, y = qpt((51.5, 43.4), (60, 50.2), (68.5, 43.4), k / 7)
+        o.append(f'<circle cx="{x:.2f}" cy="{y + 0.3:.2f}" r="0.85" fill="#FFFFFF" opacity="0.35"/>')
+        o.append(f'<circle cx="{x:.2f}" cy="{y:.2f}" r="0.85" fill="{CH["eye"]}"/>')
+    return "".join(o)
+
+
+def ex(d: Defs, x, y, w, h, r, d0, d1, side, front, n=28):
+    """Small extrusion from depth d0..d1 mm (oblique)."""
+    o = []
+    for i in range(n, -1, -1):
+        t = (d0 + (d1 - d0) * i / n) / 35
+        o.append(rrect(x + DX * t, y + DY * t, w, h, r, fill=side if i else front))
+    return "".join(o)
+
+
+def tail(d: Defs, ch, ortho=True):
+    """Starter-probe cable curled like a tail; the probe is the tail tip."""
+    pth = "M 16 82 C 4 92 -16 93 -18 80 C -19 72 -15 66 -19 60"
+    return cable(d, pth, 2.2, CH["cable"], hi_op=0.3) + probe(d, -19.2, 60.5, -100, ch, needle=16, capped=True)
+
+
+def char_front(d: Defs, ch, wink=False, tail_on=True, tail=True, cables=True, hat_motion=False):
+    col = C[ch]
+    o = [f'<ellipse cx="60" cy="{80 + LEG_H + 1}" rx="66" ry="4" fill="#6B4A35" opacity="0.2" filter="{d.blur(2.5)}"/>']
+    if tail and tail_on:
+        o.append(globals()["tail"](d, ch))
+    arm = d.lin("carm", [(0, "#F4AC8C"), (1, "#C46C4D")])
+    o.append(rrect(-8.5, 37, 13, 15, 5.5, fill=arm))
+    o.append(rrect(115.5, 37, 13, 15, 5.5, fill=arm))
+    for x0, x1 in LEGS:
+        o.append(rrect(x0, 72, x1 - x0, 8 + LEG_H, 4, fill=d.lin("cfoot", CH["foot"])))
+    if cables:
+        o.append(cable(d, "M 141 44.5 C 150 45 152 60 150 72 S 150 88 156 92", 2.2, CH["cable"], hi_op=0.3))
+        o.append(bnc_side_plug(d, 128.4, 44.5))
+    o.append(char_face(d, ch, wink))
+    o.append(f'<g transform="translate(60 0.8) rotate(-6) scale(1.55)">{_hat(d, ch, hat_motion, 1.1, soft=True)}</g>')
+    return "".join(o)
+
+
+def char_hero(d: Defs, ch, wink=False):
+    col = C[ch]
+    side = d.lin("cside", CLAY_SIDE)
+    arm_side = d.lin("carmside", [(0, "#F0A585"), (1, "#B9654A")])
+    arm_front = d.lin("carm", [(0, "#F4AC8C"), (1, "#C46C4D")])
+    foot = d.lin("cfoot", CH["foot"])
+    foot_side = d.lin("cfootside", [(0, "#C46C4D"), (1, "#9C4F36")])
+    o = [f'<ellipse cx="{60 + DX * 0.45}" cy="{80 + LEG_H + DY * 0.45}" rx="76" ry="12" fill="#6B4A35" opacity="0.15" filter="{d.blur(5)}"/>']
+    for x0, x1 in LEGS:   # contact shadows
+        o.append(f'<ellipse cx="{(x0 + x1) / 2 + 1.5}" cy="{80 + LEG_H - 0.4}" rx="{(x1 - x0) / 2 + 2}" ry="1.6" fill="#4A3020" opacity="0.28" filter="{d.blur(0.8)}"/>')
+    o.append(cable(d, "M 96 84 C 104 92 134 93 190 97", 2.6, CH["cable"], hi_op=0.3))      # USB-C + Peltier, bundled
+    o.append(tail(d, ch))
+    o.append(ex(d, -8.5, 37, 13, 15, 5.5, 10, 25, arm_side, arm_front))                    # left arm (behind)
+    for x0, x1 in LEGS:                                                                     # back legs, then front legs
+        o.append(ex(d, x0, 72, x1 - x0, 8 + LEG_H, 4, 21, 32, foot_side, foot))
+    for x0, x1 in LEGS:
+        o.append(ex(d, x0, 72, x1 - x0, 8 + LEG_H, 4, 3, 14, foot_side, foot))
+    for i in range(56, 0, -1):                                                              # body
+        t = i / 56
+        o.append(rrect(DX * t, DY * t, 120, 80, BODY_R, fill=side))
+    o.append(f'<path d="M {BODY_R} 0 L {BODY_R + DX} {DY} L {120 - BODY_R + DX} {DY} L {120 - BODY_R} 0 Z" fill="#FFFFFF" opacity="0.10"/>')
+    o.append(ex(d, 115.5, 37, 13, 15, 5.5, 10, 25, arm_side, arm_front))                   # right arm + pH plug
+    bx, by = 128.5 + DX * 0.5, 44.5 + DY * 0.5
+    o.append(bnc_side_plug(d, bx, by))
+    o.append(cable(d, f"M {bx + 13.5} {by} C {bx + 24} {by} {bx + 26} {by + 18} {bx + 24} {by + 32} S {bx + 30} 92 190 96", 2.2, CH["cable"], hi_op=0.3))
+    o.append(char_face(d, ch, wink))
+    hx, hy = 60 + DX * 0.5, DY * 0.5 + 0.8
+    o.append(f'<ellipse cx="{hx + 5}" cy="{hy + 0.8}" rx="15" ry="3.4" fill="#7A3E26" opacity="0.35" filter="{d.blur(1.3)}"/>')
+    o.append(f'<g transform="translate({hx} {hy}) rotate(-6) scale(1.55)">{_hat(d, ch, True, 2.6, soft=True)}</g>')
+    return "".join(o)
+
+
+CHERO_S, CHERO_OX, CHERO_OY = 6.2, 330, 640
+
+
+def char_hero_body(d: Defs, ch, wink=False, bg=True):
+    o = []
+    if bg:
+        o.append(rrect(0, 0, HERO_W, HERO_H, 36, fill=d.lin("cwall", [(0, "#F8F1E7"), (0.62, "#F1E6D6"), (1, "#E8D9C4")])))
+        o.append(rrect(0, 0, HERO_W, HERO_H, 36, fill=d.rad("cwallglow", [(0, "#FFFFFF", 0.6), (1, "#FFFFFF", 0)], cx=0.45, cy=0.35, r=0.6)))
+    cl = d.clip("cherocard", rrect(0, 0, HERO_W, HERO_H, 36))
+    o.append(f'<g clip-path="{cl}"><g transform="translate({CHERO_OX} {CHERO_OY}) scale({CHERO_S})">{char_hero(d, ch, wink)}</g>')
+    # "hi!" bubble
+    o.append(f'<g filter="{d.blur(9)}" opacity="0.16"><rect x="168" y="372" width="210" height="122" rx="61" fill="#6B4A35"/></g>')
+    o.append('<path d="M 300 470 Q 330 515 372 540 Q 342 505 338 470 Z" fill="#FFFFFF"/>')
+    o.append(rrect(160, 360, 210, 122, 61, fill="#FFFFFF"))
+    o.append(text(265, 440, "hi!", 64, "#2B2522", 700, "middle", 0.5))
+    o.append("</g>")
+    return "".join(o)
+
+
+def char_bottom(d: Defs):
+    """Underside: ports in a row along the back half, the four feet along the front half."""
+    jack = lambda x, r: (f'<circle cx="{x}" cy="11" r="{r + 0.9}" fill="#8A4A32"/>'
+                         f'<circle cx="{x}" cy="11" r="{r}" fill="{d.lin("jm", [(0, "#E6E7E4"), (1, "#7E8282")])}"/>'
+                         f'<circle cx="{x}" cy="11" r="{r * 0.72}" fill="#1E1917"/>')
+    eng = lambda x, s: text(x, 18.6, s, 2.2, "#FFF1E6", 700, "middle", 0.25, 'opacity="0.9"')
+    o = [rrect(1.5, 3, 120, 35, 14, fill="#6B4A35", opacity="0.14", filter=d.blur(3)),
+         rrect(0, 0, 120, 35, 14, fill=d.lin("cunder", [(0, "#C9704F"), (1, "#E0906F")])),
+         rrect(0.6, 0.6, 118.8, 33.8, 13.4, fill="none", stroke="#FFFFFF", stroke_width="0.35", opacity="0.35"),
+         jack(28, 2.0), eng(28, "T1"), jack(39, 2.0), eng(39, "T2"), jack(50, 1.6), eng(50, "DOOR"),
+         rrect(62, 8, 15, 6, 1.6, fill="#3A2A22"), rrect(63, 9, 13, 4, 1.0, fill="#1A1412")]
+    for k in range(6):
+        o.append(rrect(64.0 + k * 2.0, 10.2, 0.9, 1.6, 0.2, fill="#C9A85A"))
+    o.append(eng(69.5, "PELTIER · FAN"))
+    o.append(rrect(86.4, 9.3, 9.2, 3.4, 1.7, fill="#1E1917", stroke="#A9ABAA", stroke_width="0.5"))
+    o.append(rrect(88.5, 10.6, 5.0, 0.8, 0.3, fill="#4A4A4A"))
+    o.append(eng(91, "USB-C"))
+    for x0, x1 in LEGS:
+        o.append(rrect(x0, 21.5, x1 - x0, 10.5, 4, fill=d.lin("cfoot", CH["foot"])))
+        o.append(rrect(x0 + 2, 23.5, x1 - x0 - 4, 6.5, 3, fill="#8A4A32", opacity="0.55"))
+    return "".join(o)
+
+
+def char_back(d: Defs, ch):
+    arm = d.lin("carm", [(0, "#F4AC8C"), (1, "#C46C4D")])
+    o = [f'<ellipse cx="60" cy="{80 + LEG_H + 1}" rx="64" ry="4" fill="#6B4A35" opacity="0.18" filter="{d.blur(2.5)}"/>',
+         rrect(-8.5, 37, 13, 15, 5.5, fill=arm), rrect(115.5, 37, 13, 15, 5.5, fill=arm)]
+    for x0, x1 in LEGS:
+        o.append(rrect(x0, 72, x1 - x0, 8 + LEG_H, 4, fill=d.lin("cfoot", CH["foot"])))
+    o += [rrect(0, 0, 120, 80, BODY_R, fill=d.lin("cback", [(0, "#F0A485"), (1, "#CF7656")])),
+          rrect(14, 14, 92, 52, 14, fill=d.lin("cplate", [(0, "#FBF3E6"), (1, "#EADBC4")]))]
+    for (x, y) in ((27, 26), (93, 26), (27, 54), (93, 54)):
+        o.append(f'<circle cx="{x}" cy="{y}" r="5.4" fill="{d.rad("cmag", [(0, "#E3DCD2"), (1, "#A69C90")], cx=0.4, cy=0.35, r=0.7)}"/>')
+    for x in (50, 70):
+        o.append(f'<path d="M {x} 30 L {x} 38" stroke="#8A6A55" stroke-width="2.2" stroke-linecap="round"/>')
+        o.append(f'<circle cx="{x}" cy="40" r="2.5" fill="#8A6A55"/>')
+    o.append('<path d="M 60 59 C 57 55.5 53.6 57.4 55.2 60.4 L 60 64.5 L 64.8 60.4 C 66.4 57.4 63 55.5 60 59 Z" fill="#E9A089"/>')
+    o.append(f'<g transform="translate(60 0.8) rotate(6) scale(1.55)">{_hat(d, ch, False, 1.1, soft=True)}</g>')
+    return "".join(o)
+
+
+# ---- friendly callout board (<= 8 labels)
+CFS, CFX, CFY = 5.0, 380, 300
+CLEFT = [("Chef hat", ["bobs when its agent starts", "a new experiment (N20 motor)"], (44, -24), 150),
+         ("Camera eye", ["watches the dough rise", "through the jar"], (34.6, 30), 390),
+         ("Smile vent", ["sniffs the air: temperature,", "humidity, gas (BME680)"], (52, 44), 560)]
+CRIGHT = [("Status eye", ["glows blue for A, orange for B;", "winks while it's thinking"], (85.4, 25), 330),
+          ("pH hand", ["BNC port for the pH probe,", "with a tethered 0 mV cap"], (133, 44.5), 490),
+          ("Apron badge", ["e-ink temperature · pH · rise,", "readable with the light off"], (80.5, 64), 650)]
+CUS, CUX, CUY = 6.6, 60, 950          # underside
+CBS, CBX, CBY = 2.8, 930, 840         # back (CBY = hat top)
+CUNDER = ("Ports underneath, between the feet", ["T1 starter probe (the tail) · T2 aux · DOOR", "PELTIER / fan · USB-C 20 W"])
+CBACK = ("Magnetic back", ["4 magnets + 2 keyholes: sticks to a wall,", "or stands on its four rubber feet"])
+
+
+def cfpx(x, y):
+    return CFX + CFS * x, CFY + CFS * y
+
+
+def char_callout_body(d: Defs, ch, labels=True):
+    o = [rrect(0, 0, CAL_W, CAL_H, 36, fill=C["card"]),
+         f'<g transform="translate({CFX} {CFY}) scale({CFS})">{char_front(d, ch, tail=False)}</g>',
+         f'<g transform="translate({CUX} {CUY}) scale({CUS})">{char_bottom(d)}</g>',
+         f'<g transform="translate({CBX + 8.5 * CBS} {CBY + 42 * CBS}) scale({CBS})">{char_back(d, ch)}</g>']
+
+    def lead(pts):
+        pp = " ".join(f"{x:.1f},{y:.1f}" for x, y in pts)
+        return (f'<polyline points="{pp}" fill="none" stroke="#FFFFFF" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" opacity="0.8"/>'
+                f'<polyline points="{pp}" fill="none" stroke="{C["lead"]}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>')
+
+    def dot(x, y):
+        return (f'<circle cx="{x:.1f}" cy="{y:.1f}" r="8" fill="#FFFFFF" opacity="0.92"/>'
+                f'<circle cx="{x:.1f}" cy="{y:.1f}" r="4.4" fill="{C[ch]}"/>')
+    for _, _, (tx, ty), ly in CLEFT:
+        px, py = cfpx(tx, ty)
+        o.append(lead([(330, ly), (352, ly), (px, py)]) + dot(px, py))
+    for _, _, (tx, ty), ly in CRIGHT:
+        px, py = cfpx(tx, ty)
+        o.append(lead([(1150, ly), (1128, ly), (px, py)]) + dot(px, py))
+    if labels:
+        o.append(char_callout_text(ch))
+    return "".join(o)
+
+
+def char_callout_text(ch):
+    o = [text(40, 64, "Say hello to the Node", 34, C["ink"], 600),
+         text(40, 100, "every sensor has a job on its face · 120 × 80 × 35 mm body", 20, C["ink3"])]
+    for t, s, _, ly in CLEFT:
+        o.append(label_block(318, ly - 12, t, s, "end"))
+    for t, s, _, ly in CRIGHT:
+        o.append(label_block(1162, ly - 12, t, s, "start"))
+    t, s = CUNDER
+    o.append(label_block(CUX, CUY + 35 * CUS + 64, t, s, "start"))
+    t, s = CBACK
+    o.append(label_block(CBX, CUY + 35 * CUS + 64, t, s, "start"))
+    return "".join(o)
+
+
+CHAR_MATERIALS = [("Soft-touch terracotta", [(0, "#F6B394"), (1, "#C96F50")]), ("Cream apron", [(0, "#FFFAF1"), (1, "#E6D3B6")]),
+                  ("Smoked-glass eyes", [(0, "#6A7D90"), (0.5, "#1C2530"), (1, "#050607")])]
+
+
+def char_materials_row(d: Defs, x, y):
+    o, cx = [], x
+    for i, (label, stops) in enumerate(CHAR_MATERIALS):
+        o.append(f'<circle cx="{cx + 16}" cy="{y + 2}" r="16" fill="#000" opacity="0.10" filter="{d.blur(2)}"/>')
+        o.append(f'<circle cx="{cx + 16}" cy="{y}" r="16" fill="{d.rad(f"cmat{i}", stops, cx=0.35, cy=0.3, r=0.8)}"/>')
+        o.append(text(cx + 42, y + 7, label, 20, C["ink2"], 500))
+        cx += 42 + len(label) * 10.2 + 40
+    return "".join(o)
+
+
+def composite_char(ch="B"):
+    d = Defs("q")
+    mw = sum(82 + len(m[0]) * 10.2 for m in CHAR_MATERIALS) - 40
+    o = [text(80, 112, "FermentAI Node", 64, C["ink"], 600, ls=-0.5),
+         text(82, 160, "A friendly little sensor buddy for any proofing box, restaurant cabinet or bakery retarder", 27, C["ink2"]),
+         rrect(2722, 76, 398, 52, 26, fill="none", stroke="#B08A5E", stroke_width="2"),
+         text(2921, 110, "CONCEPT MOCKUP", 20, "#8A6338", 700, "middle", 2.4),
+         text(2536, 109, "EYE COLOUR", 17, C["ink3"], 700, "end", 2), f'<circle cx="2560" cy="102" r="9" fill="{C["A"]}"/>', text(2576, 110, "A", 22, C["ink2"], 600),
+         f'<circle cx="2628" cy="102" r="9" fill="{C["B"]}"/>', text(2644, 110, "B", 22, C["ink2"], 600),
+         f'<g transform="translate(80 210)">{char_hero_body(d, ch, wink=True)}'
+         + text(48, 70, f"Says hi from inside the proofing box · chamber {ch}", 22, C["ink2"], 600, ls=0.3)
+         + char_materials_row(d, HERO_W - 48 - mw, 62) + "</g>",
+         f'<g transform="translate(1640 210)">{char_callout_body(d, ch)}</g>']
+    sy = 1760
+    o.append(rrect(80, sy, 3040, 210, 30, fill=C["card"]))
+    cw = 3040 / len(SPECS)
+    for i, (v, lab) in enumerate(SPECS):
+        cx = 80 + cw * i + cw / 2
+        o.append(text(cx, sy + 102, v, 44, C["ink"], 600, "middle", -0.3))
+        o.append(text(cx, sy + 146, lab, 17, C["ink3"], 700, "middle", 2.2))
+        if i:
+            o.append(f'<line x1="{80 + cw * i}" y1="{sy + 50}" x2="{80 + cw * i}" y2="{sy + 160}" stroke="{C["rule"]}" stroke-width="2"/>')
+    o.append(text(80, 2050, "Concept rendering, not a shipping product. Today's prototype runs the same sensor set "
+                  "(DS18B20, BME680, pH via interface board, reed switch, OV2640, BTS7960 Peltier, N20 hat) "
+                  "on an ESP32-S3-CAM in a hand-built chamber.", 21, C["ink3"]))
+    o.append(text(80, 2086, "Character styling after the Clawd mascot. Readings are illustrative. See data/design/README.md for real-vs-concept.",
+                  21, C["ink3"]))
+    return svg_doc(COMP_W, COMP_H, d, "".join(o), bg=C["page"])
+
+
+MOOD_W, MOOD_H = 1640, 760
+MOODS = [("A", False, "Watching · chamber A", "status eye glows blue"),
+         ("B", False, "Watching · chamber B", "status eye glows orange"),
+         ("B", True, "Thinking", "the status eye winks")]
+
+
+def moods_doc(labels=True):
+    defs, o = [], [rrect(0, 0, MOOD_W, MOOD_H, 36, fill=C["card"])]
+    for i, (ch, wink, title, sub) in enumerate(MOODS):
+        d = Defs(f"md{i}")
+        x0 = 90 + i * 520
+        o.append(f'<g transform="translate({x0 + 8.5 * 3.4} {150 + 42 * 3.4}) scale(3.4)">{char_front(d, ch, wink, tail=False, cables=False, hat_motion=wink)}</g>')
+        if labels:
+            o.append(text(x0 + 20, 676, title, 28, C["ink"], 600))
+            o.append(text(x0 + 20, 712, sub, 21, C["ink2"]))
+        defs.append(d.xml())
+    if labels:
+        o.insert(1, text(60, 84, "Moods", 34, C["ink"], 600))
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{MOOD_W}" height="{MOOD_H}" viewBox="0 0 {MOOD_W} {MOOD_H}">'
+            f'{"".join(defs)}<rect width="{MOOD_W}" height="{MOOD_H}" fill="{C["page"]}"/>{"".join(o)}</svg>')
+
+
 def main():
     ASSETS.mkdir(parents=True, exist_ok=True)
-    # cream colourway kept for comparison (composite + context only)
-    set_theme("cream")
-    cream = {HERE / "sensor_module_mockup_cream.svg": (composite("B"), COMP_W, COMP_H),
-             HERE / "sensor_module_context_cream.svg": (context_doc("B"), CTX_W, CTX_H)}
+    outs = {}
+    # earlier colourways, kept for comparison
+    for theme, suffix in (("cream", "_cream"), ("black", "_black")):
+        set_theme(theme)
+        outs[HERE / f"sensor_module_mockup{suffix}.svg"] = (composite("B"), COMP_W, COMP_H)
+        outs[HERE / f"sensor_module_context{suffix}.svg"] = (context_doc("B"), CTX_W, CTX_H)
+    outs[HERE / "sensor_module_cap_variants_black.svg"] = (variants_doc(), VAR_W, VAR_H)
     set_theme("black")
-    outs = {
-        HERE / "sensor_module_mockup.svg": (composite("B"), COMP_W, COMP_H),
-        HERE / "sensor_module_context.svg": (context_doc("B"), CTX_W, CTX_H),
-        HERE / "sensor_module_cap_variants.svg": (variants_doc(), VAR_W, VAR_H),
-    }
+    # current: the character
+    outs[HERE / "sensor_module_mockup.svg"] = (composite_char("B"), COMP_W, COMP_H)
+    outs[HERE / "sensor_module_context.svg"] = (context_doc("B", char=True), CTX_W, CTX_H)
+    outs[HERE / "sensor_module_moods.svg"] = (moods_doc(), MOOD_W, MOOD_H)
     for ch in "AB":
-        d = Defs(f"h{ch}")
-        outs[ASSETS / f"hero_{ch}.svg"] = (svg_doc(HERO_W, HERO_H, d, hero_body(d, ch)), HERO_W, HERO_H)
+        for mood, wink in (("open", False), ("wink", True)):
+            d = Defs(f"h{ch}{mood}")
+            outs[ASSETS / f"hero_{ch}_{mood}.svg"] = (svg_doc(HERO_W, HERO_H, d, char_hero_body(d, ch, wink)), HERO_W, HERO_H)
         d = Defs(f"k{ch}")
-        outs[ASSETS / f"callouts_{ch}.svg"] = (svg_doc(CAL_W, CAL_H, d, callout_body(d, ch, labels=False)), CAL_W, CAL_H)
-    outs[ASSETS / "context_box_B.svg"] = (context_asset("B"), 1100, CTX_H)
-    outs[ASSETS / "cap_variants.svg"] = (variants_doc(labels=False), VAR_W, VAR_H)
+        outs[ASSETS / f"callouts_{ch}.svg"] = (svg_doc(CAL_W, CAL_H, d, char_callout_body(d, ch, labels=False)), CAL_W, CAL_H)
+    outs[ASSETS / "context_box_B.svg"] = (context_asset("B", char=True), 1100, CTX_H)
+    outs[ASSETS / "moods.svg"] = (moods_doc(labels=False), MOOD_W, MOOD_H)
     eng = None
-    for group in (cream, outs):
-        for p, (s, w, h) in group.items():
-            p.write_text(s)
-            if p.parent == HERE or "--assets-png" in sys.argv:
-                eng = render_png(p, p.with_suffix(".png"), w, h)
-    # label coordinates for the design canvas (px within the callout board)
-    lab = {"left": [(t, s, round(fpx(*tg)[1]), ly) for t, s, tg, ly in LEFT_LABELS],
-           "right": [(t, s, ly) for t, s, _, ly in RIGHT_LABELS],
-           "side": [(t, s, ly) for t, s, _, ly in SIDE_LABELS],
-           "back_label_y": KY + 80 * KS + 44}
+    for p, (s, w, h) in outs.items():
+        p.write_text(s)
+        if p.parent == HERE or "--assets-png" in sys.argv:
+            eng = render_png(p, p.with_suffix(".png"), w, h)
+    lab = {"left": [(t, s, ly) for t, s, _, ly in CLEFT], "right": [(t, s, ly) for t, s, _, ly in CRIGHT],
+           "captions_y": CUY + 35 * CUS + 64}
     (ASSETS / "callout_labels.json").write_text(json.dumps(lab, indent=1, ensure_ascii=False))
-    print(f"rendered with {eng}:", *[str(p.relative_to(HERE)) for p in {**cream, **outs}], sep="\n  ")
+    print(f"rendered with {eng}:", *[str(p.relative_to(HERE)) for p in outs], sep="\n  ")
 
 
 if __name__ == "__main__":

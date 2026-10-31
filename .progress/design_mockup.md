@@ -1,6 +1,6 @@
 # Checkpoint: product mockup (data/design/)
 
-## Status: COMPLETE — black colourway (v2) delivered; cream kept as *_cream.png (not committed)
+## Status: COMPLETE — v3 cute character delivered (not committed)
 - [x] context read (README, PLAN_MASTER §1/§5, SENSOR_WIRING, GPIO_MAP, hero/closed_loop figures)
 - [x] design canvas: https://claude.ai/artifact/GxTEVat8DfByxUbL4xYFA3 (private) — artboards Main (hero, A/B tweak),
       Callouts (A/B tweak, live HTML labels), Context (phone tile, accent tweak), Specs
@@ -18,3 +18,11 @@ Canvas art change: re-upload assets PNGs to the artifact, repoint /_blob ids in 
 - THEMES dict in make_mockup.py (cream / black / black_anodised); main renders black (+assets) and cream (*_cream)
 - canvas v6: all 4 artboards repointed to black assets + new CapOptions artboard (dark walnut chosen)
 - critique: fixed f-string bug (tether), toned ring light to smoked silver, grille lip, swatch, softer shadows, leader halos
+
+## v3 cute character (current)
+- Node = Clawd-style terracotta critter in the chef hat: camera eye + status eye (wink), smile vent, apron e-ink,
+  pH hand (BNC), tail probe, 4 feet, magnetic back; same ports underneath, 120x80x35 body
+- main PNGs = character; v1 cream + v2 black kept as *_cream / *_black (re-rendered by the same script)
+- canvas v7: Main (chamber + expression tweaks), Callouts (8 labels), Context, Specs, Moods (replaced CapOptions)
+- critique rounds: label/tail collision, back-view overlap, black hat puck -> clay, capped probe tip,
+  softer cables, rounded plug relief, neat context cable, smooth leg/arm extrusions

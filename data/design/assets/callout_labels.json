@@ -1,85 +1,55 @@
 {
  "left": [
   [
-   "Walnut cap · Wi-Fi window",
+   "Chef hat",
    [
-    "ESP32-S3 and its 2.4 GHz antenna",
-    "sit behind wood, not metal"
+    "bobs when its agent starts",
+    "a new experiment (N20 motor)"
    ],
-   297,
-   236
+   150
   ],
   [
-   "Status ring",
+   "Camera eye",
    [
-    "chamber colour; breathes while heating,",
-    "pulses when the door opens"
+    "watches the dough rise",
+    "through the jar"
    ],
-   459,
-   400
+   390
   ],
   [
-   "Camera · OV2640",
+   "Smile vent",
    [
-    "watches the jar through its wall",
-    "and tracks the rise"
-   ],
-   513,
-   520
-  ],
-  [
-   "Diffused ring light",
-   [
-    "fixed white light, so exposure",
-    "never drifts between frames"
-   ],
-   552,
-   650
-  ]
- ],
- "right": [
-  [
-   "Chef-hat automaton",
-   [
-    "N20 gear motor; bobs when its agent",
-    "starts a new experiment"
-   ],
-   140
-  ],
-  [
-   "E-ink strip",
-   [
-    "temperature, pH and rise,",
-    "readable with the light off"
-   ],
-   360
-  ],
-  [
-   "Air vent · BME680",
-   [
-    "air temperature, humidity,",
-    "pressure, VOC gas resistance"
+    "sniffs the air: temperature,",
+    "humidity, gas (BME680)"
    ],
    560
   ]
  ],
- "side": [
+ "right": [
   [
-   "pH port · BNC",
+   "Status eye",
    [
-    "any lab electrode, isolated",
-    "interface board inside"
+    "glows blue for A, orange for B;",
+    "winks while it's thinking"
    ],
-   975
+   330
   ],
   [
-   "Shorting cap",
+   "pH hand",
    [
-    "tethered BNC cap: 0 mV",
-    "check before calibration"
+    "BNC port for the pH probe,",
+    "with a tethered 0 mV cap"
    ],
-   1085
+   490
+  ],
+  [
+   "Apron badge",
+   [
+    "e-ink temperature · pH · rise,",
+    "readable with the light off"
+   ],
+   650
   ]
  ],
- "back_label_y": 1442.0
+ "captions_y": 1245.0
 }

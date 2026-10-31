@@ -19,27 +19,31 @@ a{color:#8A6338}a:hover{color:#5B3720}
   <div style="display: flex; justify-content: space-between; align-items: flex-end; height: 120px">
     <div style="display: flex; flex-direction: column; gap: 6px">
       <h1 style="margin: 0; font-size: 60px; line-height: 68px; font-weight: 600; letter-spacing: -0.5px">FermentAI Node</h1>
-      <p style="margin: 0; font-size: 25px; line-height: 32px; color: #5B5248">A retrofit sensor + climate module for any proofing box, restaurant cabinet or bakery retarder</p>
+      <p style="margin: 0; font-size: 25px; line-height: 32px; color: #5B5248">A friendly little sensor buddy for any proofing box, restaurant cabinet or bakery retarder</p>
     </div>
     <div style="display: flex; align-items: center; height: 48px; padding: 0 28px; border: 2px solid #B08A5E; border-radius: 24px; font-size: 18px; font-weight: 700; letter-spacing: 2.4px; color: #7A5530">CONCEPT MOCKUP</div>
   </div>
   <div style="position: relative; width: 1480px; height: 1500px; border-radius: 36px; overflow: hidden">
-    <img src="{{heroSrc}}" alt="FermentAI Node mounted on a chamber wall: matte charcoal body, dark walnut top cap with a chef-hat automaton, camera eye with a glowing status ring, e-ink strip, air vent grille, probe, pH and power cables" style="display: block; width: 1480px; height: 1500px">
-    <p style="position: absolute; left: 48px; top: 44px; margin: 0; font-size: 22px; line-height: 30px; font-weight: 600; color: #5B5248; letter-spacing: 0.3px">Mounted on the inner wall · chamber {{chamber}}</p>
+    <img src="{{heroSrc}}" alt="The FermentAI Node as a little terracotta character in a chef hat: a camera eye, a glowing status eye, a dotted smile vent, a cream apron with an e-ink badge, little arms and feet, saying hi" style="display: block; width: 1480px; height: 1500px">
+    <p style="position: absolute; left: 48px; top: 44px; margin: 0; font-size: 22px; line-height: 30px; font-weight: 600; color: #5B5248; letter-spacing: 0.3px">Says hi from inside the proofing box · chamber {{chamber}}</p>
     <div style="position: absolute; right: 48px; top: 44px; display: flex; gap: 36px; align-items: center; font-size: 20px; line-height: 30px; font-weight: 500; color: #5B5248">
-      <div style="display: flex; gap: 10px; align-items: center"><span style="width: 30px; height: 30px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #55595F, #141517); box-shadow: 0 2px 5px rgba(0,0,0,0.15)"></span>Matte charcoal PC</div>
-      <div style="display: flex; gap: 10px; align-items: center"><span style="width: 30px; height: 30px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #7C573A, #372317); box-shadow: 0 2px 5px rgba(0,0,0,0.15)"></span>Dark walnut</div>
-      <div style="display: flex; gap: 10px; align-items: center"><span style="width: 30px; height: 30px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #6A7D90, #1C2530 50%, #050607); box-shadow: 0 2px 5px rgba(0,0,0,0.15)"></span>Smoked glass</div>
+      <div style="display: flex; gap: 10px; align-items: center"><span style="width: 30px; height: 30px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #F6B394, #C96F50); box-shadow: 0 2px 5px rgba(0,0,0,0.12)"></span>Soft-touch terracotta</div>
+      <div style="display: flex; gap: 10px; align-items: center"><span style="width: 30px; height: 30px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #FFFAF1, #E6D3B6); box-shadow: 0 2px 5px rgba(0,0,0,0.12)"></span>Cream apron</div>
+      <div style="display: flex; gap: 10px; align-items: center"><span style="width: 30px; height: 30px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #6A7D90, #1C2530 50%, #050607); box-shadow: 0 2px 5px rgba(0,0,0,0.12)"></span>Smoked-glass eyes</div>
     </div>
   </div>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"chamber":{"editor":"enum","options":["A","B"],"default":"B","section":"Variant"},"$preview":{"width":1560,"height":1724}}'>
+<script type="text/x-dc" data-dc-script data-props='{"chamber":{"editor":"enum","options":["A","B"],"default":"B","section":"Variant"},"expression":{"editor":"enum","options":["wink","open"],"default":"wink","section":"Variant"},"$preview":{"width":1560,"height":1724}}'>
 class Component extends DCLogic {
   renderVals() {
     const ch = this.props.chamber === 'A' ? 'A' : 'B';
-    const src = { A: '/_blob/e922479906df674169020e70664b7ec5', B: '/_blob/3627e14ebc51666b75fd4fb2924d0fe7' };
-    return { chamber: ch, heroSrc: src[ch] };
+    const ex = this.props.expression === 'open' ? 'open' : 'wink';
+    const src = {
+      A_open: '/_blob/81b94d21e163d60764725d5224ec9b1a', A_wink: '/_blob/20a99a6cb05bf2b4af5b739b75bc95d0',
+      B_open: '/_blob/d85a422e9e2acfc996b6848df3ff1d8a', B_wink: '/_blob/62492f07f2de3e1994c859d325d19012'
+    };
+    return { chamber: ch, heroSrc: src[ch + '_' + ex] };
   }
 }
 </script>
