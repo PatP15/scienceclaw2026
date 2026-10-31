@@ -6,3 +6,7 @@ venv/
 node_modules/
 .env
 *.local
+.venv/
+data/fermentai.sqlite3*
+data/alchemi/**/*.pt
+*.egg-info/
