@@ -90,3 +90,34 @@ def test_all_modules_link_in_node():
     script = ";".join(f"await import({json.dumps(p.as_uri())})" for p in mods) + ";console.log('ok')"
     out = subprocess.run([_node(), "--input-type=module", "-e", script], capture_output=True, text=True, timeout=30)
     assert out.returncode == 0 and out.stdout.strip().endswith("ok"), out.stderr[-2000:]
+
+
+@pytest.mark.skipif(_node() is None, reason="needs Node >= 22 to import the ES modules")
+def test_kitchen_brigade_display_names():
+    """Display-only names: scientist_A/B -> Sous Chef A/B (raw id kept in tooltips), orchestrator -> Head Chef,
+    candidate simulations -> line cooks with short schedule labels."""
+    util, taste = (STATIC_DIR / "js" / "util.js").as_uri(), (STATIC_DIR / "js" / "taste.js").as_uri()
+    script = (
+        f"const u = await import({json.dumps(util)}); const t = await import({json.dumps(taste)});"
+        "console.log(JSON.stringify(["
+        "u.chefName('scientist_A'), u.chefName('scientist_B'), u.chefName('B'), u.chefName('system'),"
+        "u.brigadeText('[scientist_B → scientist_A] Critique'),"
+        "t.cookLabel({id: 'steady_22_14h'}), t.cookLabel({id: 'warm_then_cool_32_18'}),"
+        "t.cookLabel({id: 'step_down_27_24_20'}), t.cookLabel({id: 'odd', name: 'Odd one'})]))"
+    )
+    out = subprocess.run([_node(), "--input-type=module", "-e", script], capture_output=True, text=True, timeout=30)
+    assert out.returncode == 0, out.stderr
+    assert json.loads(out.stdout.strip().splitlines()[-1]) == [
+        "Sous Chef A", "Sous Chef B", "Sous Chef B", "Head Chef",
+        "[Sous Chef B → Sous Chef A] Critique",
+        "22 °C steady", "32→18 °C", "27→24→20 °C", "Odd one"]
+
+
+def test_brigade_legend_and_no_scientist_labels_left():
+    html = (STATIC_DIR / "index.html").read_text()
+    assert "Head Chef = orchestrator · Sous Chefs = scientist agents (A/B)" in html
+    assert "Line cooks = candidate simulations" in html
+    js = "\n".join(p.read_text() for p in (STATIC_DIR / "js").glob("*.js"))
+    assert "`Scientist ${" not in js, "agent names must use the Sous Chef display mapping"
+    for s in ("Head Chef sets the goal", "Head Chef calls the plan", "Line cooks · candidate simulations", "Hat bobs · new assignment"):
+        assert s in js, s

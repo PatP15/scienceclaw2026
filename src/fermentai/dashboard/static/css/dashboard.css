@@ -418,3 +418,9 @@ mark.ev.ev-desired { background: rgba(31,179,107,.18); box-shadow: inset 0 -2px 
 .mol-grid .tbl td:first-child .tiny, .mol-grid .tbl td:first-child div { white-space: normal; min-width: 12em; }
 .chain-step .badge { white-space: normal; max-width: 100%; }
 .chain-step { overflow: hidden; }
+
+.btn-2line { display: inline-flex; flex-direction: column; align-items: flex-start; line-height: 1.15; }
+.btn-sub { font-size: .74rem; font-weight: 600; color: var(--text-secondary); }
+.brigade-note { color: var(--text-secondary); }
+.cook-tag { display: inline-block; font-size: .7rem; font-weight: 700; color: var(--text-muted); margin-right: 4px; }
+.plated { display: inline-block; margin-left: 6px; padding: 0 7px; border-radius: 6px; font-size: .7rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: #1b1407; background: var(--accent); }

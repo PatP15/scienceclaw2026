@@ -293,3 +293,23 @@ export function demoMode(source) {
   const n = normProv(source, "device");
   return n === "measured" ? "live" : n === "replay" ? "replay" : n === "simulated_device" ? "simulation" : null;
 }
+
+// ---------------------------------------------------------------- kitchen-brigade display names
+// Display only: agent ids in payloads stay scientist_A / scientist_B; the raw id is kept in tooltips.
+//   Head Chef  = the taste-feedback orchestrator (interpretation, goal, selection, dispatch)
+//   Sous Chef A/B = scientist agents scientist_A / scientist_B
+//   Line cooks = candidate schedule simulations (candidate_ranking)
+//   Guest      = the judge;  Station A/B = chambers A/B
+export function chefName(id) {
+  const side = agentSide(id);
+  return side ? `Sous Chef ${side}` : String(id ?? "system").replace(/^system$/i, "Head Chef");
+}
+/** Name element with the raw agent id as tooltip. */
+export function chefLabel(id, cls = "") {
+  const side = agentSide(id);
+  return h("span", { class: cls, title: `agent id: ${side ? `scientist_${side}` : (id ?? "system")}` }, chefName(id));
+}
+/** Replace agent ids inside free text (e.g. "scientist_B → scientist_A") with brigade names. */
+export function brigadeText(t) {
+  return String(t ?? "").replace(/\bscientist[_\s-]?([AB])\b/gi, (_, s) => `Sous Chef ${s.toUpperCase()}`);
+}

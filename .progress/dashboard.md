@@ -37,6 +37,13 @@ estimated (olive: policy, fallback, assumption, alchemi-informed) | manual (huma
 Mode indicator LIVE/REPLAY/SIMULATION unchanged (colours green/grey/amber). Tests: tests/test_dashboard_provenance.py
 (runs util.js in Node >= 22), test_every_named_import_is_exported (static import/export check).
 
+## v4: kitchen-brigade display names (display only; ids unchanged, raw id in tooltips)
+util.js chefName/chefLabel/brigadeText; taste.js cookLabel (exported for tests).
+scientist_A/B -> Sous Chef A/B; orchestrator steps -> Head Chef (reads notes / sets the goal / calls the plan /
+dispatches); candidate_ranking -> "Line cooks · candidate simulations" (chosen = "plated · Station X");
+judge -> Guest; chamber subtitle "Station A/B"; motor button subtitle "Hat bobs · new assignment"; legend line.
+Taste flow is now 12 steps (added goal + cooks). Tests: test_kitchen_brigade_display_names, test_brigade_legend_*.
+
 ## Open items for other areas
 - API: /molecular/summary -> HTTP 500 (NaN in analysis_summary.json; jsonable() the summaries).
 - API/agents: build_context passes `recent_telemetry` (reduced keys, no received_at_utc/v1.1 fields) but the

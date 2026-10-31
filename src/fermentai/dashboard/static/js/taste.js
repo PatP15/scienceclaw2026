@@ -1,23 +1,27 @@
 // Section 4: "What did the bread taste like?" -> interpretation -> hypothesis -> agents -> next experiment.
 import { get, post, getToken, ApiError } from "./api.js";
-import { h, clear, fmt, num, provBadge, statusBadge, plotLayout, PLOT_CONFIG, whenPlotly, COLORS, agentSide, normSchedule, renderValue, toast, sleep, timeAgo, hhmmss } from "./util.js";
+import { h, clear, fmt, num, provBadge, statusBadge, plotLayout, PLOT_CONFIG, whenPlotly, COLORS, agentSide, normSchedule, renderValue, toast, sleep, timeAgo, hhmmss, chefLabel, chefName, brigadeText } from "./util.js";
 import { messageText, messageSender, messageRecipient, messageKind, messageBody } from "./messages.js";
 import { motorTrack } from "./live.js";
 
+// Kitchen-brigade naming (display only): Head Chef = orchestrator, Sous Chef A/B = scientist agents,
+// Line cooks = candidate schedule simulations, Guest = judge, Station A/B = chambers.
 const STEP_DEFS = [
-  { id: "saved", title: "Feedback saved" },
-  { id: "interp", title: "Structured sensory interpretation", wide: true },
+  { id: "saved", title: "Guest feedback saved" },
+  { id: "interp", title: "Head Chef reads the guest's notes", wide: true },
+  { id: "goal", title: "Head Chef sets the goal" },
   { id: "compare", title: "Comparison with recorded experiments" },
+  { id: "cooks", title: "Line cooks · candidate simulations", wide: true },
   { id: "hyp", title: "Hypothesis" },
-  { id: "sched", title: "Recommended temperature schedules A / B" },
-  { id: "lead", title: "Agent message" },
-  { id: "peer", title: "Second agent: critique / counter-proposal" },
-  { id: "next", title: "Proposed next experiment" },
-  { id: "motor", title: "Automaton motor commands (both chambers)" },
+  { id: "sched", title: "Recommended temperature schedules · Station A / B" },
+  { id: "lead", title: "Sous Chef proposes" },
+  { id: "peer", title: "Second Sous Chef: critique / counter-proposal" },
+  { id: "next", title: "Head Chef calls the plan" },
+  { id: "motor", title: "Head Chef dispatches · hats bob at both stations" },
   { id: "plan", title: "Updated experiment plan" },
 ];
 const DIM_LABEL = { sourness: "Sourness", texture: "Crumb openness", density: "Density", aroma: "Aroma", flavor_intensity: "Flavour intensity" };
-const STEP_DELAY_MS = 650;
+const STEP_DELAY_MS = 560;
 
 export class TastePanel {
   constructor(store, stream, live) {
@@ -249,13 +253,15 @@ export class TastePanel {
     const modeBadge = h("span", { class: `badge status-${/placeholder/i.test(r.mode_label || "") ? "bad" : /online/i.test(reasoning) ? "good" : "info"}`, title: `mode_label: ${r.mode_label || "—"}` },
       resp.recorded ? `${reasoning} · recorded` : reasoning);
     const steps = [
-      ["saved", () => ({ badges: [provBadge(isReplay ? "replay" : "manual", isReplay ? "replay input" : "judge input (human)"), modeBadge], body: this.bodySaved(resp, label, isReplay, text) })],
+      ["saved", () => ({ badges: [provBadge(isReplay ? "replay" : "manual", isReplay ? "replay input" : "Guest input (human)"), modeBadge], body: this.bodySaved(resp, label, isReplay, text) })],
       ["interp", () => ({ badges: [provBadge("estimated", "interpreted"), r.sensory_interpretation?.method ? statusBadge(r.sensory_interpretation.method, "info") : null], body: this.bodyInterp(r.sensory_interpretation) })],
+      ["goal", () => ({ badges: [provBadge("estimated", "interpreted")], body: this.bodyGoal(r.sensory_interpretation) })],
       ["compare", () => ({ badges: [provBadge(this.compareProv(r))], body: this.bodyCompare(r) })],
-      ["hyp", () => ({ badges: [provBadge("estimated", "hypothesis")], body: this.bodyHyp(r.hypothesis) })],
+      ["cooks", () => ({ badges: [provBadge(this.compareProv(r))], body: this.bodyCooks(r) })],
+      ["hyp", () => ({ title: r.hypothesis?.proposed_by ? `Hypothesis · ${chefName(r.hypothesis.proposed_by)}` : "Hypothesis", badges: [provBadge("estimated", "hypothesis")], body: this.bodyHyp(r.hypothesis) })],
       ["sched", () => ({ badges: [provBadge("estimated", "proposal")], body: this.bodySched(r.recommended_schedules) })],
-      ["lead", () => ({ title: `Scientist ${lead} proposes`, body: this.chat(leadMsgs, "No agent message was returned in this cycle.") })],
-      ["peer", () => ({ title: `Scientist ${peer} responds — critique / counter-proposal`, body: this.chat(peerMsgs, `Scientist ${peer} did not send a separate response in this cycle.`) })],
+      ["lead", () => ({ title: `Sous Chef ${lead} proposes`, body: this.chat(leadMsgs, "No agent message was returned in this cycle.") })],
+      ["peer", () => ({ title: `Sous Chef ${peer} responds — critique / counter-proposal`, body: this.chat(peerMsgs, `Sous Chef ${peer} did not send a separate response in this cycle.`) })],
       ["next", () => ({ badges: [provBadge(resp.experiment?.provenance || "estimated")], body: this.bodyNext(resp) })],
       ["motor", () => ({ body: h("div", { id: "taste-motor" }) })],
       ["plan", () => ({ body: h("div", { id: "taste-plan" }) })],
@@ -326,21 +332,53 @@ export class TastePanel {
             h("span"), h("span", { class: "tiny faint", style: { gridColumn: "2 / 4", marginTop: "-3px" } }, `${a.label || ""} · conf ${fmt(a.confidence, 2)}`));
         }) : h("div", { class: "tiny faint" }, "no attributes recognised"));
     };
-    const desired = Object.entries(si.desired || {});
     const unattr = Object.entries(si.unattributed?.attributes || {});
     return h("div", null,
-      pref,
       quote,
       h("div", { class: "tiny faint", style: { marginTop: "3px" } }, "Highlighted: ", h("mark", { class: "ev ev-A" }, "Loaf A evidence"), " ", h("mark", { class: "ev ev-B" }, "Loaf B evidence"), " ", h("mark", { class: "ev ev-desired" }, "desired change"), ` · overall confidence ${fmt(si.overall_confidence, 2)} · scales 0–1, 0.5 = neutral`),
       h("div", { class: "scores" }, loafCol("A"), loafCol("B")),
       unattr.length ? h("div", { class: "small", style: { marginTop: "6px" } }, h("b", null, "Unattributed: "), unattr.map(([k, a]) => `${DIM_LABEL[k] || k} ${a.label || fmt(a.score, 2)}`).join(", ")) : null,
       (si.comparisons || []).length ? h("div", { class: "small", style: { marginTop: "6px" } }, h("b", null, "Comparisons: "), si.comparisons.map((c) => `${c.higher} > ${c.lower} on ${DIM_LABEL[c.dimension] || c.dimension} (“${c.evidence?.text || ""}”)`).join("; ")) : null,
+      (si.flags || []).length ? h("div", { class: "small", style: { marginTop: "4px" } }, statusBadge("flags", "warn"), " ", si.flags.join(", ")) : null,
+      (si.notes || []).length ? h("div", { class: "tiny faint" }, si.notes.join(" ")) : null);
+  }
+
+  bodyGoal(si) {
+    if (!si) return h("div", { class: "empty" }, "No interpretation returned.");
+    const pref = Array.isArray(si.structured_preference) && si.structured_preference.length
+      ? h("div", { class: "human-pref" }, h("h4", null, "Human preference:"), h("ul", null, si.structured_preference.map((p) => h("li", null, typeof p === "string" ? p : messageText(p) || JSON.stringify(p)))))
+      : null;
+    const desired = Object.entries(si.desired || {});
+    return h("div", null,
+      pref,
       h("div", { class: "small", style: { marginTop: "6px" } }, h("b", null, "Desired: "), si.desired_summary || (desired.length ? "" : "no explicit preference (exploration)")),
       desired.length ? h("ul", { class: "desired-list small" }, desired.map(([k, d]) => h("li", null,
         h("b", null, DIM_LABEL[k] || k), ` — ${d.direction}${d.strength ? ` (${d.strength})` : ""}${d.preferred_pole ? `, keep ${d.preferred_pole}` : ""}`,
         h("span", { class: "faint" }, ` · conf ${fmt(d.confidence, 2)} · “${(d.evidence || []).map((e) => e.text).join("”, “")}”`)))) : null,
-      (si.flags || []).length ? h("div", { class: "small", style: { marginTop: "4px" } }, statusBadge("flags", "warn"), " ", si.flags.join(", ")) : null,
-      (si.notes || []).length ? h("div", { class: "tiny faint" }, si.notes.join(" ")) : null);
+      si.preferred_loaf ? h("div", { class: "tiny faint" }, `Guest prefers loaf ${si.preferred_loaf}.`) : null);
+  }
+
+  /** candidate_ranking -> each validated candidate schedule simulated by a "line cook"; chosen ones "plated". */
+  bodyCooks(r) {
+    const rank = Array.isArray(r.candidate_ranking) ? r.candidate_ranking : [];
+    if (!rank.length) return h("div", { class: "empty" }, "No candidate simulations were returned in this cycle.");
+    const plated = {};
+    const nx = r.next_experiment?.schedules || {};
+    for (const [cid, sc] of Object.entries(nx)) { const id = sc?.schedule_id || sc?.id; if (id) (plated[id] ||= []).push(cid); }
+    const anyPlated = Object.keys(plated).length > 0;
+    const shown = rank.slice(0, 6);
+    for (const id of Object.keys(plated)) if (!shown.some((c) => c.id === id)) { const c = rank.find((x) => x.id === id); if (c) shown.push(c); }
+    return h("div", null,
+      h("p", { class: "tiny faint" }, `${rank.length} line cooks each ran one validated temperature schedule through the fermentation model and scored it against the goal (lower cost = closer). Best ${Math.min(6, rank.length)} shown${anyPlated ? "; “plated” = chosen for the next experiment" : ""}.`),
+      h("div", { class: "tbl-wrap" }, h("table", { class: "tbl" },
+        h("thead", null, h("tr", null, h("th", null, "Line cook · schedule"), h("th", { class: "num" }, "Cost"), h("th", { class: "num" }, "Pred. sour"), h("th", { class: "num" }, "Pred. open"), h("th", { class: "num" }, "Over-proof"))),
+        h("tbody", null, shown.map((c, i) => h("tr", null,
+          h("td", null, h("span", { class: "cook-tag" }, `👨‍🍳 #${rank.indexOf(c) + 1}`), h("b", null, cookLabel(c)),
+            (plated[c.id] || (!anyPlated && i === 0 ? ["?"] : null))
+              ? h("span", { class: "plated", title: "chosen for the next experiment" }, plated[c.id] ? `plated · Station ${plated[c.id].join(" & ")}` : "plated") : null,
+            h("div", { class: "tiny faint" }, c.name || c.id, c.route ? ` · ${c.route.replace(/_/g, " ")}` : "")),
+          h("td", { class: "num" }, fmt(c.score, 3)), h("td", { class: "num" }, fmt(c.pred_sourness, 2)), h("td", { class: "num" }, fmt(c.pred_openness, 2)),
+          h("td", { class: "num" }, num(c.overproof_risk) === null ? "—" : `${Math.round(c.overproof_risk * 100)} %`)))))));
   }
 
   observationsBlock(obs) {
@@ -380,7 +418,6 @@ export class TastePanel {
     const obsEl = this.observationsBlock(r.observations);
     if (cw && typeof cw === "object" && (cw.A || cw.B)) {
       const cal = r.provenance?.calibration || {};
-      const rank = Array.isArray(r.candidate_ranking) ? r.candidate_ranking.slice(0, 5) : [];
       return h("div", null,
         h("div", { class: "tbl-wrap" }, h("table", { class: "tbl" },
           h("thead", null, h("tr", null, h("th", null, "Loaf"), h("th", null, "Recorded schedule"), h("th", { class: "num" }, "Judged sour"), h("th", { class: "num" }, "Judged open"), h("th", { class: "num" }, "Model rise"), h("th", { class: "num" }, "Over-proof risk"))),
@@ -391,12 +428,6 @@ export class TastePanel {
             h("td", { class: "num" }, fmt(x.judged?.sourness, 2)), h("td", { class: "num" }, fmt(x.judged?.openness, 2)),
             h("td", { class: "num" }, fmt(x.model_rise_progress, 2), "×"), h("td", { class: "num" }, num(x.model_overproof_risk) === null ? "—" : `${Math.round(x.model_overproof_risk * 100)} %`)))))),
         Object.keys(cal).length ? h("div", { class: "tiny faint" }, "Judged ↔ model anchoring: ", Object.entries(cal).map(([k, v]) => `${k} ${v.status || ""} (${v.n_points ?? "?"} pts)`).join(", ")) : null,
-        rank.length ? h("details", { open: true }, h("summary", null, `Validated candidate schedules ranked (${rank.length} best shown)`),
-          h("div", { class: "tbl-wrap" }, h("table", { class: "tbl" },
-            h("thead", null, h("tr", null, h("th", null, "Candidate"), h("th", { class: "num" }, "Cost"), h("th", { class: "num" }, "Pred. sour"), h("th", { class: "num" }, "Pred. open"), h("th", { class: "num" }, "Over-proof"))),
-            h("tbody", null, rank.map((c, i) => h("tr", null, h("td", null, i === 0 ? "★ " : "", c.name || c.id, h("div", { class: "tiny faint" }, (c.route || "").replace(/_/g, " "))),
-              h("td", { class: "num" }, fmt(c.score, 3)), h("td", { class: "num" }, fmt(c.pred_sourness, 2)), h("td", { class: "num" }, fmt(c.pred_openness, 2)),
-              h("td", { class: "num" }, num(c.overproof_risk) === null ? "—" : `${Math.round(c.overproof_risk * 100)} %`))))))) : null,
         obsEl);
     }
     const c = r.comparison ?? r.experiment_comparison ?? r.recorded_comparison ?? r.evidence ?? null;
@@ -437,7 +468,7 @@ export class TastePanel {
     if (typeof hyp === "string") return h("div", { class: "quote", style: { borderLeftColor: COLORS.accent, fontSize: "1rem" } }, hyp);
     const main = hyp.statement || hyp.hypothesis_statement || hyp.hypothesis || hyp.text || messageText(hyp);
     const facts = [
-      ["Proposed by", hyp.proposed_by], ["Why this agent leads", hyp.lead_reason], ["Challenged by", hyp.challenged_by],
+      ["Proposed by", hyp.proposed_by ? chefLabel(hyp.proposed_by) : null], ["Why this Sous Chef leads", brigadeText(hyp.lead_reason || "") || null], ["Challenged by", hyp.challenged_by ? chefLabel(hyp.challenged_by) : null],
       ["Peer agrees", typeof hyp.peer_agrees === "boolean" ? (hyp.peer_agrees ? "yes" : "no — see critique") : hyp.peer_agrees],
       ["Mechanism", hyp.mechanism], ["Alternative hypothesis", hyp.alternative_hypothesis],
       ["Independent variable", hyp.independent_variable], ["Confidence", hyp.confidence],
@@ -446,8 +477,8 @@ export class TastePanel {
     const shown = new Set(["statement", "hypothesis_statement", "hypothesis", "text", "proposed_by", "lead_reason", "challenged_by", "peer_agrees", "mechanism", "alternative_hypothesis", "independent_variable", "confidence", "predictions"]);
     const rest = Object.fromEntries(Object.entries(hyp).filter(([k, v]) => !shown.has(k) && v !== main));
     return h("div", null,
-      main ? h("div", { class: "quote", style: { fontSize: "1rem" } }, main) : null,
-      facts.length ? h("dl", { class: "kv", style: { marginTop: "8px" } }, facts.map(([k, v]) => [h("dt", null, k), h("dd", null, typeof v === "object" ? renderValue(v) : String(v))])) : null,
+      main ? h("div", { class: "quote", style: { fontSize: "1rem" } }, brigadeText(main)) : null,
+      facts.length ? h("dl", { class: "kv", style: { marginTop: "8px" } }, facts.map(([k, v]) => [h("dt", null, k), h("dd", null, v instanceof Node ? v : typeof v === "object" ? renderValue(v) : brigadeText(String(v)))])) : null,
       preds.length ? h("div", { class: "tbl-wrap", style: { marginTop: "6px" } }, h("table", { class: "tbl" },
         h("thead", null, h("tr", null, h("th", null, "Predicted"), h("th", { class: "num" }, "Sour"), h("th", { class: "num" }, "Open"), h("th", { class: "num" }, "Final pH"), h("th", { class: "num" }, "Peak rise (h)"), h("th", { class: "num" }, "Over-proof"), h("th", null, ""))),
         h("tbody", null, preds.map(([L, p]) => h("tr", null, h("td", null, h("span", { class: `chip chip-${agentSide(L) || "sys"}` }, L)),
@@ -497,16 +528,16 @@ export class TastePanel {
       const kind = m.kind ?? messageKind(m.content ?? m);
       const extra = ["prediction", "uncertainty", "proposed_measurement", "proposed_intervention", "rationale", "decision_change_note", "alternative_hypothesis"]
         .filter((k) => typeof body[k] === "string" && body[k] && body[k] !== text)
-        .map((k) => h("div", { class: "msg-field" }, h("b", null, k.replace(/_/g, " ") + ": "), body[k]));
+        .map((k) => h("div", { class: "msg-field" }, h("b", null, k.replace(/_/g, " ") + ": "), brigadeText(body[k])));
       const payload = body.payload && typeof body.payload === "object" ? body.payload : null;
       const concerns = Array.isArray(body.concerns || payload?.concerns) ? (body.concerns || payload.concerns) : [];
       return h("div", { class: `msg from-${side || "sys"}` },
         h("div", { class: "msg-head" },
-          h("span", { class: `chip chip-${side || "sys"}` }, side ? `Scientist ${side}` : String(sender || "system")),
-          m.recipient ?? messageRecipient(m.content ?? m) ? `→ ${m.recipient ?? messageRecipient(m.content ?? m)}` : "",
+          h("span", { class: `chip chip-${side || "sys"}` }, chefLabel(sender ?? (side ? `scientist_${side}` : "system"))),
+          m.recipient ?? messageRecipient(m.content ?? m) ? h("span", { title: `agent id: ${m.recipient ?? messageRecipient(m.content ?? m)}` }, `→ ${brigadeText(chefName(m.recipient ?? messageRecipient(m.content ?? m)))}`) : "",
           kind ? statusBadge(kind, kind === "critique" ? "warn" : "info") : null,
           body.evidence_source ? provBadge(body.evidence_source) : null),
-        h("div", null, text || renderValue(body)),
+        h("div", null, text ? brigadeText(text) : renderValue(body)),
         concerns.length ? h("ul", { class: "desired-list small" }, concerns.map((c) => h("li", null, typeof c === "string" ? c : messageText(c)))) : null,
         extra);
     }));
@@ -547,10 +578,10 @@ export class TastePanel {
     const cmds = Object.values(this.motorCmds);
     if (!cmds.length) { clear(el, h("div", { class: "empty" }, this.current?.recorded ? "Recorded replay — no motor commands were sent to the devices." : "No motor command was issued in this cycle.")); return; }
     clear(el, cmds.sort((a, b) => String(a.chamber_id).localeCompare(String(b.chamber_id))).map((c) => h("div", { class: "motor-row", style: { marginBottom: "6px", "--c": c.chamber_id === "B" ? COLORS.B : COLORS.A } },
-      h("span", { class: `chip chip-${c.chamber_id}` }, `Chamber ${c.chamber_id}`),
+      h("span", { class: `chip chip-${c.chamber_id}` }, `Station ${c.chamber_id}`),
       h("span", { class: "small" }, `${c.pattern || c.parameters?.pattern || "wiggle"} ${fmt(c.duration_s ?? (num(c.duration_ms ?? c.parameters?.duration_ms) ?? NaN) / 1000, 1)} s`),
       motorTrack(c))),
-    h("div", { class: "tiny faint" }, "Decorative chef-hat automaton = “new experiment planned”. Separate command type, bounded ≤ 10 s, cancellable, cannot touch the Peltier controller. It does not mean bread was mixed, fed or baked."));
+    h("div", { class: "tiny faint" }, "Hat bobs · new assignment: the decorative chef-hat automaton signals “new experiment planned”. Separate command type, bounded ≤ 10 s, cancellable, cannot touch the Peltier controller. It does not mean bread was mixed, fed or baked."));
   }
   async pollMotors() {
     const t0 = Date.now();
@@ -647,4 +678,13 @@ function scheduleText(points) {
   const pts = points.map((p) => (Array.isArray(p) ? p : [p.t_h, p.setpoint_c]));
   if (pts.length === 1) return `${fmt(pts[0][1], 1)} °C hold`;
   return pts.map(([t, c]) => `${fmt(c, 0)}°C@${fmt(t, 1)}h`).join(" → ");
+}
+
+/** Short line-cook label from a candidate id: steady_22_14h -> "22 °C steady", warm_then_cool_32_18 -> "32→18 °C". */
+export function cookLabel(c) {
+  const id = String(c?.id || "");
+  const temps = (id.match(/(?:^|_)(\d{1,2})(?=_|$)/g) || []).map((t) => t.replace("_", ""));
+  if (/^steady/.test(id) && temps.length) return `${temps[0]} °C steady`;
+  if (temps.length >= 2) return `${temps.join("→")} °C`;
+  return c?.name || id || "candidate";
 }

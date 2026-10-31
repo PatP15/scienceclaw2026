@@ -1,6 +1,6 @@
 // Section 1: Live Laboratories - chamber A and B side by side, fed by REST snapshots + SSE.
 import { get, post, del, getToken, ApiError } from "./api.js";
-import { h, clear, fmt, fmtOhms, timeAgo, hhmmss, statusBadge, sparkline, agentSide, toast, COLORS, num, normProv, tfield, demoMode, deviceBadge, PROV_LABEL } from "./util.js";
+import { h, clear, fmt, fmtOhms, timeAgo, hhmmss, statusBadge, sparkline, agentSide, toast, COLORS, num, normProv, tfield, demoMode, deviceBadge, PROV_LABEL, chefLabel, brigadeText } from "./util.js";
 import { messageText, messageSender } from "./messages.js";
 
 const CHAMBERS = ["A", "B"];
@@ -210,7 +210,7 @@ export class LivePanel {
     const head = h("div", { class: "ch-head" },
       h("div", null,
         h("div", { class: "ch-title" }, "Chamber ", h("span", { class: "letter" }, c)),
-        h("div", { class: "ch-sub" }, (st.label || "").replace(/^Chamber [AB]\s*[-–]\s*/, ""))),
+        h("div", { class: "ch-sub" }, h("b", null, `Station ${c}`), " · ", (st.label || "").replace(/^Chamber [AB]\s*[-–]\s*/, ""))),
       h("div", { class: "ch-badges" },
         modeBadge, prov ? deviceBadge(prov) : statusBadge("no data", "info"),
         stale ? statusBadge("stale", "bad") : statusBadge("fresh", "good"),
@@ -321,7 +321,7 @@ export class LivePanel {
     const motor = h("div", { class: "motor-row" },
       h("button", { class: "btn btn-motor", type: "button", disabled: this.busy[c] || !getToken(), onclick: () => this.startMotor(c),
         title: getToken() ? "Run the decorative chef-hat automaton for 5 s (separate from the Peltier controller)" : "Needs the API token" },
-        this.busy[c] ? "Sending…" : "▶ Start automaton animation"),
+        this.busy[c] ? "Sending…" : h("span", { class: "btn-2line" }, h("span", null, "▶ Start automaton animation"), h("span", { class: "btn-sub" }, "Hat bobs · new assignment"))),
       m ? motorTrack(m) : h("span", { class: "tiny faint" }, "no motor command yet"),
       active ? h("button", { class: "btn btn-danger btn-sm", type: "button", onclick: () => this.cancelMotor(c) }, "Cancel") : null);
 
@@ -344,9 +344,9 @@ export class LivePanel {
       st.setpoint_rationale ? ` — ${String(st.setpoint_rationale).slice(0, 120)}` : "");
     if (!as || as.available === false || as.stub) {
       return h("div", { class: "agent-box" },
-        h("div", { class: "agent-head" }, h("span", null, `Scientist ${c}`), h("span", { class: "tiny faint" }, am ? `last message ${timeAgo(am.created_at_utc, this.serverNow())}` : "idle — waiting for taste feedback")),
+        h("div", { class: "agent-head" }, chefLabel(`scientist_${c}`), h("span", { class: "tiny faint" }, am ? `last message ${timeAgo(am.created_at_utc, this.serverNow())}` : "idle — waiting for taste feedback")),
         as?.objective ? h("div", { class: "small" }, h("b", null, "Objective: "), as.objective) : null,
-        h("div", { class: "agent-text" }, am ? [am.kind ? h("b", null, `${am.kind}: `) : "", stripArrow(messageText(am.content ?? am))] : "No findings yet — the agent publishes its hypothesis and decisions after taste feedback."),
+        h("div", { class: "agent-text" }, am ? [am.kind ? h("b", null, `${am.kind}: `) : "", brigadeText(stripArrow(messageText(am.content ?? am)))] : "No findings yet — the agent publishes its hypothesis and decisions after taste feedback."),
         setpointLine);
     }
     const hyp = as.current_hypothesis;
@@ -358,9 +358,9 @@ export class LivePanel {
     if (obs) phText = obs.ph_valid ? "pH: valid observation" : `no valid pH${obs.ph_reason ? ` — ${obs.ph_reason}` : ""}`;
     return h("div", { class: "agent-box" },
       h("div", { class: "agent-head" },
-        h("span", null, `Scientist ${c} `, reasoning ? statusBadge(reasoning, /online/i.test(reasoning) ? "good" : "info") : null),
+        h("span", null, chefLabel(`scientist_${c}`), " ", reasoning ? statusBadge(reasoning, /online/i.test(reasoning) ? "good" : "info") : null),
         h("span", { class: "tiny faint" }, as.last_activity_utc ? `active ${timeAgo(as.last_activity_utc, this.serverNow())}` : "no activity yet")),
-      hyp ? h("div", { class: "agent-text" }, h("b", null, "Hypothesis: "), hyp.statement || "—") : h("div", { class: "agent-text faint" }, "No hypothesis yet — waiting for taste feedback."),
+      hyp ? h("div", { class: "agent-text" }, h("b", null, "Hypothesis: "), brigadeText(hyp.statement || "—")) : h("div", { class: "agent-text faint" }, "No hypothesis yet — waiting for taste feedback."),
       dec ? h("div", { class: "small", style: { marginTop: "3px" } }, h("b", null, "Last decision: "), dec.name || dec.schedule_id || "—",
         Array.isArray(dec.points) ? h("span", { class: "faint" }, ` (${dec.points.map((p) => `${fmt(p[1], 0)}°C@${fmt(p[0], 0)}h`).join("→")})`) : "",
         dec.revised_after_critique ? statusBadge("revised after critique", "warn") : null) : null,
@@ -368,7 +368,7 @@ export class LivePanel {
         h("b", null, "Observations: "),
         obs ? `${obs.n_records ?? "?"} records${obs.latest_stale ? " (latest stale)" : ""} · ${(obs.usable_fields || []).length} usable fields${obs.proofing_status ? ` · proofing ${obs.proofing_status}` : ""} · ` : "no quality summary yet · ",
         h("span", { class: obs && obs.ph_valid ? "" : "warn-text" }, phText)),
-      anoms.length ? h("div", { class: "tiny warn-text" }, `⚠ ${anoms.length} open anomal${anoms.length === 1 ? "y" : "ies"}: `, anoms.map((a) => a.content || a.type).join("; ").slice(0, 200)) : h("div", { class: "tiny faint" }, "No open anomalies."),
+      anoms.length ? h("div", { class: "tiny warn-text" }, `⚠ ${anoms.length} open anomal${anoms.length === 1 ? "y" : "ies"}: `, brigadeText(anoms.map((a) => a.content || a.type).join("; ").slice(0, 200))) : h("div", { class: "tiny faint" }, "No open anomalies."),
       setpointLine);
   }
 }

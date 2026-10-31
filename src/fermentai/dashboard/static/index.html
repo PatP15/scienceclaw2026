@@ -104,7 +104,7 @@
           <div class="loaf-notes-grid">
             <label><span class="chip chip-A">Loaf A</span><textarea id="taste-a" rows="2" maxlength="2000" placeholder="Loaf A only"></textarea></label>
             <label><span class="chip chip-B">Loaf B</span><textarea id="taste-b" rows="2" maxlength="2000" placeholder="Loaf B only"></textarea></label>
-            <label class="judge-name">Judge name (optional)<input id="taste-judge" type="text" maxlength="100" placeholder="Name"></label>
+            <label class="judge-name">Guest name (optional)<input id="taste-judge" type="text" maxlength="100" placeholder="Guest (judge) name"></label>
           </div>
         </details>
         <div class="taste-controls">
@@ -140,6 +140,7 @@
   <span class="badge prov-replay" title="recorded / scripted data">replay</span>
   <span class="badge prov-estimated" title="heuristics, policy proposals, assumptions">estimated</span>
   <span class="badge prov-manual" title="entered by a person">manual (human)</span>
+  <span class="small brigade-note" title="Display names only; agent ids in the data stay scientist_A / scientist_B">👨‍🍳 Head Chef = orchestrator · Sous Chefs = scientist agents (A/B) · Line cooks = candidate simulations · Guest = judge · Station = chamber</span>
   <span class="muted small legend-note">Every value carries one of these labels. Gas resistance is a BME680 signal, not CO₂.</span>
 </footer>
 
