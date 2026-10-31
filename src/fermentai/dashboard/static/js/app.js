@@ -5,7 +5,6 @@ import { LivePanel } from "./live.js";
 import { TwinPanel } from "./twin.js";
 import { MolecularPanel } from "./molecular.js";
 import { TastePanel } from "./taste.js";
-import { ChatPanel } from "./chat.js";
 
 const EVENT_TYPES = ["telemetry", "image", "setpoint", "command", "ack", "experiment", "feedback", "feedback_result", "message", "simulation", "chat", "device"];
 const TAB_KEY = "fermentai.tab";
@@ -101,8 +100,12 @@ function startClock() {
 
 // ------------------------------------------------------------------ tabs
 function wireTabs(panels) {
-  const show = (name) => {
+  const show = (route) => {
+    let name = route;
+    const lab = /^lab\/([A-Za-z0-9_-]+)$/.exec(route || "");
+    if (lab) name = "live";
     if (!panels[name]) name = "live";
+    if (name === "live" && panels.live) { if (lab) panels.live.openDetail(lab[1]); else panels.live.closeDetail(); }
     for (const btn of $$(".tab")) btn.setAttribute("aria-selected", String(btn.dataset.tab === name));
     for (const [k, p] of Object.entries(panels)) {
       const sec = document.getElementById(`tab-${k}`);
@@ -110,20 +113,22 @@ function wireTabs(panels) {
       if (k === name) p?.show?.(); else p?.hide?.();
     }
     try { localStorage.setItem(TAB_KEY, name); } catch { /* ignore */ }
-    if (location.hash !== `#${name}`) history.replaceState(null, "", `${location.pathname}${location.search}#${name}`);
+    const want = lab ? route : name;
+    if (location.hash !== `#${want}`) history.replaceState(null, "", `${location.pathname}${location.search}#${want}`);
   };
   for (const btn of $$(".tab")) btn.addEventListener("click", () => show(btn.dataset.tab));
   window.addEventListener("hashchange", () => show(location.hash.slice(1)));
   let initial = location.hash.slice(1);
-  if (!panels[initial]) { try { initial = localStorage.getItem(TAB_KEY) || "live"; } catch { initial = "live"; } }
+  if (!panels[initial] && !/^lab\//.test(initial)) { try { initial = localStorage.getItem(TAB_KEY) || "live"; } catch { initial = "live"; } }
   show(initial);
   window.addEventListener("resize", () => Object.values(panels).forEach((p) => p?.resize?.()));
 }
 
 // ------------------------------------------------------------------ icons for tabs / section headers
 function decorate() {
-  const tabIcons = { live: "station", twin: "chart", molecular: "atom", taste: "headchef" };
+  const tabIcons = { live: "station", twin: "chart", molecular: "atom", taste: "headchef" };  // taste = Kitchen pass
   for (const b of $$(".tab")) if (!b.querySelector(".ico")) b.prepend(icon(tabIcons[b.dataset.tab] || "toque", { size: 18 }));
+  for (const el of $$("[data-icon]")) if (!el.querySelector(".ico")) el.append(icon(el.dataset.icon, { size: 18 }));
   const secIcons = { "tab-twin": "chart", "tab-molecular": "atom" };
   for (const [id, ic] of Object.entries(secIcons)) {
     const h2 = document.querySelector(`#${id} .section-head h2`);
@@ -168,12 +173,11 @@ async function boot() {
   const molecular = new MolecularPanel();
   const taste = new TastePanel(store, stream, live);
   if (store.health && store.health.llm_mode && store.health.llm_mode !== "offline") taste.setMode("live");
+  live.taste = taste;   // lab detail chats play the Head Chef reveal through the taste panel
   wireTabs({ live, twin, molecular, taste });
-  const chat = new ChatPanel(document.getElementById("chat-card"), taste);
   await live.load();
   await taste.init();
-  await chat.init(stream, store.apiPaths);
-  window.fermentai = { store, stream, live, twin, molecular, taste, chat }; // handy for debugging in the browser console
+  window.fermentai = { store, stream, live, twin, molecular, taste }; // handy for debugging in the browser console
 }
 
 boot();

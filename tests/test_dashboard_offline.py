@@ -101,10 +101,14 @@ def test_data_snapshots_match_their_sources():
 
 
 def test_live_cards_never_invent_missing_values():
-    """Missing sensors render an explicit 'unavailable' state (PLAN_MASTER §11), and the
-    measured source maps to the real/physical badge."""
+    """Lab cards show ONLY sensors that report a value from the current device (null -> no tile, never a
+    number); missing sensors are listed once as "not fitted" in the collapsed device drawer. The card badge
+    comes from telemetry provenance (measured -> real/physical), and a camera frame from another device is
+    never shown."""
     live = (STATIC / "js" / "live.js").read_text()
     util = (STATIC / "js" / "util.js").read_text()
-    assert '"unavailable"' in live and "device clock unsynced" in live
-    assert "equipment safety" in live.lower() and "not fermentation evidence" in live
+    assert "SENSORS.filter((s) => s.get(tel) !== null)" in live
+    assert "not fitted:" in live and "device clock unsynced" in live
+    assert "not fermentation evidence" in live and "hs.some((x) => x !== null)" in live   # safety strip only if a heatsink reports
+    assert "stale_image_from_other_device" in live and "No frame from this device yet" in live
     assert 's.startsWith("measured")' in util

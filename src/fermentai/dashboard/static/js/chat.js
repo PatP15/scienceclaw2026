@@ -22,10 +22,12 @@ export function understoodChips(u) {
   const loaves = u.loaves || u.sensory_interpretation?.loaves;
   for (const L of ["A", "B"]) {
     let words = [];
-    const attrs = loaves?.[L]?.attributes;
+    // parse_feedback shape {L: {attributes: {dim: {...}}}} or chat shape {L: {dim: {label, score}}}
+    const attrs = loaves?.[L]?.attributes || (loaves?.[L] && typeof loaves[L] === "object" && !Array.isArray(loaves[L]) ? loaves[L] : null);
     if (attrs && typeof attrs === "object") {
       for (const a of Object.values(attrs)) {
-        const w = (a?.evidence?.[0]?.text || a?.label || "").toString().trim();
+        if (!a || typeof a !== "object") continue;
+        const w = (a.evidence?.[0]?.text || String(a.label || "").split("/").pop() || "").toString().trim();
         if (w && !words.includes(w)) words.push(w);
       }
     } else {
@@ -44,15 +46,26 @@ export function understoodChips(u) {
   }
   if (!wants.length && Array.isArray(u.wants)) wants = u.wants.map(String);
   if (wants.length) chips.push({ side: "wants", text: `wants: ${wants.slice(0, 4).join(", ")}` });
+  const other = u.compared_other;
+  if (other) {
+    const o = typeof other === "object" ? other : {};
+    const vs = o.station || o.other_station || (u.station === "A" ? "B" : u.station === "B" ? "A" : null);
+    const sum = typeof other === "string" ? other : o.summary || o.text || "";
+    chips.push({ side: vs || "cmp", text: `compared${vs ? ` with ${vs}` : ""}${sum ? `: ${String(sum).slice(0, 40)}` : ""}` });
+  }
+  if (u.preferred_loaf) chips.push({ side: "pref", text: `prefers ${u.preferred_loaf}` });
   return chips;
 }
 
 export class ChatPanel {
-  constructor(root, taste) {
+  /** opts.station: bind to one station's Sous Chef (own session, fixed chef, reveal inside the lab view). */
+  constructor(root, taste, opts = {}) {
     this.root = root;
     this.taste = taste;
-    this.sessionId = lsGet(SESSION_KEY);
-    this.sousChef = lsGet(CHEF_KEY) === "B" ? "B" : "A";
+    this.station = opts.station || null;
+    this.sessionKey = this.station ? `${SESSION_KEY}.${this.station}` : SESSION_KEY;
+    this.sessionId = lsGet(this.sessionKey);
+    this.sousChef = this.station || (lsGet(CHEF_KEY) === "B" ? "B" : "A");
     this.transcript = [];
     this.stage = null;
     this.understood = null;
@@ -72,13 +85,13 @@ export class ChatPanel {
     this.newBtn = h("button", { class: "btn btn-ghost btn-sm", type: "button", onclick: () => this.reset() }, "New tasting");
     this.log = h("div", { class: "chat-log", role: "log", "aria-live": "polite" });
     this.chips = h("div", { class: "chat-chips" });
-    this.input = h("textarea", { class: "chat-input", rows: "2", maxlength: "2000", placeholder: "Tell the Sous Chef how the bread tasted…", "aria-label": "Message to the Sous Chef" });
+    this.input = h("textarea", { class: "chat-input", rows: "2", maxlength: "2000", placeholder: "How did this loaf taste?", "aria-label": "Message to the Sous Chef" });
     this.input.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); this.send(); } });
     this.sendBtn = h("button", { class: "btn btn-primary btn-big chat-send", type: "button", onclick: () => this.send() }, "Send");
     this.hint = h("div", { class: "tiny faint chat-hint" });
     clear(this.root,
-      h("div", { class: "chat-head" }, h("span", { class: "chat-ico" }, icon("toque", { size: 24 })), this.titleEl, this.stageEl,
-        h("span", { class: "chat-head-actions" }, this.seg, this.newBtn)),
+      h("div", { class: "chat-head" }, h("span", { class: "chat-ico hat", "data-hat": this.sousChef }, icon("toque", { size: 24 })), this.titleEl, this.stageEl,
+        h("span", { class: "chat-head-actions" }, this.station ? null : this.seg, this.newBtn)),
       this.log, this.chips,
       h("div", { class: "chat-compose" }, this.input, this.sendBtn),
       this.hint);
@@ -91,7 +104,7 @@ export class ChatPanel {
     if (persist) lsSet(CHEF_KEY, this.sousChef);
     this.root.dataset.chef = this.sousChef;
     this.seg.querySelectorAll(".seg-btn").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.chef === this.sousChef)));
-    clear(this.titleEl, `Talk to Sous Chef ${this.sousChef}`);
+    clear(this.titleEl, this.station ? `Talk to Sous Chef ${this.sousChef} about this loaf` : `Talk to Sous Chef ${this.sousChef}`);
     this.titleEl.title = `agent id: scientist_${this.sousChef}`;
   }
 
@@ -104,7 +117,7 @@ export class ChatPanel {
     const parts = [];
     if (this.available === false) parts.push(`Chat not available yet${this.reason ? ` (${this.reason})` : ""} — the form below runs the same cycle.`);
     else if (!getToken()) parts.push("Read-only: click “Read-only” to enter the API token (or open the ?token=… URL) to chat.");
-    else parts.push(`Enter sends · Shift+Enter for a new line · ${this.taste.mode === "live" ? "Online Agent requested (falls back to Offline Policy if unavailable)" : "Offline Policy"}`);
+    else parts.push(`Enter ↵ send · ${this.taste.mode === "live" ? "Online Agent" : "Offline Policy"}`);
     this.hint.textContent = parts.join(" ");
     const disabled = this.available === false || !getToken() || this.pending;
     this.input.disabled = this.available === false || !getToken();
@@ -129,12 +142,10 @@ export class ChatPanel {
 
   renderLog() {
     if (this.available === false) {
-      clear(this.log, emptyCard({ icon: "toque", title: "Chat not available yet",
-        detail: "The kitchen chat service is not running on this server. Use “What did the bread taste like?” below — it runs the same Head Chef → line cooks → Sous Chefs cycle." }));
+      clear(this.log, emptyCard({ icon: "toque", title: "Chat not available yet", detail: "Fallback: Kitchen pass → free-text form." }));
     } else if (!this.transcript.length) {
       clear(this.log, h("div", { class: "chat-empty" }, this.bubble({ role: `scientist_${this.sousChef}`,
-        text: `Hello — I'm Sous Chef ${this.sousChef}. Tell me how loaf A and loaf B tasted, in your own words. I'll ask a question or two, then hand it to the Head Chef.` }),
-        h("div", { class: "tiny faint", style: { textAlign: "center" } }, "(greeting shown by the dashboard; the conversation starts when you send a message)")));
+        text: this.station ? `How did loaf ${this.sousChef} taste?` : "How did the bread taste?" })));
     } else {
       clear(this.log, this.transcript.map((e) => this.bubble(e)));
     }
@@ -156,7 +167,7 @@ export class ChatPanel {
     if (this.available !== false && this.sessionId) {
       try { this.apply(await get(`/api/v1/chat/${encodeURIComponent(this.sessionId)}`), { reveal: false }); }
       catch (e) {
-        if (e.status === 404 && /unknown chat session/i.test(e.message)) { this.sessionId = null; lsSet(SESSION_KEY, null); }
+        if (e.status === 404 && /unknown chat session/i.test(e.message)) { this.sessionId = null; lsSet(this.sessionKey, null); }
         else this.markUnavailable(e);
       }
     }
@@ -174,12 +185,12 @@ export class ChatPanel {
 
   apply(r, { reveal = true } = {}) {
     if (!r || typeof r !== "object") return;
-    if (r.session_id) { this.sessionId = r.session_id; lsSet(SESSION_KEY, r.session_id); }
+    if (r.session_id) { this.sessionId = r.session_id; lsSet(this.sessionKey, r.session_id); }
     this.available = true;
     if (Array.isArray(r.transcript)) this.transcript = r.transcript.filter((e) => e && typeof e === "object");
     else if (r.reply) this.transcript.push({ role: `scientist_${this.sousChef}`, text: r.reply });
     if (r.understood) this.understood = r.understood;
-    if (r.sous_chef && (r.sous_chef === "A" || r.sous_chef === "B")) this.setChef(r.sous_chef, false);
+    if (!this.station && (r.sous_chef === "A" || r.sous_chef === "B")) this.setChef(r.sous_chef, false);
     this.setStage(r.stage || null);
     if (r.reasoning_mode_label) document.dispatchEvent(new CustomEvent("fermentai:mode", { detail: { reasoning: r.reasoning_mode_label, modeLabel: r.reasoning_mode_label } }));
     if ((r.stage === "handoff" || r.stage === "done") && (r.persisted || r.handoff_result)) this.handoff(r, reveal);
@@ -205,9 +216,10 @@ export class ChatPanel {
     this.revealedKey = key;
     const guestText = this.transcript.filter((e) => e.role === "guest").map((e) => e.text).join("\n");
     this.taste.beforeSetpoints = this.taste.currentSetpoints();
-    this.taste.resetSteps();
+    const slot = this.station ? document.getElementById("lab-reveal") : null;   // play inside the lab view
+    this.taste.resetSteps(slot);
     this.taste.stepsEl.scrollIntoView({ behavior: "smooth", block: "start" });
-    this.taste.renderCycle(resp, { animate: true, text: guestText, label: `From the chat with Sous Chef ${this.sousChef}` });
+    this.taste.renderCycle(resp, { animate: true, text: guestText, label: `Sous Chef ${this.sousChef} chat`, slot });
   }
 
   async send() {
@@ -216,6 +228,7 @@ export class ChatPanel {
     if (!getToken()) { toast("Write access needed to chat: click “Read-only” to enter the API token.", "bad"); return; }
     this.pending = true;
     this.taste.pending = true;  // the hand-off's SSE feedback_result must not trigger a second reveal
+    document.dispatchEvent(new CustomEvent("fermentai:thinking", { detail: { station: this.sousChef, on: true } }));
     this.transcript.push({ role: "guest", text, ts: new Date().toISOString() });
     this.input.value = "";
     this.renderLog();
@@ -234,12 +247,13 @@ export class ChatPanel {
       this.renderLog();
     } finally {
       this.taste.pending = false;
+      document.dispatchEvent(new CustomEvent("fermentai:thinking", { detail: { station: this.sousChef, on: false } }));
     }
   }
 
   async reset() {
     const sid = this.sessionId;
-    this.sessionId = null; lsSet(SESSION_KEY, null);
+    this.sessionId = null; lsSet(this.sessionKey, null);
     this.transcript = []; this.understood = null; this.revealedKey = null; this.setStage(null);
     this.renderLog();
     if (sid && this.available !== false && getToken()) { try { await del(`/api/v1/chat/${encodeURIComponent(sid)}`); } catch { /* best effort */ } }
@@ -247,7 +261,7 @@ export class ChatPanel {
 
   onEvent(d) {
     if (!d || !this.sessionId || d.session_id !== this.sessionId) return;
-    if (d.stage === "reset") { this.sessionId = null; lsSet(SESSION_KEY, null); this.transcript = []; this.understood = null; this.setStage(null); this.renderLog(); return; }
+    if (d.stage === "reset") { this.sessionId = null; lsSet(this.sessionKey, null); this.transcript = []; this.understood = null; this.setStage(null); this.renderLog(); return; }
     if (this.pending) return;  // our own turn: the POST response carries the full transcript
     // Another screen spoke in this session: refresh from the server.
     get(`/api/v1/chat/${encodeURIComponent(this.sessionId)}`).then((r) => this.apply(r)).catch(() => {});

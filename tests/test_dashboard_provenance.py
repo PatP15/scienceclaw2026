@@ -142,3 +142,12 @@ def test_chat_understood_chips():
     full, pref, none = json.loads(out.stdout.strip().splitlines()[-1])
     assert [c["text"] for c in full] == ["A: mild · fluffy", "B: more sour", "wants: more sour, keep it airy"]
     assert pref == [{"side": "wants", "text": "wants: More sourness"}] and none == []
+    # live chat shape (fermentai.agents.chat): loaves map dims directly; station / compared_other / preferred_loaf
+    chat_shape = {"station": "A", "compared_other": True, "preferred_loaf": "B",
+                  "loaves": {"A": {"sourness": {"label": "mild"}, "texture": {"label": "open / airy / fluffy"}},
+                             "B": {"sourness": {"label": "sour"}, "density": {"label": "dense / heavy"}}},
+                  "structured_preference": ["More sourness"]}
+    script2 = f"const m = await import({json.dumps(chat)}); console.log(JSON.stringify(m.understoodChips({json.dumps(chat_shape)}).map((c) => c.text)))"
+    out2 = subprocess.run([_node(), "--input-type=module", "-e", script2], capture_output=True, text=True, timeout=30)
+    assert json.loads(out2.stdout.strip().splitlines()[-1]) == [
+        "A: mild · fluffy", "B: sour · heavy", "wants: More sourness", "compared with B", "prefers B"]

@@ -39,20 +39,34 @@
 
 <nav class="tabs" role="tablist" aria-label="Dashboard sections">
   <button role="tab" class="tab" data-tab="live" id="tabbtn-live" aria-controls="tab-live">Live Laboratories</button>
+  <button role="tab" class="tab tab-key" data-tab="taste" id="tabbtn-taste" aria-controls="tab-taste">Kitchen pass</button>
   <button role="tab" class="tab" data-tab="twin" id="tabbtn-twin" aria-controls="tab-twin">Digital Twin</button>
   <button role="tab" class="tab" data-tab="molecular" id="tabbtn-molecular" aria-controls="tab-molecular">NVIDIA Molecular Explorer</button>
-  <button role="tab" class="tab tab-key" data-tab="taste" id="tabbtn-taste" aria-controls="tab-taste">Taste → Next Experiment</button>
 </nav>
 <div id="mode-bar" class="mode-bar" aria-hidden="true"></div>
 </div>
 
 <main>
-  <!-- ===================================================== Live Laboratories -->
+  <!-- ===================================================== Live Laboratories: grid + #lab/<id> detail -->
   <section id="tab-live" class="tabpanel" role="tabpanel" aria-labelledby="tabbtn-live">
-    <div class="chambers live-grid">
-      <article class="chamber card" id="chamber-A" data-chamber="A"></article>
-      <article class="chamber card" id="chamber-B" data-chamber="B"></article>
-      <aside class="card live-side" id="live-side" aria-label="Kitchen pass: conversation and plan"></aside>
+    <div id="live-grid-view">
+      <div class="lab-grid" id="lab-grid"></div>
+    </div>
+    <div id="lab-detail" hidden>
+      <div class="detail-head" id="lab-detail-head"></div>
+      <div class="detail-charts" id="lab-detail-charts"></div>
+      <div class="detail-row">
+        <div class="detail-chatcol">
+          <div class="detail-mode"><div class="seg seg-sm mode-seg" role="radiogroup" aria-label="Reasoning mode">
+            <button type="button" class="seg-btn" role="radio" data-mode="live" aria-checked="false" title="requests the configured online LLM; falls back to the Offline Policy (labelled) if unavailable">Online Agent</button>
+            <button type="button" class="seg-btn" role="radio" data-mode="offline" aria-checked="true" title="deterministic decision engine, no internet needed">Offline Policy</button>
+          </div></div>
+          <div id="lab-chat"></div>
+        </div>
+        <div class="detail-side" id="lab-detail-side"></div>
+        <aside class="card live-side" id="lab-thread"></aside>
+      </div>
+      <div id="lab-reveal"></div>
     </div>
   </section>
 
@@ -91,11 +105,27 @@
     <div id="mol-body"></div>
   </section>
 
-  <!-- ===================================================== Taste feedback -->
+  <!-- ===================================================== Kitchen pass (plan history, A<->B, replays, fallback form) -->
   <section id="tab-taste" class="tabpanel" role="tabpanel" aria-labelledby="tabbtn-taste" hidden>
-    <div class="taste-layout">
-      <div class="taste-main">
-      <section class="card chat-card" id="chat-card" aria-label="Chat with a Sous Chef"></section>
+    <div class="pass-grid">
+      <section class="card" id="pass-plan">
+        <h3><span class="pass-ico" data-icon="headchef"></span> Plan history</h3>
+        <div id="pass-plan-history"></div>
+      </section>
+      <section class="card live-side" id="pass-thread"></section>
+      <section class="card" id="pass-replay">
+        <h3><span class="pass-ico" data-icon="guest"></span> Replays</h3>
+        <div id="pass-replay-body">
+          <select id="replay-select" aria-label="Replay scenario"><option value="">— recorded scenarios —</option></select>
+        </div>
+        <aside class="plan-card" id="plan-card">
+          <h3>Updated experiment plan</h3>
+          <div id="plan-body" class="muted">Loading experiments…</div>
+        </aside>
+      </section>
+    </div>
+    <details class="card legacy-form">
+      <summary>Free-text form (fallback)</summary>
       <form class="card taste-form" id="taste-form" autocomplete="off">
         <h2 class="taste-title">What did the bread taste like?</h2>
         <p class="muted">Describe both loaves in your own words — flavour, sourness, crumb, texture, what you would change. No special phrases needed.</p>
@@ -115,23 +145,12 @@
             <button type="button" class="seg-btn" role="radio" data-mode="live" aria-checked="false" title="requests the configured online LLM; falls back to the Offline Policy (labelled) if unavailable">Online Agent</button>
             <button type="button" class="seg-btn" role="radio" data-mode="offline" aria-checked="true" title="deterministic decision engine, no internet needed">Offline Policy</button>
           </div>
-          <div class="replay">
-            <label for="replay-select" class="muted small">Replay example</label>
-            <select id="replay-select"><option value="">— scripted examples (Replay) —</option></select>
-          </div>
           <button class="btn btn-primary btn-big" id="taste-submit" type="submit">Interpret &amp; plan next experiment</button>
         </div>
         <p class="small muted" id="taste-hint"></p>
       </form>
-      </div>
-
-      <aside class="card plan-card" id="plan-card">
-        <h3>Updated experiment plan</h3>
-        <div id="plan-body" class="muted">Loading experiments…</div>
-      </aside>
-    </div>
-
-    <ol class="steps" id="taste-steps" aria-live="polite"></ol>
+    </details>
+    <div id="pass-steps-slot"><ol class="steps" id="taste-steps" aria-live="polite"></ol></div>
   </section>
 </main>
 
@@ -145,7 +164,7 @@
   <span class="badge prov-estimated" title="heuristics, policy proposals, assumptions">estimated</span>
   <span class="badge prov-manual" title="entered by a person">manual (human)</span>
   <span class="small brigade-note" title="Display names only; agent ids in the data stay scientist_A / scientist_B">👨‍🍳 Head Chef = orchestrator · Sous Chefs = scientist agents (A/B) · Line cooks = candidate simulations · Guest = judge · Station = chamber</span>
-  <span class="muted small legend-note">Every value carries one of these labels. Gas resistance is a BME680 signal, not CO₂.</span>
+  
 </footer>
 
 <div id="token-dialog" class="dialog" hidden>

@@ -1,13 +1,18 @@
-// Section 1: Live Laboratories - chamber A and B side by side, fed by REST snapshots + SSE.
+// Section 1: Live Laboratories - a grid of lab cards (#live) and a lab detail view (#lab/<id>).
+// Terse by design: only sensors that report a value from the CURRENT device are shown, each as a big number
+// plus a short history line; one provenance badge per card; explanations live in tooltips / disclosures.
 import { get, post, del, getToken, ApiError } from "./api.js";
-import { h, clear, fmt, fmtOhms, timeAgo, hhmmss, statusBadge, sparkline, agentSide, toast, COLORS, num, normProv, tfield, demoMode, deviceBadge, PROV_LABEL, chefLabel, brigadeText, icon, emptyCard, agentSide as sideOf, provBadge, normSchedule } from "./util.js";
+import { h, clear, fmt, timeAgo, hhmmss, statusBadge, sparkline, agentSide, toast, COLORS, num, normProv, tfield, demoMode,
+  deviceBadge, chefLabel, brigadeText, icon, emptyCard, provBadge, normSchedule, plotLayout, PLOT_CONFIG, whenPlotly } from "./util.js";
 import { messageText, messageSender } from "./messages.js";
+import { ChatPanel } from "./chat.js";
 
-const CHAMBERS = ["A", "B"];
-const STALE_AFTER_S = 60; // mirrors configs/hardware.yaml telemetry.stale_after_s; server flag wins on refresh
-const HISTORY_MAX = 360;
-
+const STALE_AFTER_S = 60;       // configs/hardware.yaml telemetry.stale_after_s; the server flag wins on refresh
+const HISTORY_MAX = 720;        // rows kept per chamber (~2 h at 10 s)
+const WINDOW_MIN = 60;          // history window shown on cards and charts
 const MOTOR_TERMINAL = new Set(["completed", "failed", "cancelled", "rejected", "expired", "expired_unacked", "superseded"]);
+const STATION_COLOR = { A: COLORS.A, B: COLORS.B };
+const colorOf = (c) => STATION_COLOR[c] || COLORS.accent;
 
 export function motorTrack(cmd) {
   // issued -> accepted (device ack) -> completed (device ack). The motor counts as having RUN only
@@ -25,453 +30,26 @@ export function motorTrack(cmd) {
     step("issued", issued), arrow(), step("accepted", acc), arrow(), last);
 }
 
-const SENSOR_FOR = {
-  chamber_temperature_c: ["sht31", "bme680"], starter_temperature_c: ["ds18b20_starter"],
-  relative_humidity_percent: ["sht31", "bme680"], pressure_pa: ["bme680"], gas_resistance_ohms: ["bme680"],
-  ph: ["ph"], starter_height_mm: ["camera"], door_open: ["door", "door_switch", "reed_switch"],
-  internal_heatsink_temperature_c: ["ds18b20_heatsink_internal", "internal_heatsink"],
-  external_heatsink_temperature_c: ["ds18b20_heatsink_external", "external_heatsink"],
-};
-const PROV_SHORT = { measured: "measured", simulated_device: "sim device", modeled: "modeled", computed: "computed", replay: "replay", estimated: "est", manual: "manual" };
+const ens = (r) => tfield(r, "diagnostics")?.ens160 || null;
+/** Sensor catalogue. A sensor is shown only when the latest telemetry from the current device has a value. */
+const SENSORS = [
+  { key: "air", label: "Air", unit: "°C", dp: 1, get: (r) => num(tfield(r, "chamber_temperature_c")) },
+  { key: "starter", label: "Starter", unit: "°C", dp: 1, get: (r) => num(tfield(r, "starter_temperature_c")) },
+  { key: "humidity", label: "Humidity", unit: "%", dp: 0, get: (r) => num(tfield(r, "relative_humidity_percent")) },
+  { key: "rise", label: "Rise", unit: "mm", dp: 1, get: (r) => num(tfield(r, "starter_height_mm")) },
+  { key: "ph", label: "pH", unit: "", dp: 2, get: (r) => num(tfield(r, "ph")) },
+  { key: "aqi", label: "Air quality", unit: "AQI", dp: 0, note: "index · not CO₂", tip: "ENS160 air-quality indices (AQI, TVOC, eCO₂ equivalent) — not a CO₂ measurement",
+    get: (r) => { const e = ens(r); return e && e.valid !== 0 ? num(e.aqi) : null; },
+    sub: (r) => { const e = ens(r); return e ? [num(e.tvoc_ppb) !== null ? `TVOC ${fmt(e.tvoc_ppb, 0)}` : null, num(e.eco2_ppm) !== null ? `eCO₂ idx ${fmt(e.eco2_ppm, 0)}` : null].filter(Boolean).join(" · ") : ""; } },
+  { key: "gas", label: "Gas", unit: "kΩ", dp: 1, note: "BME680 · not CO₂", get: (r) => { const g = num(tfield(r, "gas_resistance_ohms")); return g === null ? null : g / 1000; } },
+  { key: "pressure", label: "Pressure", unit: "hPa", dp: 1, get: (r) => { const p = num(tfield(r, "pressure_pa")); return p === null ? null : p / 100; } },
+  { key: "peltier", label: "Peltier", unit: "%", dp: 0, text: (r) => tfield(r, "peltier_mode"),
+    get: (r) => { const f = num(tfield(r, "peltier_output_fraction")); return f === null ? (tfield(r, "peltier_mode") ? 0 : null) : f * 100; } },
+];
+const NOT_FITTED = [["ph", "pH"], ["pressure_pa", "pressure"], ["gas_resistance_ohms", "gas"], ["starter_height_mm", "rise camera"],
+  ["relative_humidity_percent", "humidity"], ["internal_heatsink_temperature_c", "heatsinks"]];
 
-export class LivePanel {
-  constructor(store, stream) {
-    this.store = store;
-    this.stream = stream;
-    this.state = {};       // chamber -> /state payload (kept fresh by SSE)
-    this.history = {};     // chamber -> [{t, temp, sp}]
-    this.agentMsg = {};    // chamber -> latest message row from that agent
-    this.motor = {};       // chamber -> latest motor command {command_id, status, ...}
-    this.agentState = {};  // chamber -> GET /agents/{id}/state
-    this.allMsgs = [];     // recent agent messages (kitchen pass column)
-    this.experiments = [];
-    this.sideEl = document.getElementById("live-side");
-    this.busy = {};
-    this.cards = Object.fromEntries(CHAMBERS.map((c) => [c, document.getElementById(`chamber-${c}`)]));
-    for (const c of CHAMBERS) this.history[c] = [];
-    this.wire();
-  }
-
-  wire() {
-    const s = this.stream;
-    s.on("telemetry", (f) => this.onTelemetry(f));
-    s.on("image", (f) => {
-      const c = f.chamber_id || f.data?.chamber_id;
-      if (!this.state[c]) return;
-      this.state[c].latest_image = { id: f.data.image_id, url: f.data.url, timestamp_utc: f.data.timestamp_utc, source: f.data.source };
-      this.render(c);
-    });
-    s.on("setpoint", (f) => { if (f.chamber_id) this.refreshState(f.chamber_id); });
-    s.on("experiment", () => { CHAMBERS.forEach((c) => this.refreshState(c)); this.loadExperiments(); });
-    s.on("command", (f) => this.onCommand(f.data, f.chamber_id));
-    s.on("ack", (f) => this.onCommand({ ...f.data, status: f.data.command_status || f.data.status }, f.chamber_id));
-    s.on("message", (f) => {
-      const side = agentSide(f.data.sender ?? messageSender(f.data.content));
-      if (side) { this.agentMsg[side] = f.data; this.render(side); }
-      this.allMsgs.push(f.data); this.allMsgs = this.allMsgs.slice(-60); this.renderSide();
-      clearTimeout(this._agentTimer);
-      this._agentTimer = setTimeout(() => CHAMBERS.forEach((c) => this.refreshAgent(c)), 1500);
-    });
-    setInterval(() => CHAMBERS.forEach((c) => this.refreshAgent(c)), 30000);
-    setInterval(() => CHAMBERS.forEach((c) => this.render(c)), 5000);         // ages / staleness
-    setInterval(() => CHAMBERS.forEach((c) => this.refreshState(c)), 20000);  // server truth
-  }
-
-  // ------------------------------------------------------------------ USB serial bridge status
-  startBridgePoll() {
-    const paths = this.store.apiPaths;
-    if (paths && !paths.has("/api/v1/bridge/status")) { this.bridge = { unsupported: true }; return; }
-    const poll = async () => {
-      try { this.bridge = await get("/api/v1/bridge/status"); }
-      catch (e) { if (e.status === 404) { this.bridge = { unsupported: true }; clearInterval(this.bridgeTimer); } }
-      CHAMBERS.forEach((c) => this.render(c));
-    };
-    poll();
-    this.bridgeTimer = setInterval(poll, 5000);
-  }
-
-  /** {cls, text, title, realLinked, deviceId} for a station's USB link, or null when unsupported. */
-  usbLink(c) {
-    const b = this.bridge;
-    if (!b || b.unsupported) return null;
-    const ch = (b.chambers || {})[c] || null;
-    const link = String(ch?.link || (b.bridge_running ? "disconnected" : "bridge_offline")).toLowerCase();
-    let text, cls;
-    if (!b.bridge_running || link === "bridge_offline") { text = "USB · bridge not running"; cls = "off"; }
-    else if (link === "connected") { text = "USB · connected"; cls = "ok"; }
-    else if (/log/.test(link)) { text = "USB · printing logs only"; cls = "warn"; }
-    else { text = "USB · disconnected"; cls = "bad"; }
-    if (ch?.label && /^USB/.test(ch.label) && !(cls === "ok" && ch.simulated === true)) text = ch.label;
-    if (cls === "ok" && ch?.simulated === true) text = "USB · connected (simulated)";
-    const title = [b.transport || "usb-serial", ch?.port && `port ${ch.port}`, ch?.device_id && `device ${ch.device_id}`, ch?.firmware_version && `fw ${ch.firmware_version}`,
-      ch?.last_seen && `last seen ${ch.last_seen}`, !b.bridge_running && b.reason].filter(Boolean).join(" · ");
-    return { cls, text, title, realLinked: cls === "ok" && ch?.simulated === false, deviceId: ch?.device_id || null };
-  }
-
-  async loadExperiments() {
-    try { this.experiments = await get("/api/v1/experiments?limit=3"); } catch { /* keep */ }
-    this.renderSide();
-  }
-
-  /** Right-hand "kitchen pass" column: latest Sous Chef conversation + the experiment plan. */
-  renderSide() {
-    if (!this.sideEl) return;
-    const msgs = this.allMsgs.slice(-6);
-    const convo = msgs.length ? h("div", { class: "pass-convo" }, msgs.map((m) => {
-      const sender = m.sender ?? messageSender(m.content);
-      const side = sideOf(sender);
-      const txt = brigadeText(stripArrow(messageText(m.content ?? m)));
-      return h("div", { class: `pmsg ${side ? `pmsg-${side}` : "pmsg-head"}` },
-        h("div", { class: "pwho" }, side ? icon("toque", { size: 14 }) : icon("headchef", { size: 14 }), chefLabel(sender ?? "system"),
-          m.kind ? h("span", { class: "pkind" }, ` · ${m.kind}`) : null, m.created_at_utc ? h("span", { class: "pts" }, ` · ${timeAgo(m.created_at_utc, this.serverNow())}`) : null),
-        h("div", { class: "ptext" }, txt));
-    })) : emptyCard({ icon: "toque", title: "No conversation yet", detail: "The Sous Chefs talk after the guest's feedback (Taste tab).", compact: true });
-    const exps = this.experiments || [];
-    const plan = exps.length ? exps.map((e, i) => h("div", { class: `pass-exp${i === 0 ? " latest" : ""}` },
-      h("div", { class: "pass-exp-t" }, i === 0 ? "★ " : "", e.title || e.experiment_id),
-      h("div", { class: "tiny faint" }, `${e.status || ""} · ${timeAgo(e.created_at_utc, this.serverNow())} `, provBadge(e.provenance || "unknown")),
-      e.schedules ? h("div", { class: "tiny" }, Object.entries(e.schedules).map(([cid, sc]) => {
-        const pts = normSchedule(sc).points;
-        return `${cid}: ${pts.map(([t, c]) => `${fmt(c, 0)}°`).join("→") || "—"}`;
-      }).join(" · ")) : null))
-      : emptyCard({ icon: "headchef", title: "No experiment planned yet", detail: "The Head Chef calls the next plan after a tasting.", compact: true });
-    clear(this.sideEl,
-      h("div", { class: "pass-head" }, icon("headchef", { size: 22 }), h("h3", null, "Kitchen pass"),
-        h("a", { class: "btn btn-sm btn-ghost pass-link", href: "#taste" }, "Talk to a Sous Chef →")),
-      h("h4", null, "Latest conversation"), convo,
-      h("h4", { style: { marginTop: "12px" } }, "Experiment plan"), plan);
-  }
-
-  async load() {
-    this.startBridgePoll();
-    this.loadExperiments();
-    await Promise.all(CHAMBERS.map(async (c) => {
-      await this.refreshState(c);
-      try {
-        const rows = await get(`/api/v1/chambers/${c}/telemetry?limit=${HISTORY_MAX}`);
-        this.history[c] = rows.map((r) => this.histPoint(r)).filter(Boolean);
-      } catch (e) { /* history optional */ }
-      try {
-        // "all" + client-side filtering: Finding-shaped messages carry agent_id, which the API's
-        // per-agent filter (sender_key from from/sender/agent/author) does not index.
-        const msgs = await get(`/api/v1/agents/all/messages?limit=60`);
-        if (c === "A") { this.allMsgs = msgs.slice(-60); this.renderSide(); }
-        const own = msgs.filter((m) => agentSide(m.sender ?? messageSender(m.content)) === c);
-        if (own.length) this.agentMsg[c] = own[own.length - 1];
-      } catch (e) { /* none */ }
-      await this.refreshAgent(c, false);
-      this.render(c);
-    }));
-  }
-
-  async refreshAgent(c, rerender = true) {
-    try { this.agentState[c] = await get(`/api/v1/agents/${c}/state`); } catch { /* keep last */ }
-    if (rerender) this.render(c);
-  }
-
-  histPoint(r) {
-    const t = Date.parse(r.timestamp_utc || r.received_at_utc); // unsynced device clock -> server receipt time
-    if (!Number.isFinite(t)) return null;
-    return { t, temp: num(r.chamber_temperature_c), sp: num(r.temperature_setpoint_c), starter: num(r.starter_temperature_c), height: num(r.starter_height_mm) };
-  }
-
-  async refreshState(c) {
-    try {
-      const st = await get(`/api/v1/chambers/${c}/state`);
-      this.state[c] = st;
-      this.store.serverOffsetMs = Date.parse(st.server_time_utc) - Date.now();
-      if (st.last_motor_command) this.motor[c] = { ...(this.motor[c] || {}), ...st.last_motor_command }; // server is truth
-      this.render(c);
-    } catch (e) {
-      if (!this.state[c]) clear(this.cards[c], h("div", { class: "empty" }, `Chamber ${c}: cannot reach the local API (${e.message}).`));
-    }
-  }
-
-  onTelemetry(f) {
-    const c = f.chamber_id || f.data?.chamber_id;
-    if (!CHAMBERS.includes(c)) return;
-    const st = this.state[c] || (this.state[c] = { chamber_id: c });
-    st.latest_telemetry = f.data;
-    st.provenance = f.data.source;
-    st.telemetry_stale = false;
-    st.device_reported_setpoint_c = f.data.temperature_setpoint_c;
-    const p = this.histPoint(f.data);
-    if (p) { this.history[c].push(p); if (this.history[c].length > HISTORY_MAX) this.history[c].shift(); }
-    this.render(c);
-    document.dispatchEvent(new CustomEvent("fermentai:telemetry", { detail: { chamber: c, row: f.data } }));
-  }
-
-  onCommand(d, chamber) {
-    if (!d || (d.command_type && d.command_type !== "motor")) return;
-    const c = chamber || d.chamber_id;
-    if (!CHAMBERS.includes(c)) return;
-    const cur = this.motor[c];
-    if (cur && cur.command_id !== d.command_id && d.status !== "issued") return; // ack for an older command
-    this.motor[c] = { ...(cur && cur.command_id === d.command_id ? cur : {}), ...d };
-    this.render(c);
-  }
-
-  serverNow() { return Date.now() + (this.store.serverOffsetMs || 0); }
-
-  isStale(st) {
-    const tel = st.latest_telemetry;
-    if (!tel) return true;
-    const age = (this.serverNow() - Date.parse(tel.received_at_utc || tel.timestamp_utc)) / 1000;
-    return !(age <= STALE_AFTER_S);
-  }
-
-  async startMotor(c) {
-    if (!getToken()) { toast("Write access needed: click “Read-only” to enter the API token.", "bad"); return; }
-    this.busy[c] = true; this.render(c);
-    try {
-      const cmd = await post(`/api/v1/chambers/${c}/motor`, { duration_s: 5, pattern: "wiggle", reason: "dashboard: start automaton animation", source: "dashboard" });
-      this.motor[c] = cmd;
-      toast(`Chamber ${c}: automaton animation issued (5 s wiggle).`, "good");
-    } catch (e) {
-      toast(`Chamber ${c} motor: ${e instanceof ApiError ? e.message : e}`, "bad");
-    } finally { this.busy[c] = false; this.render(c); }
-  }
-
-  async cancelMotor(c) {
-    const m = this.motor[c];
-    if (!m) return;
-    try {
-      const r = await del(`/api/v1/commands/${encodeURIComponent(m.command_id)}`);
-      this.motor[c] = { ...m, status: r.cancelled ? "cancelled" : r.status };
-      toast(r.cancelled ? `Chamber ${c}: motor command cancelled.` : `Chamber ${c}: ${r.reason || "not cancellable"}`, r.cancelled ? "good" : "");
-    } catch (e) { toast(`Cancel failed: ${e.message}`, "bad"); }
-    this.render(c);
-  }
-
-  sensorState(tel, field) {
-    const health = tfield(tel, "diagnostics")?.sensor_health || {};
-    for (const k of [field, ...(SENSOR_FOR[field] || [])]) if (health[k]) return String(health[k]);
-    return null;
-  }
-  provMini(tel, field) {
-    const fp = (tel && (tel.field_provenance || tel.payload?.field_provenance)) || {};
-    const raw = fp[field] || (tel ? tel.source : null);
-    if (!raw) return null;
-    const n = normProv(raw, "device");
-    const title = `provenance of this value: ${raw} → ${PROV_LABEL[n] || n}${fp[field] ? " (field_provenance)" : " (record source)"}`;
-    // Same as the record source (already badged once in the card header): a quiet coloured dot.
-    // Different (e.g. pH entered manually on a simulated-device record): spelled out.
-    if (normProv(tel?.source, "device") === n) return h("span", { class: `pdot prov-${n}`, title, "aria-label": title });
-    return h("span", { class: `badge mini prov-${n}`, title }, PROV_SHORT[n] || raw);
-  }
-  /** A value cell: real number, or an explicit "unavailable" state - never an invented value. */
-  val(tel, field, format) {
-    const x = tfield(tel, field);
-    if (x === null || x === undefined || (typeof x === "number" && !Number.isFinite(x))) {
-      const sh = this.sensorState(tel, field);
-      return h("div", { class: "val na" }, "unavailable", sh && sh !== "ok" ? h("span", { class: "tiny" }, ` (sensor ${sh})`) : "");
-    }
-    return h("div", { class: "val" }, format(x));
-  }
-
-  render(c) {
-    const card = this.cards[c];
-    const st = this.state[c];
-    if (!card || !st) return;
-    const tel = st.latest_telemetry || null;
-    const stale = st.telemetry_stale === true && !tel ? true : this.isStale(st);
-    const usb = this.usbLink(c);
-    // A real (non-simulated) device linked over USB makes the station LIVE / MEASURED - but only when the
-    // latest telemetry actually comes from that device (otherwise we would relabel someone else's data).
-    // Never relabel records whose own source says "simulated" (virtual devices may reuse the real device id).
-    const telFromLinked = usb?.realLinked && tel && (!usb.deviceId || tfield(tel, "device_id") === usb.deviceId)
-      && normProv(tel.source, "device") !== "simulated_device";
-    const prov = telFromLinked ? "measured" : (tel ? tel.source : null);
-    const mode = demoMode(prov);
-    document.dispatchEvent(new CustomEvent("fermentai:source", { detail: { chamber: c, source: prov, mode, stale } }));
-    const diag = tfield(tel, "diagnostics") || {};
-    const unsynced = tel && (tel.timestamp_utc === null || tel.timestamp_utc === undefined || tfield(tel, "timestamp_quality") === "unsynced");
-
-    const head = h("div", { class: "ch-head" },
-      h("div", { class: "ch-id" },
-        h("span", { class: "ch-ico" }, icon("station", { size: 26 })),
-        h("div", null,
-          h("div", { class: "ch-title" }, "Chamber ", h("span", { class: "letter" }, c)),
-          h("div", { class: "ch-sub" }, h("b", null, `Station ${c}`), " · ", (st.label || "").replace(/^Chamber [AB]\s*[-–]\s*/, "")))),
-      h("div", { class: "ch-badges" },
-        prov ? deviceBadge(prov) : statusBadge("no device", "info"),
-        tel ? (stale ? statusBadge("stale", "bad") : statusBadge("fresh", "good")) : null,
-        usb ? h("span", { class: `usb-chip usb-${usb.cls}`, title: usb.title }, usb.text) : null,
-        usb?.realLinked && tel && !telFromLinked ? h("span", { class: "usb-chip usb-warn", title: `A real USB device${usb.deviceId ? ` (${usb.deviceId})` : ""} is linked, but the latest telemetry is labelled ${tel.source || "?"} from ${tfield(tel, "device_id") || "an unknown device"} — shown as recorded.` }, "latest data not from USB device") : null,
-        st.experiment_id ? h("span", { class: "badge status-info", title: "current experiment" }, st.experiment_id) : null));
-
-    const devId = tfield(tel, "device_id") || st.device_id;
-    const boot = tfield(tel, "boot_id"), seq = tfield(tel, "sequence_number"), up = tfield(tel, "device_uptime_ms");
-    const staleBanner = stale && tel
-      ? h("div", { class: "stale-banner" }, `⚠ Telemetry stale — last reading received ${timeAgo(tel.received_at_utc, this.serverNow())}. Values below are the last known, not live.`)
-      : null;
-    if (!tel) {
-      // Intentional empty state: nothing measured yet, so nothing is shown as a number.
-      const m0 = this.motor[c];
-      clear(card, head,
-        emptyCard({ icon: "plug", title: "No device · USB bridge pending",
-          detail: `Waiting for the first telemetry from Station ${c}${devId ? ` (${devId})` : ""}. Connect the ESP32 over the USB serial bridge, or run scripts/start_demo.sh --with-simulated-devices.` }),
-        h("div", { class: "sec-row" },
-          h("div", null, h("span", { class: "sec-lbl" }, "Setpoint (server)"), h("b", null, fmt(st.desired_setpoint_c, 1, " °C"))),
-          h("div", null, h("span", { class: "sec-lbl" }, "Readings"), h("b", { class: "faint" }, "unavailable"))),
-        this.agentBox(c, st), this.motorRow(c, m0));
-      return;
-    }
-    const hist = this.history[c];
-    const spark = sparkline([
-      { values: hist.map((p) => ({ t: p.t, v: p.sp })), color: COLORS.muted, dash: true },
-      { values: hist.map((p) => ({ t: p.t, v: p.temp })), color: c === "A" ? COLORS.A : COLORS.B },
-    ]);
-    const span = hist.length > 1 ? Math.round((hist[hist.length - 1].t - hist[0].t) / 60000) : 0;
-    const tempNow = tfield(tel, "chamber_temperature_c");
-    const starter = num(tfield(tel, "starter_temperature_c"));
-    const hero = h("div", { class: "hero-temp" },
-      h("div", { class: "lbl" }, "Chamber air temperature ", this.provMini(tel, "chamber_temperature_c")),
-      num(tempNow) === null ? h("div", { class: "big na" }, "unavailable") : h("div", { class: "big" }, fmt(tempNow, 1), h("span", { class: "unit" }, "°C")),
-      h("div", { class: "sec-row" },
-        h("div", null, h("span", { class: "sec-lbl" }, "Setpoint"), h("b", null, fmt(st.desired_setpoint_c, 1, " °C")),
-          num(st.device_reported_setpoint_c) !== null && Math.abs(st.device_reported_setpoint_c - st.desired_setpoint_c) > 0.05 ? h("span", { class: "tiny faint" }, ` device ${fmt(st.device_reported_setpoint_c, 1)}`) : null),
-        h("div", null, h("span", { class: "sec-lbl" }, "Starter ", this.provMini(tel, "starter_temperature_c")), starter === null ? h("b", { class: "faint" }, "unavailable") : h("b", null, fmt(starter, 1, " °C")))),
-      spark,
-      h("div", { class: "spark-legend" },
-        h("span", null, h("i", { style: { background: c === "A" ? COLORS.A : COLORS.B } }), "air"),
-        h("span", null, h("i", { class: "dashed" }), "setpoint (device)"),
-        h("span", null, span ? `${span} min${unsynced ? " · receipt time" : ""}` : "")));
-
-    const img = st.latest_image;
-    let snap = card.querySelector(".snap");
-    const imgKey = img ? img.url : "none";
-    if (!snap || snap.dataset.key !== imgKey) {
-      snap = h("div", { class: "snap", dataset: { key: imgKey } },
-        img ? h("img", { src: img.url, alt: `Chamber ${c} camera snapshot`, loading: "lazy" }) : emptyCard({ icon: "camera", title: "No camera frame yet", detail: "The station camera has not uploaded a snapshot.", compact: true }),
-        img ? h("div", { class: "snap-cap" }, h("span", null, `${hhmmss(img.timestamp_utc)}`), deviceBadge(img.source)) : null);
-    } else {
-      const cap = snap.querySelector(".snap-cap span");
-      if (cap && img) cap.textContent = `📷 ${hhmmss(img.timestamp_utc)}`;
-    }
-
-    // Starter rise estimate: camera-derived height vs the first height in the loaded history.
-    const heights = hist.filter((p) => p.height !== null && p.height !== undefined);
-    const hNow = num(tfield(tel, "starter_height_mm"));
-    const rise = heights.length && hNow !== null && heights[0].height > 0 ? hNow / heights[0].height : null;
-
-    const metric = (lbl, field, val, cls = "") => h("div", { class: `metric ${cls}` }, h("div", { class: "lbl" }, lbl, " ", field ? this.provMini(tel, field) : null), val);
-    const peltier = tfield(tel, "peltier_mode");
-    const frac = num(tfield(tel, "peltier_output_fraction"));
-    const doorOpen = tfield(tel, "door_open");
-    const motorRunning = tfield(tel, "motor_running");
-    const metrics = h("div", { class: "metrics" },
-      metric("Peltier state (device)", "peltier_mode", h("div", { class: peltier ? "val" : "val na" }, peltier || "unavailable",
-        h("span", { class: "tiny faint" }, frac !== null ? ` ${Math.round(frac * 100)} % output` : "", st.peltier_mode_hint ? ` · hint ${st.peltier_mode_hint}` : ""))),
-      metric("Starter height (camera)", "starter_height_mm", this.val(tel, "starter_height_mm", (x) => [fmt(x, 1, " mm"), rise !== null ? h("span", { class: "tiny faint" }, ` rise ×${rise.toFixed(2)} est.`) : ""])),
-      metric("Humidity", "relative_humidity_percent", this.val(tel, "relative_humidity_percent", (x) => fmt(x, 0, " %RH"))),
-      metric("BME680 gas resistance (Ω) — not CO₂", "gas_resistance_ohms", this.val(tel, "gas_resistance_ohms", fmtOhms)),
-      metric("pH", "ph", num(tfield(tel, "ph")) === null
-        ? h("div", { class: "val na" }, "no pH observation", this.sensorState(tel, "ph") && this.sensorState(tel, "ph") !== "ok" ? h("span", { class: "tiny" }, ` (probe ${this.sensorState(tel, "ph")})`) : "")
-        : h("div", { class: "val" }, fmt(tfield(tel, "ph"), 2), h("span", { class: "tiny faint" }, tfield(tel, "ph_method") ? ` ${tfield(tel, "ph_method")}` : ""))),
-      metric("Pressure", "pressure_pa", this.val(tel, "pressure_pa", (x) => fmt(x / 100, 1, " hPa"))),
-      metric("Door", "door_open", doorOpen === true ? h("div", { class: "val", style: { color: "#ffb0b0" } }, "OPEN") : doorOpen === false ? h("div", { class: "val" }, "closed") : this.val(tel, "door_open", String)),
-      metric("Chef-hat motor", "motor_running", h("div", { class: motorRunning === null ? "val na" : "val" }, motorRunning === true ? "running" : motorRunning === false ? "idle" : "unavailable",
-        h("span", { class: "tiny faint" }, st.motor_ran ? " · last cmd ran" : ""))),
-      metric("Last valid update", null, h("div", { class: tel ? "val" : "val na" }, tel ? timeAgo(tel.received_at_utc, this.serverNow()) : "never",
-        h("span", { class: "tiny faint" }, tel ? (unsynced ? " · receipt" : ` · device ${hhmmss(tel.timestamp_utc)}`) : ""))));
-
-    // Equipment safety (heatsinks): compact, separate - never fermentation evidence.
-    const safety = h("div", { class: "safety-line", title: "Heatsink temperatures protect the Peltier module; they are not fermentation evidence." },
-      icon("shield", { size: 14 }), h("span", { class: "safety-lbl" }, "Equipment safety · not fermentation evidence"),
-      h("span", null, "heatsink in ", this.inline(tel, "internal_heatsink_temperature_c", (x) => fmt(x, 1, " °C"))),
-      h("span", null, "out ", this.inline(tel, "external_heatsink_temperature_c", (x) => fmt(x, 1, " °C"))),
-      tfield(tel, "fan_running") !== null ? h("span", null, `fan ${tfield(tel, "fan_running") ? "on" : "off"}`) : null);
-
-    // Device drawer: identity + diagnostics, collapsed by default (click to open).
-    const health = diag.sensor_health || {};
-    const hb = (k, v) => h("span", { class: `badge ${v === "ok" ? "status-good" : /missing|absent|not_installed/.test(v) ? "status-info" : "status-bad"}`, title: `sensor_health.${k} = ${v}` }, `${k.replace(/_/g, " ")}: ${v}`);
-    const rssi = num(diag.wifi_rssi_dbm ?? tfield(tel, "wifi_rssi_dbm"));
-    const flags = (tel?.quality_flags || []).filter((f) => f);
-    const nOk = Object.values(health).filter((v) => v === "ok").length, nH = Object.keys(health).length;
-    const fw = diag.firmware_version || tfield(tel, "firmware_version");
-    const drawer = h("details", { class: "device-drawer" },
-      h("summary", null, icon("device", { size: 16 }), h("b", null, devId || "device"),
-        unsynced ? h("span", { class: "chip-mini warn" }, "device clock unsynced") : h("span", { class: "chip-mini ok" }, "device clock synced"),
-        nH ? h("span", { class: `chip-mini ${nOk === nH ? "ok" : "warn"}` }, `${nOk}/${nH} sensors ok`) : null,
-        h("span", { class: "drawer-hint" }, "details")),
-      h("div", { class: "drawer-body" },
-        h("div", { class: "dev-line tiny" },
-          boot ? h("span", { title: `boot_id ${boot}` }, `boot ${String(boot).slice(0, 8)}`) : null,
-          seq !== null ? h("span", null, `seq #${seq}`) : null,
-          up !== null ? h("span", null, `up ${fmtUptime(up)}`) : null,
-          fw ? h("span", null, `fw ${fw}`) : null,
-          rssi !== null ? h("span", null, `RSSI ${rssi.toFixed(0)} dBm`) : null,
-          num(diag.free_heap_bytes) !== null ? h("span", null, `heap ${(diag.free_heap_bytes / 1024).toFixed(0)} kB`) : null,
-          tfield(tel, "time_basis") ? h("span", null, `time basis ${tfield(tel, "time_basis")}`) : null),
-        unsynced ? h("div", { class: "tiny warn-text" }, "Device clock unsynced: times shown are the server's receipt time.") : null,
-        nH ? h("div", { class: "health-badges" }, Object.entries(health).map(([k, v]) => hb(k, String(v)))) : null,
-        flags.length ? h("div", { class: "tiny faint" }, "Quality flags: ", flags.join(", ")) : null));
-
-    const agent = this.agentBox(c, st);
-
-    // Pending device commands (v1.1 commands[] not yet acked)
-    const pend = Array.isArray(st.pending_commands) ? st.pending_commands : [];
-    const pendEl = pend.length ? h("div", { class: "tiny faint" }, `Pending device commands: ${pend.map((p) => p.action || p.command_type).join(", ")}`) : null;
-
-    const mainRow = h("div", { class: "ch-main" }, hero, snap);
-    clear(card, head, staleBanner, mainRow, metrics, safety, drawer, agent, pendEl, this.motorRow(c, this.motor[c]));
-  }
-
-  motorRow(c, m) {
-    const active = m && !MOTOR_TERMINAL.has(m.status);
-    return h("div", { class: "motor-row" },
-      h("button", { class: "btn btn-motor", type: "button", disabled: this.busy[c] || !getToken(), onclick: () => this.startMotor(c),
-        title: getToken() ? "Run the decorative chef-hat automaton for 5 s (separate from the Peltier controller)" : "Needs the API token" },
-        this.busy[c] ? "Sending…" : h("span", { class: "btn-2line" }, h("span", null, "▶ Start automaton animation"), h("span", { class: "btn-sub" }, "Hat bobs · new assignment"))),
-      m ? motorTrack(m) : h("span", { class: "tiny faint" }, "no motor command yet"),
-      active ? h("button", { class: "btn btn-danger btn-sm", type: "button", onclick: () => this.cancelMotor(c) }, "Cancel") : null);
-  }
-
-  inline(tel, field, format) {
-    const x = num(tfield(tel, field));
-    if (x === null) { const sh = this.sensorState(tel, field); return h("b", { class: "faint" }, `unavailable${sh && sh !== "ok" ? ` (${sh})` : ""}`); }
-    return h("b", null, format(x));
-  }
-
-  agentBox(c, st) {
-    const as = this.agentState[c];
-    const am = this.agentMsg[c];
-    const changed = st.setpoint_updated_at_utc ? timeAgo(st.setpoint_updated_at_utc, this.serverNow()) : "";
-    const setpointLine = h("div", { class: "tiny faint", style: { marginTop: "4px" } },
-      `Chamber setpoint ${fmt(st.desired_setpoint_c, 1, " °C")} set by ${st.setpoint_source || "—"}${changed ? ` (${changed})` : ""}`,
-      st.setpoint_rationale ? ` — ${String(st.setpoint_rationale).slice(0, 120)}` : "");
-    if (!as || as.available === false || as.stub) {
-      return h("div", { class: "agent-box" },
-        h("div", { class: "agent-head" }, h("span", { class: "who" }, icon("toque", { size: 18, cls: "toque" }), chefLabel(`scientist_${c}`)), h("span", { class: "tiny faint" }, am ? `last message ${timeAgo(am.created_at_utc, this.serverNow())}` : "idle — waiting for taste feedback")),
-        as?.objective ? h("div", { class: "small" }, h("b", null, "Objective: "), as.objective) : null,
-        h("div", { class: "agent-text" }, am ? [am.kind ? h("b", null, `${am.kind}: `) : "", brigadeText(stripArrow(messageText(am.content ?? am)))] : "No findings yet — the agent publishes its hypothesis and decisions after taste feedback."),
-        setpointLine);
-    }
-    const hyp = as.current_hypothesis;
-    const dec = as.last_decision;
-    const obs = as.last_observation;
-    const anoms = Array.isArray(as.open_anomalies) ? as.open_anomalies : [];
-    const reasoning = as.mode?.reasoning_mode_label;
-    let phText = "pH: no observation summary yet";
-    if (obs) phText = obs.ph_valid ? "pH: valid observation" : `no valid pH${obs.ph_reason ? ` — ${obs.ph_reason}` : ""}`;
-    return h("div", { class: "agent-box" },
-      h("div", { class: "agent-head" },
-        h("span", { class: "who" }, icon("toque", { size: 18, cls: "toque" }), chefLabel(`scientist_${c}`), " ", reasoning ? statusBadge(reasoning, /online/i.test(reasoning) ? "good" : "info") : null),
-        h("span", { class: "tiny faint" }, as.last_activity_utc ? `active ${timeAgo(as.last_activity_utc, this.serverNow())}` : "no activity yet")),
-      hyp ? h("div", { class: "agent-text" }, h("b", null, "Hypothesis: "), brigadeText(hyp.statement || "—")) : h("div", { class: "agent-text faint" }, "No hypothesis yet — waiting for taste feedback."),
-      dec ? h("div", { class: "small", style: { marginTop: "3px" } }, h("b", null, "Last decision: "), dec.name || dec.schedule_id || "—",
-        Array.isArray(dec.points) ? h("span", { class: "faint" }, ` (${dec.points.map((p) => `${fmt(p[1], 0)}°C@${fmt(p[0], 0)}h`).join("→")})`) : "",
-        dec.revised_after_critique ? statusBadge("revised after critique", "warn") : null) : null,
-      h("div", { class: "tiny", style: { marginTop: "3px" } },
-        h("b", null, "Observations: "),
-        obs ? `${obs.n_records ?? "?"} records${obs.latest_stale ? " (latest stale)" : ""} · ${(obs.usable_fields || []).length} usable fields${obs.proofing_status ? ` · proofing ${obs.proofing_status}` : ""} · ` : "no quality summary yet · ",
-        h("span", { class: obs && obs.ph_valid ? "" : "warn-text" }, phText)),
-      anoms.length ? h("div", { class: "tiny warn-text" }, `⚠ ${anoms.length} open anomal${anoms.length === 1 ? "y" : "ies"}: `, brigadeText(anoms.map((a) => a.content || a.type).join("; ").slice(0, 200))) : h("div", { class: "tiny faint" }, "No open anomalies."),
-      setpointLine);
-  }
-}
-
+const rowTime = (r) => Date.parse(r.timestamp_utc || r.received_at_utc);
 function stripArrow(t) { return String(t || "").replace(/^\s*\[[^\]]{1,60}(→|->)[^\]]{1,60}\]\s*/, ""); }
 function fmtUptime(ms) {
   const s = Math.floor(Number(ms) / 1000);
@@ -479,4 +57,525 @@ function fmtUptime(ms) {
   if (s < 120) return `${s}s`;
   if (s < 7200) return `${Math.floor(s / 60)}m`;
   return `${Math.floor(s / 3600)}h ${Math.floor((s % 3600) / 60)}m`;
+}
+
+export class LivePanel {
+  constructor(store, stream) {
+    this.store = store;
+    this.stream = stream;
+    this.ids = ["A", "B"];
+    this.state = {};
+    this.rows = {};          // chamber -> recent telemetry rows (oldest first)
+    this.agentMsg = {};
+    this.agentState = {};
+    this.motor = {};
+    this.allMsgs = [];
+    this.experiments = [];
+    this.busy = {};
+    this.thinking = {};      // chamber -> {pending: n, until: ms}
+    this.chats = {};         // chamber -> ChatPanel (detail view)
+    this.detailId = null;
+    this.gridEl = document.getElementById("lab-grid");
+    this.gridView = document.getElementById("live-grid-view");
+    this.detailView = document.getElementById("lab-detail");
+    this.passThreadEl = document.getElementById("pass-thread");
+    this.wire();
+  }
+
+  // ------------------------------------------------------------------ wiring
+  wire() {
+    const s = this.stream;
+    s.on("telemetry", (f) => this.onTelemetry(f));
+    s.on("image", (f) => {
+      const c = f.chamber_id || f.data?.chamber_id;
+      if (!this.state[c]) return;
+      this.state[c].latest_image = { id: f.data.image_id, url: f.data.url, timestamp_utc: f.data.timestamp_utc, source: f.data.source,
+        device_id: f.data.device_id, stale_image_from_other_device: f.data.stale_image_from_other_device };
+      this.render(c);
+    });
+    s.on("setpoint", (f) => { if (f.chamber_id) this.refreshState(f.chamber_id); });
+    s.on("experiment", () => { this.ids.forEach((c) => this.refreshState(c)); this.loadExperiments(); });
+    s.on("command", (f) => this.onCommand(f.data, f.chamber_id));
+    s.on("ack", (f) => this.onCommand({ ...f.data, status: f.data.command_status || f.data.status }, f.chamber_id));
+    s.on("message", (f) => {
+      const side = agentSide(f.data.sender ?? messageSender(f.data.content));
+      if (side) this.agentMsg[side] = f.data;
+      this.allMsgs.push(f.data); this.allMsgs = this.allMsgs.slice(-60);
+      this.renderThreads();
+      if (side) this.render(side);
+      clearTimeout(this._agentTimer);
+      this._agentTimer = setTimeout(() => this.ids.forEach((c) => this.refreshAgent(c)), 1500);
+    });
+    s.on("chat", (f) => this.onChatEvent(f.data || {}));
+    document.addEventListener("fermentai:thinking", (e) => this.setThinking(e.detail.station, e.detail.on));
+    setInterval(() => this.ids.forEach((c) => this.render(c)), 5000);
+    setInterval(() => this.ids.forEach((c) => this.refreshState(c)), 20000);
+    setInterval(() => this.ids.forEach((c) => this.refreshAgent(c)), 30000);
+    setInterval(() => this.renderHats(), 1000);
+  }
+
+  // ------------------------------------------------------------------ thinking (hat wiggle)
+  setThinking(station, on) {
+    for (const c of station ? [station] : this.ids) {
+      const t = (this.thinking[c] ||= { pending: 0, until: 0 });
+      t.pending = Math.max(0, t.pending + (on ? 1 : -1));
+    }
+    this.renderHats();
+  }
+  onChatEvent(d) {
+    const role = String(d.role || "");
+    if (!/sous|head/.test(role) && d.stage !== "handoff") return;
+    const fromSession = Object.entries(this.chats).find(([, cp]) => cp.sessionId && cp.sessionId === d.session_id)?.[0];
+    const stations = /head/.test(role) || d.stage === "handoff" ? this.ids : fromSession ? [fromSession] : [];
+    for (const c of stations) { const t = (this.thinking[c] ||= { pending: 0, until: 0 }); t.until = Date.now() + 6000; }
+    this.renderHats();
+  }
+  isThinking(c) {
+    const t = this.thinking[c] || {};
+    const m = this.motor[c];
+    return t.pending > 0 || Date.now() < (t.until || 0) || (m && (m.status === "issued" || m.status === "accepted"));
+  }
+  hat(c, size = 26) {
+    const st = this.state[c] || {};
+    const running = tfield(st.latest_telemetry, "motor_running") === true;
+    const m = this.motor[c];
+    const title = running ? "hat motor running" : this.isThinking(c) ? "thinking — hat bobbing" : `hat idle${m?.status ? ` · last command ${m.status.replace(/_/g, " ")}` : ""}`;
+    return h("span", { class: `hat${this.isThinking(c) ? " thinking" : ""}${running ? " running" : ""}`, "data-hat": c, title }, icon("toque", { size }));
+  }
+  renderHats() {
+    document.querySelectorAll("[data-hat]").forEach((el) => {
+      const c = el.dataset.hat;
+      el.classList.toggle("thinking", this.isThinking(c));
+      el.classList.toggle("running", tfield(this.state[c]?.latest_telemetry, "motor_running") === true);
+    });
+  }
+
+  // ------------------------------------------------------------------ USB serial bridge
+  startBridgePoll() {
+    const paths = this.store.apiPaths;
+    if (paths && !paths.has("/api/v1/bridge/status")) { this.bridge = { unsupported: true }; return; }
+    const poll = async () => {
+      try { this.bridge = await get("/api/v1/bridge/status"); }
+      catch (e) { if (e.status === 404) { this.bridge = { unsupported: true }; clearInterval(this.bridgeTimer); } }
+      this.ids.forEach((c) => this.render(c));
+    };
+    poll();
+    this.bridgeTimer = setInterval(poll, 5000);
+  }
+  usbLink(c) {
+    const b = this.bridge;
+    if (!b || b.unsupported) return null;
+    const ch = (b.chambers || {})[c] || null;
+    const link = String(ch?.link || (b.bridge_running ? "disconnected" : "bridge_offline")).toLowerCase();
+    let text, cls;
+    if (!b.bridge_running || link === "bridge_offline") { text = "USB · bridge off"; cls = "off"; }
+    else if (link === "connected") { text = ch?.simulated ? "USB · simulated" : "USB · connected"; cls = "ok"; }
+    else if (/log/.test(link)) { text = "USB · logs only"; cls = "warn"; }
+    else { text = "USB · disconnected"; cls = "bad"; }
+    const title = [ch?.label, b.transport || "usb-serial", ch?.port && `port ${ch.port}`, ch?.device_id && `device ${ch.device_id}`,
+      ch?.firmware_version && `fw ${ch.firmware_version}`, ch?.last_seen && `last seen ${ch.last_seen}`, !b.bridge_running && b.reason].filter(Boolean).join(" · ");
+    return { cls, text, title, realLinked: cls === "ok" && ch?.simulated === false, deviceId: ch?.device_id || null };
+  }
+
+  // ------------------------------------------------------------------ data
+  async load() {
+    try { const all = await get("/api/v1/chambers"); this.ids = Object.keys(all); Object.assign(this.state, all); } catch { /* keep A/B */ }
+    this.startBridgePoll();
+    this.loadExperiments();
+    await Promise.all(this.ids.map(async (c) => {
+      if (!this.state[c]) await this.refreshState(c, false);
+      try { this.rows[c] = await get(`/api/v1/chambers/${c}/telemetry?limit=${HISTORY_MAX}`); } catch { this.rows[c] = []; }
+      if (this.state[c]?.last_motor_command) this.motor[c] = this.state[c].last_motor_command;
+      await this.refreshAgent(c, false);
+    }));
+    try {
+      const msgs = await get("/api/v1/agents/all/messages?limit=60");
+      this.allMsgs = msgs.slice(-60);
+      for (const m of msgs) { const s = agentSide(m.sender ?? messageSender(m.content)); if (s) this.agentMsg[s] = m; }
+    } catch { /* none */ }
+    this.buildGrid();
+    this.ids.forEach((c) => this.render(c));
+    this.renderThreads();
+  }
+  async refreshAgent(c, rerender = true) {
+    try { this.agentState[c] = await get(`/api/v1/agents/${c}/state`); } catch { /* keep last */ }
+    if (rerender) this.render(c);
+  }
+  async refreshState(c, rerender = true) {
+    try {
+      const st = await get(`/api/v1/chambers/${c}/state`);
+      this.state[c] = st;
+      this.store.serverOffsetMs = Date.parse(st.server_time_utc) - Date.now();
+      if (st.last_motor_command) this.motor[c] = { ...(this.motor[c] || {}), ...st.last_motor_command };
+    } catch { /* offline API: keep last */ }
+    if (rerender) this.render(c);
+  }
+  async loadExperiments() {
+    try { this.experiments = await get("/api/v1/experiments?limit=6"); } catch { /* keep */ }
+    this.renderThreads();
+  }
+  onTelemetry(f) {
+    const c = f.chamber_id || f.data?.chamber_id;
+    if (!c) return;
+    if (!this.ids.includes(c)) { this.ids.push(c); this.buildGrid(); }
+    const st = this.state[c] || (this.state[c] = { chamber_id: c });
+    st.latest_telemetry = f.data;
+    st.provenance = f.data.source;
+    st.telemetry_stale = false;
+    st.device_reported_setpoint_c = f.data.temperature_setpoint_c;
+    (this.rows[c] ||= []).push(f.data);
+    if (this.rows[c].length > HISTORY_MAX) this.rows[c].splice(0, this.rows[c].length - HISTORY_MAX);
+    this.render(c);
+  }
+  onCommand(d, chamber) {
+    if (!d || (d.command_type && d.command_type !== "motor")) return;
+    const c = chamber || d.chamber_id;
+    if (!c) return;
+    const cur = this.motor[c];
+    if (cur && cur.command_id !== d.command_id && d.status !== "issued") return;
+    this.motor[c] = { ...(cur && cur.command_id === d.command_id ? cur : {}), ...d };
+    this.render(c);
+    this.renderHats();
+  }
+  serverNow() { return Date.now() + (this.store.serverOffsetMs || 0); }
+  isStale(st) {
+    const tel = st?.latest_telemetry;
+    if (!tel) return true;
+    return !((this.serverNow() - Date.parse(tel.received_at_utc || tel.timestamp_utc)) / 1000 <= STALE_AFTER_S);
+  }
+  windowRows(c) {
+    const cut = this.serverNow() - WINDOW_MIN * 60000;
+    return (this.rows[c] || []).filter((r) => rowTime(r) >= cut);
+  }
+
+  // ------------------------------------------------------------------ derived per-station facts
+  facts(c) {
+    const st = this.state[c] || {};
+    const tel = st.latest_telemetry || null;
+    const stale = this.isStale(st);
+    const usb = this.usbLink(c);
+    // A real USB-linked device makes the station LIVE/MEASURED only when the latest telemetry is from that
+    // device AND not itself labelled simulated (virtual devices may reuse the real device id).
+    const fromLinked = usb?.realLinked && tel && (!usb.deviceId || tfield(tel, "device_id") === usb.deviceId) && normProv(tel.source, "device") !== "simulated_device";
+    const prov = fromLinked ? "measured" : (tel ? tel.source : null);
+    const kind = normProv(prov, "device");
+    let link;
+    if (usb && usb.cls !== "off") link = usb;
+    else if (!tel || stale) link = { cls: "off", text: usb ? usb.text : "offline", title: usb?.title || "no fresh telemetry" };
+    else if (kind === "simulated_device") link = { cls: "sim", text: "simulated", title: "virtual device over HTTP" };
+    else link = { cls: "ok", text: "network", title: "device posting over the LAN (HTTP)" };
+    const sensors = tel ? SENSORS.filter((s) => s.get(tel) !== null) : [];
+    const unsynced = tel && (tel.timestamp_utc === null || tel.timestamp_utc === undefined || tfield(tel, "timestamp_quality") === "unsynced");
+    document.dispatchEvent(new CustomEvent("fermentai:source", { detail: { chamber: c, source: prov, mode: demoMode(prov), stale } }));
+    return { st, tel, stale, usb, prov, link, sensors, unsynced, online: !!tel && !stale };
+  }
+
+  // ------------------------------------------------------------------ grid
+  buildGrid() {
+    if (!this.gridEl) return;
+    this.cardEls = {};
+    clear(this.gridEl, this.ids.map((c) => {
+      const el = h("article", { class: "lab-card card", dataset: { chamber: c }, tabindex: "0", role: "link", "aria-label": `Open Station ${c}`,
+        onclick: (ev) => { if (!ev.target.closest("button, a, summary")) location.hash = `#lab/${c}`; },
+        onkeydown: (ev) => { if (ev.key === "Enter") location.hash = `#lab/${c}`; } });
+      this.cardEls[c] = el;
+      return el;
+    }));
+  }
+
+  render(c) {
+    if (this.cardEls?.[c]) this.renderCard(c, this.cardEls[c]);
+    if (this.detailId === c) this.renderDetail(c);
+  }
+
+  headBits(c, f, { big = false } = {}) {
+    return [
+      h("div", { class: "lab-id" },
+        h("span", { class: "lab-dot", style: { background: colorOf(c) } }),
+        h("div", null, h("div", { class: big ? "lab-title big" : "lab-title" }, `Station ${c}`),
+          h("div", { class: "lab-sub" }, (f.st.label || "").replace(/^Chamber [AB]\s*[-–]\s*/, "").replace(/ hypothesis$/, "")))),
+      h("div", { class: "lab-badges" },
+        f.tel ? deviceBadge(f.prov) : null,
+        h("span", { class: `usb-chip usb-${f.link.cls}`, title: f.link.title }, f.link.text),
+        f.tel ? h("span", { class: `fresh-dot ${f.stale ? "stale" : "fresh"}`, title: f.stale ? `stale — last reading ${timeAgo(f.tel.received_at_utc, this.serverNow())}` : "fresh" }, f.stale ? "stale" : "live") : null,
+        f.usb?.realLinked && f.tel && !(f.prov === "measured") ? h("span", { class: "usb-chip usb-warn", title: "A real USB device is linked, but the latest telemetry is labelled simulated — shown as recorded." }, "data ≠ USB device") : null),
+      h("div", { class: "lab-icons" }, this.doorIcon(f.tel), this.hat(c, big ? 30 : 26)),
+    ];
+  }
+
+  doorIcon(tel) {
+    const d = tfield(tel, "door_open");
+    if (d === null) return null;
+    return h("span", { class: `door-ico ${d ? "open" : "closed"}`, title: d ? "door open" : "door closed" }, icon(d ? "door_open" : "door_closed", { size: 22 }));
+  }
+
+  /** Big air number + air/setpoint line; tiles for the other reporting sensors. */
+  readings(c, f, { tileLines = true } = {}) {
+    const rows = this.windowRows(c);
+    const air = SENSORS[0];
+    const airNow = air.get(f.tel);
+    const line = (s) => sparkline([{ values: rows.map((r) => ({ t: rowTime(r), v: s.get(r) })), color: colorOf(c) }], { height: 30 });
+    const hero = airNow === null ? null : h("div", { class: "lab-hero" },
+      h("div", { class: "lab-hero-num" }, h("span", { class: "lbl" }, "Air"), h("span", { class: "big" }, fmt(airNow, 1), h("span", { class: "unit" }, "°C")),
+        h("span", { class: "setp", title: "server setpoint (device-reported in tooltip)" }, `→ ${fmt(f.st.desired_setpoint_c, 1)}`)),
+      sparkline([
+        { values: rows.map((r) => ({ t: rowTime(r), v: num(tfield(r, "temperature_setpoint_c")) ?? f.st.desired_setpoint_c })), color: COLORS.muted, dash: true },
+        { values: rows.map((r) => ({ t: rowTime(r), v: air.get(r) })), color: colorOf(c) },
+      ], { height: 44 }));
+    const tiles = f.sensors.filter((s) => s.key !== "air").map((s) => {
+      const v = s.get(f.tel);
+      return h("div", { class: "tile", title: s.tip || s.note || "" },
+        h("div", { class: "tile-lbl" }, s.label, s.note ? h("span", { class: "tile-note" }, s.note) : null),
+        h("div", { class: "tile-val" }, s.text ? [h("span", { class: "tile-txt" }, s.text(f.tel)), " ", h("span", { class: "unit" }, `${fmt(v, 0)} %`)] : [fmt(v, s.dp), h("span", { class: "unit" }, s.unit ? ` ${s.unit}` : "")]),
+        s.sub ? h("div", { class: "tile-sub" }, s.sub(f.tel)) : null,
+        tileLines ? line(s) : null);
+    });
+    const door = this.doorTimeline(c, rows);
+    return h("div", { class: "lab-readings" }, hero, tiles.length || door ? h("div", { class: "tiles" }, tiles, door) : null);
+  }
+
+  doorTimeline(c, rows) {
+    if (!rows.length || rows.every((r) => tfield(r, "door_open") === null)) return null;
+    const t1 = this.serverNow(), t0 = t1 - WINDOW_MIN * 60000;
+    const NS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(NS, "svg");
+    svg.setAttribute("viewBox", "0 0 300 14"); svg.setAttribute("preserveAspectRatio", "none"); svg.setAttribute("class", "door-line");
+    const bg = document.createElementNS(NS, "rect"); bg.setAttribute("x", 0); bg.setAttribute("y", 4); bg.setAttribute("width", 300); bg.setAttribute("height", 6); bg.setAttribute("rx", 3); bg.setAttribute("fill", "#2d323a"); svg.append(bg);
+    let opens = 0, prev = false;
+    rows.forEach((r, i) => {
+      const open = tfield(r, "door_open") === true;
+      if (open && !prev) opens++;
+      prev = open;
+      if (!open) return;
+      const a = rowTime(r), b = i + 1 < rows.length ? rowTime(rows[i + 1]) : t1;
+      const x = ((a - t0) / (t1 - t0)) * 300, w = Math.max(2, ((b - a) / (t1 - t0)) * 300);
+      const seg = document.createElementNS(NS, "rect"); seg.setAttribute("x", x); seg.setAttribute("y", 2); seg.setAttribute("width", w); seg.setAttribute("height", 10); seg.setAttribute("rx", 2); seg.setAttribute("fill", "#fab219"); svg.append(seg);
+    });
+    const nowOpen = tfield(this.state[c]?.latest_telemetry, "door_open") === true;
+    return h("div", { class: "tile door-tile", title: `door state over the last ${WINDOW_MIN} min (amber = open)` },
+      h("div", { class: "tile-lbl" }, "Door"),
+      h("div", { class: "tile-val" }, nowOpen ? "open" : "closed", h("span", { class: "unit" }, ` · ${opens} open${opens === 1 ? "" : "s"}`)),
+      svg);
+  }
+
+  chefLine(c) {
+    const m = this.agentMsg[c];
+    const text = m ? brigadeText(stripArrow(messageText(m.content ?? m))) : "";
+    return h("div", { class: "lab-chef" },
+      h("span", { class: "chef-av", style: { color: c === "B" ? "var(--chamber-B-text)" : "var(--chamber-A-text)" } }, icon("toque", { size: 16 })),
+      h("span", { class: "chef-name" }, chefLabel(`scientist_${c}`)),
+      h("span", { class: "chef-msg" }, text || "—"));
+  }
+
+  renderCard(c, el) {
+    const f = this.facts(c);
+    el.classList.toggle("offline", !f.online);
+    if (!f.tel) {
+      clear(el, h("div", { class: "lab-head" }, this.headBits(c, f)),
+        emptyCard({ icon: "plug", title: "No device", detail: f.usb ? f.usb.text : "USB bridge pending", compact: true }),
+        h("div", { class: "lab-foot" }, h("span", { class: "setp" }, `set ${fmt(f.st.desired_setpoint_c, 1)} °C`)));
+      return;
+    }
+    clear(el, h("div", { class: "lab-head" }, this.headBits(c, f)), this.readings(c, f), this.chefLine(c));
+  }
+
+  // ------------------------------------------------------------------ detail view (#lab/<id>)
+  openDetail(c) {
+    if (!this.ids.includes(c)) c = this.ids[0];
+    this.detailId = c;
+    this.gridView.hidden = true;
+    this.detailView.hidden = false;
+    this.detailView.dataset.chamber = c;
+    const chatRoot = document.getElementById("lab-chat");
+    if (!this.chats[c]) {
+      this.chats[c] = new ChatPanel(h("section", { class: "card chat-card" }), this.taste, { station: c });
+      this.chats[c].init(this.stream, this.store.apiPaths);
+    }
+    clear(chatRoot, this.chats[c].root);
+    this._chartKey = null;
+    this.renderDetail(c, true);
+    window.scrollTo(0, 0);
+  }
+  closeDetail() {
+    this.detailId = null;
+    this.detailView.hidden = true;
+    this.gridView.hidden = false;
+  }
+  show() { if (this.detailId) this.renderDetail(this.detailId, true); }
+  hide() {}
+
+  renderDetail(c, force = false) {
+    const f = this.facts(c);
+    clear(document.getElementById("lab-detail-head"),
+      h("a", { class: "btn btn-ghost btn-sm back-link", href: "#live" }, "← Labs"),
+      h("div", { class: "lab-head" }, this.headBits(c, f, { big: true })),
+      this.motorRow(c, this.motor[c]));
+    const now = Date.now();
+    if (force || !this._detailAt || now - this._detailAt > 2000) {   // throttle chart redraws
+      this._detailAt = now;
+      this.renderDetailCharts(c, f);
+    }
+    this.renderDetailSide(c, f);
+    this.renderThreads();
+  }
+
+  async renderDetailCharts(c, f) {
+    const box = document.getElementById("lab-detail-charts");
+    if (!f.tel) { clear(box, emptyCard({ icon: "plug", title: "No device", detail: f.usb ? f.usb.text : "USB bridge pending" })); return; }
+    const key = f.sensors.map((s) => s.key).join(",");
+    if (this._chartKey !== key || !box.querySelector(".dchart")) {
+      this._chartKey = key;
+      clear(box, f.sensors.map((s) => h("div", { class: `dchart-card${s.key === "air" ? " wide" : ""}` },
+        h("div", { class: "dchart-head" }, h("span", { class: "tile-lbl" }, s.label, s.note ? h("span", { class: "tile-note" }, s.note) : null), h("span", { class: "dchart-val", "data-val": s.key })),
+        h("div", { class: "dchart", id: `dchart-${s.key}` }))), this.doorTimeline(c, this.windowRows(c)));
+    } else {
+      const old = box.querySelector(".door-tile"); const nd = this.doorTimeline(c, this.windowRows(c));
+      if (old && nd) old.replaceWith(nd);
+    }
+    let Plotly;
+    try { Plotly = await whenPlotly(); } catch { return; }
+    const rows = this.windowRows(c);
+    const xs = rows.map((r) => new Date(rowTime(r)));
+    for (const s of f.sensors) {
+      const valEl = box.querySelector(`[data-val="${s.key}"]`);
+      if (valEl) valEl.textContent = s.text ? `${s.text(f.tel)} · ${fmt(s.get(f.tel), 0)} %` : `${fmt(s.get(f.tel), s.dp)}${s.unit ? ` ${s.unit}` : ""}`;
+      const el = document.getElementById(`dchart-${s.key}`);
+      if (!el) continue;
+      const traces = [{ x: xs, y: rows.map((r) => s.get(r)), type: "scatter", mode: "lines", name: s.label, line: { color: colorOf(c), width: 2 },
+        hovertemplate: `${s.label} %{y:.${s.dp}f}${s.unit ? ` ${s.unit}` : ""}<extra></extra>` }];
+      if (s.key === "air") traces.unshift({ x: xs, y: rows.map((r) => num(tfield(r, "temperature_setpoint_c")) ?? f.st.desired_setpoint_c), type: "scatter", mode: "lines", name: "setpoint",
+        line: { color: COLORS.muted, width: 1.5, dash: "dash" }, hovertemplate: "setpoint %{y:.1f} °C<extra></extra>" });
+      await Plotly.react(el, traces, plotLayout({ showlegend: false, margin: { l: 38, r: 8, t: 4, b: 24 }, xaxis: { type: "date", tickformat: "%H:%M" } }), PLOT_CONFIG);
+    }
+  }
+
+  /** Camera frame (only from this device), device drawer, Sous Chef status with a "why" disclosure. */
+  renderDetailSide(c, f) {
+    const box = document.getElementById("lab-detail-side");
+    if (!box) return;
+    // Image rule: never show a frame from another device than the latest telemetry's.
+    const img = f.st.latest_image;
+    const telKind = normProv(f.tel?.source, "device");
+    const otherDevice = img && (img.stale_image_from_other_device === true
+      || (img.device_id && f.tel && tfield(f.tel, "device_id") && img.device_id !== tfield(f.tel, "device_id"))
+      || (f.tel && img.source && normProv(img.source, "device") !== telKind));
+    let snap = box.querySelector(".snap");
+    const key = img && !otherDevice ? img.url : "none";
+    if (!snap || snap.dataset.key !== key) {
+      snap = h("div", { class: "snap", dataset: { key } },
+        img && !otherDevice ? h("img", { src: img.url, alt: `Station ${c} camera frame`, loading: "lazy" }) : emptyCard({ icon: "camera", title: "No frame from this device yet", compact: true }),
+        img && !otherDevice ? h("div", { class: "snap-cap" }, h("span", null, hhmmss(img.timestamp_utc)), deviceBadge(img.source)) : null);
+    }
+    clear(box, snap, this.deviceDrawer(c, f), this.agentBox(c, f.st));
+  }
+
+  deviceDrawer(c, f) {
+    const tel = f.tel;
+    if (!tel) return null;
+    const diag = tfield(tel, "diagnostics") || {};
+    const health = diag.sensor_health || {};
+    const nOk = Object.values(health).filter((v) => v === "ok").length, nH = Object.keys(health).length;
+    const fw = diag.firmware_version || tfield(tel, "firmware_version");
+    const notFitted = NOT_FITTED.filter(([k]) => tfield(tel, k) === null).map(([, n]) => n);
+    const hs = [num(tfield(tel, "internal_heatsink_temperature_c")), num(tfield(tel, "external_heatsink_temperature_c"))];
+    const flags = (tel.quality_flags || []).filter(Boolean);
+    return h("details", { class: "device-drawer" },
+      h("summary", null, icon("device", { size: 16 }), h("b", null, tfield(tel, "device_id") || "device"),
+        f.unsynced ? h("span", { class: "chip-mini warn" }, "device clock unsynced") : h("span", { class: "chip-mini ok" }, "device clock synced"),
+        nH ? h("span", { class: `chip-mini ${nOk === nH ? "ok" : "warn"}` }, `${nOk}/${nH} ok`) : null,
+        h("span", { class: "drawer-hint" }, "device")),
+      h("div", { class: "drawer-body" },
+        h("div", { class: "dev-line tiny" },
+          tfield(tel, "boot_id") ? h("span", null, `boot ${String(tfield(tel, "boot_id")).slice(0, 8)}`) : null,
+          tfield(tel, "sequence_number") !== null ? h("span", null, `seq #${tfield(tel, "sequence_number")}`) : null,
+          tfield(tel, "device_uptime_ms") !== null ? h("span", null, `up ${fmtUptime(tfield(tel, "device_uptime_ms"))}`) : null,
+          fw ? h("span", null, `fw ${fw}`) : null,
+          num(diag.wifi_rssi_dbm) !== null ? h("span", null, `RSSI ${fmt(diag.wifi_rssi_dbm, 0)} dBm`) : null,
+          num(diag.free_heap_bytes) !== null ? h("span", null, `heap ${(diag.free_heap_bytes / 1024).toFixed(0)} kB`) : null),
+        hs.some((x) => x !== null) ? h("div", { class: "safety-line", title: "Heatsinks protect the Peltier module." }, icon("shield", { size: 14 }),
+          h("span", { class: "safety-lbl" }, "Equipment safety · not fermentation evidence"),
+          hs[0] !== null ? h("span", null, `in ${fmt(hs[0], 1)} °C`) : null, hs[1] !== null ? h("span", null, `out ${fmt(hs[1], 1)} °C`) : null) : null,
+        nH ? h("div", { class: "health-badges" }, Object.entries(health).map(([k, v]) => h("span", { class: `badge ${v === "ok" ? "status-good" : "status-bad"}` }, `${k.replace(/_/g, " ")}: ${v}`))) : null,
+        notFitted.length ? h("div", { class: "tiny faint" }, `not fitted: ${notFitted.join(" · ")}`) : null,
+        flags.length ? h("div", { class: "tiny faint" }, `flags: ${flags.join(", ")}`) : null));
+  }
+
+  agentBox(c, st) {
+    const as = this.agentState[c];
+    const hyp = as?.current_hypothesis, dec = as?.last_decision, obs = as?.last_observation;
+    const anoms = Array.isArray(as?.open_anomalies) ? as.open_anomalies : [];
+    const reasoning = as?.mode?.reasoning_mode_label;
+    return h("div", { class: "agent-box", style: { "--c": colorOf(c) } },
+      h("div", { class: "agent-head" }, h("span", { class: "who" }, icon("toque", { size: 18, cls: "toque" }), chefLabel(`scientist_${c}`)),
+        reasoning ? statusBadge(reasoning, /online/i.test(reasoning) ? "good" : "info") : null),
+      dec ? h("div", { class: "agent-dec" }, h("b", null, dec.name || dec.schedule_id || "—"), dec.revised_after_critique ? statusBadge("revised", "warn") : null) : h("div", { class: "faint" }, "no plan yet"),
+      obs && !obs.ph_valid ? h("div", { class: "tiny warn-text" }, "no valid pH") : null,
+      anoms.length ? h("div", { class: "tiny warn-text" }, `⚠ ${anoms.length} anomal${anoms.length === 1 ? "y" : "ies"}`) : null,
+      hyp || anoms.length ? h("details", { class: "why" }, h("summary", null, "why"),
+        hyp ? h("p", { class: "small" }, brigadeText(hyp.statement || "")) : null,
+        obs ? h("p", { class: "tiny faint" }, `${obs.n_records ?? "?"} records · ${(obs.usable_fields || []).length} usable fields${obs.proofing_status ? ` · proofing ${obs.proofing_status}` : ""}${obs.ph_valid ? "" : ` · no valid pH${obs.ph_reason ? ` (${obs.ph_reason})` : ""}`}`) : null,
+        anoms.length ? h("p", { class: "tiny warn-text" }, brigadeText(anoms.map((a) => a.content || a.type).join("; ").slice(0, 300))) : null,
+        h("p", { class: "tiny faint" }, `setpoint ${fmt(st.desired_setpoint_c, 1)} °C · ${st.setpoint_source || "—"}`)) : null);
+  }
+
+  motorRow(c, m) {
+    const active = m && !MOTOR_TERMINAL.has(m.status);
+    return h("div", { class: "motor-row" },
+      h("button", { class: "btn btn-motor btn-sm", type: "button", disabled: this.busy[c] || !getToken(), onclick: () => this.startMotor(c),
+        title: getToken() ? "Run the decorative chef-hat automaton for 5 s (separate from the Peltier controller) — Hat bobs · new assignment" : "Needs the API token" },
+        this.busy[c] ? "Sending…" : h("span", { class: "btn-2line" }, h("span", null, "▶ Start automaton animation"), h("span", { class: "btn-sub" }, "Hat bobs · new assignment"))),
+      m ? motorTrack(m) : null,
+      active ? h("button", { class: "btn btn-danger btn-sm", type: "button", onclick: () => this.cancelMotor(c) }, "Cancel") : null);
+  }
+
+  async startMotor(c) {
+    if (!getToken()) { toast("Write access needed: click “Read-only” to enter the API token.", "bad"); return; }
+    this.busy[c] = true; this.render(c);
+    try {
+      this.motor[c] = await post(`/api/v1/chambers/${c}/motor`, { duration_s: 5, pattern: "wiggle", reason: "dashboard: start automaton animation", source: "dashboard" });
+    } catch (e) {
+      toast(`Station ${c} motor: ${e instanceof ApiError ? e.message : e}`, "bad");
+    } finally { this.busy[c] = false; this.render(c); this.renderHats(); }
+  }
+  async cancelMotor(c) {
+    const m = this.motor[c];
+    if (!m) return;
+    try {
+      const r = await del(`/api/v1/commands/${encodeURIComponent(m.command_id)}`);
+      this.motor[c] = { ...m, status: r.cancelled ? "cancelled" : r.status };
+    } catch (e) { toast(`Cancel failed: ${e.message}`, "bad"); }
+    this.render(c); this.renderHats();
+  }
+
+  // ------------------------------------------------------------------ threads (kitchen pass + per-lab)
+  thread(filter) {
+    const msgs = this.allMsgs.filter((m) => !filter || filter(m)).slice(-6);
+    if (!msgs.length) return emptyCard({ icon: "toque", title: "No exchange yet", compact: true });
+    return h("div", { class: "pass-convo" }, msgs.map((m) => {
+      const sender = m.sender ?? messageSender(m.content);
+      const side = agentSide(sender);
+      return h("div", { class: `pmsg ${side ? `pmsg-${side}` : "pmsg-head"}` },
+        h("div", { class: "pwho" }, icon(side ? "toque" : "headchef", { size: 14 }), chefLabel(sender ?? "system"),
+          m.kind ? h("span", { class: "pkind" }, ` · ${m.kind}`) : null, m.created_at_utc ? h("span", { class: "pts" }, ` · ${timeAgo(m.created_at_utc, this.serverNow())}`) : null),
+        h("div", { class: "ptext" }, brigadeText(stripArrow(messageText(m.content ?? m)))));
+    }));
+  }
+  renderThreads() {
+    if (this.passThreadEl) clear(this.passThreadEl, h("h3", null, icon("toque", { size: 18 }), " Latest A ↔ B"), this.thread(null));
+    const lab = document.getElementById("lab-thread");
+    if (lab && this.detailId) {
+      const c = this.detailId;
+      clear(lab, h("h3", null, icon("toque", { size: 18 }), ` Sous Chef ${c} thread`),
+        this.thread((m) => { const s = agentSide(m.sender ?? messageSender(m.content)); const r = agentSide(m.recipient ?? m.content?.to); return s === c || r === c || !s; }));
+    }
+    const plan = document.getElementById("pass-plan-history");
+    if (plan) {
+      clear(plan, this.experiments.length ? this.experiments.map((e, i) => h("div", { class: `ticket-card${i === 0 ? " latest" : ""}` },
+        h("div", { class: "ticket-top" }, h("b", null, e.title || e.experiment_id), provBadge(e.provenance || "unknown")),
+        h("div", { class: "ticket-st" }, Object.entries(e.schedules || {}).map(([cid, sc]) => h("span", { class: `st-chip st-${cid}` },
+          `${cid} ${normSchedule(sc).points.map(([, t]) => `${fmt(t, 0)}°`).join("→") || "—"}`))),
+        h("div", { class: "tiny faint" }, `${e.status || ""} · ${timeAgo(e.created_at_utc, this.serverNow())}`)))
+        : emptyCard({ icon: "headchef", title: "No plan yet", compact: true }));
+    }
+  }
 }

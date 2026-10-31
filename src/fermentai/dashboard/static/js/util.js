@@ -330,6 +330,8 @@ const ICON_PATHS = {
   shield: '<path d="M12 3l7 3v5c0 4.6-3 8.4-7 10-4-1.6-7-5.4-7-10V6z"/>',
   chart: '<path d="M4 19h16v1.6H4z"/><path d="M5 16l4.5-5 3.5 3 6-7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
   atom: '<circle cx="12" cy="12" r="2"/><ellipse cx="12" cy="12" rx="9" ry="3.6" fill="none" stroke="currentColor" stroke-width="1.5"/><ellipse cx="12" cy="12" rx="9" ry="3.6" fill="none" stroke="currentColor" stroke-width="1.5" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="3.6" fill="none" stroke="currentColor" stroke-width="1.5" transform="rotate(-60 12 12)"/>',
+  door_closed: '<path d="M6 3h12v18H6z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="15" cy="12.5" r="1.2"/><path d="M3 21h18" stroke="currentColor" stroke-width="1.8"/>',
+  door_open: '<path d="M6 3h12v18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-dasharray="2 2"/><path d="M6 3l7 2.5v18L6 21z"/><circle cx="11" cy="13" r="1" fill="#15171a"/><path d="M3 21h18" stroke="currentColor" stroke-width="1.8"/>',
   plug: '<path d="M9 2v5M15 2v5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M6 7h12v3a6 6 0 0 1-5 5.9V22h-2v-6.1A6 6 0 0 1 6 10z"/>',
   camera: '<path d="M4 7h3.5L9 5h6l1.5 2H20a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.2" fill="#15171a"/>',
 };

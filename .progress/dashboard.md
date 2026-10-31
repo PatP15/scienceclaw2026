@@ -69,6 +69,18 @@ Loopback + server default_token_in_use -> auto write access with the documented 
 (this Mac)"), dropped on 401/403, opt-out via "Forget token". iPad/touch wording removed. Mode toggle labels
 Online Agent / Offline Policy. Screenshots are 1440x900 @2x.
 
+## v8: lab grid + lab detail (#lab/<id>) + Kitchen pass; terse
+Tabs: Live Laboratories · Kitchen pass (tab id still "taste") · Digital Twin · Molecular.
+live.js rewritten around SENSORS catalogue: a sensor is shown only if the latest telemetry from the current device
+has a value (big number + 60-min line); door = icon + open timeline; hat icon wiggles while thinking (chat/cycle
+pending, SSE chat sous/head chef, motor issued/accepted) and bobs while motor_running. One provenance badge per card.
+Detail: full-width Plotly charts per reporting sensor, camera frame only if from this device (stale_image_from_other_device
+or device_id/source-kind mismatch -> "No frame from this device yet"), collapsed device drawer ("not fitted: …",
+safety strip only if a heatsink reports), agent box with "why", per-station ChatPanel ({station}) whose hand-off plays
+the 12-step reveal inside #lab-reveal (TastePanel.placeSteps). Kitchen pass: plan-history tickets, latest A↔B,
+replays, fallback form collapsed. Real stack verified on :8765 with FERMENTAI_FINDINGS_LOG/FERMENTAI_CHAT_SESSIONS
+pointed at scratch files (keeps data/experiments clean).
+
 ## Open items for other areas
 - API: /molecular/summary -> HTTP 500 (NaN in analysis_summary.json; jsonable() the summaries).
 - API/agents: build_context passes `recent_telemetry` (reduced keys, no received_at_utc/v1.1 fields) but the

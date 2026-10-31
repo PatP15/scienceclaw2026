@@ -92,16 +92,18 @@ export class TastePanel {
   setReplay(ex) {
     this.replay = ex;
     if (!ex) document.getElementById("replay-select").value = "";
-    let banner = this.form.querySelector(".replay-banner");
-    let btn = this.form.querySelector("#replay-show");
-    if (ex && !banner) { banner = h("div", { class: "replay-banner" }); this.form.querySelector(".taste-controls").before(banner); }
+    // Replay controls live in the Kitchen pass "Replay" card when present (else inside the form).
+    const host = document.getElementById("pass-replay-body") || this.form;
+    let banner = host.querySelector(".replay-banner");
+    let btn = document.getElementById("replay-show");
+    if (ex && !banner) { banner = h("div", { class: "replay-banner" }); host.append(banner); }
     if (ex && !btn) {
-      btn = h("button", { class: "btn btn-ghost", id: "replay-show", type: "button", onclick: () => this.showRecorded() }, "▶ Show recorded replay");
-      this.submitBtn.after(btn);
+      btn = h("button", { class: "btn btn-primary btn-sm", id: "replay-show", type: "button", onclick: () => this.showRecorded() }, "▶ Show recorded replay");
+      host.append(btn);
     }
     if (ex) {
-      clear(banner, h("b", null, "REPLAY — "), ex.demo?.disclaimer || `scripted example input “${ex.title}”, not a live judge's tasting.`,
-        h("div", { class: "tiny", style: { marginTop: "3px", fontWeight: 500 } }, "“Interpret & plan” re-runs this scripted text through the live decision cycle (and the motors). “Show recorded replay” displays the stored output only — nothing is sent to the devices."));
+      clear(banner, h("b", null, "REPLAY"), " · scripted, not a live tasting",
+        h("span", { class: "tiny faint", title: ex.demo?.disclaimer || "" }, " ⓘ"));
     } else { banner?.remove(); btn?.remove(); }
   }
   async showRecorded() {
@@ -152,7 +154,13 @@ export class TastePanel {
     s.avatar.title = key === "A" || key === "B" ? `${spk.name} (agent id: scientist_${key})` : spk.name;
     clear(s.who, spk.name);
   }
-  resetSteps() {
+  /** Move the reveal list into `slot` (a lab detail view) or back to the Kitchen pass, then clear it. */
+  placeSteps(slot) {
+    const target = slot || document.getElementById("pass-steps-slot");
+    if (target && this.stepsEl.parentElement !== target) target.append(this.stepsEl);
+  }
+  resetSteps(slot = null) {
+    this.placeSteps(slot);
     for (const s of Object.values(this.steps)) {
       s.li.classList.remove("shown", "active", "error");
       clear(s.title, s.def.title);
@@ -226,6 +234,7 @@ export class TastePanel {
     if (!getToken()) { toast("Write access needed: click “Read-only” to enter the API token.", "bad"); return; }
     if (this.pending) return;
     this.pending = true;
+    document.dispatchEvent(new CustomEvent("fermentai:thinking", { detail: { station: null, on: true } }));
     this.submitBtn.disabled = true;
     this.submitBtn.textContent = this.mode === "live" ? "Thinking (live LLM)…" : "Interpreting…";
     this.beforeSetpoints = this.currentSetpoints();
@@ -247,16 +256,18 @@ export class TastePanel {
       await this.renderCycle(resp, { animate: true, replay: wasReplay, text });
     } catch (e) {
       this.setStep("saved", { title: "Feedback not processed", badges: [statusBadge("error", "bad")], state: "error",
-        body: h("div", null, e instanceof ApiError && (e.status === 401 || e.status === 403) ? "The API rejected the token. Re-open the URL printed by start_demo.sh." : `The local API returned an error: ${e.message}`) });
+        body: h("div", null, e instanceof ApiError && (e.status === 401 || e.status === 403) ? "The API rejected the token. Click “Read-only” to enter it." : `The local API returned an error: ${e.message}`) });
     } finally {
       this.pending = false;
+      document.dispatchEvent(new CustomEvent("fermentai:thinking", { detail: { station: null, on: false } }));
       this.submitBtn.disabled = false;
       this.submitBtn.textContent = "Interpret & plan next experiment";
     }
   }
 
   // ------------------------------------------------------------------ render a full cycle
-  async renderCycle(resp, { animate = true, label = null, replay = false, text = null } = {}) {
+  async renderCycle(resp, { animate = true, label = null, replay = false, text = null, slot = undefined } = {}) {
+    if (slot !== undefined) this.placeSteps(slot);
     this.current = resp;
     const r = resp.result || {};
     const isReplay = !!replay;
@@ -393,7 +404,7 @@ export class TastePanel {
     const shown = rank.slice(0, 6);
     for (const id of Object.keys(plated)) if (!shown.some((c) => c.id === id)) { const c = rank.find((x) => x.id === id); if (c) shown.push(c); }
     return h("div", null,
-      h("p", { class: "tiny faint" }, `${rank.length} line cooks each ran one validated temperature schedule through the fermentation model and scored it against the goal (lower cost = closer). Best ${Math.min(6, rank.length)} shown${anyPlated ? "; “plated” = chosen for the next experiment" : ""}.`),
+      h("p", { class: "tiny faint", title: "Each line cook ran one validated temperature schedule through the fermentation model and scored it against the goal." }, `${rank.length} simulated · lower cost = closer${anyPlated ? " · PLATED = chosen" : ""}`),
       h("div", { class: "tbl-wrap" }, h("table", { class: "tbl" },
         h("thead", null, h("tr", null, h("th", null, "Line cook · schedule"), h("th", { class: "num" }, "Cost"), h("th", { class: "num" }, "Pred. sour"), h("th", { class: "num" }, "Pred. open"), h("th", { class: "num" }, "Over-proof"))),
         h("tbody", null, shown.map((c, i) => h("tr", null,
@@ -503,7 +514,7 @@ export class TastePanel {
     const rest = Object.fromEntries(Object.entries(hyp).filter(([k, v]) => !shown.has(k) && v !== main));
     return h("div", null,
       main ? h("div", { class: "quote", style: { fontSize: "1rem" } }, brigadeText(main)) : null,
-      facts.length ? h("dl", { class: "kv", style: { marginTop: "8px" } }, facts.map(([k, v]) => [h("dt", null, k), h("dd", null, v instanceof Node ? v : typeof v === "object" ? renderValue(v) : brigadeText(String(v)))])) : null,
+      facts.length ? h("details", { class: "why" }, h("summary", null, "why"), h("dl", { class: "kv", style: { marginTop: "6px" } }, facts.map(([k, v]) => [h("dt", null, k), h("dd", null, v instanceof Node ? v : typeof v === "object" ? renderValue(v) : brigadeText(String(v)))]))) : null,
       preds.length ? h("div", { class: "tbl-wrap", style: { marginTop: "6px" } }, h("table", { class: "tbl" },
         h("thead", null, h("tr", null, h("th", null, "Predicted"), h("th", { class: "num" }, "Sour"), h("th", { class: "num" }, "Open"), h("th", { class: "num" }, "Final pH"), h("th", { class: "num" }, "Peak rise (h)"), h("th", { class: "num" }, "Over-proof"), h("th", null, ""))),
         h("tbody", null, preds.map(([L, p]) => h("tr", null, h("td", null, h("span", { class: `chip chip-${agentSide(L) || "sys"}` }, L)),
