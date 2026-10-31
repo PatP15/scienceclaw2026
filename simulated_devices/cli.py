@@ -88,7 +88,7 @@ def build_parser() -> argparse.ArgumentParser:
     ap.add_argument("--no-contract-fallback", action="store_true")
     ap.add_argument("--synced-clock", action="store_true",
                     help="send real UTC timestamps (timestamp_quality=synced); default null/unsynced")
-    ap.add_argument("--ph", action="store_true", help="simulated pH probe on chamber A (never B)")
+    ap.add_argument("--ph", action="store_true", help="simulated pH probe on chamber A (B-F report simulated pH by default)")
     ap.add_argument("--manual-ph", action="append", default=[], metavar="CHAMBER:PH",
                     help="inject one manual pH reading, e.g. A:4.15 (field provenance 'manual')")
     ap.add_argument("--door-events", nargs="+", metavar="C:START:DUR",
@@ -138,8 +138,6 @@ def make_configs(args: argparse.Namespace):
         if cid == "A":
             cfg = chamber_A.config(has_ph_probe=args.ph, **common)
         elif cid == "B":
-            if args.ph:
-                log.info("[B] --ph ignored: chamber B has no pH probe")
             cfg = chamber_B.config(**common)
         else:
             preset = DEMO_RESTAURANTS.get(cid) if args.profile == "demo-restaurants" else None
@@ -147,9 +145,10 @@ def make_configs(args: argparse.Namespace):
                 common["door_events"] = common["door_events"] or list(preset["doors"])
                 cfg = ChamberConfig(chamber_id=cid, seed=preset["seed"],
                                     plant=PlantParams(ambient_c=preset["ambient_c"]),
-                                    room_rh_percent=preset["rh"], **common)
+                                    room_rh_percent=preset["rh"],
+                                    has_ph_probe=True, ph_method="probe", **common)
             else:
-                cfg = ChamberConfig(chamber_id=cid, **common)
+                cfg = ChamberConfig(chamber_id=cid, has_ph_probe=True, ph_method="probe", **common)
         if args.profile == "demo-restaurants" and cid in DEMO_RESTAURANTS:
             pass  # the profile's ambient wins over the global --ambient default
         elif args.ambient is not None:

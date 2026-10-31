@@ -1,7 +1,7 @@
 // Section 1: Live Laboratories - a grid of lab cards (#live) and a lab detail view (#lab/<id>).
 // Terse by design: only sensors that report a value from the CURRENT device are shown, each as a big number
 // plus a short history line; one provenance badge per card; explanations live in tooltips / disclosures.
-import { get, post, del, getToken, ApiError } from "./api.js";
+import { get, getText, post, del, getToken, ApiError } from "./api.js";
 import { h, clear, fmt, timeAgo, hhmmss, statusBadge, sparkline, agentSide, toast, COLORS, num, normProv, tfield, demoMode,
   deviceBadge, chefLabel, brigadeText, icon, emptyCard, provBadge, normSchedule, plotLayout, PLOT_CONFIG, whenPlotly } from "./util.js";
 import { messageText, messageSender } from "./messages.js";
@@ -242,6 +242,34 @@ export class LivePanel {
     } catch { /* offline API: keep last */ }
     if (rerender) this.render(c);
   }
+  /** Forecast pH [[time_h, ph], ...] for a station from its model prediction CSV (cached; null if none). */
+  predPhCurve(c) {
+    this.predPh = this.predPh || {};
+    if (!(c in this.predPh)) {
+      this.predPh[c] = null;
+      getText(`/api/v1/predictions/chamber_${c}_prediction.csv`).then((txt) => {
+        const lines = String(txt).trim().split(/\r?\n/), cols = lines[0].split(",");
+        const it = cols.indexOf("time_h"), ip = cols.indexOf("ph");
+        const pts = it < 0 || ip < 0 ? [] : lines.slice(1).map((l) => { const x = l.split(","); return [Number(x[it]), Number(x[ip])]; }).filter(([t, v]) => isFinite(t) && isFinite(v));
+        this.predPh[c] = pts.length >= 2 ? pts : null;
+        if (this.predPh[c]) this.render(c);
+      }).catch(() => { /* no prediction for this station */ });
+    }
+    return this.predPh[c];
+  }
+  /** Modeled pH tile for a station whose telemetry has no pH (always carries the MODELED badge). */
+  predPhTile(c, f, tileLines) {
+    const pts = this.predPhCurve(c);
+    const first = (this.rows[c] || [])[0];
+    if (!pts || !first) return null;
+    const hrs = Math.max(0, (this.serverNow() - rowTime(first)) / 3600000);
+    let v = pts[pts.length - 1][1];
+    for (let i = 1; i < pts.length; i++) if (pts[i][0] >= hrs) { const [t0, v0] = pts[i - 1], [t1, v1] = pts[i]; v = v0 + (v1 - v0) * ((hrs - t0) / Math.max(1e-9, t1 - t0)); break; }
+    return h("div", { class: "tile", title: `fermentation-model prediction, ${fmt(hrs, 1)} h after first telemetry` },
+      h("div", { class: "tile-lbl" }, "pH"),
+      h("div", { class: "tile-val" }, fmt(v, 2), " ", provBadge("modeled", "MODELED")),
+      tileLines ? sparkline([{ values: pts.map(([t, y]) => ({ t, v: y })), color: colorOf(c), dash: true }], { height: 30 }) : null);
+  }
   async loadExperiments() {
     try { this.experiments = await get("/api/v1/experiments?limit=6"); } catch { /* keep */ }
     this.renderThreads();
@@ -366,6 +394,7 @@ export class LivePanel {
         s.sub ? h("div", { class: "tile-sub" }, s.sub(f.tel)) : null,
         tileLines ? line(s) : null);
     });
+    if (f.tel && !f.sensors.some((s) => s.key === "ph")) { const pt = this.predPhTile(c, f, tileLines); if (pt) tiles.push(pt); }
     const door = this.doorTimeline(c, rows);
     return h("div", { class: "lab-readings" }, hero, tiles.length || door ? h("div", { class: "tiles" }, tiles, door) : null);
   }
@@ -581,7 +610,7 @@ export class LivePanel {
       h("button", { class: "btn btn-motor btn-sm", type: "button", disabled: this.busy[c] || !getToken(), onclick: () => this.startMotor(c),
         title: getToken() ? "Run the decorative chef-hat automaton for 5 s (separate from the Peltier controller) — Hat bobs · new assignment" : "Needs the API token" },
         this.busy[c] ? "Sending…" : h("span", { class: "btn-2line" }, h("span", null, "▶ Start automaton animation"), h("span", { class: "btn-sub" }, "Hat bobs · new assignment"))),
-      m ? motorTrack(m) : null,
+      null,  // status track (issued → accepted → completed) hidden from the lab header
       active ? h("button", { class: "btn btn-danger btn-sm", type: "button", onclick: () => this.cancelMotor(c) }, "Cancel") : null);
   }
 

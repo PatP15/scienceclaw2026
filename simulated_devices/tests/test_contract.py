@@ -77,13 +77,21 @@ def test_manual_ph_provenance_and_chamber_b_has_no_ph():
     assert t["field_provenance"]["ph"] == "manual"
     assert t["field_provenance"]["chamber_temperature_c"] == "simulated"
     assert a.build_telemetry()["ph"] is None            # one-shot reading
+
+def test_chamber_b_reports_simulated_ph():
     from simulated_devices import chamber_B
 
-    b = make_device("B", has_ph_probe=False)
-    cfg = chamber_B.config(has_ph_probe=True)            # B forces it off
-    assert cfg.has_ph_probe is False
-    tb = b.build_telemetry()
-    assert tb["ph"] is None and "ph" not in tb["field_provenance"]
+    cfg = chamber_B.config()
+    assert cfg.has_ph_probe and cfg.ph_method == "probe"
+    b = make_device("B", has_ph_probe=True, ph_method="probe")
+    readings = []
+    for _ in range(30):
+        b.starter.step(600.0, 26.0)
+        tb = b.build_telemetry()
+        readings.append(tb["ph"])
+        assert tb["ph_method"] == "probe" and tb["source"] == "simulated"
+        assert tb["field_provenance"]["ph"] == "simulated"
+    assert 3.6 <= readings[-1] < readings[0] <= 5.3
     assert tb["device_id"] == "fermentai-esp32-b"
 
 

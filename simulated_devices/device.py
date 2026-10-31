@@ -64,6 +64,7 @@ class ChamberConfig:
     controller: ControllerParams = field(default_factory=ControllerParams)
     initial_starter_height_mm: float = 25.0
     has_ph_probe: bool = False                 # only chamber A may have one (--ph)
+    ph_method: str = "probe_sample"             # 'probe' for simulated always-on pH (B-F)
     manual_ph: float | None = None              # injected manual reading (sent once)
     telemetry_interval_s: float = 5.0
     poll_interval_s: float = 2.0                # 1-3 s per PLAN_MASTER §6
@@ -408,7 +409,7 @@ class VirtualChamber:
             provenance_override = {"ph": "manual", "ph_method": "manual"}
             self.pending_manual_ph = None
         elif self.cfg.has_ph_probe:
-            ph, ph_method = self.starter.ph_reading(), "probe_sample"
+            ph, ph_method = self.starter.ph_reading(), self.cfg.ph_method
         synced = self.cfg.synced_clock
         sensor_health = {"bme680": "ok", "ds18b20_starter": "ok", "internal_heatsink": "ok",
                          "external_heatsink": "ok", "door_switch": "ok", "camera": "ok"}

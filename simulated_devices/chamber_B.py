@@ -1,4 +1,4 @@
-"""Virtual ESP32 for chamber B ("more-acidic hypothesis"). Has NO pH probe (ph is always null).
+"""Virtual ESP32 for chamber B ("more-acidic hypothesis"). Simulated pH reporting is on by default (ph_method "probe", provenance simulated).
 
 Run alone (separate process):
     uv run python -m simulated_devices.chamber_B --base-url http://127.0.0.1:8000
@@ -22,8 +22,8 @@ def config(**overrides) -> ChamberConfig:
                                                            ambient_drift_amplitude_c=0.8),
               initial_starter_height_mm=24.0)
     kw.update(overrides)
-    kw["has_ph_probe"] = False   # chamber B never has a pH probe
-    kw["manual_ph"] = overrides.get("manual_ph")
+    kw["has_ph_probe"] = True    # SIMULATED pH (starter model), labelled simulated
+    kw["ph_method"] = "probe"
     return ChamberConfig(**kw)
 
 

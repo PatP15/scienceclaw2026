@@ -81,12 +81,22 @@ the 12-step reveal inside #lab-reveal (TastePanel.placeSteps). Kitchen pass: pla
 replays, fallback form collapsed. Real stack verified on :8765 with FERMENTAI_FINDINGS_LOG/FERMENTAI_CHAT_SESSIONS
 pointed at scratch files (keeps data/experiments clean).
 
+## v9: Molecular Explorer as six answer cards (js/molecular.js, css/molecular.css)
+Header strip "COMPUTED · NVIDIA ALCHEMI + AIMNet2 · RTX A6000 · N optimisations · M MD runs" (campaign 1 counts from
+analysis_summary.json + campaign-2 counts parsed from /molecular/environment report_md). Cards (question, inline-SVG
+picture, one number, one line; everything else in "Details"): 1 acid strength (pKa axis, measured dots, GPU lactic pKa
+anchored on measured acetic, by n from c2 thermo_cycles dd_boltzmann / RT ln10), 2 trust tiles (acetic dimer vs
+literature range; ΔpKa sign/magnitude), 3 water (c2_association_by_n.csv mean ΔF/water over n + c2_md_long_summary.csv
+H-bonds at T nearest 22 °C), 4 Gln-Gln proxy, 5 coupling report (pKa gap, lactic potency, max |ΔpH|), 6 lazy 3D viewer.
+Card CSS lives in css/molecular.css (separate file: dashboard.css is edited concurrently). Old tables moved to Details.
+Tests: tests/test_dashboard_molecular.py (no hard-coded result values, lazy viewer, stylesheet linked).
+Screenshots: data/demos/molecular_before.png / molecular_after.png (headless Chrome 1440x900, --force-prefers-reduced-motion).
+
 ## Open items for other areas
 - API: /molecular/summary -> HTTP 500 (NaN in analysis_summary.json; jsonable() the summaries).
 - API/agents: build_context passes `recent_telemetry` (reduced keys, no received_at_utc/v1.1 fields) but the
   pipeline reads `context["telemetry"]` -> live cycles always report "no telemetry" observations.
-- API: no route for data/benchmarks/ (dashboard uses a synced snapshot) or data/alchemi/environment/report.md
-  (GPU cost hard-coded with source note in molecular.js RUN_REPORT).
+- API: no route for data/benchmarks/ (dashboard uses a synced snapshot). (report.md now via /molecular/environment.)
 
 ## Resume
 `uv run python -m fermentai.dashboard.vendor` (re-copy plotly + snapshots), `--check`;
