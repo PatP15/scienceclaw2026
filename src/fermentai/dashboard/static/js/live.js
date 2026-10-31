@@ -392,7 +392,18 @@ export class LivePanel {
         h("div", { class: "lab-foot" }, h("span", { class: "setp" }, `set ${fmt(f.st.desired_setpoint_c, 1)} °C`)));
       return;
     }
-    clear(el, h("div", { class: "lab-head" }, this.headBits(c, f)), this.readings(c, f), this.chefLine(c));
+    clear(el, h("div", { class: "lab-head" }, this.headBits(c, f)), this.readings(c, f), this.chefLine(c), this.danceButton(c));
+  }
+
+  // one-click hat dance on the grid card; stopPropagation keeps the card from opening the detail view
+  danceButton(c) {
+    const m = this.motor[c];
+    const running = m && !MOTOR_TERMINAL.has(m.status);
+    return h("div", { class: "lab-dance" },
+      h("button", { class: "btn btn-motor btn-sm", type: "button", disabled: this.busy[c] || running,
+        title: getToken() ? "Make the chef hat dance for 5 s" : "Needs the API token",
+        onclick: (ev) => { ev.stopPropagation(); this.startMotor(c); } },
+        this.busy[c] ? "Sending…" : running ? "💃 dancing…" : "💃 Dance"));
   }
 
   // ------------------------------------------------------------------ detail view (#lab/<id>)
