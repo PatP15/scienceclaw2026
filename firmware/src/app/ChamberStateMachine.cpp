@@ -1,4 +1,5 @@
 #include "app/ChamberStateMachine.h"
+#include "device_config.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -38,8 +39,9 @@ void ChamberStateMachine::safetyTick(uint32_t now_ms) {
   } else if (peltier_.mode() == PeltierMode::Fault) {
     peltier_.clearFault(now_ms);
   }
-  // Door open: Peltier idle (handled in controlTick) and the motor must stop immediately.
-  if (sensors_.doorOpen() && motor_ && motor_->isMotorRunning()) {
+  // Door open: Peltier idle (handled in controlTick). The motor stops too unless the door interlock
+  // is compiled out (decorative hat on the outside of the chamber: kMotorDoorInterlock).
+  if (limits::kMotorDoorInterlock && sensors_.doorOpen() && motor_ && motor_->isMotorRunning()) {
     motor_stop_cause_ = MotorStopCause::Door;
     motor_->stopMotor(now_ms);
   }
@@ -146,7 +148,7 @@ bool ChamberStateMachine::startMotor(uint32_t duration_ms, const char* pattern, 
   };
   if (!motor_) return fail("motor not enabled on this device");
   if (!motor_->armed()) return fail("motor not armed (commissioning)");
-  if (sensors_.doorOpen()) return fail("door open");
+  if (limits::kMotorDoorInterlock && sensors_.doorOpen()) return fail("door open");
   // Refuse during a genuine thermal hazard (operator attention needed). Sensor-health faults
   // that only inhibit the Peltier (e.g. heatsink probe unassigned) do not block the motor.
   if (safety_.faults() & (kFaultOvertemp | kFaultUndertemp | kFaultHeatsinkOvertemp))

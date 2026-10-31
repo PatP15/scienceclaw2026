@@ -75,6 +75,12 @@ constexpr uint32_t kFanOverrunMs = 30UL * 1000UL;
 constexpr uint32_t kSensorStaleMs = 30UL * 1000UL;
 constexpr uint32_t kOfflineHoldMs = 1800UL * 1000UL;
 constexpr uint32_t kMotorMaxDurationMs = 10UL * 1000UL;
+// The chef hat sits on the outside of the chamber, so by default it may run with the door open.
+// Build with -DFERMENTAI_MOTOR_DOOR_INTERLOCK=1 to refuse/stop the motor while the door is open.
+#ifndef FERMENTAI_MOTOR_DOOR_INTERLOCK
+#define FERMENTAI_MOTOR_DOOR_INTERLOCK 0
+#endif
+constexpr bool kMotorDoorInterlock = FERMENTAI_MOTOR_DOOR_INTERLOCK != 0;
 // Contract §5.2: over/under-temp fault latches until back in range this long.
 constexpr uint32_t kFaultClearHoldMs = 60UL * 1000UL;
 // Heatsink fault clears only below this (hysteresis) for kFaultClearHoldMs.

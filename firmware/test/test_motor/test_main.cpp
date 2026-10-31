@@ -3,6 +3,7 @@
 #include <unity.h>
 
 #include "app/ChamberStateMachine.h"
+#include "device_config.h"
 #include "control/MotorController.h"
 #include "simulation/MockActuators.h"
 #include "simulation/MockSensors.h"
@@ -215,10 +216,15 @@ void test_csm_motor_rejected_when_door_open() {
   TEST_ASSERT_TRUE(c.csm.doorOpen());
   c.send("{\"chamber_id\":\"A\",\"motor\":{\"command_id\":\"m2\",\"action\":\"run\",\"run\":true,"
          "\"duration_s\":5.0,\"sequence_number\":7,\"ttl_s\":60}}");
-  TEST_ASSERT_FALSE(c.motor.isMotorRunning());
-  TEST_ASSERT_EQUAL(1, c.sink.n);
-  TEST_ASSERT_TRUE(c.sink.acks[0].status == AckStatus::Rejected);
-  TEST_ASSERT_EQUAL_STRING("door open", c.sink.acks[0].message);
+  if (limits::kMotorDoorInterlock) {
+    TEST_ASSERT_FALSE(c.motor.isMotorRunning());
+    TEST_ASSERT_EQUAL(1, c.sink.n);
+    TEST_ASSERT_TRUE(c.sink.acks[0].status == AckStatus::Rejected);
+    TEST_ASSERT_EQUAL_STRING("door open", c.sink.acks[0].message);
+  } else {
+    // Interlock compiled out (default): the decorative hat runs with the door open.
+    TEST_ASSERT_TRUE(c.motor.isMotorRunning());
+  }
 }
 
 void test_csm_door_opening_stops_running_motor() {
@@ -230,9 +236,13 @@ void test_csm_door_opening_stops_running_motor() {
   c.run(1000);
   c.door_in.level = true;
   c.run(400);
-  TEST_ASSERT_FALSE(c.motor.isMotorRunning());
-  TEST_ASSERT_FALSE(c.gate.state());
-  TEST_ASSERT_TRUE(c.sink.acks[c.sink.n - 1].status == AckStatus::Failed);
+  if (limits::kMotorDoorInterlock) {
+    TEST_ASSERT_FALSE(c.motor.isMotorRunning());
+    TEST_ASSERT_FALSE(c.gate.state());
+    TEST_ASSERT_TRUE(c.sink.acks[c.sink.n - 1].status == AckStatus::Failed);
+  } else {
+    TEST_ASSERT_TRUE(c.motor.isMotorRunning());
+  }
 }
 
 void test_csm_v10_stop_directive_cancels() {
