@@ -32,3 +32,11 @@
 - Intentional test changes: pipeline telemetry fixture now fresh + correct chamber ids (old one was 6-10 h stale and
   chamber "X", now correctly rejected); judge interpretation is a sensory_feedback message (was observation);
   FINDING_TYPES test checks superset.
+
+## Round 3 — Sous Chef chat front door — COMPLETE, not committed
+- [x] src/fermentai/agents/chat.py: SousChefChat, chat_turn(session_id, text, context=None, mode="offline"), chat_reset
+- [x] deterministic state machine greeting->collecting->confirming->handoff->done (max 2 clarifying questions)
+- [x] llm_adapter.LLMAdapter.chat(): wording only (strict schema reply + extracted_* fields); no handoff field
+- [x] hand-off runs run_taste_feedback_cycle and logs sensory_feedback tagged "via chat"
+- [x] sessions: memory + append-only data/experiments/chat_sessions.jsonl (context chat_sessions_path / FERMENTAI_CHAT_SESSIONS)
+- [x] tests/test_agents_chat.py (12) ; agent tests 143 passed ; full suite 533 passed, 1 skipped, 1 xfailed

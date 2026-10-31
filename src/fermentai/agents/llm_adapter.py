@@ -112,6 +112,39 @@ Your context (JSON):
 """
 
 
+CHAT_SYSTEM = """\
+You are Sous Chef {chamber} ({agent_id}), a friendly kitchen scientist in the FermentAI brigade. You are
+chatting with a Guest who just tasted two sourdough loaves (Loaf A and Loaf B). The Head Chef (the
+planning pipeline) turns the tasting into the next experiment; line cooks are candidate simulations.
+Rules:
+- Write the next chat message in plain, warm, concise language (1-3 sentences, no jargon, no lists).
+- You MUST carry out `next_action` exactly as described: ask the question in `question_draft` when one
+  is given (keep its meaning, end with a question mark), or reflect back `reflection_draft` and ask the
+  Guest to confirm, or acknowledge the hand-off. Do not ask about anything else.
+- You do not decide when to hand off, and you never say an experiment has started: the operator confirms
+  every plan and the hardware validates every command.
+- Never invent tasting notes. Only fill the extracted_* fields with what the Guest actually said in the
+  latest message (empty string if nothing).
+Return only JSON matching the schema.
+"""
+
+CHAT_TASK = """\
+Structured chat state (JSON):
+{state}
+"""
+
+
+class ChatReply(BaseModel):
+    reply: str
+    extracted_loaf_a: str
+    extracted_loaf_b: str
+    extracted_wish: str
+
+
+def chat_schema() -> dict[str, Any]:
+    return _string_schema(ChatReply, [])
+
+
 def _string_schema(model: type[BaseModel], ids: list[str]) -> dict[str, Any]:
     props: dict[str, Any] = {}
     for name, field in model.model_fields.items():
@@ -330,6 +363,15 @@ class LLMAdapter:
         system = LEAD_SYSTEM.format(agent_id=agent_id, chamber=chamber, peer=peer)
         user = LEAD_TASK.format(chamber=chamber, peer=peer, context=json.dumps(context, indent=1, default=str))
         return self._structured(system, user, lead_schema(ids), LeadDecision, ids)  # type: ignore[return-value]
+
+    def chat(self, agent_id: str, chamber: str, state: dict[str, Any]) -> ChatReply:
+        """Word the Sous Chef's next chat message from the deterministic chat state."""
+        system = CHAT_SYSTEM.format(agent_id=agent_id, chamber=chamber)
+        user = CHAT_TASK.format(state=json.dumps(state, indent=1, default=str))
+        out = self._structured(system, user, chat_schema(), ChatReply, [])
+        if not out.reply.strip() or len(out.reply) > 800:  # type: ignore[union-attr]
+            raise LLMError("chat reply empty or too long")
+        return out  # type: ignore[return-value]
 
     def critique(self, agent_id: str, chamber: str, peer_agent: str, context: dict[str, Any],
                  ids: list[str]) -> PeerDecision:
