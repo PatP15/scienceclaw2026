@@ -46,7 +46,8 @@ export function normProv(p) {
   if (p && typeof p === "object") p = p.source || p.provenance || p.label;
   const s = String(p ?? "").toLowerCase();
   if (!s) return "unknown";
-  if (s.startsWith("real")) return "real";
+  if (s.startsWith("real") || s.startsWith("measured") || s === "physical") return "real";
+  if (s === "manual") return "imported_human";
   if (s.includes("replay") || s.includes("scripted")) return "replay";
   if (s.includes("imported") || s.includes("human") || s.includes("judge")) return "imported_human";
   if (s.includes("simul") || s.includes("model") || s.includes("in_silico") || s.includes("in-silico")) return "simulated";
@@ -58,7 +59,8 @@ export function normProv(p) {
 export function provBadge(p, text) {
   const n = normProv(p);
   const raw = typeof p === "string" ? p : (p && (p.source || p.provenance)) || "";
-  return h("span", { class: `badge prov-${n}`, title: raw ? `provenance: ${raw}` : "provenance" }, text || (n === "unknown" ? (raw || "unknown") : n));
+  const label = text || (n === "unknown" ? (raw || "unknown") : n === "real" ? "real · physical" : n === "imported_human" && /manual/i.test(raw) ? "manual (human)" : n);
+  return h("span", { class: `badge prov-${n}`, title: raw ? `provenance: ${raw}` : "provenance" }, label);
 }
 export function statusBadge(text, kind = "info") { return h("span", { class: `badge status-${kind}` }, text); }
 
@@ -255,4 +257,19 @@ export function renderValue(v, depth = 0) {
   const dl = h("dl", { class: "kv" });
   for (const [k, x] of Object.entries(v)) dl.append(h("dt", null, k.replace(/_/g, " ")), h("dd", null, renderValue(x, depth + 1)));
   return dl;
+}
+
+/** Telemetry value that may live on the row or (v1.1 extras) only inside row.payload. */
+export function tfield(tel, k) {
+  if (!tel) return null;
+  const v = tel[k];
+  if (v !== undefined && v !== null) return v;
+  const p = tel.payload && tel.payload[k];
+  return p === undefined ? null : p;
+}
+
+/** Map a telemetry record source to a demonstration mode. */
+export function demoMode(source) {
+  const n = normProv(source);
+  return n === "real" ? "live" : n === "replay" ? "replay" : n === "simulated" ? "simulation" : null;
 }

@@ -3,7 +3,6 @@ import { get, post, getToken, ApiError } from "./api.js";
 import { h, clear, fmt, num, provBadge, statusBadge, plotLayout, PLOT_CONFIG, whenPlotly, COLORS, agentSide, normSchedule, renderValue, toast, sleep, timeAgo, hhmmss } from "./util.js";
 import { messageText, messageSender, messageRecipient, messageKind, messageBody } from "./messages.js";
 import { motorTrack } from "./live.js";
-import { REPLAY_EXAMPLES } from "./examples.js";
 
 const STEP_DEFS = [
   { id: "saved", title: "Feedback saved" },
@@ -44,15 +43,18 @@ export class TastePanel {
   // ------------------------------------------------------------------ form
   buildForm() {
     document.querySelectorAll(".seg-btn").forEach((b) => b.addEventListener("click", () => this.setMode(b.dataset.mode)));
+    // Replay scenarios come from GET /api/v1/demos (data/demos/*.json, label "Replay").
     const sel = document.getElementById("replay-select");
-    REPLAY_EXAMPLES.forEach((ex, i) => sel.append(h("option", { value: String(i) }, `Replay · ${ex.title}`)));
-    sel.addEventListener("change", () => {
-      const ex = REPLAY_EXAMPLES[Number(sel.value)];
-      if (!sel.value || !ex) { this.setReplay(null); return; }
-      this.text.value = ex.text;
-      document.getElementById("taste-a").value = ex.loaf_a_notes || "";
-      document.getElementById("taste-b").value = ex.loaf_b_notes || "";
-      this.setReplay(ex);
+    sel.addEventListener("change", async () => {
+      const f = (this.demos || []).find((d) => d.path === sel.value);
+      if (!sel.value || !f) { this.setReplay(null); return; }
+      try {
+        const demo = await get(f.url);
+        this.text.value = demo.feedback_text || "";
+        document.getElementById("taste-a").value = demo.loaf_a_notes || "";
+        document.getElementById("taste-b").value = demo.loaf_b_notes || "";
+        this.setReplay({ title: demo.title || f.title || f.name, text: demo.feedback_text || "", demo, file: f });
+      } catch (e) { toast(`Could not load replay ${f.name}: ${e.message}`, "bad"); this.setReplay(null); }
     });
     this.text.addEventListener("input", () => { if (this.replay && this.text.value !== this.replay.text) this.setReplay(null); });
     this.form.addEventListener("submit", (ev) => { ev.preventDefault(); this.submit(); });
@@ -64,13 +66,45 @@ export class TastePanel {
     document.querySelectorAll(".seg-btn").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.mode === this.mode)));
     this.updateHint();
   }
+  async loadDemos() {
+    const sel = document.getElementById("replay-select");
+    try {
+      const r = await get("/api/v1/demos");
+      this.demos = (r.files || []).filter((f) => f.suffix === ".json");
+    } catch { this.demos = []; }
+    clear(sel, h("option", { value: "" }, this.demos.length ? "— recorded scenarios (Replay) —" : "— no replay scenarios available —"),
+      this.demos.map((f) => h("option", { value: f.path }, `${/^replay/i.test(f.title || "") ? "" : "Replay · "}${f.title || f.name}`)));
+  }
   setReplay(ex) {
     this.replay = ex;
     if (!ex) document.getElementById("replay-select").value = "";
     let banner = this.form.querySelector(".replay-banner");
+    let btn = this.form.querySelector("#replay-show");
     if (ex && !banner) { banner = h("div", { class: "replay-banner" }); this.form.querySelector(".taste-controls").before(banner); }
-    if (ex) banner.textContent = `REPLAY — scripted example input “${ex.title}”. It is not a live judge's tasting; the analysis below is computed live from it.`;
-    else if (banner) banner.remove();
+    if (ex && !btn) {
+      btn = h("button", { class: "btn btn-ghost", id: "replay-show", type: "button", onclick: () => this.showRecorded() }, "▶ Show recorded replay");
+      this.submitBtn.after(btn);
+    }
+    if (ex) {
+      clear(banner, h("b", null, "REPLAY — "), ex.demo?.disclaimer || `scripted example input “${ex.title}”, not a live judge's tasting.`,
+        h("div", { class: "tiny", style: { marginTop: "3px", fontWeight: 500 } }, "“Interpret & plan” re-runs this scripted text through the live decision cycle (and the motors). “Show recorded replay” displays the stored output only — nothing is sent to the devices."));
+    } else { banner?.remove(); btn?.remove(); }
+  }
+  async showRecorded() {
+    const ex = this.replay;
+    if (!ex?.demo?.result) { toast("This replay file has no recorded result.", "bad"); return; }
+    const d = ex.demo, re = d.resulting_experiment || {};
+    const resp = {
+      recorded: true, demo_id: d.id || ex.file?.name, feedback_id: null,
+      received_at_utc: d.generated_with?.now_utc || d.result.timestamp_utc, mode: "replay", pipeline_available: true,
+      result: d.result, stored_messages: [], motor_commands: [], schedule_applied: false, applied_setpoints: {},
+      experiment: { experiment_id: re.id || d.result.next_experiment?.id, title: re.title, hypothesis: re.hypothesis, schedules: re.schedules,
+        status: "recorded (not added to the live plan)", proposed_by: re.proposed_by || "agents (recorded)", provenance: "replay" },
+    };
+    this.beforeSetpoints = this.currentSetpoints();
+    this.resetSteps();
+    this.stepsEl.scrollIntoView({ behavior: "smooth", block: "start" });
+    await this.renderCycle(resp, { animate: true, replay: true, text: d.feedback_text, label: `${d.title || "Recorded replay"} · generated ${d.generated_with?.now_utc || ""}` });
   }
   updateHint() {
     const parts = [];
@@ -115,7 +149,9 @@ export class TastePanel {
       const d = f.data || {};
       if (!d.command_id || !this.motorCmds[d.command_id]) return;
       const status = f.type === "ack" ? (d.command_status || d.status) : d.status;
-      this.motorCmds[d.command_id] = { ...this.motorCmds[d.command_id], status, acked: this.motorCmds[d.command_id].acked || f.type === "ack" };
+      this.motorCmds[d.command_id] = { ...this.motorCmds[d.command_id], status, acked: this.motorCmds[d.command_id].acked || f.type === "ack",
+        ran: this.motorCmds[d.command_id].ran || d.ran === true || (f.type === "ack" && d.status === "completed"),
+        acks: f.type === "ack" ? [...(this.motorCmds[d.command_id].acks || []), { status: d.status }] : this.motorCmds[d.command_id].acks };
       this.renderMotor();
     };
     this.stream.on("command", onCmd).on("ack", onCmd);
@@ -130,6 +166,7 @@ export class TastePanel {
   }
 
   async init() {
+    await this.loadDemos();
     await this.loadPlan();
     try {
       const rows = await get("/api/v1/taste-feedback?limit=1");
@@ -197,7 +234,7 @@ export class TastePanel {
     this.current = resp;
     const r = resp.result || {};
     const isReplay = !!replay;
-    document.dispatchEvent(new CustomEvent("fermentai:mode", { detail: { modeLabel: r.mode_label, pipeline: resp.pipeline_available } }));
+    document.dispatchEvent(new CustomEvent("fermentai:mode", { detail: { modeLabel: r.mode_label, reasoning: r.reasoning_mode_label, pipeline: resp.pipeline_available, replay: !!resp.recorded } }));
     const msgs = (resp.stored_messages && resp.stored_messages.length ? resp.stored_messages : (r.agent_messages || []).map((m) => ({ content: m, sender: messageSender(m), recipient: messageRecipient(m), kind: messageKind(m) })));
     const sides = msgs.map((m) => agentSide(m.sender ?? messageSender(m)));
     const lead = sides.find((s) => s) || "A";
@@ -205,10 +242,12 @@ export class TastePanel {
     const firstPeer = sides.findIndex((s) => s === peer);
     const leadMsgs = firstPeer < 0 ? msgs : msgs.slice(0, firstPeer);
     const peerMsgs = firstPeer < 0 ? [] : msgs.slice(firstPeer);
-    this.newExperimentId = resp.experiment?.experiment_id || null;
+    this.newExperimentId = resp.recorded ? null : (resp.experiment?.experiment_id || null);
     this.motorCmds = Object.fromEntries((resp.motor_commands || []).map((c) => [c.command_id, c]));
 
-    const modeBadge = statusBadge(r.mode_label || resp.mode || "mode unknown", /placeholder/i.test(r.mode_label || "") ? "bad" : "info");
+    const reasoning = r.reasoning_mode_label || (/^live:/i.test(r.mode_label || "") ? "Online Agent" : r.mode_label ? "Offline Policy" : "mode unknown");
+    const modeBadge = h("span", { class: `badge status-${/placeholder/i.test(r.mode_label || "") ? "bad" : /online/i.test(reasoning) ? "good" : "info"}`, title: `mode_label: ${r.mode_label || "—"}` },
+      resp.recorded ? `${reasoning} · recorded` : reasoning);
     const steps = [
       ["saved", () => ({ badges: [provBadge(isReplay ? "replay" : "imported_human", isReplay ? "replay input" : "judge input"), modeBadge], body: this.bodySaved(resp, label, isReplay, text) })],
       ["interp", () => ({ badges: [provBadge("estimated", "interpreted"), r.sensory_interpretation?.method ? statusBadge(r.sensory_interpretation.method, "info") : null], body: this.bodyInterp(r.sensory_interpretation) })],
@@ -242,15 +281,20 @@ export class TastePanel {
     const raw = r.sensory_interpretation?.raw_text;
     return h("div", null,
       label ? h("div", { class: "tiny faint" }, label) : null,
-      h("div", null, `Feedback #${resp.feedback_id} stored at ${hhmmss(resp.received_at_utc)} · requested mode: ${resp.mode}`),
+      resp.recorded
+        ? h("div", null, `Recorded replay “${resp.demo_id}” — output generated ${resp.received_at_utc || "earlier"} by the offline policy. Not stored as new feedback; no device commands sent.`)
+        : h("div", null, `Feedback #${resp.feedback_id} stored at ${hhmmss(resp.received_at_utc)} · requested mode: ${resp.mode}`),
       resp.pipeline_available === false ? h("div", { class: "stale-banner", style: { marginTop: "6px" } }, "Agents pipeline unavailable — the server saved your feedback and returned a clearly-labelled placeholder.") : null,
-      isReplay ? h("div", { class: "replay-banner" }, "Replay: scripted example input, not a live tasting.") : null,
+      isReplay ? h("div", { class: "replay-banner" }, resp.recorded ? "REPLAY: recorded scenario — scripted input and stored output, not a live tasting." : "Replay: scripted example input, not a live tasting.") : null,
       raw || !text ? null : h("div", { class: "quote", style: { marginTop: "6px" } }, text));
   }
 
   bodyInterp(si) {
     if (!si) return h("div", { class: "empty" }, "No interpretation returned.");
-    if (!si.loaves) return renderValue(si);
+    const pref = Array.isArray(si.structured_preference) && si.structured_preference.length
+      ? h("div", { class: "human-pref" }, h("h4", null, "Human preference:"), h("ul", null, si.structured_preference.map((p) => h("li", null, typeof p === "string" ? p : messageText(p) || JSON.stringify(p)))))
+      : null;
+    if (!si.loaves) return h("div", null, pref, renderValue(si));
     const text = si.raw_text || "";
     const spans = [];
     const addEv = (ev, cls) => (ev || []).forEach((e) => { if (Number.isInteger(e.start) && Number.isInteger(e.end) && e.end > e.start) spans.push({ ...e, cls }); });
@@ -285,6 +329,7 @@ export class TastePanel {
     const desired = Object.entries(si.desired || {});
     const unattr = Object.entries(si.unattributed?.attributes || {});
     return h("div", null,
+      pref,
       quote,
       h("div", { class: "tiny faint", style: { marginTop: "3px" } }, "Highlighted: ", h("mark", { class: "ev ev-A" }, "Loaf A evidence"), " ", h("mark", { class: "ev ev-B" }, "Loaf B evidence"), " ", h("mark", { class: "ev ev-desired" }, "desired change"), ` · overall confidence ${fmt(si.overall_confidence, 2)} · scales 0–1, 0.5 = neutral`),
       h("div", { class: "scores" }, loafCol("A"), loafCol("B")),
@@ -298,6 +343,32 @@ export class TastePanel {
       (si.notes || []).length ? h("div", { class: "tiny faint" }, si.notes.join(" ")) : null);
   }
 
+  observationsBlock(obs) {
+    if (!obs || typeof obs !== "object" || !Object.keys(obs).length) return null;
+    return h("div", null, h("h4", { style: { marginTop: "10px" } }, "Chamber observations used (quality-checked)"),
+      h("div", { class: "obs-grid" }, Object.entries(obs).map(([cid, o]) => {
+        const q = o?.latest?.quality_summary || {};
+        const qq = o?.quality || {};
+        const counts = q.counts ? Object.entries(q.counts).map(([k, v]) => `${v} ${k}`).join(" · ") : "";
+        const ph = o?.ph_status || {};
+        const anoms = o?.latest?.anomalies || [];
+        const src = o?.latest?.record_source || (qq.sources || []).join("+");
+        return h("div", { class: "obs-card" },
+          h("div", null, h("span", { class: `chip chip-${agentSide(cid) || "sys"}` }, cid), " ", src ? provBadge(src) : statusBadge("no telemetry", "info"),
+            qq.latest_stale ? statusBadge("stale", "bad") : null,
+            o?.latest?.age_s !== undefined && o?.latest?.age_s !== null ? h("span", { class: "tiny faint" }, ` latest ${Math.round(o.latest.age_s)} s old`) : null),
+          !o?.latest ? h("div", { class: "faint" }, "No usable telemetry for this chamber.") : null,
+          counts ? h("div", null, h("b", null, "Fields: "), counts) : null,
+          (q.downweighted || []).length ? h("div", { class: "tiny" }, "Down-weighted: ", q.downweighted.join(", ")) : null,
+          (q.rejected || []).length ? h("div", { class: "tiny warn-text" }, "Rejected: ", q.rejected.join(", ")) : null,
+          (q.missing || []).length ? h("div", { class: "tiny faint" }, "Missing: ", q.missing.join(", ")) : null,
+          h("div", { class: ph.valid ? "" : "warn-text" }, h("b", null, "pH: "), ph.valid ? `${fmt(ph.latest, 2)} (valid observation)` : `no valid pH${ph.reason ? ` — ${ph.reason}` : ""}`),
+          h("div", { class: "tiny faint" }, "Deviation from prediction: ", o?.deviations_from_prediction ? "" : "not available (no matching prediction run)"),
+          o?.deviations_from_prediction ? renderValue(o.deviations_from_prediction) : null,
+          anoms.length ? h("div", { class: "tiny warn-text" }, `⚠ anomalies: ${anoms.map((a) => a.code || a.type || JSON.stringify(a)).join(", ")}`) : null);
+      })));
+  }
+
   compareProv(r) {
     if (r.provenance?.prediction_source) return r.provenance.prediction_source;
     const c = r.comparison_with_recorded || r.comparison || r.experiment_comparison || r.recorded_comparison || r.evidence;
@@ -306,6 +377,7 @@ export class TastePanel {
 
   bodyCompare(r) {
     const cw = r.comparison_with_recorded;
+    const obsEl = this.observationsBlock(r.observations);
     if (cw && typeof cw === "object" && (cw.A || cw.B)) {
       const cal = r.provenance?.calibration || {};
       const rank = Array.isArray(r.candidate_ranking) ? r.candidate_ranking.slice(0, 5) : [];
@@ -324,7 +396,8 @@ export class TastePanel {
             h("thead", null, h("tr", null, h("th", null, "Candidate"), h("th", { class: "num" }, "Cost"), h("th", { class: "num" }, "Pred. sour"), h("th", { class: "num" }, "Pred. open"), h("th", { class: "num" }, "Over-proof"))),
             h("tbody", null, rank.map((c, i) => h("tr", null, h("td", null, i === 0 ? "★ " : "", c.name || c.id, h("div", { class: "tiny faint" }, (c.route || "").replace(/_/g, " "))),
               h("td", { class: "num" }, fmt(c.score, 3)), h("td", { class: "num" }, fmt(c.pred_sourness, 2)), h("td", { class: "num" }, fmt(c.pred_openness, 2)),
-              h("td", { class: "num" }, num(c.overproof_risk) === null ? "—" : `${Math.round(c.overproof_risk * 100)} %`))))))) : null);
+              h("td", { class: "num" }, num(c.overproof_risk) === null ? "—" : `${Math.round(c.overproof_risk * 100)} %`))))))) : null,
+        obsEl);
     }
     const c = r.comparison ?? r.experiment_comparison ?? r.recorded_comparison ?? r.evidence ?? null;
     if (c && c.recorded) {
@@ -472,10 +545,10 @@ export class TastePanel {
     const el = document.getElementById("taste-motor");
     if (!el) return;
     const cmds = Object.values(this.motorCmds);
-    if (!cmds.length) { clear(el, h("div", { class: "empty" }, "No motor command was issued in this cycle.")); return; }
+    if (!cmds.length) { clear(el, h("div", { class: "empty" }, this.current?.recorded ? "Recorded replay — no motor commands were sent to the devices." : "No motor command was issued in this cycle.")); return; }
     clear(el, cmds.sort((a, b) => String(a.chamber_id).localeCompare(String(b.chamber_id))).map((c) => h("div", { class: "motor-row", style: { marginBottom: "6px", "--c": c.chamber_id === "B" ? COLORS.B : COLORS.A } },
       h("span", { class: `chip chip-${c.chamber_id}` }, `Chamber ${c.chamber_id}`),
-      h("span", { class: "small" }, `${c.pattern || "wiggle"} ≤ ${fmt(c.duration_s, 0)} s`),
+      h("span", { class: "small" }, `${c.pattern || c.parameters?.pattern || "wiggle"} ${fmt(c.duration_s ?? (num(c.duration_ms ?? c.parameters?.duration_ms) ?? NaN) / 1000, 1)} s`),
       motorTrack(c))),
     h("div", { class: "tiny faint" }, "Decorative chef-hat automaton = “new experiment planned”. Separate command type, bounded ≤ 10 s, cancellable, cannot touch the Peltier controller. It does not mean bread was mixed, fed or baked."));
   }
@@ -487,7 +560,7 @@ export class TastePanel {
       if (!open.length) return;
       try {
         const rows = await get("/api/v1/commands?command_type=motor&limit=20");
-        for (const r of rows) if (this.motorCmds[r.command_id]) this.motorCmds[r.command_id] = { ...this.motorCmds[r.command_id], status: r.status, acked: r.acked };
+        for (const r of rows) if (this.motorCmds[r.command_id]) this.motorCmds[r.command_id] = { ...this.motorCmds[r.command_id], status: r.status, acked: r.acked, ran: r.ran, acks: r.acks };
         this.renderMotor();
       } catch { /* keep trying */ }
     }
@@ -540,6 +613,14 @@ export class TastePanel {
     const el = document.getElementById("taste-plan");
     if (!el) return;
     const e = resp.experiment || {};
+    if (resp.recorded) {
+      clear(el, h("div", { class: "small" }, statusBadge("replay", "warn"), " Recorded scenario: its proposed experiment is shown above but is ", h("b", null, "not"), " added to the live plan and no setpoints change."),
+        this.currentRunActions(resp.result?.current_run_actions),
+        h("div", { class: "small muted", style: { marginTop: "8px" } }, "Live plan (unchanged)"),
+        (this.experiments || []).slice(0, 3).map((x) => this.planItem(x)));
+      this.renderPlanCard();
+      return;
+    }
     const applyBtn = h("button", { class: "btn btn-sm", type: "button", disabled: !getToken() || !e.experiment_id, onclick: async (ev) => {
       ev.currentTarget.disabled = true;
       try {

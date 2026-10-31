@@ -13,26 +13,48 @@ const store = { serverOffsetMs: 0, health: null, modeLabel: null };
 captureTokenFromURL();
 
 // ------------------------------------------------------------------ global banner
-function setModePill(label, pipelineAvailable) {
+// Reasoning mode: "Online Agent" | "Offline Policy" (pipeline reasoning_mode_label); raw mode_label in tooltip.
+function setModePill({ reasoning, modeLabel, pipeline, replay } = {}) {
   const pill = $("#mode-pill");
-  const text = String(label || "");
-  let cls = "mode-offline";
-  if (/placeholder/i.test(text) || pipelineAvailable === false) cls = "mode-placeholder";
-  else if (/(live|llm|claude|anthropic|cloud)/i.test(text) && !/(fallback|deterministic|^offline)/i.test(text)) cls = "mode-live";
+  const raw = String(modeLabel || "");
+  let label = reasoning || (/^live:/i.test(raw) ? "Online Agent" : raw ? "Offline Policy" : "");
+  let cls = /online/i.test(label) ? "mode-live" : "mode-offline";
+  if (pipeline === false || /placeholder/i.test(raw)) { label = "Placeholder (agents pipeline unavailable)"; cls = "mode-placeholder"; }
+  if (replay) { label = `${label || "Offline Policy"} · REPLAY (recorded)`; cls = "mode-replay"; }
+  if (/live unavailable/i.test(raw)) label += " · online LLM unavailable";
   pill.className = `pill pill-mode ${cls}`;
-  // Keep the pill short; the full server label (including any fallback reason) is in the tooltip.
-  const main = text.replace(/\s*\(.*\)\s*$/, "");
-  const pretty = main.replace(/^offline:/i, "Offline · ").replace(/^live:/i, "Live LLM · ").replace(/_/g, " ")
-    + (/live unavailable/i.test(text) ? " · live LLM unavailable" : "");
-  pill.textContent = text ? `Mode: ${pretty}` : "Mode: unknown";
-  pill.title = `Decision engine mode reported by the server: ${text}`;
+  pill.textContent = `Reasoning: ${label || "unknown"}`;
+  pill.title = raw ? `Server mode_label: ${raw}` : "Reasoning mode of the scientist agents";
 }
-document.addEventListener("fermentai:mode", (e) => { store.modeLabel = e.detail.modeLabel; setModePill(e.detail.modeLabel, e.detail.pipeline); });
+document.addEventListener("fermentai:mode", (e) => { store.modeLabel = e.detail.modeLabel; setModePill(e.detail); });
+
+// Demonstration mode from the record source of each chamber's latest (non-stale) telemetry.
+const sources = {};
+document.addEventListener("fermentai:source", (e) => { sources[e.detail.chamber] = e.detail; updateDataMode(); });
+function updateDataMode() {
+  const el = $("#data-mode");
+  const bar = $("#mode-bar");
+  const active = new Set();
+  const parts = [];
+  for (const c of ["A", "B"]) {
+    const s = sources[c];
+    if (!s) continue;
+    const m = s.stale ? null : s.mode;
+    if (m) active.add(m);
+    const short = { live: "LIVE", replay: "REPLAY", simulation: "SIM" };
+    parts.push(`${c}: ${s.stale ? "stale" : (m ? short[m] : (s.source || "no data"))}`);
+  }
+  el.querySelectorAll(".dm-seg").forEach((seg) => seg.classList.toggle("on", active.has(seg.dataset.mode)));
+  el.querySelector(".dm-detail").textContent = parts.length ? parts.join(" · ") : "waiting for data…";
+  bar.className = `mode-bar ${active.size === 1 ? [...active][0] : active.size > 1 ? "mixed" : ""}`;
+  const word = { live: "LIVE = physical devices (source measured)", replay: "REPLAY = recorded data", simulation: "SIMULATION = virtual devices / generated data" };
+  el.title = `Demonstration mode from the telemetry actually arriving. ${[...active].map((m) => word[m]).join("; ") || "No fresh telemetry."}`;
+}
 
 function setSsePill({ state, retryInMs }) {
   const pill = $("#sse-pill");
   const txt = pill.querySelector(".txt");
-  if (state === "connected") { pill.className = "pill pill-ok"; txt.textContent = "Live (SSE connected)"; }
+  if (state === "connected") { pill.className = "pill pill-ok"; txt.textContent = "Connected (SSE)"; }
   else if (state === "reconnecting") { pill.className = "pill pill-warn"; txt.textContent = `Reconnecting${retryInMs ? ` in ${Math.ceil(retryInMs / 1000)} s` : "…"}`; }
   else if (state === "closed") { pill.className = "pill pill-bad"; txt.textContent = "Disconnected"; }
   else { pill.className = "pill pill-warn"; txt.textContent = "Connecting…"; }
@@ -101,10 +123,9 @@ async function boot() {
     store.health = await get("/api/v1/health");
     store.serverOffsetMs = Date.parse(store.health.server_time_utc) - Date.now();
     const llm = String(store.health.llm_mode || "offline");
-    setModePill(llm === "offline" ? "Offline deterministic fallback (server default)" : `Live LLM configured (${llm})`, store.health.pipeline_available);
-    if (!store.health.pipeline_available) setModePill("placeholder — agents pipeline not installed", false);
+    setModePill({ reasoning: llm === "offline" ? "Offline Policy" : "Online Agent (configured)", modeLabel: `server llm_mode=${llm}`, pipeline: store.health.pipeline_available });
   } catch (e) {
-    setModePill("API unreachable", false);
+    setModePill({ reasoning: "unknown (API unreachable)" });
     toast(`Cannot reach the local API: ${e.message}`, "bad");
   }
 

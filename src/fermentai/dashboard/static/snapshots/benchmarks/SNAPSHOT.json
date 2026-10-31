@@ -1,0 +1,18 @@
+{
+ "note": "Copied by fermentai.dashboard.vendor because no API route serves the source directory.",
+ "copied_utc": "2026-10-31T05:00:54Z",
+ "files": {
+  "summary.json": {
+   "source": "data/benchmarks/summary.json",
+   "sha256": "65ac963781038dbf4cdfcfe5826c9733e456e4370d7e73f0cfd8d51c23126d21"
+  },
+  "run_manifest.json": {
+   "source": "data/benchmarks/run_manifest.json",
+   "sha256": "d3ec9d27e8834da8083241aec287b60a4ed0de4074e97158b4751f707edc9b9c"
+  },
+  "paired_differences_well_specified.png": {
+   "source": "data/benchmarks/paired_differences_well_specified.png",
+   "sha256": "302ca767e5452320c7f54515cc320d24d5676a60719f500c50099ffee0eb4063"
+  }
+ }
+}

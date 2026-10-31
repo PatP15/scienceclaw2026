@@ -26,7 +26,11 @@
     </div>
   </div>
   <div class="status-row" role="status" aria-live="polite">
-    <span id="mode-pill" class="pill pill-mode" title="Decision engine mode">Mode: …</span>
+    <span id="data-mode" class="datamode" title="Demonstration mode, derived from the telemetry actually arriving (record source of each chamber)">
+      <span class="dm-seg dm-live" data-mode="live">LIVE</span><span class="dm-seg dm-replay" data-mode="replay">REPLAY</span><span class="dm-seg dm-sim" data-mode="simulation">SIMULATION</span>
+      <span class="dm-detail">waiting for data…</span>
+    </span>
+    <span id="mode-pill" class="pill pill-mode" title="Reasoning mode">Reasoning: …</span>
     <span id="sse-pill" class="pill pill-warn"><span class="dot"></span><span class="txt">Connecting…</span></span>
     <button id="token-pill" class="pill pill-btn" type="button">Read-only</button>
     <span id="clock" class="clock">--:--:--</span>
@@ -39,6 +43,7 @@
   <button role="tab" class="tab" data-tab="molecular" id="tabbtn-molecular" aria-controls="tab-molecular">NVIDIA Molecular Explorer</button>
   <button role="tab" class="tab tab-key" data-tab="taste" id="tabbtn-taste" aria-controls="tab-taste">Taste → Next Experiment</button>
 </nav>
+<div id="mode-bar" class="mode-bar" aria-hidden="true"></div>
 </div>
 
 <main>
@@ -65,8 +70,10 @@
     <div class="chart-grid" id="twin-charts"></div>
     <div class="twin-lower">
       <div class="card" id="twin-summary"></div>
-      <div class="card" id="twin-morphology"></div>
+      <div class="card" id="twin-chain"></div>
     </div>
+    <div class="card" id="twin-morphology" style="margin-top:10px"></div>
+    <div class="card" id="twin-bench" style="margin-top:10px"></div>
   </section>
 
   <!-- ===================================================== Molecular -->

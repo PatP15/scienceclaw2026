@@ -3,32 +3,41 @@
 Owner scope: src/fermentai/dashboard/ (static/, vendor.py), tests/test_dashboard_*.py, this file.
 Do NOT edit api/agents/fermentation/geometry/molecular.
 
-## Status: COMPLETE (v1). `uv run pytest tests/test_dashboard_*.py` -> 36 passed (95 with test_api_*)
-- [x] Vendored plotly.min.js (plotly.py 7.1.0 -> plotly.js 4.1.1) into static/vendor/; `vendor.py` re-copies/checks
-- [x] index.html, css/dashboard.css, js/{app,api,util,messages,live,twin,molecular,taste,examples}.js
-- [x] tests/test_dashboard_offline.py (URL scan, no fonts/CDN, plotly matches installed pkg, no map/geo traces)
-- [x] tests/test_dashboard_serve.py (GET /, crawl every asset + ES import -> 200 w/ JS MIME, JS API paths vs OpenAPI)
-- [x] Live run on :8765 with scripts/simulate_device.py; headless Chrome via CDP: all 4 tabs, taste cycle,
-      motor start/cancel, 3D explorer iframe (SwiftShader WebGL), SSE kill -9 / restart resume, 390/820/1180 widths.
-      Every run: 0 external requests, 0 console errors. Screenshot: data/demos/dashboard_screenshot.png
+## Status: v2 (PLAN_MASTER §11/§14, contract v1.1) COMPLETE, not committed
+`uv run pytest tests/test_dashboard_*.py tests/test_api_*.py` -> 141 passed, 1 skipped.
+Verified live against `scripts/start_demo.sh --with-simulated-devices --sim-images` (port 8765) with
+headless Chrome over CDP: every view, demo_04 live cycle (motors issued->accepted->completed·ran on A and B),
+recorded replay, molecular viewers. 0 external requests. Screenshots: data/demos/dashboard_{screenshot,live,
+twin,molecular,taste}.png
 
-## Design notes
-- Served by FastAPI StaticFiles at "/" (html=True). Plain ES modules, no build. Plotly = classic deferred script.
-- Token: ?token= read once -> localStorage "fermentai.token" -> stripped from URL. "Read-only"/"Write access"
-  pill opens a token dialog.
-- SSE: own reconnect (exp. backoff 1..30 s with jitter), resumes with ?since=<last id>, de-dupes ids.
-- Colours: chamber A #3987e5, B #d95926; acetic #199e70, lactic #9085e9.
-- Pipeline result rendered defensively: parse_feedback shape, comparison_with_recorded, candidate_ranking,
-  hypothesis object, next_experiment.schedules{points,predicted}, current_run_actions, safety_note.
-- Agent messages are Finding dicts (agent_id); API stores sender=NULL for them, so live.js reads
-  /agents/all/messages and filters client-side.
+## v2 changes
+- Header: LIVE / REPLAY / SIMULATION indicator derived from each chamber's telemetry `source`
+  (measured->LIVE "real · physical", simulated->SIMULATION, replay->REPLAY) + colour bar; reasoning pill
+  "Online Agent" / "Offline Policy" from `reasoning_mode_label` (mode_label in tooltip); SSE pill "Connected".
+- Live cards: device_id, boot, seq, uptime, fw; "device clock unsynced" (timestamp_utc null -> receipt time);
+  per-value field_provenance mini badges; pressure, Peltier output fraction, motor state, rise estimate,
+  last valid update; heatsinks in an "Equipment safety — not fermentation evidence" strip; diagnostics
+  (RSSI, heap, sensor_health badges, flags); missing -> "unavailable". Agent box from GET /agents/{id}/state.
+  Pending commands from state.pending_commands. Motor track issued -> accepted -> completed · ran (acks/`ran`).
+- Taste: Replay dropdown from GET /api/v1/demos (examples.js deleted); "Show recorded replay" renders the
+  stored demo result without API writes; "Human preference:" block (structured_preference); observations[c]
+  (quality counts, down-weighted/missing, pH validity, deviations, anomalies).
+- Molecular: provenance (GPU, toolkit, checkpoint, 159 opts, 72 MD, cross-check, cost from report.md excerpt),
+  caveat, association chart+table, deprotonation table, MD H-bonds vs T chart (md_summary.csv), coupling report
+  (data/predictions/molecular_coupling_report.json), 4 iframe viewers, H-bond table.
+  Falls back to /molecular/files/analysis_summary.json (NaN-tolerant parse) because /molecular/summary 500s.
+- Twin: baseline vs simulation-derived crumb specimens + table (chain_summary.json), evidence-chain strip,
+  IN-SILICO benchmark panel from static/snapshots/benchmarks/ (synced by vendor.py; no API route).
 
-## Open items / requests to other areas (see final report)
-- API: map Finding `agent_id` -> sender in feedback._store_messages; expose data/demos via API; serve
-  data/alchemi/results/xyz if a native (non-iframe) 3D view is wanted.
+## Open items for other areas
+- API: /molecular/summary -> HTTP 500 (NaN in analysis_summary.json; jsonable() the summaries).
+- API/agents: build_context passes `recent_telemetry` (reduced keys, no received_at_utc/v1.1 fields) but the
+  pipeline reads `context["telemetry"]` -> live cycles always report "no telemetry" observations.
+- API: no route for data/benchmarks/ (dashboard uses a synced snapshot) or data/alchemi/environment/report.md
+  (GPU cost hard-coded with source note in molecular.js RUN_REPORT).
 
 ## Resume
-`uv run pytest tests/test_dashboard_*.py`
-Run: `FERMENTAI_DB_PATH=/tmp/x.sqlite3 FERMENTAI_API_TOKEN=t uv run uvicorn fermentai.api.app:app --port 8765`
-then `FERMENTAI_API_TOKEN=t uv run python scripts/simulate_device.py --base-url http://127.0.0.1:8765 --images`
-and open http://127.0.0.1:8765/?token=t
+`uv run python -m fermentai.dashboard.vendor` (re-copy plotly + snapshots), `--check`;
+`uv run pytest tests/test_dashboard_*.py`.
+Run: `FERMENTAI_HOST=127.0.0.1 FERMENTAI_PORT=8765 FERMENTAI_DB_PATH=/tmp/x.sqlite3 FERMENTAI_API_TOKEN=t
+scripts/start_demo.sh --with-simulated-devices --sim-images`, open http://127.0.0.1:8765/?token=t

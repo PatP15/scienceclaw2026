@@ -93,3 +93,18 @@ def test_system_fonts_only():
     css = (STATIC / "css" / "dashboard.css").read_text()
     assert "--font: -apple-system" in css
     assert "font-face" not in css
+
+
+def test_data_snapshots_match_their_sources():
+    """static/snapshots/ copies (for data dirs the API does not serve) must not go stale."""
+    assert vendor.snapshot_problems() == []
+
+
+def test_live_cards_never_invent_missing_values():
+    """Missing sensors render an explicit 'unavailable' state (PLAN_MASTER §11), and the
+    measured source maps to the real/physical badge."""
+    live = (STATIC / "js" / "live.js").read_text()
+    util = (STATIC / "js" / "util.js").read_text()
+    assert '"unavailable"' in live and "device clock unsynced" in live
+    assert "equipment safety" in live.lower() and "not fermentation evidence" in live
+    assert 's.startsWith("measured")' in util

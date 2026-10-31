@@ -69,7 +69,7 @@ def collect_assets(client):
 def test_every_referenced_asset_resolves(client):
     assets = collect_assets(client)
     assert "/vendor/plotly.min.js" in assets and "/js/app.js" in assets and "/css/dashboard.css" in assets
-    for mod in ("api", "util", "live", "twin", "molecular", "taste", "messages", "examples"):
+    for mod in ("api", "util", "live", "twin", "molecular", "taste", "messages"):
         assert f"/js/{mod}.js" in assets, f"{mod}.js not reachable from index.html imports"
     bad = {u: r.status_code for u, r in assets.items() if r.status_code != 200}
     assert not bad, bad
@@ -96,9 +96,11 @@ def _api_paths_in_js():
     for p in (STATIC_DIR / "js").glob("*.js"):
         for lit in API_LITERAL_RE.findall(p.read_text()):
             path = lit.split("?")[0]
+            if path.endswith("/"):  # URL prefix constant, e.g. FILES = "/api/v1/molecular/files/"
+                path += "X"
             path = re.sub(r"/\$\{[^}]*\}(?=/|$)", "/X", path)  # whole-segment params -> placeholder
             path = re.sub(r"\$\{[^}]*\}", "", path)  # query-string suffixes like ${qs}
-            out.add(path.rstrip("/") or path)
+            out.add(path)
     return sorted(out)
 
 
@@ -120,7 +122,8 @@ def test_api_reads_used_by_dashboard_work_unauthenticated(client):
     for path in ("/api/v1/health", "/api/v1/chambers/A/state", "/api/v1/chambers/A/telemetry?limit=10",
                  "/api/v1/agents/all/messages?limit=5", "/api/v1/experiments?limit=8",
                  "/api/v1/taste-feedback?limit=1", "/api/v1/predictions", "/api/v1/molecular/summary",
-                 "/api/v1/stl", "/api/v1/commands?command_type=motor&limit=5"):
+                 "/api/v1/stl", "/api/v1/commands?command_type=motor&limit=5", "/api/v1/demos",
+                 "/api/v1/agents/A/state", "/api/v1/agents/B/state"):
         r = client.get(path)
         assert r.status_code == 200, (path, r.status_code, r.text[:200])
 
@@ -130,3 +133,16 @@ def test_sse_stream_named_events_shape(client):
     with client.stream("GET", "/api/v1/events/stream?since=0&max_events=1&timeout_s=2") as r:
         body = "".join(r.iter_text())
     assert "event: telemetry" in body and '"chamber_id":"B"' in body
+
+
+def test_benchmark_snapshot_served(client):
+    r = client.get("/snapshots/benchmarks/SNAPSHOT.json")
+    assert r.status_code == 200
+    for name in r.json()["files"]:
+        assert client.get(f"/snapshots/benchmarks/{name}").status_code == 200
+
+
+def test_replay_examples_come_from_api_not_bundled():
+    js = "\n".join(p.read_text() for p in (STATIC_DIR / "js").glob("*.js"))
+    assert "/api/v1/demos" in js
+    assert not (STATIC_DIR / "js" / "examples.js").exists()
