@@ -93,11 +93,16 @@ and 100 kΩ on the MOSFET gate. That keeps them off in the ~300 ms between reset
 
 ## 5. Bring-up results (fill in)
 
+Board note (2026-10-31): the board enumerates on the Mac as **Espressif "USB JTAG/serial debug unit"**
+(`/dev/cu.usbmodem*`, VID 0x303A PID 0x1001), i.e. the native USB port, not a CH340 UART. The
+console is therefore built with `ARDUINO_USB_MODE=1` + `ARDUINO_USB_CDC_ON_BOOT=1`. Opening the
+port with DTR/RTS asserted resets the chip (new `boot_id`), so open it with both lines low.
+
 | Item | Measured value / observation | Date | By |
 |---|---|---|---|
-| Module marking (e.g. ESP32-S3-WROOM-1 N16R8) | | | |
-| PSRAM detected (`status` → psram > 0) | | | |
-| Camera init OK with table 1 | | | |
+| Module marking (e.g. ESP32-S3-WROOM-1 N16R8) | esptool: ESP32-S3 rev v0.2, flash 16 MB (mfr 0x68 dev 0x4018), PSRAM ≈8 MB → N16R8-class. Printed marking still to be read off the can. | 2026-10-31 | PP + Claude |
+| PSRAM detected (`status` → psram > 0) | yes: `psram=8179891` free (≈8 MB octal, 3.3 V class, so GPIO47 is a 3.3 V pin) | 2026-10-31 | PP + Claude |
+| Camera init OK with table 1 | yes: boot log `camera: ok` on first try with the ESP32-S3-EYE set | 2026-10-31 | PP + Claude |
 | GPIO38 level during reset (RST held) / after boot | | | |
 | GPIO40 level during reset / after boot | | | |
 | GPIO14 / GPIO21 level during reset | | | |

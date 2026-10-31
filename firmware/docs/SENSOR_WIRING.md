@@ -54,6 +54,27 @@ All signal levels are 3.3 V. **No ESP32 pin may see more than 3.3 V.**
 - **Gas resistance is not CO₂.** It is a broad VOC-, humidity- and temperature-sensitive
   resistance and is reported only as `gas_resistance_ohms`.
 
+## ENS160 + AHT21 combo board (`-DENV_SENSOR=ENV_SENSOR_ENS160_AHT21`; fitted on chamber A, 2026-10-31)
+
+| Pin | Connect to |
+|---|---|
+| VIN / VCC | 3.3 V (never 5 V; the I²C lines must stay at 3.3 V) |
+| GND | GND |
+| SDA / SCL | GPIO41 / GPIO42 (breakout has its own pull-ups) |
+| INT | not connected |
+| ADD | not connected (ENS160 at 0x53) or GND (0x52). The firmware tries both. |
+
+- AHT21 (0x38) supplies `chamber_temperature_c` and `relative_humidity_percent`. `pressure_pa` and
+  `gas_resistance_ohms` are null with this sensor.
+- ENS160 (0x53/0x52) gives TVOC (ppb), eCO2 (ppm equivalent) and a 1–5 AQI. These are chip-computed
+  **indices, not a CO₂ measurement**, compensated with the AHT21 T/RH. Shown in the console
+  `status` line `ens160:`; not yet in telemetry (the contract has no field for them, needs a
+  backend-owner addition). Warm-up: ~3 min after power-up, ~1 h on first-ever use (`warmup=1`).
+- **Self-heating:** the ENS160 hot-plate sits millimetres from the AHT21. Bench observation
+  2026-10-31: the reading climbed 23.1 → 25.2 °C in the first 90 s after power-up at constant room
+  temperature. Compare against a DS18B20 in the same air and set an offset before trusting it as
+  the control temperature.
+
 ## SHT31 (optional, `-DENV_SENSOR=ENV_SENSOR_SHT31`)
 
 Same I²C bus. Address 0x44 (ADDR low) or 0x45 (ADDR high). No address conflict with the BME680

@@ -24,6 +24,7 @@
 #define ENV_SENSOR_NONE 0
 #define ENV_SENSOR_BME680 1
 #define ENV_SENSOR_SHT31 2
+#define ENV_SENSOR_ENS160_AHT21 3   // combined breakout: AHT21 T/RH (0x38) + ENS160 TVOC/eCO2 (0x52/0x53)
 #ifndef ENV_SENSOR
 #define ENV_SENSOR ENV_SENSOR_BME680
 #endif

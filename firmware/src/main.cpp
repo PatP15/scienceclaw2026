@@ -32,6 +32,7 @@
 #include "network/NetworkManager.h"
 #include "network/TelemetryClient.h"
 #include "sensors/BME680Sensor.h"
+#include "sensors/ENS160AHT21Sensor.h"
 #include "sensors/SHT31Sensor.h"
 #include "simulation/MockActuators.h"
 #include "simulation/MockSensors.h"
@@ -73,6 +74,8 @@ ThermalTestPlant plant(&pwmA, &pwmB, &envSensor, &owBus);
 #else
 #if ENV_SENSOR == ENV_SENSOR_SHT31
 SHT31Sensor envSensor(&Wire);
+#elif ENV_SENSOR == ENV_SENSOR_ENS160_AHT21
+ENS160AHT21Sensor envSensor(&Wire);
 #else
 BME680Sensor envSensor(&Wire);
 #endif
@@ -269,6 +272,11 @@ void printStatus(uint32_t now) {
                 (unsigned long)o.door_open_count,
                 csm.experiment().hasSetpoint() ? csm.experiment().setpoint() : NAN,
                 (unsigned long)csm.faults());
+#if !FERMENTAI_NOIO && ENV_SENSOR == ENV_SENSOR_ENS160_AHT21
+  Serial.printf("  ens160: present=%d addr=0x%02x valid=%d warmup=%d aqi=%u tvoc=%u ppb eco2=%u ppm (indices, not CO2)\n",
+                envSensor.ensPresent(), envSensor.ensAddress(), envSensor.ensDataValid(), envSensor.warmingUp(),
+                (unsigned)envSensor.aqi(), (unsigned)envSensor.tvocPpb(), (unsigned)envSensor.eco2Ppm());
+#endif
   Serial.print("  flags:");
   for (size_t i = 0; i < o.flags.n; ++i) Serial.printf(" %s", o.flags.items[i]);
   Serial.printf("\n  wifi=%d rssi=%ld tel_q=%u acks_q=%u heap=%lu psram=%lu\n",
