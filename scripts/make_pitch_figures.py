@@ -935,12 +935,37 @@ def fig_benchmark_summary():
 # ============================================================================================
 # 7. Technology partners: NVIDIA ALCHEMI | Formlabs PreForm (text wordmarks, no logos)
 # ============================================================================================
-# Placeholders until the PreForm integration reports real estimates. Never invent these.
+PRINT_MANIFEST = STL / "print" / "print_manifest.json"
+PREFORM_TRANSCRIPT = STL / "print" / "preform_api_transcript.json"
+# Shown only if the live PreForm manifest is missing. Never invent these.
 PREFORM_ESTIMATES = {
     "time": "[PreForm: print time — pending]",
     "resin": "[PreForm: resin volume — pending]",
 }
 HERO_PNG = STL / "hero_chamber_AB.png"
+
+
+def preform_numbers() -> dict | None:
+    """Estimates and checks from the live PreForm run (data/stl/print/print_manifest.json)."""
+    if not PRINT_MANIFEST.exists():
+        return None
+    m = json.loads(PRINT_MANIFEST.read_text())
+    est = m["build"]["estimates"]
+    chk = m["printability_checks"]
+    cups = {c: chk["cups"][c]["cup_count"] for c in chk["cups"]}
+    n_calls = None
+    if PREFORM_TRANSCRIPT.exists():
+        tr = json.loads(PREFORM_TRANSCRIPT.read_text())
+        n_calls = len(tr["entries"])
+        assert not any(e["path"].rstrip("/").endswith("/scene/print") for e in tr["entries"]), "print was called"
+    assert m["job_submitted"] is False
+    return {
+        "time_h": est["print_time_h"], "resin_ml": est["material_volume_ml"], "layers": est["layer_count"],
+        "n_checks": sum(isinstance(v, dict) for v in chk.values()), "cups": cups,
+        "check_note": "pass; cup warnings\n" + " · ".join(f"{c} {n}" for c, n in cups.items()),
+        "printer": m["printer"]["label"], "material": m["material"]["label"], "layer_mm": m["layer_thickness_mm"],
+        "server": m["preform_server"]["version"].rsplit(".", 1)[0], "n_calls": n_calls,
+    }
 
 
 def _placeholder(ax, x, y, text, size=11.0, ha="center"):
@@ -968,7 +993,7 @@ def fig_tech_highlights():
     fig, ax = canvas()
     ax.text(3, 86.5, "Two technology partners, one evidence chain", fontsize=22, fontweight="bold", color=INK,
             va="top")
-    ax.text(3, 81.2, "Wordmarks are text only. Each panel says what is real today and what is pending.", fontsize=13,
+    ax.text(3, 81.2, "Wordmarks are text only. Each badge says what is real and what is simulated.", fontsize=13,
             color=MUTED, va="top")
 
     px, pw, py, ph = (3.0, 81.5), 75.5, 4.0, 72.0
@@ -1015,45 +1040,72 @@ def fig_tech_highlights():
 
     # ---------------- Formlabs panel
     x = px[1]
+    pf = preform_numbers()
     rbox(ax, x, py, pw, ph, fc="white", ec=PURPLE, lw=2.6, r=2.0)
     ax.text(x + 3, py + ph - 5.0, "Formlabs PreForm API", fontsize=24, fontweight="bold", color=INK, va="center")
-    ax.text(x + 3, py + ph - 10.0, "printable crumb hypothesis, prepared via the PreForm Local API", fontsize=13,
-            color=MUTED, va="center")
-    badge(ax, x + pw - 3, py + ph - 5.0, "simulated", size=12, ha="right", text="SIMULATED GEOMETRY")
+    badge(ax, x + 3, py + ph - 10.6, "simulated", size=11, ha="left", text="GEOMETRY · SIMULATED")
+    badge(ax, x + 30.5, py + ph - 10.6, "real", size=11, ha="left", text="PRINT PREP · REAL (PreForm API)")
     # step chips
     steps = ["STL", "scene", "orient", "supports", "layout", "estimate", ".form"]
     cw, cg, cy = 8.6, 1.7, py + ph - 17.5
     for k, stp in enumerate(steps):
         cx0 = x + 3 + k * (cw + cg)
         last = k == len(steps) - 1
-        rbox(ax, cx0, cy - 2.4, cw, 4.8, fc=PURPLE if last else PANEL, ec="none", r=1.0)
+        rbox(ax, cx0, cy - 2.4, cw, 4.8, fc=GREEN if last else PANEL, ec="none", r=1.0)
         ax.text(cx0 + cw / 2, cy, stp, fontsize=11.5, fontweight="bold", color="white" if last else INK,
                 ha="center", va="center")
         if not last:
             ax.text(cx0 + cw + cg / 2, cy, "›", fontsize=14, color=MUTED, ha="center", va="center")
-    ax.text(x + 3, cy - 5.6, "Never auto-prints: a person reviews the .form and presses print.", fontsize=12,
-            color=INK, fontweight="bold", va="center")
-    # images
-    iy0, ih_ = py + 17.0, 27.0
+    if pf:
+        never = f"{pf['n_calls']} real PreForm API calls recorded; /v1/scene/print never called."
+    else:
+        never = "Never auto-prints: a person reviews the .form and presses print."
+    ax.text(x + 3, cy - 5.4, never, fontsize=12, color=INK, fontweight="bold", va="center")
+    # images: hero render (simulated geometry) + PreForm's own render (real print prep)
+    iy0, ih_ = py + 19.0, 25.0
+    hw = 41.0
     if HERO_PNG.exists():
         from PIL import Image
 
-        _fit_image(ax, np.asarray(Image.open(HERO_PNG).convert("RGB")), x + 3, iy0, pw - 6, ih_)
+        hero = Image.open(HERO_PNG).convert("RGB")
+        w_, h_ = hero.size
+        _fit_image(ax, np.asarray(hero.crop((0, int(h_ * 0.27), w_, int(h_ * 0.84)))), x + 2.5, iy0, hw, ih_ - 3.5)
     else:
         for j, c in enumerate("AB"):
             im = _crop(STL / "crumb_chamber_comparison.png", CHAMBER_THUMB_BOX[c])
-            cx0 = x + 3 + j * (pw - 6) / 2
             if im is not None:
-                _fit_image(ax, im, cx0 + 2, iy0, (pw - 6) / 2 - 4, ih_ - 4)
-            m = chain[c]["measured_on_mesh"]
-            ax.text(cx0 + (pw - 6) / 4, iy0 + ih_ - 1.0,
-                    f"{c} · {chain[c]['temperature_c']:.0f} °C · {100 * m['cut_face_pore_area_fraction']:.0f} % pores",
-                    fontsize=12.5, fontweight="bold", color=A_COL if c == "A" else "#d4660a", ha="center", va="center")
-    ext = chain["A"]["measured_on_mesh"]["extents_mm"]
-    ax.text(x + 3, py + 13.0, f"{ext[0]:.0f} × {ext[1]:.0f} × {ext[2]:.0f} mm · watertight, validated STL per chamber",
-            fontsize=12, color=INK, va="center")
-    _placeholder(ax, x + 3, py + 6.0, PREFORM_ESTIMATES["time"], ha="left")
-    _placeholder(ax, x + pw - 3, py + 6.0, PREFORM_ESTIMATES["resin"], ha="right")
+                _fit_image(ax, im, x + 2.5 + j * hw / 2, iy0, hw / 2 - 1, ih_ - 3.5)
+    for j, c in enumerate("AB"):
+        m = chain[c]["measured_on_mesh"]
+        ax.text(x + 2.5 + hw / 4 + j * hw / 2, iy0 + ih_ - 1.2,
+                f"{c} · {chain[c]['temperature_c']:.0f} °C · {100 * m['cut_face_pore_area_fraction']:.0f} %",
+                fontsize=12, fontweight="bold", color=A_COL if c == "A" else "#d4660a", ha="center", va="center")
+    iso = STL / "print" / "crumb_chambers_AB_form4-grey-v5_iso.png"
+    ix0 = x + 2.5 + hw + 2.0
+    iw_ = pw - (ix0 - x) - 2.5
+    rbox(ax, ix0, iy0 + 0.5, iw_, ih_ - 1.5, fc="#f2f2f2", ec=LINE, lw=1.2, r=1.2)
+    if iso.exists():
+        from PIL import Image
+
+        _fit_image(ax, np.asarray(Image.open(iso).convert("RGB")), ix0 + 0.8, iy0 + 1.3, iw_ - 1.6, ih_ - 5.5)
+    ax.text(ix0 + iw_ / 2, iy0 + ih_ - 2.3, "PreForm's render: rafts + supports", fontsize=10.5, color=INK,
+            ha="center", va="center", fontweight="bold")
+    # estimate tiles
+    if pf:
+        tiles = [(f"{pf['time_h']:.2f} h", "print time"), (f"{pf['resin_ml']:.0f} mL", "resin"),
+                 (f"{pf['layers']}", "layers"), (f"{pf['n_checks']} checks", pf["check_note"])]
+    else:
+        tiles = [("…", PREFORM_ESTIMATES["time"]), ("…", PREFORM_ESTIMATES["resin"])]
+    tw = (pw - 6 - (len(tiles) - 1) * 1.6) / len(tiles)
+    for k, (big, small) in enumerate(tiles):
+        tx = x + 3 + k * (tw + 1.6)
+        rbox(ax, tx, py + 7.2, tw, 10.8, fc=PANEL, ec="none", r=1.4)
+        ax.text(tx + 1.5, py + 14.9, big, fontsize=18, fontweight="bold", color=INK, va="center")
+        ax.text(tx + 1.5, py + 10.0, small, fontsize=10.5, color=MUTED, va="center", linespacing=1.1)
+    foot = (f"PreForm's own estimates: {pf['printer']} · {pf['material']} · {pf['layer_mm']} mm layers · both chambers "
+            f"on one platform\nofficial formlabs-sdk → PreFormServer {pf['server']} on the Mac · .form exported, "
+            "never auto-printed") if pf else "Prepared via the PreForm Local API; estimates pending."
+    ax.text(x + 3, py + 3.6, foot, fontsize=9.6, color=MUTED, va="center", linespacing=1.25)
     return save(fig, "tech_highlights")
 
 

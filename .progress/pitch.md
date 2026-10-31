@@ -6,18 +6,17 @@ Owner scope: docs/pitch/, docs/demo_script.md, scripts/make_pitch_figures.py, da
 - [x] scripts/make_pitch_figures.py — 7 figures (PNG 3200x1800 + SVG); numbers read from data files;
       byte-identical reruns; ruff clean; no matplotlib warnings
 - [x] tech_highlights (new): NVIDIA ALCHEMI | Formlabs PreForm panels, text wordmarks only
-- [x] docs/pitch/slides.md — investor deck: 391 spoken words = 2:48 @140 wpm
+- [x] docs/pitch/slides.md — investor deck: 401 spoken words = 2:52 @140 wpm
 - [x] docs/demo_script.md — investor intro; ~274 spoken words
 - [x] docs/pitch/figure_sources.md
 
 ## Pending placeholders
-- PREFORM_ESTIMATES in scripts/make_pitch_figures.py + slide 3 bullet: print time / resin volume
+- [ALCHEMI: relative pKa — pending] — slide 3 notes only (GPU campaign 2); not on any figure
 - [ASK — team to fill] on slide 4 (bullet + notes)
-- data/stl/hero_chamber_AB.png: picked up automatically by tech_highlights when it exists
+- Formlabs: DONE — tech_highlights reads data/stl/print/print_manifest.json + transcript (live PreForm run)
 
 ## Next
-- When the Formlabs agent reports estimates (.progress/formlabs.md / docs/formlabs_workflow.md): fill
-  PREFORM_ESTIMATES, re-run, update slide 3.
+- When GPU campaign 2 lands: fill the relative-pKa clause in slide 3 notes (keep total <= 3:00).
 - Rehearse demo against the committed dashboard build.
 
 ## Resume
