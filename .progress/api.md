@@ -57,3 +57,10 @@ Resume: read contracts/README.md (semantics + deviations), run the tests above.
 - feedback.build_context: + telemetry (full stored records per chamber), hardware_limits, experiment_id,
   experiment_ids, now_utc (server clock); recent_telemetry kept
 - routes: GET /benchmarks, /benchmarks/{path}, /molecular/environment (+ /files/{path}, parsed cost)
+
+# PHASE 4 — chat endpoint COMPLETE
+- src/fermentai/api/chat.py (chat_turn/chat_state/chat_reset), routes POST /chat, GET/DELETE /chat/{id},
+  ChatIn schema, chat_sessions table, taste_feedback.chat_session_id, SSE `chat` events, health.chat_available.
+- feedback.py refactor: insert_feedback + persist_cycle shared by taste-feedback and chat hand-off.
+- tests/test_api_chat.py (5: fake module flow, 503 unavailable/error, auth/validation, real module e2e).
+- Full repo: 538 passed, 1 skipped, 1 xfailed.

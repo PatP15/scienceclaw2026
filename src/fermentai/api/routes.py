@@ -30,6 +30,7 @@ from .schemas import (
     SetpointIn,
     SetpointResult,
     SimulationRunIn,
+    ChatIn,
     TasteFeedbackIn,
     TelemetryAck,
     TelemetryIn,
@@ -70,6 +71,7 @@ def health(request: Request):
         "auth": "bearer token on writes + desired-control; reads open on LAN",
         "default_token_in_use": s.token_is_default,
         "pipeline_available": pipeline_available(),
+        "chat_available": __import__("fermentai.api.chat", fromlist=["chat_available"]).chat_available(),
         "simulation_available": simulation_available(),
         "dashboard_static": request.app.state.dashboard_static,
         "llm_mode": s.llm_mode,
@@ -388,6 +390,31 @@ def get_simulation(simulation_id: int, request: Request):
 @router.post("/taste-feedback", dependencies=AUTH, tags=["feedback"])
 def taste_feedback(body: TasteFeedbackIn, request: Request):
     return run_feedback(svc(request), settings(request), body)
+
+
+@router.post("/chat", dependencies=AUTH, tags=["feedback"])
+def chat(body: ChatIn, request: Request):
+    """One guest turn of the kitchen-brigade conversation (fermentai.agents.chat.chat_turn).
+    A turn whose result carries `handoff_result` is persisted exactly like POST /taste-feedback.
+    503 (labelled) when the chat module is unavailable -> use the taste-feedback form."""
+    from . import chat as chat_api
+
+    return chat_api.chat_turn(svc(request), settings(request), text=body.text, session_id=body.session_id,
+                              mode=body.mode, sous_chef=body.sous_chef, judge_name=body.judge_name)
+
+
+@router.get("/chat/{session_id}", tags=["feedback"])
+def chat_get(session_id: str, request: Request):
+    from . import chat as chat_api
+
+    return chat_api.chat_state(svc(request), session_id)
+
+
+@router.delete("/chat/{session_id}", dependencies=AUTH, tags=["feedback"])
+def chat_delete(session_id: str, request: Request):
+    from . import chat as chat_api
+
+    return chat_api.chat_reset(svc(request), settings(request), session_id)
 
 
 @router.get("/taste-feedback", tags=["feedback"])

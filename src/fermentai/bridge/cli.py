@@ -61,6 +61,9 @@ def build_parser() -> argparse.ArgumentParser:
     ap.add_argument("--replay", type=Path, default=None,
                     help="replay a recorded device line log (raw lines or --record JSONL); source=replay")
     ap.add_argument("--replay-speed", type=float, default=0.0, help="0 = as fast as possible")
+    ap.add_argument("--parse-status-log", action=argparse.BooleanOptionalAction, default=True,
+                    help="convert legacy fw 0.3.x plain-text status blocks into measured telemetry "
+                         "(default on; disabled per port once the device speaks serial_v1)")
     ap.add_argument("--duration", type=float, default=0.0, help="seconds to run (0 = forever)")
     ap.add_argument("-v", "--verbose", action="store_true")
     return ap
@@ -97,6 +100,7 @@ def config_from_args(args: argparse.Namespace) -> BridgeConfig:
         device_tokens=tokens,
         chambers={c: (cfg.device_id or f"fermentai-esp32-{c.lower()}") for c, cfg in hw.chambers.items()},
         record_path=args.record,
+        parse_status_log=args.parse_status_log,
     )
 
 

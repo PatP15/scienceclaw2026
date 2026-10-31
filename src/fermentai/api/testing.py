@@ -46,6 +46,7 @@ def make_app(tmp_path: Path, *, hw_overrides: dict[str, Any] | None = None,
         dashboard_static_dir=static_dir or tmp_path / "no-dashboard",
         device_tokens=dict(device_tokens or {}),
         findings_path=tmp_path / "findings_log.jsonl",  # never touch the repo's runtime log
+        chat_sessions_path=tmp_path / "chat_sessions.jsonl",
     )
     app = create_app(settings)
     if clock is not None:

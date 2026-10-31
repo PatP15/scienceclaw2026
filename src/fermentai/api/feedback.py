@@ -83,7 +83,10 @@ def telemetry_record(row: dict) -> dict:
     return rec
 
 
-def build_context(svc: ControlService, settings: Settings, fb: TasteFeedbackIn, feedback_id: int) -> dict:
+def build_context(svc: ControlService, settings: Settings, fb: TasteFeedbackIn | None,
+                  feedback_id: int | None, extra: dict | None = None) -> dict:
+    """Context for the agents (taste-feedback cycle and chat). fb/feedback_id may be None
+    (chat turns before a hand-off): prior feedback is then simply the latest 10."""
     keep = ("id", "timestamp_utc", "source", "chamber_temperature_c", "starter_temperature_c",
             "relative_humidity_percent", "gas_resistance_ohms", "ph", "ph_method",
             "starter_height_mm", "door_open", "peltier_mode", "temperature_setpoint_c",
@@ -100,7 +103,8 @@ def build_context(svc: ControlService, settings: Settings, fb: TasteFeedbackIn, 
     experiments = [loads_cols(r, "schedules_json", "payload_json") for r in svc.db.query(
         "SELECT * FROM experiments ORDER BY id DESC LIMIT 20")]
     prior = [loads_cols(r, "result_json") for r in svc.db.query(
-        "SELECT * FROM taste_feedback WHERE id<? ORDER BY id DESC LIMIT 10", (feedback_id,))]
+        "SELECT * FROM taste_feedback WHERE id<? ORDER BY id DESC LIMIT 10",
+        (feedback_id if feedback_id is not None else 2**62,))]
     t = svc.hw.temperature
     hw_limits = {
         **svc.hw.firmware_local_limits,
@@ -125,8 +129,8 @@ def build_context(svc: ControlService, settings: Settings, fb: TasteFeedbackIn, 
         "experiment_ids": exp_ids,
         "telemetry": raw,                     # full stored records per chamber (oldest -> newest)
         "hardware_limits": hw_limits,
-        "judge_name": fb.judge_name,
-        "loaf_notes": {"A": fb.loaf_a_notes, "B": fb.loaf_b_notes},
+        "judge_name": fb.judge_name if fb else None,
+        "loaf_notes": {"A": fb.loaf_a_notes if fb else None, "B": fb.loaf_b_notes if fb else None},
         "chambers": chambers,
         "current_setpoints": setpoints,
         "setpoints": setpoints,               # key the agents' offline policy reads
@@ -138,6 +142,7 @@ def build_context(svc: ControlService, settings: Settings, fb: TasteFeedbackIn, 
         "llm_mode": settings.llm_mode,
         # The pipeline appends to this findings log (served by GET /api/v1/findings).
         **({"findings_log_path": str(settings.findings_path)} if settings.findings_path else {}),
+        **(extra or {}),
     }
 
 
@@ -327,21 +332,42 @@ def _store_hypothesis_and_calibration(svc: ControlService, fid: int, experiment_
                      provenance, fid, dumps(c)))
 
 
-def run_feedback(svc: ControlService, settings: Settings, fb: TasteFeedbackIn) -> dict:
+def insert_feedback(svc: ControlService, fb: TasteFeedbackIn, chat_session_id: str | None = None
+                    ) -> tuple[int, str]:
+    """Store the judge's feedback and emit the SSE `feedback` event."""
     now = iso(svc.clock())
     with svc.db.tx() as conn:
         fid = conn.execute(
             "INSERT INTO taste_feedback(created_at_utc, text, loaf_a_notes, loaf_b_notes, judge_name,"
-            " mode) VALUES (?,?,?,?,?,?)",
-            (now, fb.text, fb.loaf_a_notes, fb.loaf_b_notes, fb.judge_name, fb.mode),
+            " mode, chat_session_id) VALUES (?,?,?,?,?,?,?)",
+            (now, fb.text, fb.loaf_a_notes, fb.loaf_b_notes, fb.judge_name, fb.mode, chat_session_id),
         ).lastrowid
         svc.db.emit("feedback", {"feedback_id": fid, "created_at_utc": now, "text": fb.text,
                                  "loaf_a_notes": fb.loaf_a_notes, "loaf_b_notes": fb.loaf_b_notes,
-                                 "judge_name": fb.judge_name, "mode": fb.mode}, None, conn=conn)
+                                 "judge_name": fb.judge_name, "mode": fb.mode,
+                                 "chat_session_id": chat_session_id}, None, conn=conn)
+    return fid, now
 
+
+def run_feedback(svc: ControlService, settings: Settings, fb: TasteFeedbackIn) -> dict:
+    fid, now = insert_feedback(svc, fb)
     context = build_context(svc, settings, fb, fid)
     result, available = call_pipeline(fb, context)
+    return persist_cycle(svc, settings, fb, fid, now, result, available)
 
+
+def normalize_cycle_result(result: dict) -> dict:
+    result = jsonable(result)
+    for k in RESULT_KEYS:
+        result.setdefault(k, None)
+    return result
+
+
+def persist_cycle(svc: ControlService, settings: Settings, fb: TasteFeedbackIn, fid: int, now: str,
+                  result: dict, available: bool, *, chat_session_id: str | None = None) -> dict:
+    """Everything that follows a taste cycle (shared by POST /taste-feedback and the chat
+    hand-off): agent messages, proposed experiment (+ hypotheses/schedules), optional clamped
+    schedule application, bounded motor commands, stored result and the SSE feedback_result."""
     messages = _store_messages(svc, fid, result.get("agent_messages"))
 
     nxt = result.get("next_experiment")
@@ -384,6 +410,7 @@ def run_feedback(svc: ControlService, settings: Settings, fb: TasteFeedbackIn) -
         "schedule_applied": bool(apply and available),
         "applied_setpoints": applied,
         "motor_commands": motors,
+        **({"chat_session_id": chat_session_id} if chat_session_id else {}),
     }
     svc.db.execute(
         "UPDATE taste_feedback SET mode_label=?, pipeline_available=?, result_json=? WHERE id=?",
@@ -397,5 +424,6 @@ def run_feedback(svc: ControlService, settings: Settings, fb: TasteFeedbackIn) -
         "next_experiment": experiment, "provenance": result.get("provenance"),
         "applied_setpoints": applied,
         "motor_command_ids": [m["command_id"] for m in motors],
+        "chat_session_id": chat_session_id,
     })
     return response

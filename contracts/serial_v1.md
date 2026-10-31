@@ -225,6 +225,43 @@ The bridge writes `data/telemetry/bridge_status.json` every 2 s. The API serves 
     never collides with the live record.
   - Acks are not forwarded, and **no commands are sent anywhere**.
 
+## 8b. Legacy firmware 0.3.x status blocks (`--parse-status-log`, on by default)
+
+Firmware 0.3.0 (Wi-Fi build, serial hook not applied) doesn't speak this protocol. Every 30 s it
+prints a plain-text block like this one, which comes from the real board:
+
+```
+[A fermentai-esp32-a] fw=0.3.0 boot=1185100b reset=other state=waiting_for_command mode=idle out=0.00 armed(peltier=0 motor=1)
+  chamber=28.60C rh=13.2% p=nanPa gas=nanohm starter=23.44C hs_int=nanC hs_ext=nanC
+  ph=nan mv=0.0 raw=0 cal=0 door=closed opens=0 setpoint=nan faults=0x0
+  ens160: present=1 addr=0x53 valid=1 warmup=0 aqi=0 tvoc=0 ppb eco2=0 ppm (indices, not CO2)
+  flags: ds18b20_role_unassigned ph_out_of_range
+  wifi=0 rssi=0 tel_q=0 acks_q=0 heap=239416 psram=8179891
+```
+
+`src/fermentai/bridge/status_log.py` turns each block into one telemetry_v1 record. The block is
+emitted on its `wifi=` line, on the next header, or 5 s after its last line. Lines may be
+missing or out of order. The record has:
+
+- `source: "measured"` and the quality flag `legacy_status_log`;
+- `timestamp_utc: null` / `"unsynced"`, and no `device_uptime_ms`;
+- `sequence_number` = a counter per boot plus the bridge start time in seconds, so numbers stay
+  unique when the bridge restarts during the same boot;
+- `nan` → null;
+- pH only when `cal=1` (`ph_method: "probe"`). Otherwise `ph` is null, with the flag
+  `ph_uncalibrated` and the raw mV/ADC in `diagnostics`;
+- ENS160 AQI/TVOC/eCO2 → `diagnostics.ens160` only, never `gas_resistance_ohms`;
+- `motor_running: false` unless a line says the motor is running (`armed` isn't running).
+
+`device_id`, chamber, `boot_id` and firmware come from the `[A device]` header, or from the
+`FermentAI 0.3.0 chamber=A device=… boot=…` boot banner when the port was opened mid-block.
+
+While a port is in legacy mode the bridge doesn't write to it: no commands, pings or periodic
+`time` lines, because the firmware's text console would answer "ERR unknown command". Only the
+single connect-time `time` line is sent. Commands are written only after the device has spoken
+serial_v1, which also switches status-text parsing off for that connection. Disable the whole
+feature with `--no-parse-status-log`.
+
 ## 9. What a firmware implementer must do (checklist)
 
 1. `Serial.begin(115200)`. Print anything you like for debugging; non-JSON lines are harmless.

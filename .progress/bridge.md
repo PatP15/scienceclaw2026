@@ -24,3 +24,10 @@ scripts/start_demo.sh (--with-serial-bridge), simulated_devices/transport_serial
 - No new deps (pyserial NOT in venv; termios link used). Never opened /dev/cu.usbmodem2101; firmware/ untouched.
 ## Resume
 uv run pytest tests/test_bridge_*.py ; protocol in contracts/serial_v1.md
+## Legacy status-log converter (fw 0.3.0) — DONE
+- src/fermentai/bridge/status_log.py + PortSession integration (--parse-status-log default on); legacy ports get
+  no commands/pings/periodic time (console would print "ERR unknown command"); tests/test_bridge_status_log.py (7).
+- REAL RUN: bridge running in background (nohup) on /dev/cu.usbmodem2101=A -> http://127.0.0.1:8000,
+  log data/telemetry/bridge.log; measured chamber ~28-29 C every 30 s. Stop: pkill -f "fermentai.bridge --port".
+- Running backend predates /api/v1/bridge/status (needs backend restart to expose it; file is written anyway).
+## NEXT: chat endpoint (src/fermentai/api/chat.py written; routes + tests pending)

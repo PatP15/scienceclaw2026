@@ -173,6 +173,8 @@ class Settings:
     token_is_default: bool = False
     # chamber_id -> per-device token (env FERMENTAI_DEVICE_TOKEN_<CHAMBER>); optional.
     device_tokens: dict[str, str] = field(default_factory=dict)
+    # Where fermentai.agents.chat keeps sessions (None = the module's default / env).
+    chat_sessions_path: Path | None = None
     extra: dict = field(default_factory=dict)
 
     @classmethod

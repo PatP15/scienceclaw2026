@@ -32,6 +32,7 @@ from typing import Any
 import httpx
 
 from . import protocol as P
+from .status_log import StatusLogParser
 from .serial_link import (
     DEFAULT_PORT_PATTERNS,
     AsyncLineChannel,
@@ -85,6 +86,7 @@ class BridgeConfig:
     record_path: Path | None = None
     http_timeout_s: float = 5.0
     max_outbox: int = 500
+    parse_status_log: bool = True       # legacy fw 0.3.x plain-text status blocks -> telemetry
 
 
 class ReplayChannel:
@@ -181,6 +183,8 @@ class PortSession:
         self._ping_seq = 0
         self._retry_at = 0.0
         self._finished = False
+        self.status_parser = StatusLogParser() if self.cfg.parse_status_log else None
+        self.protocol: str | None = None        # "serial_v1" | "legacy_status_log"
 
     # ---------------------------------------------------------------- lifecycle
     async def run(self, stop: asyncio.Event) -> None:
@@ -230,6 +234,9 @@ class PortSession:
         self.times["connected_at_utc"] = P.utc_now_iso()
         self.sent.clear()                # re-plugged/rebooted device must get pending commands again
         self.hello = None
+        self.protocol = None
+        if self.status_parser:
+            self.status_parser.block = None     # drop any half block from before the reconnect
         self.chamber_id = self.mapped
         self.blocked_reason = None
         self.last_rx_mono = self.last_proto_mono = None
@@ -271,9 +278,14 @@ class PortSession:
                 await self._handle_line(line)
             now = time.monotonic()
             if self.replay is None:
-                if self.chamber_id and not self.blocked_reason and now >= next_poll:
+                # Commands only go to a device that has spoken serial_v1. A legacy fw 0.3.x device
+                # has a text console on this port and would just print "ERR unknown command".
+                talk = self.protocol == "serial_v1"
+                if talk and self.chamber_id and not self.blocked_reason and now >= next_poll:
                     next_poll = now + cfg.poll_interval_s
                     await self._poll_commands()
+                if self.protocol == "legacy_status_log":
+                    next_time = next_ping = now + cfg.time_interval_s     # stay silent on its console
                 if now >= next_time:
                     next_time = now + cfg.time_interval_s
                     await self._send(P.time_msg())
@@ -281,6 +293,9 @@ class PortSession:
                     next_ping = now + cfg.ping_interval_s
                     self._ping_seq += 1
                     await self._send(P.ping(self._ping_seq))
+            if self.status_parser and self.protocol != "serial_v1":
+                for rec in self.status_parser.flush_if_stale(now):
+                    await self._forward_legacy(rec)
             if self.outbox and now >= self._retry_at:
                 await self._flush_outbox()
             self._expire_images(now)
@@ -319,6 +334,18 @@ class PortSession:
         p = P.parse_line(raw)
         if p.kind == "log":
             self.counters["rx_log_text"] += 1
+            if self.status_parser and self.protocol != "serial_v1":
+                before = self.status_parser.lines_parsed
+                recs = self.status_parser.feed(p.text, now)
+                if self.status_parser.lines_parsed > before:
+                    self.counters["legacy_status_lines"] += 1
+                    self.logs.append(p.text[:500])
+                    log.debug("[%s] status line: %s", self.name, p.text)
+                else:
+                    self._log(p.text)
+                for rec in recs:
+                    await self._forward_legacy(rec)
+                return
             self._log(p.text)
             return
         if p.kind == "invalid":
@@ -327,6 +354,8 @@ class PortSession:
             log.debug("[%s] ignored line: %s", self.name, p.error)
             return
         msg = p.msg
+        if msg["type"] in ("hello", "telemetry", "ack"):
+            self.protocol = "serial_v1"          # a protocol device: stop parsing status text
         self.last_proto_mono = now
         self.counters[f"rx_{msg['type']}"] += 1
         if p.nan_fixed:
@@ -408,11 +437,28 @@ class PortSession:
             return None
         return ch
 
+    async def _forward_legacy(self, rec: dict) -> None:
+        """A telemetry record reconstructed from a legacy fw 0.3.x status block."""
+        self.last_proto_mono = time.monotonic()
+        if self.protocol is None:
+            self.protocol = "legacy_status_log"
+            log.info("[%s] legacy status-log firmware detected (%s fw %s); converting status blocks to "
+                     "measured telemetry", self.name, rec.get("device_id"), rec.get("firmware_version"))
+        self.counters["legacy_blocks"] += 1
+        if not self.hello:
+            self.device_id = rec.get("device_id") or self.device_id
+            self.boot_id = rec.get("boot_id") or self.boot_id
+            self.firmware_version = rec.get("firmware_version") or self.firmware_version
+        await self._forward_telemetry(rec, False)
+
     async def _on_telemetry(self, msg: dict, p) -> None:
         payload = msg.get("payload")
         if not isinstance(payload, dict):
             self.counters["rx_invalid"] += 1
             return
+        await self._forward_telemetry(payload, p.nan_fixed)
+
+    async def _forward_telemetry(self, payload: dict, nan_fixed: bool) -> None:
         ch = self._resolve_chamber(payload)
         if ch is None:
             return
@@ -426,7 +472,7 @@ class PortSession:
         elif payload.get("source") in (None, "", "real"):
             payload["source"] = "measured"
         payload.setdefault("device_id", self.device_id or self.cfg.chambers.get(ch))
-        if p.nan_fixed:
+        if nan_fixed:
             payload["quality_flags"] = [*(payload.get("quality_flags") or []), "bridge_nan_replaced_with_null"]
         self.times["last_telemetry_utc"] = P.utc_now_iso()
         await self._post("telemetry", "/api/v1/telemetry", payload)
@@ -580,6 +626,7 @@ class PortSession:
             "link": self.state, "device_id": self.device_id, "boot_id": self.boot_id,
             "firmware_version": self.firmware_version, "simulated": self.simulated,
             "capabilities": self.capabilities, "blocked_reason": self.blocked_reason,
+            "protocol": self.protocol,
             **self.times, "counters": dict(self.counters), "outbox": len(self.outbox),
             "last_error": self.last_error, "last_log": self.logs[-1] if self.logs else None,
             "recent_logs": list(self.logs)[-5:],
@@ -634,6 +681,7 @@ class Bridge:
                 "device_id": (s.device_id if s else None) or dev,
                 "boot_id": s.boot_id if s else None, "firmware_version": s.firmware_version if s else None,
                 "simulated": s.simulated if s else None,
+                "protocol": s.protocol if s else None,
                 "last_seen_utc": s.times["last_rx_utc"] if s else None,
                 "last_telemetry_utc": s.times["last_telemetry_utc"] if s else None,
                 "label": "USB · " + {"connected": "connected", "waiting": "waiting for device",

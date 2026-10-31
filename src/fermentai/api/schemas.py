@@ -425,6 +425,16 @@ class AgentMessage(_Strict):
     _v = field_validator("schema_version")(_check_schema_version)
 
 
+class ChatIn(_Strict):
+    """POST /api/v1/chat: one guest message to the kitchen brigade (Sous Chef A/B, Head Chef)."""
+
+    session_id: Annotated[str, StringConstraints(pattern=r"^[A-Za-z0-9_.:-]{1,64}$")] | None = None
+    text: Annotated[str, StringConstraints(min_length=1, max_length=4000)]
+    mode: Literal["live", "offline"] = "offline"
+    sous_chef: Literal["A", "B"] | None = None
+    judge_name: Annotated[str, StringConstraints(max_length=100)] | None = None
+
+
 class SimulationRunIn(BaseModel):
     model_config = ConfigDict(extra="allow", allow_inf_nan=False)
     chamber_id: ChamberId | None = None

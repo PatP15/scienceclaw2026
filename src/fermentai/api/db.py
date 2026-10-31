@@ -240,6 +240,21 @@ CREATE TABLE IF NOT EXISTS model_calibrations (
     payload_json TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS chat_sessions (
+    session_id TEXT PRIMARY KEY,
+    created_at_utc TEXT NOT NULL,
+    updated_at_utc TEXT NOT NULL,
+    stage TEXT,
+    mode TEXT,
+    sous_chef TEXT,
+    judge_name TEXT,
+    turns INTEGER NOT NULL DEFAULT 0,
+    transcript_len INTEGER NOT NULL DEFAULT 0,
+    handoff_key TEXT,                     -- identity of the last persisted hand-off (cycle_id/hash)
+    feedback_id INTEGER,                  -- taste_feedback row created by the last hand-off
+    state_json TEXT                       -- last chat_turn result (transcript, stage, ...)
+);
+
 CREATE TABLE IF NOT EXISTS molecular_results (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     imported_at_utc TEXT NOT NULL,
@@ -259,6 +274,7 @@ ADDED_COLUMNS = {
                   ("timestamp_quality", "TEXT"), ("device_uptime_ms", "INTEGER")],
     "chamber_control": [("control_mode", "TEXT NOT NULL DEFAULT 'auto'")],
     "commands": [("action", "TEXT")],
+    "taste_feedback": [("chat_session_id", "TEXT")],
     "agent_messages": [("message_uid", "TEXT"), ("in_reply_to", "TEXT"), ("chamber_id", "TEXT"),
                        ("cycle_id", "TEXT")],
 }
