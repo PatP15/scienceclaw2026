@@ -283,7 +283,7 @@ PREF_POS_RE = re.compile(
     r"winner|superior|the one i liked)\b"
 )
 TOO_RE = re.compile(r"\btoo\b")
-STILL_RE = re.compile(r"\bstill\b")  # "a more sour loaf that's still fluffy" -> preserve
+STILL_RE = re.compile(r"\bstill\b|\b(?:the )?same\b")  # "still fluffy" / "same tang, but lighter" -> preserve
 INDIFFERENT_RE = re.compile(
     r"\b(?:doesn'?t|does not|don'?t|do not|didn'?t) (?:really )?matter|\b(?:don'?t|do not) (?:really )?care|"
     r"\bnot (?:that |very )?important|\bunimportant|\birrelevant|\bwhatever\b|\bi'?m (?:not fussed|easy)"
@@ -739,7 +739,8 @@ def parse_feedback(text: str, setpoints: dict[str, float] | None = None) -> dict
                     mode = "avoid"
                     if "too" in avoid.group(0) or "overly" in avoid.group(0):
                         mods["too"] = False
-                elif in_desire_clause and t_start >= desire_pos and STILL_RE.search(low, desire_pos, t_start):
+                elif (in_desire_clause and t_start >= desire_pos and not comparative
+                      and STILL_RE.search(low, max(desire_pos, c_start), t_start)):
                     mode = "maintain"
                 elif in_desire_clause and t_start >= desire_pos or in_desire_clause and comparative and t_start < desire_pos and desire_pos - t_end < 15:
                     mode = "desire"
@@ -1115,7 +1116,10 @@ def structured_preference(desired: dict[str, Any]) -> list[str]:
 
     out = []
     sv = votes("sourness")
-    if "increase" in sv and sv.get("increase", 0) >= sv.get("decrease", 0):
+    if "maintain" in sv and "high" in poles("sourness") and sv["maintain"] >= max(sv.get("increase", 0),
+                                                                              sv.get("decrease", 0)):
+        out.append("Keep the current sourness")
+    elif "increase" in sv and sv.get("increase", 0) >= sv.get("decrease", 0):
         out.append("More sourness")
     elif "decrease" in sv:
         out.append("Less sourness")

@@ -6,15 +6,23 @@ orchestrating pipeline (``run_taste_feedback_cycle``), line cooks = candidate si
     chat_turn(session_id, text, context=None, mode="offline") -> dict
     chat_reset(session_id, context=None) -> dict
 
-A deterministic state machine (never the LLM) decides what happens next:
+Per lab: ``context["sous_chef"]`` is the station the Guest is standing at (A or B); that Sous Chef
+is responsible for ITS loaf. A deterministic state machine (never the LLM) decides what happens next:
 
     greeting -> collecting -> confirming -> handoff -> done
 
-* Every guest message is folded into a running tasting note and re-parsed with
-  ``sensory.parse_feedback`` (partial information is fine). Short answers are attributed to the
-  loaf/topic the Sous Chef just asked about ("Loaf B: <answer>").
-* Hand-off when: the Guest confirms the reflected summary; or says that's all / go ahead; or the
-  two clarifying questions are used up. Both loaves + a wish -> confirm first.
+1. greeting names the station and asks about this loaf;
+2. up to 3 focused follow-ups about THIS loaf (sourness, crumb, aroma/crust/anything else),
+   skipping what is already answered;
+3. "Did you also taste another experiment — Station X's loaf? Want to compare?" -> if yes, the other
+   loaf's impression and an explicit "which did you prefer, and why?"; if no, skipped;
+4. the wish ("What would you want the next loaf to be?");
+5. read-back + confirm; 6. hand-off to the Head Chef with a consolidated note that attributes each
+   loaf to its letter. Single-loaf tastings hand off too.
+
+Every guest message is folded into the note and re-parsed with ``sensory.parse_feedback``; bare
+answers are attributed to the loaf being discussed ("this one" -> this station, "the other one" ->
+the other station). "That's all" finishes the current part; "go ahead"/"proceed" hands off now.
 * ``mode="live"``: the LLM only *words* the Sous Chef's message from the structured state (strict
   JSON schema); any failure falls back to the offline templates. The hand-off cycle runs with the
   same ``mode`` (and has its own fallback).
@@ -42,14 +50,16 @@ from .pipeline import run_taste_feedback_cycle
 from .sensory import DESIRE_RE, find_loaf_refs, parse_feedback
 
 DEFAULT_SESSIONS_PATH = REPO_ROOT / "data" / "experiments" / "chat_sessions.jsonl"
-MAX_CLARIFYING = 2
+MAX_OWN_FOLLOWUPS = 3  # focused follow-ups about this station's loaf
 STAGES = ("greeting", "collecting", "confirming", "handoff", "done")
 
 AFFIRM_RE = re.compile(r"^\s*(?:yes|yeah|yep|yup|ya|correct|right|exactly|that'?s (?:right|correct|it)|sounds (?:good|right)|"
                        r"spot on|perfect|ok(?:ay)?|sure|absolutely|go (?:ahead|for it)|do it|confirm(?:ed)?)\b", re.IGNORECASE)
 NEGATE_RE = re.compile(r"^\s*(?:no\b|nope|not (?:quite|really|exactly)|actually|wrong|that'?s not|incorrect)", re.IGNORECASE)
-PROCEED_RE = re.compile(r"\b(?:that'?s (?:all|it|everything)|nothing else|go ahead|proceed|send it|hand (?:it )?(?:off|over)|"
-                        r"let'?s (?:go|do it|proceed)|i'?m done|that'?s enough|make (?:the|a) plan|plan it)\b", re.IGNORECASE)
+# strong "proceed" -> hand off now; soft "done" -> finish the current part of the conversation
+PROCEED_RE = re.compile(r"\b(?:go ahead|proceed|send it|hand (?:it )?(?:off|over)|let'?s (?:go|do it|proceed)|i'?m done|"
+                        r"make (?:the|a) plan|plan it|take it to the head chef)\b", re.IGNORECASE)
+SOFT_DONE_RE = re.compile(r"\b(?:that'?s (?:all|it|everything)|nothing else|that'?s enough|nothing more)\b", re.IGNORECASE)
 UNKNOWN_RE = re.compile(r"\b(?:i )?(?:don'?t|do not) (?:really )?know\b|\bnot sure\b|\bno idea\b|\bdunno\b|"
                         r"\bcan'?t (?:tell|say|remember)\b|\bhard to say\b|\bno clue\b", re.IGNORECASE)
 SAME_RE = re.compile(r"\b(?:the )?same\b|\bno difference\b|\bidentical\b|\bcouldn'?t tell (?:them )?apart\b|\bindistinguishable\b",
@@ -100,12 +110,12 @@ def _sour_word(attrs: dict[str, Any]) -> str | None:
 
 def _loaf_phrase(attrs: dict[str, Any], tags: list[str]) -> str | None:
     bits = [w for w in (_sour_word(attrs), _crumb_word(attrs)) if w]
-    if "aroma" in attrs:
-        a = attrs["aroma"]["score"]
-        bits.append("with a strong aroma" if a >= 0.65 else "with a faint aroma" if a < 0.35 else "nicely aromatic")
     good_tags = [t for t in tags if t in ("nutty", "fruity", "toasty", "malty", "yeasty", "buttery", "earthy", "acetic")]
     if good_tags:
-        bits.append(("vinegary" if good_tags[0] == "acetic" else good_tags[0]) + " notes")
+        bits.append("with " + ("vinegary" if good_tags[0] == "acetic" else good_tags[0]) + " notes")
+    elif "aroma" in attrs:
+        a = attrs["aroma"]["score"]
+        bits.append("with a strong aroma" if a >= 0.65 else "with a faint aroma" if a < 0.35 else "nicely aromatic")
     if not bits:
         return None
     if len(bits) == 1:
@@ -146,9 +156,17 @@ def _restate(attrs: dict[str, Any]) -> list[str]:
 PREF_PHRASES = {
     "More sourness": "more sour", "Less sourness": "milder", "Do not increase sourness": "no sourer than now",
     "Lower density": "less dense", "Denser / chewier crumb": "chewier",
-    "Preserve good rise (airy/fluffy crumb)": "keeping the airy rise", "Stronger aroma": "more aromatic",
+    "Preserve good rise (airy/fluffy crumb)": "keeping the airy rise", "Keep the current sourness": "just as tangy", "Stronger aroma": "more aromatic",
     "Subtler aroma": "a subtler aroma", "More flavor": "more flavorful", "Milder overall flavor": "milder overall",
 }
+
+
+def _second_person(text: str) -> str:
+    """Echo the guest's reason back to them ("I like the tang" -> "you like the tang")."""
+    for pat, rep in ((r"\bI'm\b", "you're"), (r"\bI've\b", "you've"), (r"\bI\b", "you"), (r"\bmy\b", "your"),
+                     (r"\bme\b", "you"), (r"\bmyself\b", "yourself")):
+        text = re.sub(pat, rep, text)
+    return text
 
 
 def _join(items: list[str]) -> str:
@@ -171,10 +189,12 @@ def _sessions_path(context: dict[str, Any] | None) -> Path:
 
 def _new_session(session_id: str, sous_chef: str) -> dict[str, Any]:
     return {
-        "session_id": session_id, "sous_chef": sous_chef, "stage": "greeting", "turn": 0,
-        "transcript": [], "notes": [], "last_topic": "opening", "clarifying_asked": 0,
+        "session_id": session_id, "sous_chef": sous_chef, "station": sous_chef,
+        "other": "B" if sous_chef == "A" else "A", "stage": "greeting", "turn": 0,
+        "transcript": [], "notes": [], "last_topic": "own_open", "asked": [], "own_followups": 0,
+        "own_done": False, "compare": None, "preferred": None, "preference_basis": None, "preference_reason": None,
         "flags": {"unknown_A": False, "unknown_B": False, "wish_unknown": False, "wish_no_change": False,
-                  "both_same": False, "same_as": None},
+                  "tie": False, "same_as": None},
         "handoff_result": None, "trial_id": None, "off_topic_streak": 0, "chat_mode_label": None,
     }
 
@@ -265,7 +285,7 @@ class SousChefChat:
             "reply": reply,
             "stage": sess["stage"],
             "understood": self._understood(sess),
-            "questions_remaining": max(0, MAX_CLARIFYING - sess["clarifying_asked"]),
+            "questions_remaining": self._questions_remaining(sess, self._parse(sess, ctx)),
             "transcript": list(sess["transcript"]),
             "handoff_result": sess["handoff_result"] if sess["stage"] in ("handoff", "done") else None,
             "reasoning_mode_label": label,
@@ -277,34 +297,113 @@ class SousChefChat:
 
     # -- state machine ---------------------------------------------------------------
     def _note(self, sess: dict[str, Any]) -> str:
-        lines = list(sess["notes"])
-        if sess["flags"]["both_same"] and not lines:
-            lines.append("Both loaves tasted about the same.")
-        return " ".join(_sentence(l) for l in lines)
+        return " ".join(_sentence(l) for l in sess["notes"])
 
-    def _parse(self, sess: dict[str, Any], ctx: dict[str, Any]) -> dict[str, Any]:
-        return parse_feedback(self._note(sess), ctx.get("setpoints") if isinstance(ctx.get("setpoints"), dict) else None)
+    def _parse(self, sess: dict[str, Any], ctx: dict[str, Any] | None = None) -> dict[str, Any]:
+        sp = (ctx or {}).get("setpoints")
+        return parse_feedback(self._note(sess), sp if isinstance(sp, dict) else None)
 
     def _coverage(self, sess: dict[str, Any], interp: dict[str, Any]) -> dict[str, bool]:
         f = sess["flags"]
-        cov = {l: bool(interp["loaves"][l]["attributes"]) or f[f"unknown_{l}"] or f["both_same"] for l in ("A", "B")}
+        cov = {l: bool(interp["loaves"][l]["attributes"]) or f[f"unknown_{l}"] for l in ("A", "B")}
         explicit = any(not v.get("implied") for v in interp["desired"].values())
         cov["wish"] = explicit or f["wish_unknown"] or f["wish_no_change"]
         return cov
+
+    def _rewrite(self, sess: dict[str, Any], text: str, topic: str) -> str:
+        """Map station language onto loaf letters and attribute bare answers to the asked loaf."""
+        own, other = sess["station"], sess["other"]
+        t = re.sub(r"\bstation\s+([ab])(?:'s)?(?:\s+loaf)?\b", lambda m: f"Loaf {m.group(1).upper()}", text, flags=re.IGNORECASE)
+        t = re.sub(r"\bthe other (?:one|loaf|bread|experiment|station(?:'s loaf)?)\b|\bthe other\b(?! \w+ (?:was|is))",
+                   f"Loaf {other}", t, flags=re.IGNORECASE)
+        t = re.sub(r"\b(?:this|my|your|our) (?:one|loaf|bread|station(?:'s loaf)?)\b|\bthe one here\b|\bthis station's loaf\b",
+                   f"Loaf {own}", t, flags=re.IGNORECASE)
+        if topic.startswith("own_") and not _has_loaf_ref(t):
+            return f"Loaf {own}: {t}"
+        if topic == "other_open" and not _has_loaf_ref(t):
+            return f"Loaf {other}: {t}"
+        if topic == "wish" and not DESIRE_RE.search(t.lower().replace("’", "'")):
+            return "I'd like " + t[0].lower() + t[1:]
+        return t
+
+    def _changed(self, sess, line, ctx) -> bool:
+        def sig(p):
+            return ({l: p["loaves"][l]["attributes"] for l in ("A", "B")}, p["unattributed"]["attributes"],
+                    p["desired"], p["preferred_loaf"])
+        before = self._parse(sess, ctx)
+        after = parse_feedback(" ".join(_sentence(l) for l in sess["notes"] + [line]))
+        return sig(after) != sig(before)
 
     def _absorb(self, sess: dict[str, Any], text: str, ctx: dict[str, Any]) -> dict[str, Any]:
         """Fold a guest message into the tasting note. Returns what kind of message it was."""
         topic = sess["last_topic"]
         f = sess["flags"]
+        own, other = sess["station"], sess["other"]
         info: dict[str, Any] = {"unknown": False, "same": False, "off_topic": False, "new_info": False,
-                                "no_change": False}
-        before = self._parse(sess, ctx)
-        alone = parse_feedback(text) if UNKNOWN_RE.search(text) else None
-        if alone is not None and not (alone["loaves"]["A"]["attributes"] or alone["loaves"]["B"]["attributes"]
-                                      or alone["unattributed"]["attributes"] or alone["desired"]):
+                                "no_change": False, "soft_done": False, "compare": None}
+        line = self._rewrite(sess, text, topic)
+        alone = parse_feedback(line)
+        no_terms = not (alone["loaves"]["A"]["attributes"] or alone["loaves"]["B"]["attributes"]
+                        or alone["unattributed"]["attributes"] or alone["desired"])
+        # --- the comparison offer --------------------------------------------------------
+        if topic == "compare_offer":
+            if not no_terms and self._changed(sess, line, ctx):
+                if not _has_loaf_ref(line):
+                    line = f"Loaf {other}: {text}"
+                sess["notes"].append(line)
+                sess["compare"] = "yes"
+                info.update(new_info=True, compare="yes")
+                pl = parse_feedback(line).get("preferred_loaf")
+                if pl and not sess["preferred"]:
+                    sess["preferred"], sess["preference_basis"] = pl, "stated while comparing"
+            elif NEGATE_RE.search(text) or re.search(r"\b(?:didn'?t|did not|haven'?t|only (?:this|tried|tasted)|no)\b",
+                                                     text, re.IGNORECASE) or UNKNOWN_RE.search(text):
+                sess["compare"] = "no"
+                info["compare"] = "no"
+            elif AFFIRM_RE.search(text) or re.search(r"\b(?:i did|tried it|tasted it|yes)\b", text, re.IGNORECASE):
+                sess["compare"] = "yes"
+                info["compare"] = "yes"
+            else:
+                info["off_topic"] = True
+            return info
+        # --- which did you prefer? ----------------------------------------------------------
+        if topic == "compare_pref":
+            if re.search(r"\b(?:neither|both|no preference|equally|tie|same|can'?t (?:decide|choose))\b", text, re.IGNORECASE) \
+                    and not re.search(r"\bprefer(?:red)? loaf\b", line, re.IGNORECASE):
+                f["tie"] = True
+                info["same"] = True
+                if not no_terms:
+                    sess["notes"].append(line)
+                return info
+            if UNKNOWN_RE.search(text) and no_terms:
+                f["tie"] = True
+                info["unknown"] = True
+                return info
+            refs = {l for r in find_loaf_refs(line, line.lower(), None) if r.kind != "than" for l in r.loaves}
+            if len(refs) == 1:
+                x = refs.pop()
+                sess["preferred"] = x
+                sess["preference_basis"] = "explicit comparison"
+                why = re.search(r"\b(?:because|since|as|cause|'cause)\b\s*(.+)$", text, re.IGNORECASE)
+                sess["preference_reason"] = _second_person(why.group(1).strip().rstrip(".")) if why else None
+                sess["notes"].append(f"I preferred Loaf {x}")
+                if not no_terms:
+                    sess["notes"].append(line)
+                info["new_info"] = True
+                return info
+            if not no_terms and self._changed(sess, line, ctx):
+                sess["notes"].append(line)
+                info["new_info"] = True
+                return info
+            info["off_topic"] = True
+            return info
+        # --- generic answers --------------------------------------------------------------
+        if UNKNOWN_RE.search(text) and no_terms:
             info["unknown"] = True
-            if topic in ("loaf_A", "loaf_B"):
-                f[f"unknown_{topic[-1]}"] = True
+            if topic == "own_open":
+                pass  # ask the specific follow-ups instead
+            elif topic == "other_open":
+                f[f"unknown_{other}"] = True
             elif topic == "wish":
                 f["wish_unknown"] = True
             return info
@@ -312,47 +411,91 @@ class SousChefChat:
             f["wish_no_change"] = True
             info["no_change"] = True
             return info
-        alone = parse_feedback(text)
-        no_terms = not (alone["loaves"]["A"]["attributes"] or alone["loaves"]["B"]["attributes"]
-                        or alone["unattributed"]["attributes"] or alone["desired"])
         if SAME_RE.search(text) and no_terms and topic != "wish":
             info["same"] = True
-            other = {"loaf_B": "A", "loaf_A": "B"}.get(topic)
-            src = before["loaves"][other]["attributes"] if other else {}
-            if other and src:
-                target = topic[-1]
-                sess["notes"].append(f"Loaf {target}: {', '.join(_restate(src))}")  # "same as Loaf {other}"
-                f["same_as"] = {target: other}
-            else:
-                f["both_same"] = True
-                sess["notes"].append("Both loaves tasted about the same")
+            interp = self._parse(sess, ctx)
+            src_loaf = own if topic == "other_open" else other
+            dst_loaf = other if topic == "other_open" else own
+            src = interp["loaves"][src_loaf]["attributes"]
+            if src:
+                sess["notes"].append(f"Loaf {dst_loaf}: {', '.join(_restate(src))}")  # "same as Loaf {src_loaf}"
+                f["same_as"] = {dst_loaf: src_loaf}
+                if topic == "other_open":
+                    f["tie"] = f["tie"] or False
+            elif topic == "other_open":
+                f[f"unknown_{other}"] = True
             return info
-        line = text
-        if topic in ("loaf_A", "loaf_B") and not _has_loaf_ref(text):
-            line = f"Loaf {topic[-1]}: {text}"
-        elif topic == "wish" and not DESIRE_RE.search(text.lower().replace("’", "'")):
-            line = "I'd like " + text[0].lower() + text[1:] if text else text
-        candidate = sess["notes"] + [line]
-        after = parse_feedback(" ".join(_sentence(l) for l in candidate),
-                               ctx.get("setpoints") if isinstance(ctx.get("setpoints"), dict) else None)
-        def sig(p):
-            return ({l: p["loaves"][l]["attributes"] for l in ("A", "B")}, p["unattributed"]["attributes"],
-                    p["desired"], p["preferred_loaf"])
-        changed = sig(after) != sig(before)
-        if changed:
+        if topic == "own_more" and (SOFT_DONE_RE.search(text) or re.fullmatch(r"\s*(?:no|nope|nah|not really)\W*", text, re.IGNORECASE)):
+            info["soft_done"] = True
+            return info
+        if self._changed(sess, line, ctx):
             sess["notes"].append(line)
             info["new_info"] = True
-        else:
-            info["off_topic"] = not (AFFIRM_RE.search(text) or NEGATE_RE.search(text) or PROCEED_RE.search(text))
+            if topic == "other_open" and alone.get("preferred_loaf") and not sess["preferred"]:
+                sess["preferred"], sess["preference_basis"] = alone["preferred_loaf"], "stated while comparing"
+            return info
+        if SOFT_DONE_RE.search(text):
+            info["soft_done"] = True
+            return info
+        info["off_topic"] = not (AFFIRM_RE.search(text) or NEGATE_RE.search(text))
         return info
 
-    def _next_question(self, sess: dict[str, Any], cov: dict[str, bool]) -> str | None:
-        for t in ("A", "B"):
-            if not cov[t]:
-                return f"loaf_{t}"
-        if not cov["wish"]:
+    def _plan(self, sess: dict[str, Any], interp: dict[str, Any]) -> str:
+        """Next topic to ask about, or 'confirm'. Each topic is asked at most once."""
+        own, other = sess["station"], sess["other"]
+        asked = set(sess["asked"])
+        cov = self._coverage(sess, interp)
+        attrs = interp["loaves"][own]["attributes"]
+        one_shot = cov[other] and cov["wish"]
+        if not sess["own_done"]:
+            if "own_open" not in asked:
+                return "own_open"
+            missing = []
+            if "sourness" not in attrs:
+                missing.append("own_sourness")
+            if "texture" not in attrs and "density" not in attrs:
+                missing.append("own_crumb")
+            for t in missing:
+                if t not in asked and sess["own_followups"] < MAX_OWN_FOLLOWUPS and not one_shot:
+                    return t
+            if "own_more" not in asked and sess["own_followups"] < MAX_OWN_FOLLOWUPS and not one_shot:
+                return "own_more"
+            sess["own_done"] = True
+        if cov[other] and sess["compare"] is None:
+            sess["compare"] = "yes"
+            if interp.get("preferred_loaf") and not sess["preferred"]:
+                sess["preferred"], sess["preference_basis"] = interp["preferred_loaf"], "stated while comparing"
+        if sess["compare"] is None and "compare_offer" not in asked:
+            return "compare_offer"
+        if sess["compare"] == "yes":
+            if not cov[other] and "other_open" not in asked:
+                return "other_open"
+            if not sess["preferred"] and not sess["flags"]["tie"] and "compare_pref" not in asked:
+                return "compare_pref"
+        if not cov["wish"] and "wish" not in asked:
             return "wish"
-        return None
+        return "confirm"
+
+    def _questions_remaining(self, sess: dict[str, Any], interp: dict[str, Any]) -> int:
+        if sess["stage"] in ("confirming", "handoff", "done"):
+            return 0
+        own, other = sess["station"], sess["other"]
+        asked = set(sess["asked"])
+        cov = self._coverage(sess, interp)
+        attrs = interp["loaves"][own]["attributes"]
+        n = 0
+        if not sess["own_done"]:
+            own_q = [t for t, miss in (("own_sourness", "sourness" not in attrs),
+                                       ("own_crumb", "texture" not in attrs and "density" not in attrs),
+                                       ("own_more", True)) if miss and t not in asked]
+            n += min(len(own_q), MAX_OWN_FOLLOWUPS - sess["own_followups"])
+        if sess["compare"] is None and "compare_offer" not in asked and not cov[other]:
+            n += 1
+        if sess["compare"] in (None, "yes"):
+            n += int(not cov[other] and "other_open" not in asked)
+            n += int(not (sess["preferred"] or sess["flags"]["tie"]) and "compare_pref" not in asked)
+        n += int(not cov["wish"] and "wish" not in asked)
+        return n
 
     def _advance(self, sess: dict[str, Any], text: str, ctx: dict[str, Any]) -> dict[str, Any]:
         stage = sess["stage"]
@@ -361,45 +504,66 @@ class SousChefChat:
             return {"kind": "done"}
         if not text:
             if stage == "greeting":
-                sess["last_topic"] = "opening"
+                sess["last_topic"] = "own_open"
+                if "own_open" not in sess["asked"]:
+                    sess["asked"].append("own_open")
                 return {"kind": "greet"}
             return {"kind": "reask", "topic": sess["last_topic"], "info": {}}
-        affirm, negate, proceed = bool(AFFIRM_RE.search(text)), bool(NEGATE_RE.search(text)), bool(PROCEED_RE.search(text))
+        affirm, negate = bool(AFFIRM_RE.search(text)), bool(NEGATE_RE.search(text))
+        proceed = bool(PROCEED_RE.search(text))
         if stage == "confirming":
-            if (affirm or proceed) and not negate:
-                info = self._absorb(sess, text, ctx) if len(text.split()) > 4 else {"new_info": False}
-                return self._to_handoff(sess, "confirmed", info)
+            if (affirm or proceed or SOFT_DONE_RE.search(text)) and not negate:
+                return self._to_handoff(sess, "confirmed", {})
             if negate:
-                info = self._absorb(sess, text, ctx)
-                sess["stage"] = "collecting"
+                info = self._absorb_correction(sess, text, ctx)
                 if info.get("new_info"):
                     return self._to_confirm(sess, info, corrected=True)
+                sess["stage"] = "collecting"
                 sess["last_topic"] = "correction"
                 return {"kind": "ask_correction", "info": info}
-            info = self._absorb(sess, text, ctx)
+            info = self._absorb_correction(sess, text, ctx)
             if info.get("new_info"):
                 return self._to_confirm(sess, info, added=True)
             return {"kind": "reconfirm", "info": info}
+        if stage == "greeting" and "own_open" not in sess["asked"]:
+            sess["asked"].append("own_open")
         sess["stage"] = "collecting"
-        info = self._absorb(sess, text, ctx)
-        if sess["last_topic"] == "correction" and info.get("new_info"):
-            return self._to_confirm(sess, info, corrected=True)
+        if sess["last_topic"] == "correction":
+            info = self._absorb_correction(sess, text, ctx)
+            if info.get("new_info"):
+                return self._to_confirm(sess, info, corrected=True)
         if proceed:
+            info = self._absorb(sess, text, ctx)
             return self._to_handoff(sess, "guest asked to proceed", info)
+        info = self._absorb(sess, text, ctx)
         if info.get("off_topic"):
             sess["off_topic_streak"] += 1
             return {"kind": "redirect", "topic": sess["last_topic"], "info": info}
         sess["off_topic_streak"] = 0
-        interp = self._parse(sess, ctx)
-        cov = self._coverage(sess, interp)
-        nxt = self._next_question(sess, cov)
-        if nxt is None:
+        if info.get("soft_done") and sess["last_topic"].startswith("own_"):
+            sess["own_done"] = True
+        nxt = self._plan(sess, self._parse(sess, ctx))
+        if nxt == "confirm":
             return self._to_confirm(sess, info)
-        if sess["clarifying_asked"] >= MAX_CLARIFYING:
-            return self._to_handoff(sess, "clarifying questions used up", info)
-        sess["clarifying_asked"] += 1
+        sess["asked"].append(nxt)
+        if nxt.startswith("own_") and nxt != "own_open":
+            sess["own_followups"] += 1
         sess["last_topic"] = nxt
         return {"kind": "ask", "topic": nxt, "info": info}
+
+    def _absorb_correction(self, sess, text, ctx):
+        """Corrections may concern either loaf; use the text's own loaf references (default: this station)."""
+        body = re.sub(r"^\s*(?:no|nope|not quite|not really|actually|wrong|incorrect)\b[,.!]?\s*(?:actually\b[,]?\s*)?",
+                      "", text, flags=re.IGNORECASE)
+        if not body.strip():
+            return {"new_info": False}
+        line = self._rewrite(sess, body, "correction")
+        if not _has_loaf_ref(line) and not DESIRE_RE.search(line.lower()):
+            line = f"Loaf {sess['station']}: {line}"
+        if self._changed(sess, line, ctx):
+            sess["notes"].append(line)
+            return {"new_info": True}
+        return {"new_info": False}
 
     def _to_confirm(self, sess, info, corrected=False, added=False):
         sess["stage"] = "confirming"
@@ -411,69 +575,80 @@ class SousChefChat:
         return {"kind": "handoff", "reason": reason, "info": info}
 
     # -- wording ---------------------------------------------------------------------
+    def _preferred(self, sess: dict[str, Any], interp: dict[str, Any]) -> tuple[str | None, str | None]:
+        if sess.get("preferred"):
+            return sess["preferred"], sess.get("preference_basis") or "explicit comparison"
+        if interp.get("preferred_loaf"):
+            return interp["preferred_loaf"], "stated in the tasting notes"
+        if sess["compare"] != "yes" and sess["flags"]["wish_no_change"]:
+            return sess["station"], "inferred: guest would keep this loaf as it is"
+        return None, ("single loaf tasted; preference expressed only through the wish" if sess["compare"] != "yes"
+                      else ("no preference between the loaves" if sess["flags"]["tie"] else None))
+
     def _reflection(self, sess: dict[str, Any], interp: dict[str, Any]) -> str:
         f = sess["flags"]
+        own, other = sess["station"], sess["other"]
         parts = []
-        for l in ("A", "B"):
-            ph = _loaf_phrase(interp["loaves"][l]["attributes"], interp["loaves"][l]["aroma_tags"])
-            if ph:
-                parts.append(f"Loaf {l} was {ph}")
-            elif f[f"unknown_{l}"]:
-                parts.append(f"you weren't sure about Loaf {l}")
-        if f["both_same"] and not parts:
-            parts.append("the two loaves tasted about the same")
-        un = interp["unattributed"]["attributes"]
-        if un and not parts:
-            ph = _loaf_phrase(un, interp["unattributed"]["aroma_tags"])
-            if ph:
-                parts.append(f"the bread was {ph}")
-        if interp.get("preferred_loaf"):
-            parts.append(f"you preferred {interp['preferred_loaf']}")
+        ph = _loaf_phrase(interp["loaves"][own]["attributes"], interp["loaves"][own]["aroma_tags"])
+        parts.append(f"Loaf {own} here was {ph}" if ph else f"you weren't sure how to describe Loaf {own}")
+        if sess["compare"] == "yes":
+            oph = _loaf_phrase(interp["loaves"][other]["attributes"], interp["loaves"][other]["aroma_tags"])
+            parts.append(f"Station {other}'s loaf was {oph}" if oph else f"you also tried Station {other}'s loaf")
+        pref, _basis = self._preferred(sess, interp)
+        if pref and sess["compare"] == "yes":
+            why = sess.get("preference_reason")
+            parts.append(f"you preferred Loaf {pref}" + (f" because {why}" if why else ""))
+        elif f["tie"] and sess["compare"] == "yes":
+            parts.append("you liked them about equally")
         prefs = [PREF_PHRASES.get(p, p.lower()) for p in interp.get("structured_preference") or []]
         if prefs:
             parts.append(f"you'd like the next one {_join(prefs)}")
         elif f["wish_no_change"]:
-            parts.append("you'd keep things as they are")
+            parts.append("you'd keep it as it is")
         elif f["wish_unknown"]:
             parts.append("you're open on what to change")
-        if not parts:
-            return "I didn't catch any specific tasting notes yet"
         return _join(parts)
 
     def _question(self, sess: dict[str, Any], topic: str, interp: dict[str, Any]) -> str:
         sid, turn = sess["session_id"], sess["turn"]
-        if topic in ("loaf_A", "loaf_B"):
-            l = topic[-1]
-            other = "B" if l == "A" else "A"
-            other_known = bool(interp["loaves"][other]["attributes"])
-            return _pick([
-                f"And Loaf {l}? Was it mild, tangy or properly sour — and was the crumb airy or on the dense side?",
-                f"How about Loaf {l}{' compared with ' + other if other_known else ''}? Sourness, crumb, aroma — "
-                f"whatever stood out.",
-                f"Tell me about Loaf {l}: how sour did it taste, and how was the texture?",
-            ], sid, turn, topic)
-        if topic == "wish":
-            return _pick([
-                "Last thing: what would you like the next bake to do differently?",
-                "If we bake again, what should change — more or less sour, a lighter crumb, a different aroma?",
-                "What would make the next loaf better for you?",
-            ], sid, turn, topic)
-        if topic == "correction":
-            return "Sorry about that — what did I get wrong?"
-        return _pick([
-            "How did the two loaves taste? Start with Loaf A if you like — sourness, texture, anything that stood out.",
-            "Tell me about the loaves: how sour was each one, and how was the crumb?",
-        ], sid, turn, "opening")
+        own, other = sess["station"], sess["other"]
+        q = {
+            "own_open": [f"You've just tasted Loaf {own}, our loaf here at Station {own}. How was it?",
+                         f"What did you think of Loaf {own} — the one from this station?"],
+            "own_sourness": [f"How sour was Loaf {own} — mild, gently tangy, or properly sour?",
+                             "And the sourness — would you call it mild, tangy or really sour?"],
+            "own_crumb": ["How was the crumb — light and airy, or on the dense side?",
+                          f"And the texture of Loaf {own}: fluffy and open, or a bit tight and dense?"],
+            "own_more": ["Anything about the aroma or the crust — or anything else that stood out?",
+                         "Did the smell or the crust catch your attention? Anything else worth noting?"],
+            "compare_offer": [f"Did you also taste another experiment — Station {other}'s loaf? Want to compare?",
+                              f"Have you tried Station {other}'s loaf too? Happy to compare the two if you did."],
+            "other_open": [f"How was Loaf {other} from Station {other} — sourness, crumb, anything that stood out?",
+                           f"Tell me about Station {other}'s loaf: how sour, and how was the crumb?"],
+            "compare_pref": ["Which did you prefer, and why?",
+                             f"So between Loaf {own} and Loaf {other} — which did you prefer, and why?"],
+            "wish": ["What would you want the next loaf to be?",
+                     "If we bake again, what would you want the next loaf to be like?"],
+            "correction": ["Sorry about that — what did I get wrong?"],
+        }.get(topic) or [f"Tell me about Loaf {own} — how did it taste?"]
+        return _pick(q, sid, turn, topic)
 
     def _ack(self, sess: dict[str, Any], action: dict[str, Any], interp: dict[str, Any]) -> str:
         info = action.get("info") or {}
         sid, turn = sess["session_id"], sess["turn"]
+        if info.get("compare") == "no":
+            return _pick([f"No problem — we'll stick with Loaf {sess['station']}.", "That's fine, one loaf is plenty."],
+                         sid, turn, "cmpno")
+        if info.get("compare") == "yes" and not info.get("new_info"):
+            return "Great."
         if info.get("unknown"):
             return _pick(["No problem.", "That's fine — not every loaf speaks up.", "Fair enough."], sid, turn, "unk")
         if info.get("same"):
             return _pick(["Same as the other one — noted.", "Got it, no difference there."], sid, turn, "same")
         if info.get("no_change"):
             return "Keep it as it is — noted."
+        if info.get("soft_done"):
+            return "Okay."
         if info.get("new_info"):
             opts = ["Got it.", "Thanks, that helps.", "Noted.", "Lovely, that's useful."]
             choice = _pick(opts, sid, turn, "ack")
@@ -484,13 +659,13 @@ class SousChefChat:
         return ""
 
     def _offline_reply(self, sess: dict[str, Any], action: dict[str, Any], interp: dict[str, Any]) -> str:
-        sid, turn, x = sess["session_id"], sess["turn"], sess["sous_chef"]
+        sid, turn, x = sess["session_id"], sess["turn"], sess["station"]
         k = action["kind"]
         ack = self._ack(sess, action, interp)
         if k == "greet":
-            hello = _pick([f"Hi! I'm Sous Chef {x}. Thanks for tasting with us.",
-                           f"Welcome — I'm Sous Chef {x}, and I'd love to hear what you thought."], sid, "greet")
-            return f"{hello} {self._question(sess, 'opening', interp)}"
+            hello = _pick([f"Hi! I'm Sous Chef {x}, and this is Station {x}.",
+                           f"Welcome to Station {x} — I'm Sous Chef {x}."], sid, "greet")
+            return f"{hello} {self._question(sess, 'own_open', interp)}"
         if k == "ask":
             return f"{ack} {self._question(sess, action['topic'], interp)}".strip()
         if k == "redirect":
@@ -510,11 +685,10 @@ class SousChefChat:
         if k == "reconfirm":
             return f"Just to be sure — {self._reflection(sess, interp)}. Shall I take that to the Head Chef?"
         if k == "handoff":
-            refl = self._reflection(sess, interp)
             if action.get("reason") == "confirmed":
                 return _pick(["Perfect — taking this to the Head Chef now.",
                               "Great, I'll hand this to the Head Chef."], sid, turn, "ho")
-            return (f"{ack + ' ' if ack else ''}I have enough to go on: {refl}. "
+            return (f"{ack + ' ' if ack else ''}I have enough to go on: {self._reflection(sess, interp)}. "
                     f"Taking it to the Head Chef now.").strip()
         if k == "done":
             trial = sess.get("trial_id") or "the next trial"
@@ -618,6 +792,7 @@ class SousChefChat:
     def _understood(self, sess: dict[str, Any]) -> dict[str, Any]:
         interp = parse_feedback(self._note(sess))
         cov = self._coverage(sess, interp)
+        pref, basis = self._preferred(sess, interp)
         return {
             "loaves": {l: {d: {"label": v["label"], "score": v["score"], "confidence": v["confidence"]}
                            for d, v in interp["loaves"][l]["attributes"].items()} for l in ("A", "B")},
@@ -627,7 +802,11 @@ class SousChefChat:
                         for d, v in interp["desired"].items()},
             "structured_preference": interp.get("structured_preference", []),
             "desired_summary": interp.get("desired_summary"),
-            "preferred_loaf": interp.get("preferred_loaf"),
+            "station": sess["station"],
+            "compared_other": sess["compare"] == "yes",
+            "preferred_loaf": pref,
+            "preference_basis": basis,
+            "preference_reason": sess.get("preference_reason"),
             "coverage": cov,
             "flags": dict(sess["flags"]),
             "consolidated_note": self._note(sess),

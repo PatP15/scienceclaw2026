@@ -40,3 +40,11 @@
 - [x] hand-off runs run_taste_feedback_cycle and logs sensory_feedback tagged "via chat"
 - [x] sessions: memory + append-only data/experiments/chat_sessions.jsonl (context chat_sessions_path / FERMENTAI_CHAT_SESSIONS)
 - [x] tests/test_agents_chat.py (12) ; agent tests 143 passed ; full suite 533 passed, 1 skipped, 1 xfailed
+
+## Round 4 — chat is per lab — COMPLETE, not committed
+- context["sous_chef"] = station (A|B); flow: greet+this loaf -> <=3 follow-ups (sourness, crumb, aroma/crust/else; skip answered)
+  -> "Did you also taste Station X's loaf? Want to compare?" -> (other loaf + "which did you prefer, and why?") -> wish
+  -> read-back/confirm -> hand-off. "this one"/"the other one"/"Station X" mapped to loaf letters.
+- understood gains station, compared_other, preferred_loaf (+ preference_basis, preference_reason)
+- sensory: "still"/"same" preserve markers are clause-local in desire clauses; new "Keep the current sourness" preference
+- tests/test_agents_chat.py rewritten for the per-station flow (15 tests); agent tests 146 passed
