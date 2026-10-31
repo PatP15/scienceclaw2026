@@ -6,6 +6,7 @@ import { h, clear, fmt, timeAgo, hhmmss, statusBadge, sparkline, agentSide, toas
   deviceBadge, chefLabel, brigadeText, icon, emptyCard, provBadge, normSchedule, plotLayout, PLOT_CONFIG, whenPlotly } from "./util.js";
 import { messageText, messageSender } from "./messages.js";
 import { ChatPanel } from "./chat.js";
+import { TwinPanel } from "./twin.js";
 
 const SHOW_CAMERA = false;       // camera frames are hidden for now (API endpoints untouched); flip to bring them back
 const DOOR_FLASH_MS = 1800;     // door icon/tile pulse after an SSE `door` open event
@@ -14,8 +15,9 @@ const STALE_AFTER_S = 60;       // configs/hardware.yaml telemetry.stale_after_s
 const HISTORY_MAX = 720;        // rows kept per chamber (~2 h at 10 s)
 const WINDOW_MIN = 60;          // history window shown on cards and charts
 const MOTOR_TERMINAL = new Set(["completed", "failed", "cancelled", "rejected", "expired", "expired_unacked", "superseded"]);
-const STATION_COLOR = { A: COLORS.A, B: COLORS.B };
-const colorOf = (c) => STATION_COLOR[c] || COLORS.accent;
+const colorOf = (c) => COLORS[c] || COLORS.accent;
+const isDemo = (st) => st?.kind === "demo";
+const hasName = (st) => !!st?.label && !/^Chamber\s+[A-Za-z0-9]\b/.test(st.label);
 
 export function motorTrack(cmd) {
   // issued -> accepted (device ack) -> completed (device ack). The motor counts as having RUN only
@@ -82,8 +84,21 @@ export class LivePanel {
     this.gridView = document.getElementById("live-grid-view");
     this.detailView = document.getElementById("lab-detail");
     this.passThreadEl = document.getElementById("pass-thread");
+    this.sp = {};            // chamber -> {el, result, cmd, busy, polledAt} (manual setpoint control)
+    this.twin = new TwinPanel(store);
+    document.getElementById("lab-twin-toggle").addEventListener("click", () => this.toggleTwin());
     this.wire();
   }
+
+  toggleTwin(open) {
+    const body = document.getElementById("lab-twin-body"), btn = document.getElementById("lab-twin-toggle");
+    const want = open === undefined ? body.hidden : open;
+    body.hidden = !want;
+    btn.textContent = want ? "Close digital twin" : "Open digital twin";
+    btn.setAttribute("aria-expanded", String(want));
+    this.twin.setOpen(want);
+  }
+  resize() { this.twin.resize(); }
 
   // ------------------------------------------------------------------ wiring
   wire() {
@@ -291,7 +306,7 @@ export class LivePanel {
     if (!this.gridEl) return;
     this.cardEls = {};
     clear(this.gridEl, this.ids.map((c) => {
-      const el = h("article", { class: "lab-card card", dataset: { chamber: c }, tabindex: "0", role: "link", "aria-label": `Open Station ${c}`,
+      const el = h("article", { class: "lab-card card", dataset: { chamber: c }, tabindex: "0", role: "link", "aria-label": `Open ${this.state[c]?.label || "Station " + c}`,
         onclick: (ev) => { if (!ev.target.closest("button, a, summary")) location.hash = `#lab/${c}`; },
         onkeydown: (ev) => { if (ev.key === "Enter") location.hash = `#lab/${c}`; } });
       this.cardEls[c] = el;
@@ -308,8 +323,12 @@ export class LivePanel {
     return [
       h("div", { class: "lab-id" },
         h("span", { class: "lab-dot", style: { background: colorOf(c) } }),
-        h("div", null, h("div", { class: big ? "lab-title big" : "lab-title" }, `Station ${c}`),
-          h("div", { class: "lab-sub" }, (f.st.label || "").replace(/^Chamber [AB]\s*[-–]\s*/, "").replace(/ hypothesis$/, "")))),
+        h("div", null, h("div", { class: big ? "lab-title big" : "lab-title" }, hasName(f.st) ? f.st.label : `Station ${c}`,
+          hasName(f.st) ? h("span", { class: "lab-tag" }, c) : null,
+          isDemo(f.st) ? h("span", { class: "lab-tag demo", title: "fictional demo lab, simulated device" }, "DEMO") : null),
+          hasName(f.st)
+            ? (f.st.location ? h("div", { class: "lab-pin" }, `📍 ${f.st.location}`) : null)
+            : h("div", { class: "lab-sub" }, (f.st.label || "").replace(/^Chamber [A-Za-z0-9]\s*[-–]\s*/, "").replace(/ hypothesis$/, "")))),
       h("div", { class: "lab-badges" },
         f.tel ? deviceBadge(f.prov) : null,
         h("span", { class: `usb-chip usb-${f.link.cls}`, title: f.link.title }, f.link.text),
@@ -414,17 +433,25 @@ export class LivePanel {
     this.detailView.hidden = false;
     this.detailView.dataset.chamber = c;
     const chatRoot = document.getElementById("lab-chat");
-    if (!this.chats[c]) {
+    const demo = isDemo(this.state[c]);
+    const modeSeg = this.detailView.querySelector(".detail-mode");
+    if (modeSeg) modeSeg.hidden = demo;
+    if (demo) { clear(chatRoot, h("section", { class: "card chat-card demo-chat-note" }, "Demo lab — chat available at Stations A and B")); }
+    else if (!this.chats[c]) {
       this.chats[c] = new ChatPanel(h("section", { class: "card chat-card" }), this.taste, { station: c });
       this.chats[c].init(this.stream, this.store.apiPaths);
     }
-    clear(chatRoot, this.chats[c].root);
+    if (!demo) clear(chatRoot, this.chats[c].root);
     this._chartKey = null;
+    this.twin.setChamber(c);
+    this.toggleTwin(false);                // closed by default for each station visit
+    this.buildSetpoint(c);
     this.renderDetail(c, true);
     window.scrollTo(0, 0);
   }
   closeDetail() {
     this.detailId = null;
+    this.twin.setOpen(false);
     this.detailView.hidden = true;
     this.gridView.hidden = false;
   }
@@ -443,6 +470,7 @@ export class LivePanel {
       this.renderDetailCharts(c, f);
     }
     this.renderDetailSide(c, f);
+    this.updateSetpoint(c);
     this.renderThreads();
   }
 
@@ -471,7 +499,7 @@ export class LivePanel {
       const traces = [{ x: xs, y: rows.map((r) => s.get(r)), type: "scatter", mode: "lines", name: s.label, line: { color: colorOf(c), width: 2 },
         hovertemplate: `${s.label} %{y:.${s.dp}f}${s.unit ? ` ${s.unit}` : ""}<extra></extra>` }];
       if (s.key === "air") traces.unshift({ x: xs, y: rows.map((r) => num(tfield(r, "temperature_setpoint_c")) ?? f.st.desired_setpoint_c), type: "scatter", mode: "lines", name: "setpoint",
-        line: { color: COLORS.muted, width: 1.5, dash: "dash" }, hovertemplate: "setpoint %{y:.1f} °C<extra></extra>" });
+        line: { color: COLORS.muted, width: 1.5, dash: "dash", shape: "hv" }, hovertemplate: "setpoint %{y:.1f} °C<extra></extra>" });
       await Plotly.react(el, traces, plotLayout({ showlegend: false, margin: { l: 38, r: 8, t: 4, b: 24 }, xaxis: { type: "date", tickformat: "%H:%M" } }), PLOT_CONFIG);
     }
   }
@@ -575,6 +603,70 @@ export class LivePanel {
       this.motor[c] = { ...m, status: r.cancelled ? "cancelled" : r.status };
     } catch (e) { toast(`Cancel failed: ${e.message}`, "bad"); }
     this.render(c); this.renderHats();
+  }
+
+  // ------------------------------------------------------------------ manual target temperature (detail view)
+  buildSetpoint(c) {
+    const box = document.getElementById("lab-setpoint");
+    const st = (this.sp[c] ||= { result: null, cmd: null, busy: false, polledAt: 0 });
+    const cur = this.state[c]?.desired_setpoint_c;
+    const input = h("input", { class: "sp-input", type: "number", min: "4", max: "35", step: "0.5", inputmode: "decimal", "aria-label": "Target temperature in °C",
+      value: Number.isFinite(cur) ? String(cur) : "" });
+    const btn = h("button", { class: "btn btn-primary btn-sm", type: "button", onclick: () => this.sendSetpoint(c) }, "Set");
+    input.addEventListener("keydown", (ev) => { if (ev.key === "Enter") this.sendSetpoint(c); });
+    st.input = input; st.btn = btn; st.out = h("div", { class: "sp-status tiny" });
+    clear(box, h("div", { class: "sp-row" }, h("span", { class: "tile-lbl" }, "Target temperature"), input, h("span", { class: "tiny faint" }, "°C (4–35)"), btn), st.out);
+    this.loadSpCmd(c);
+  }
+  async loadSpCmd(c) {
+    const st = this.sp[c]; if (!st) return;
+    st.polledAt = Date.now();
+    try {
+      const rows = await get(`/api/v1/commands?chamber_id=${encodeURIComponent(c)}&action=set_setpoint&limit=5`);
+      st.cmd = (Array.isArray(rows) ? rows : []).find((r) => r.action === "set_setpoint" || r.payload?.temperature_setpoint_c !== undefined) || null;
+    } catch { /* keep last */ }
+    this.updateSetpoint(c);
+  }
+  async sendSetpoint(c) {
+    const st = this.sp[c]; if (!st || st.busy) return;
+    const v = Number(st.input.value);
+    if (st.input.value === "" || !Number.isFinite(v) || v < 4 || v > 35) { toast("Enter a target between 4 and 35 °C.", "bad"); return; }
+    if (!getToken()) { toast("Write access needed: click “Read-only” to enter the API token.", "bad"); return; }
+    st.busy = true; this.updateSetpoint(c);
+    try {
+      st.result = await post(`/api/v1/chambers/${c}/setpoint`, { setpoint_c: v, source: "operator", rationale: "dashboard: manual target temperature" });
+      if (st.result.applied_c !== undefined) this.state[c] = { ...(this.state[c] || {}), desired_setpoint_c: st.result.applied_c };
+    } catch (e) {
+      st.result = { error: e instanceof ApiError ? e.message : String(e), requested_c: v };
+    } finally { st.busy = false; }
+    this.updateSetpoint(c);
+    setTimeout(() => this.loadSpCmd(c), 1500);
+  }
+  updateSetpoint(c) {
+    const st = this.sp[c]; if (!st || !st.out) return;
+    if (this.detailId === c && Date.now() - st.polledAt > 5000) this.loadSpCmd(c);   // refresh device ack (throttled)
+    st.btn.disabled = st.busy || !getToken();
+    st.btn.textContent = st.busy ? "Setting…" : "Set";
+    st.btn.title = getToken() ? "" : "Needs the API token";
+    const r = st.result, tel = this.state[c]?.latest_telemetry;
+    const devSp = num(tel?.temperature_setpoint_c);
+    const ack = st.cmd?.acks?.length ? st.cmd.acks[st.cmd.acks.length - 1] : null;
+    const ackDetail = ack?.payload?.detail || ack?.payload?.message || null;
+    const forced = num(ack?.payload?.result?.applied_setpoint_c ?? ack?.payload?.applied_setpoint_c);
+    const bits = [];
+    if (r) bits.push(h("span", null, `requested ${fmt(r.requested_c, 1)} °C`, r.applied_c !== undefined && r.applied_c !== r.requested_c ? ` → server ${fmt(r.applied_c, 1)} °C` : ""));
+    bits.push(h("span", null, `server ${fmt(this.state[c]?.desired_setpoint_c, 1)} °C`));
+    bits.push(h("span", { title: "temperature_setpoint_c from the latest device telemetry" }, `device in force ${devSp !== null ? fmt(devSp, 1) : "—"} °C`));
+    if (st.cmd) bits.push(statusBadge(`device ack: ${ack ? ack.status : st.cmd.status}`, (ack?.status || st.cmd.status) === "rejected" ? "warn" : (ack?.status || st.cmd.status) === "accepted" || (ack?.status || st.cmd.status) === "completed" ? "good" : "info"));
+    const why = [];
+    if (r?.error) why.push(r.error);
+    else if (r) {
+      if (r.rejected || r.clamped || r.step_limited) why.push(r.reason);
+    }
+    if (ack?.status === "rejected" && ackDetail) {
+      why.push(/disarmed/i.test(ackDetail) ? `Peltier disarmed on the device — arm it on the board to heat/cool${forced !== null ? ` (setpoint ${fmt(forced, 1)} °C stored locally)` : ""}` : ackDetail);
+    } else if (!ack && tel && String(tel.peltier_mode || "").toLowerCase() === "disarmed") why.push("Peltier disarmed on the device — arm it on the board to heat/cool");
+    clear(st.out, h("div", { class: "sp-line" }, bits), why.length ? h("div", { class: "warn-text" }, why.join(" · ")) : null);
   }
 
   // ------------------------------------------------------------------ threads (kitchen pass + per-lab)

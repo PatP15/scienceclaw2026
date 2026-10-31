@@ -17,6 +17,7 @@
     use_simulator       False -> force the heuristic predictor
     replay              True  -> every finding labeled evidence_source "replay"
     llm_mode            override FERMENTAI_LLM_MODE for live mode (offline|claude_cli|anthropic_api)
+    station             guest's station (A|B, default A) for the top-3 ``suggestions``
     llm_adapter         injected LLMAdapter (tests)
 """
 
@@ -33,6 +34,7 @@ from .communication import Finding, FindingsLog, utc_now_iso
 from .llm_adapter import LLMAdapter
 from .scientist import ScientistAgent
 from .sensory import parse_feedback
+from .suggestions import build_suggestions
 
 MODE_OFFLINE = "offline:deterministic_fallback"
 REASONING_ONLINE = "Online Agent"
@@ -316,6 +318,11 @@ def _run_cycle(interp: dict[str, Any], context: dict[str, Any], setpoints: dict[
                  proposed_action={"type": "start_experiment", "experiment_id": next_id,
                                   "schedules": {c: final[c]["schedule_id"] for c in P.LOAVES},
                                   "requires_human_confirmation": True})
+    station = str(context.get("station") or context.get("sous_chef") or "A").replace("scientist_", "").strip().upper()
+    station = station if station in P.LOAVES else "A"
+    suggestions = build_suggestions(agents[station].evidence,
+                                    P.rank_candidates(agents[station].evidence, risk_weight=agents[station].state.risk_weight),
+                                    interp, station, final[station]["schedule_id"])
     staged = [f for f in staging.read() if f.id not in already]
     comparison = {c: {"recorded_schedule": ev["recorded"][c]["points"], "recorded_source": ev["recorded"][c]["source"],
                       "recorded_violations": ev["recorded"][c]["violations"], "judged": ev["recorded"][c]["judged"],
@@ -378,6 +385,7 @@ def _run_cycle(interp: dict[str, Any], context: dict[str, Any], setpoints: dict[
                              "quality": agents[c].state.observation_quality or {"n": 0, "note": "no telemetry"},
                              "ph_status": agents[c].state.ph_status,
                              "deviations_from_prediction": agents[c].state.deviations} for c in P.LOAVES},
+        "suggestions": suggestions,
         "candidate_ranking": [{"id": r["id"], "name": r["name"], "route": r["route"], "score": r["score"],
                                "pred_sourness": r["pred_sourness"], "pred_openness": r["pred_openness"],
                                "overproof_risk": r["model"]["overproof_risk"]}

@@ -39,8 +39,8 @@
 
 <nav class="tabs" role="tablist" aria-label="Dashboard sections">
   <button role="tab" class="tab" data-tab="live" id="tabbtn-live" aria-controls="tab-live">Live Laboratories</button>
+  <button role="tab" class="tab" data-tab="compare" id="tabbtn-compare" aria-controls="tab-compare">Compare labs</button>
   <button role="tab" class="tab tab-key" data-tab="taste" id="tabbtn-taste" aria-controls="tab-taste">Kitchen pass</button>
-  <button role="tab" class="tab" data-tab="twin" id="tabbtn-twin" aria-controls="tab-twin">Digital Twin</button>
   <button role="tab" class="tab" data-tab="molecular" id="tabbtn-molecular" aria-controls="tab-molecular">NVIDIA Molecular Explorer</button>
 </nav>
 <div id="mode-bar" class="mode-bar" aria-hidden="true"></div>
@@ -55,6 +55,7 @@
     <div id="lab-detail" hidden>
       <div class="detail-head" id="lab-detail-head"></div>
       <div class="detail-charts" id="lab-detail-charts"></div>
+      <section class="card lab-setpoint" id="lab-setpoint" aria-label="Target temperature"></section>
       <div class="detail-row">
         <div class="detail-chatcol">
           <div class="detail-mode"><div class="seg seg-sm mode-seg" role="radiogroup" aria-label="Reasoning mode">
@@ -66,29 +67,26 @@
         <div class="detail-side" id="lab-detail-side"></div>
         <aside class="card live-side" id="lab-thread"></aside>
       </div>
+      <section class="card lab-twin" id="lab-twin" aria-label="Digital twin">
+        <div class="lab-twin-head">
+          <h3>Digital twin <span class="badge prov-modeled">modeled</span></h3>
+          <button class="btn btn-ghost btn-sm" id="lab-twin-toggle" type="button" aria-expanded="false" aria-controls="lab-twin-body">Open digital twin</button>
+        </div>
+        <div id="lab-twin-body" hidden>
+          <p class="muted tiny">This station's model forecast (median with 5–95 % band) with its own observed telemetry overlaid where it exists.
+            <button class="btn btn-ghost btn-sm" id="twin-reload" type="button">Reload predictions</button></p>
+          <div class="twin-status" id="twin-status"></div>
+          <div class="chart-grid" id="twin-charts"></div>
+        </div>
+      </section>
       <div id="lab-reveal"></div>
     </div>
   </section>
 
-  <!-- ===================================================== Digital Twin -->
-  <section id="tab-twin" class="tabpanel" role="tabpanel" aria-labelledby="tabbtn-twin" hidden>
-    <div class="section-head">
-      <div>
-        <h2>Digital Twin <span class="badge prov-modeled">modeled</span></h2>
-        <p class="muted" id="twin-sub">Fermentation model predictions (median with 5–95 % band) for Chamber A vs B, with observed telemetry overlaid where it exists.</p>
-      </div>
-      <div class="head-actions">
-        <button class="btn btn-ghost" id="twin-reload" type="button">Reload predictions</button>
-      </div>
-    </div>
-    <div class="twin-status" id="twin-status"></div>
-    <div class="chart-grid" id="twin-charts"></div>
-    <div class="twin-lower">
-      <div class="card" id="twin-summary"></div>
-      <div class="card" id="twin-chain"></div>
-    </div>
-    <div class="card" id="twin-morphology" style="margin-top:10px"></div>
-    <div class="card" id="twin-bench" style="margin-top:10px"></div>
+  <!-- ===================================================== Compare labs -->
+  <section id="tab-compare" class="tabpanel" role="tabpanel" aria-labelledby="tabbtn-compare" hidden>
+    <div class="section-head"><h2>Compare labs</h2></div>
+    <div id="compare-body"></div>
   </section>
 
   <!-- ===================================================== Molecular -->

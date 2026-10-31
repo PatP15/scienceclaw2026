@@ -2,7 +2,7 @@
 import { get, captureTokenFromURL, getToken, setToken, EventStream } from "./api.js";
 import { $, $$, toast, icon } from "./util.js";
 import { LivePanel } from "./live.js";
-import { TwinPanel } from "./twin.js";
+import { ComparePanel } from "./compare.js";
 import { MolecularPanel } from "./molecular.js";
 import { TastePanel } from "./taste.js";
 
@@ -126,10 +126,10 @@ function wireTabs(panels) {
 
 // ------------------------------------------------------------------ icons for tabs / section headers
 function decorate() {
-  const tabIcons = { live: "station", twin: "chart", molecular: "atom", taste: "headchef" };  // taste = Kitchen pass
+  const tabIcons = { live: "station", molecular: "atom", taste: "headchef", compare: "chart" };  // taste = Kitchen pass
   for (const b of $$(".tab")) if (!b.querySelector(".ico")) b.prepend(icon(tabIcons[b.dataset.tab] || "toque", { size: 18 }));
   for (const el of $$("[data-icon]")) if (!el.querySelector(".ico")) el.append(icon(el.dataset.icon, { size: 18 }));
-  const secIcons = { "tab-twin": "chart", "tab-molecular": "atom" };
+  const secIcons = { "tab-molecular": "atom", "tab-compare": "chart" };
   for (const [id, ic] of Object.entries(secIcons)) {
     const h2 = document.querySelector(`#${id} .section-head h2`);
     if (h2 && !h2.querySelector(".ico")) h2.prepend(icon(ic, { size: 20 }));
@@ -169,15 +169,15 @@ async function boot() {
   // Which optional routes this server has (chat, USB bridge status) - avoids polling 404s.
   try { store.apiPaths = new Set(Object.keys((await get("/openapi.json")).paths || {})); } catch { store.apiPaths = null; }
   const live = new LivePanel(store, stream);
-  const twin = new TwinPanel(store);
+  const compare = new ComparePanel(store, live);
   const molecular = new MolecularPanel();
   const taste = new TastePanel(store, stream, live);
   if (store.health && store.health.llm_mode && store.health.llm_mode !== "offline") taste.setMode("live");
   live.taste = taste;   // lab detail chats play the Head Chef reveal through the taste panel
-  wireTabs({ live, twin, molecular, taste });
+  wireTabs({ live, compare, molecular, taste });
   await live.load();
   await taste.init();
-  window.fermentai = { store, stream, live, twin, molecular, taste }; // handy for debugging in the browser console
+  window.fermentai = { store, stream, live, compare, molecular, taste }; // handy for debugging in the browser console
 }
 
 boot();

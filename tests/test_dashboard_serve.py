@@ -42,7 +42,7 @@ def test_root_serves_dashboard(client):
     assert r.headers["content-type"].startswith("text/html")
     assert "<title>FermentAI Lab Dashboard</title>" in r.text
     assert "What did the bread taste like?" in r.text
-    for section in ("Live Laboratories", "Digital Twin", "NVIDIA Molecular Explorer"):
+    for section in ("Live Laboratories", "Digital twin", "Compare labs", "NVIDIA Molecular Explorer"):
         assert section in r.text
 
 
@@ -69,7 +69,7 @@ def collect_assets(client):
 def test_every_referenced_asset_resolves(client):
     assets = collect_assets(client)
     assert "/vendor/plotly.min.js" in assets and "/js/app.js" in assets and "/css/dashboard.css" in assets
-    for mod in ("api", "util", "live", "twin", "molecular", "taste", "messages"):
+    for mod in ("api", "util", "live", "twin", "compare", "molecular", "taste", "messages"):
         assert f"/js/{mod}.js" in assets, f"{mod}.js not reachable from index.html imports"
     bad = {u: r.status_code for u, r in assets.items() if r.status_code != 200}
     assert not bad, bad

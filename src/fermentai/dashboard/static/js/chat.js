@@ -4,11 +4,11 @@
 //   GET    /api/v1/chat/{session_id}      DELETE /api/v1/chat/{session_id}      SSE `chat` {session_id, role, text, stage}
 // Degrades to a "chat not available yet" state when the route is missing (404) or the service is down (503).
 import { get, post, del, getToken, ApiError } from "./api.js";
-import { h, clear, icon, emptyCard, statusBadge, toast, brigadeText, agentSide } from "./util.js";
+import { h, clear, icon, emptyCard, statusBadge, toast, brigadeText, agentSide, sparkline, fmt, num } from "./util.js";
 
 const SESSION_KEY = "fermentai.chat.session";
 const CHEF_KEY = "fermentai.chat.sousChef";
-const STAGE_LABEL = { greeting: "greeting", collecting: "listening", confirming: "confirming", handoff: "handing off to Head Chef", done: "plan called", reset: "new tasting" };
+const STAGE_LABEL = { greeting: "greeting", collecting: "listening", confirming: "confirming", handoff: "handing off to Head Chef", choosing: "choose next step", done: "plan called", reset: "new tasting" };
 const DIM_WORD = { sourness: ["more sour", "milder", "keep the sourness"], texture: ["more open / airy", "tighter crumb", "keep it airy"],
   density: ["denser", "less dense", "keep it light"], aroma: ["more aroma", "less aroma", "keep the aroma"], flavor_intensity: ["more flavour", "less flavour", "keep the flavour"] };
 
@@ -149,12 +149,44 @@ export class ChatPanel {
     } else {
       clear(this.log, this.transcript.map((e) => this.bubble(e)));
     }
+    const sg = this.suggestionsBlock();
+    if (sg) this.log.append(sg);
     if (this.pending) this.log.append(h("div", { class: "cmsg chef chef-" + this.sousChef + " typing" }, h("span", { class: "chat-av" }, icon("toque", { size: 18 })),
       h("div", { class: "cbubble" }, h("span", { class: "dots" }, h("i"), h("i"), h("i")))));
     this.log.scrollTop = this.log.scrollHeight;
     const chips = understoodChips(this.understood);
     clear(this.chips, chips.length ? [h("span", { class: "tiny faint" }, "Understood so far:"), chips.map((c) => h("span", { class: `uchip uchip-${c.side}` }, c.text))] : null);
     this.updateHint();
+  }
+
+  /** Three Head Chef suggestion cards (click = send "1"/"2"/"3"); once chosen, a cream "Next at Station" ticket. */
+  suggestionsBlock() {
+    const sug = this.hres?.hr?.suggestions;
+    if (!Array.isArray(sug) || !sug.length) return null;
+    const chosen = this.hres.chosen;
+    const chosenId = chosen && (chosen.id ?? chosen.suggestion_id), chosenRank = chosen && (chosen.rank ?? null);
+    const isChosen = (x) => chosen && ((chosenId !== undefined && chosenId !== null && x.id === chosenId) || (chosenRank !== null && x.rank === chosenRank));
+    const chips = (x) => [["pH@16h", x.predicted?.ph_16h, 2, ""], ["peak rise", x.predicted?.peak_rise, 1, "×"], ["overproof", x.predicted?.overproof_h, 1, " h"]]
+      .filter(([, v]) => num(v) !== null).map(([l, v, d, u]) => h("span", { class: "sg-chip" }, `${l} ${fmt(v, d)}${u}`));
+    const spark = (x) => Array.isArray(x.points) && x.points.length > 1 ? sparkline([{ values: x.points.map((p) => ({ t: num(p[0]), v: num(p[1]) })), color: "currentColor" }], { height: 26 }) : null;
+    if (chosen) {
+      const x = sug.find(isChosen) || chosen;
+      const expId = chosen.experiment_id || this.hres.exp?.experiment_id || this.hres.hr.next_experiment?.id;
+      return h("div", { class: "sg-ticket" },
+        h("div", { class: "sg-ticket-h" }, `Next at Station ${this.sousChef}`),
+        h("div", { class: "sg-title" }, x.title || x.schedule_id || "chosen plan"), spark(x),
+        h("div", { class: "sg-chips" }, chips(x)), x.why ? h("div", { class: "sg-why" }, x.why) : null,
+        expId ? h("button", { class: "btn btn-primary btn-sm", type: "button", disabled: !getToken(), title: getToken() ? "" : "Needs the API token",
+          onclick: async (ev) => { const b = ev.currentTarget; b.disabled = true;
+            try { await post(`/api/v1/experiments/${encodeURIComponent(expId)}/apply`); b.textContent = "Applied"; toast("Applied to station (safety-clamped setpoint path).", "good"); }
+            catch (e) { b.disabled = false; toast(`Apply failed: ${e.message}`, "bad"); } } }, "Apply to station") : null);
+    }
+    return h("div", { class: "sg-list" }, sug.slice(0, 3).map((x) => h("button", { type: "button", class: "sg-card", disabled: this.pending || !getToken(),
+      title: `Send "${x.rank}"`, onclick: () => { this.input.value = String(x.rank); this.send(); } },
+      h("div", { class: "sg-top" }, h("span", { class: "sg-title" }, x.title || x.schedule_id || `Option ${x.rank}`),
+        x.rank === 1 ? h("span", { class: "sg-pick" }, "Head Chef's pick") : null),
+      spark(x), h("div", { class: "sg-chips" }, chips(x), x.risk ? h("span", { class: "sg-chip sg-risk" }, `risk: ${x.risk}`) : null),
+      x.why ? h("div", { class: "sg-why" }, x.why) : null)));
   }
 
   // ------------------------------------------------------------------ data
@@ -190,6 +222,8 @@ export class ChatPanel {
     if (Array.isArray(r.transcript)) this.transcript = r.transcript.filter((e) => e && typeof e === "object");
     else if (r.reply) this.transcript.push({ role: `scientist_${this.sousChef}`, text: r.reply });
     if (r.understood) this.understood = r.understood;
+    const hr = r.handoff_result || r.persisted?.result;
+    if (hr) this.hres = { hr, chosen: hr.chosen_suggestion || r.persisted?.chosen || r.chosen_suggestion || null, exp: r.persisted?.experiment };
     if (!this.station && (r.sous_chef === "A" || r.sous_chef === "B")) this.setChef(r.sous_chef, false);
     this.setStage(r.stage || null);
     if (r.reasoning_mode_label) document.dispatchEvent(new CustomEvent("fermentai:mode", { detail: { reasoning: r.reasoning_mode_label, modeLabel: r.reasoning_mode_label } }));
@@ -254,14 +288,14 @@ export class ChatPanel {
   async reset() {
     const sid = this.sessionId;
     this.sessionId = null; lsSet(this.sessionKey, null);
-    this.transcript = []; this.understood = null; this.revealedKey = null; this.setStage(null);
+    this.transcript = []; this.understood = null; this.revealedKey = null; this.hres = null; this.setStage(null);
     this.renderLog();
     if (sid && this.available !== false && getToken()) { try { await del(`/api/v1/chat/${encodeURIComponent(sid)}`); } catch { /* best effort */ } }
   }
 
   onEvent(d) {
     if (!d || !this.sessionId || d.session_id !== this.sessionId) return;
-    if (d.stage === "reset") { this.sessionId = null; lsSet(this.sessionKey, null); this.transcript = []; this.understood = null; this.setStage(null); this.renderLog(); return; }
+    if (d.stage === "reset") { this.sessionId = null; lsSet(this.sessionKey, null); this.transcript = []; this.understood = null; this.hres = null; this.setStage(null); this.renderLog(); return; }
     if (this.pending) return;  // our own turn: the POST response carries the full transcript
     // Another screen spoke in this session: refresh from the server.
     get(`/api/v1/chat/${encodeURIComponent(this.sessionId)}`).then((r) => this.apply(r)).catch(() => {});

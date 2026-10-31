@@ -9,7 +9,7 @@ orchestrating pipeline (``run_taste_feedback_cycle``), line cooks = candidate si
 Per lab: ``context["sous_chef"]`` is the station the Guest is standing at (A or B); that Sous Chef
 is responsible for ITS loaf. A deterministic state machine (never the LLM) decides what happens next:
 
-    greeting -> collecting -> confirming -> handoff -> done
+    greeting -> collecting -> confirming -> handoff -> choosing -> done
 
 1. greeting names the station and asks about this loaf;
 2. up to 3 focused follow-ups about THIS loaf (sourness, crumb, aroma/crust/anything else),
@@ -19,6 +19,11 @@ is responsible for ITS loaf. A deterministic state machine (never the LLM) decid
 4. the wish ("What would you want the next loaf to be?");
 5. read-back + confirm; 6. hand-off to the Head Chef with a consolidated note that attributes each
    loaf to its letter. Single-loaf tastings hand off too.
+7. the Head Chef's menu: the hand-off reply lists the top-3 distinct ``suggestions`` for this station and asks
+   "Which should we try? Reply 1, 2 or 3." (the hand-off turn itself reports stage "handoff"). Any later reply
+   is read deterministically as a choice ("2", "the second", a title fragment) -> stage "done" and the turn's
+   result carries ``chosen_suggestion`` (the operator still applies it); anything else -> stage "choosing" with a
+   gentle re-ask. The LLM never picks or words the menu/choice.
 
 Every guest message is folded into the note and re-parsed with ``sensory.parse_feedback``; bare
 answers are attributed to the loaf being discussed ("this one" -> this station, "the other one" ->
@@ -51,7 +56,7 @@ from .sensory import DESIRE_RE, find_loaf_refs, parse_feedback
 
 DEFAULT_SESSIONS_PATH = REPO_ROOT / "data" / "experiments" / "chat_sessions.jsonl"
 MAX_OWN_FOLLOWUPS = 3  # focused follow-ups about this station's loaf
-STAGES = ("greeting", "collecting", "confirming", "handoff", "done")
+STAGES = ("greeting", "collecting", "confirming", "handoff", "choosing", "done")
 
 AFFIRM_RE = re.compile(r"^\s*(?:yes|yeah|yep|yup|ya|correct|right|exactly|that'?s (?:right|correct|it)|sounds (?:good|right)|"
                        r"spot on|perfect|ok(?:ay)?|sure|absolutely|go (?:ahead|for it)|do it|confirm(?:ed)?)\b", re.IGNORECASE)
@@ -195,7 +200,7 @@ def _new_session(session_id: str, sous_chef: str) -> dict[str, Any]:
         "own_done": False, "compare": None, "preferred": None, "preference_basis": None, "preference_reason": None,
         "flags": {"unknown_A": False, "unknown_B": False, "wish_unknown": False, "wish_no_change": False,
                   "tie": False, "same_as": None},
-        "handoff_result": None, "trial_id": None, "off_topic_streak": 0, "chat_mode_label": None,
+        "handoff_result": None, "trial_id": None, "suggestions": [], "chosen_suggestion": None, "off_topic_streak": 0, "chat_mode_label": None,
     }
 
 
@@ -270,6 +275,8 @@ class SousChefChat:
             sess["transcript"].append({"role": "guest", "text": text, "ts": now})
         action = self._advance(sess, text, ctx)
         reply, label = self._word(sess, action, ctx, mode, text)
+        if action["kind"] in ("chosen", "rechoose") and sess.get("handoff_result"):
+            label = sess["handoff_result"].get("reasoning_mode_label", label)
         handoff = None
         if action["kind"] == "handoff":
             handoff = self._handoff(sess, ctx, mode, now)
@@ -287,7 +294,9 @@ class SousChefChat:
             "understood": self._understood(sess),
             "questions_remaining": self._questions_remaining(sess, self._parse(sess, ctx)),
             "transcript": list(sess["transcript"]),
-            "handoff_result": sess["handoff_result"] if sess["stage"] in ("handoff", "done") else None,
+            "handoff_result": sess["handoff_result"] if sess["stage"] in ("handoff", "choosing", "done") else None,
+            "suggestions": list(sess.get("suggestions") or []),
+            "chosen_suggestion": sess["chosen_suggestion"] if action["kind"] == "chosen" else None,
             "reasoning_mode_label": label,
             "chat_mode_label": sess.get("chat_mode_label"),
             "sous_chef": f"Sous Chef {sess['sous_chef']}",
@@ -477,7 +486,7 @@ class SousChefChat:
         return "confirm"
 
     def _questions_remaining(self, sess: dict[str, Any], interp: dict[str, Any]) -> int:
-        if sess["stage"] in ("confirming", "handoff", "done"):
+        if sess["stage"] in ("confirming", "handoff", "choosing", "done"):
             return 0
         own, other = sess["station"], sess["other"]
         asked = set(sess["asked"])
@@ -499,7 +508,18 @@ class SousChefChat:
 
     def _advance(self, sess: dict[str, Any], text: str, ctx: dict[str, Any]) -> dict[str, Any]:
         stage = sess["stage"]
-        if stage in ("handoff", "done"):
+        if stage in ("handoff", "choosing") and sess.get("suggestions"):
+            picked = parse_choice(text, sess["suggestions"]) if text else None
+            if picked is None:
+                sess["stage"] = "choosing"
+                return {"kind": "rechoose"}
+            sess["chosen_suggestion"] = {**picked, "station": sess["sous_chef"], "session_id": sess["session_id"],
+                                         "cycle_id": (sess.get("handoff_result") or {}).get("cycle_id"),
+                                         "trial_id": sess.get("trial_id"), "status": "proposed",
+                                         "requires_human_confirmation": True}
+            sess["stage"] = "done"
+            return {"kind": "chosen"}
+        if stage in ("handoff", "choosing", "done"):
             sess["stage"] = "done"
             return {"kind": "done"}
         if not text:
@@ -690,7 +710,18 @@ class SousChefChat:
                               "Great, I'll hand this to the Head Chef."], sid, turn, "ho")
             return (f"{ack + ' ' if ack else ''}I have enough to go on: {self._reflection(sess, interp)}. "
                     f"Taking it to the Head Chef now.").strip()
+        if k == "chosen":
+            c = sess["chosen_suggestion"]
+            return (f"Great — Station {sess['sous_chef']} will run '{c['title']}' next. The operator applies it. "
+                    f"Nothing starts until they confirm.")
+        if k == "rechoose":
+            return (f"Sorry, I didn't catch which one. Which should we try? Reply 1, 2 or 3 "
+                    f"({_menu_titles(sess['suggestions'])}), or say 'start over'.")
         if k == "done":
+            c = sess.get("chosen_suggestion")
+            if c:
+                return (f"Station {sess['sous_chef']} is set to run '{c['title']}' next; the operator applies it. "
+                        f"Say 'start over' if you'd like to taste again.")
             trial = sess.get("trial_id") or "the next trial"
             return (f"The Head Chef already has this tasting — the plan is {trial}. "
                     f"Say 'start over' if you'd like to taste again.")
@@ -700,6 +731,9 @@ class SousChefChat:
               text: str) -> tuple[str, str]:
         interp = self._parse(sess, ctx)
         offline = self._offline_reply(sess, action, interp)
+        if action["kind"] in ("chosen", "rechoose", "done"):  # deterministic; the LLM only words the chat part
+            sess["chat_mode_label"] = sess.get("chat_mode_label") or "offline:templated"
+            return offline, "Offline Policy"
         if (mode or "offline").lower() != "live":
             sess["chat_mode_label"] = "offline:templated"
             return offline, "Offline Policy"
@@ -739,10 +773,13 @@ class SousChefChat:
     def _handoff(self, sess: dict[str, Any], ctx: dict[str, Any], mode: str, now: str) -> dict[str, Any]:
         note = self._note(sess) or "The guest gave no specific tasting notes."
         cyc_ctx = {k: v for k, v in ctx.items() if k not in ("chat_sessions_path", "sous_chef")}
+        cyc_ctx["station"] = sess["sous_chef"]
         cyc_ctx.setdefault("now_utc", now)
         result = run_taste_feedback_cycle(note, cyc_ctx, mode=mode)
         sess["handoff_result"] = result
         sess["trial_id"] = result["next_experiment"]["id"]
+        sess["suggestions"] = list(result.get("suggestions") or [])
+        sess["chosen_suggestion"] = None
         sess["stage"] = "handoff"
         if cyc_ctx.get("persist_findings", True):
             log = FindingsLog(cyc_ctx.get("findings_log_path") or "default")
@@ -782,12 +819,17 @@ class SousChefChat:
         src = r["provenance"].get("prediction_source", "estimated")
         revised = msgs[2]["payload"].get("revised")
         trial = ne["id"].replace("_", " ").title()
+        menu = ""
+        if sess.get("suggestions"):
+            items = "; ".join(f"{x['rank']}. {x['title']} — {x['target']} ({x['risk']})" for x in sess["suggestions"])
+            menu = (f" Suggestions for Station {sess['sous_chef']} (my pick is 1): {items}. "
+                    f"Which should we try? Reply 1, 2 or 3.")
         return (f"Head Chef: goal set — {goal}. I sent out {len(S.LIBRARY)} line cooks (candidate simulations, "
                 f"{src}) to try every validated schedule. Sous Chef {lead_ch} proposed '{lead_pick}' for "
                 f"Station {lead_ch}; Sous Chef {peer_ch} {stance}: {concern}"
                 f"{' Sous Chef ' + lead_ch + ' revised its plan.' if revised else ''} "
                 f"→ {trial}: Station A: '{st['A']['name']}', Station B: '{st['B']['name']}'. "
-                f"({r['reasoning_mode_label']}; nothing starts until the operator confirms.)")
+                f"({r['reasoning_mode_label']}; nothing starts until the operator confirms.){menu}")
 
     def _understood(self, sess: dict[str, Any]) -> dict[str, Any]:
         interp = parse_feedback(self._note(sess))
@@ -811,6 +853,44 @@ class SousChefChat:
             "flags": dict(sess["flags"]),
             "consolidated_note": self._note(sess),
         }
+
+
+_ORDINALS = {"1": 0, "one": 0, "first": 0, "1st": 0, "2": 1, "two": 1, "second": 1, "2nd": 1,
+             "3": 2, "three": 2, "third": 2, "3rd": 2, "last": 2}
+_STOP = {"the", "a", "an", "one", "with", "and", "start", "ferment", "please", "try", "go", "let", "lets", "i", "to",
+         "of", "it", "that", "this", "option", "suggestion", "number", "no", "pick", "choose", "take", "like", "want"}
+
+
+def _menu_titles(suggestions: list[dict[str, Any]]) -> str:
+    return "; ".join(f"{x['rank']}. {x['title']}" for x in suggestions)
+
+
+def parse_choice(text: str, suggestions: list[dict[str, Any]]) -> dict[str, Any] | None:
+    """Deterministically map a reply ("2", "the second one", a title fragment) to one suggestion, else None."""
+    words = re.findall(r"[a-z0-9]+(?:st|nd|rd)?", (text or "").lower())
+    n = len(suggestions)
+    hits = set()
+    for w in words:
+        if w in _ORDINALS and _ORDINALS[w] < n and (w != "one" or "number" in words or len(words) == 1):
+            hits.add(_ORDINALS[w])
+    if len(hits) == 1:
+        return suggestions[hits.pop()]
+    if len(hits) > 1:
+        return None
+    low = " ".join(words)
+    full = [x for x in suggestions if x["title"].lower().rstrip(")").split(" (")[0] in low]
+    if len(full) == 1:
+        return full[0]
+    toks = {w for w in words if len(w) >= 3 and w not in _STOP}
+    if not toks:
+        return None
+    score = []
+    for x in suggestions:
+        tt = {w for w in re.findall(r"[a-z0-9]+", x["title"].lower()) if len(w) >= 3 and w not in _STOP}
+        others = set().union(*(set(re.findall(r"[a-z0-9]+", y["title"].lower())) for y in suggestions if y is not x))
+        score.append(len((tt - others) & toks))
+    best = max(score)
+    return suggestions[score.index(best)] if best >= 1 and score.count(best) == 1 else None
 
 
 _CHATS: dict[str, SousChefChat] = {}

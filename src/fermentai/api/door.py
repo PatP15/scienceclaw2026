@@ -57,11 +57,8 @@ class DoorRule:
             return
         with self._lock:
             if door_open:
-                if legacy:
-                    # legacy console + open door: the interlock will refuse it; wait for close
-                    if cfg.retry_on_close_if_rejected:
-                        self.deferred.add(chamber_id)
-                    return
+                # Fire right away; firmware built with the door interlock rejects it with "door open",
+                # and the rejection path then defers one wiggle to the next close.
                 self._fire(chamber_id, "door opened")
             elif chamber_id in self.deferred:
                 self.deferred.discard(chamber_id)

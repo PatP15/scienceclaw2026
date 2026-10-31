@@ -55,8 +55,9 @@ def test_plan14_conversation_at_station_a_reaches_handoff(ctx, tmp_path):
     lines = [json.loads(l) for l in (tmp_path / "findings.jsonl").read_text().splitlines()]
     via = [f for f in lines if f["type"] == "sensory_feedback" and "via chat" in f["payload"].get("tags", [])]
     assert len(via) == 1 and via[0]["payload"]["structured_preference"] == PLAN14_PREFS
-    done = chat_turn("s14", "thanks!", ctx)
-    assert done["stage"] == "done" and "trial_002" in done["reply"]
+    assert [x["rank"] for x in res["suggestions"]] == [1, 2, 3] and "Reply 1, 2 or 3" in final["reply"]
+    done = chat_turn("s14", "2", ctx)  # the two-loaf path also ends with a choice
+    assert done["stage"] == "done" and done["chosen_suggestion"]["rank"] == 2
 
 
 def test_single_lab_tasting_without_comparison_hands_off(ctx):
@@ -228,3 +229,52 @@ def test_live_handoff_cycle_falls_back_cleanly(ctx):
     assert r2["stage"] == "handoff"
     assert r2["handoff_result"]["mode_label"].startswith("offline:deterministic_fallback (live unavailable:")
     assert r2["reasoning_mode_label"] == "Offline Policy"
+
+
+SINGLE = ["", "It was pretty mild and a bit dense.", "no", "no, only this one", "more tang and a lighter crumb", "yes"]
+
+
+def test_single_loaf_a_gets_three_diverse_suggestions_and_choice(ctx):
+    r = run("sg", SINGLE, ctx, station="A")
+    h = r[-1]
+    assert h["stage"] == "handoff" and "Which should we try? Reply 1, 2 or 3." in h["reply"]
+    sg = h["handoff_result"]["suggestions"]
+    assert [s["rank"] for s in sg] == [1, 2, 3] and h["suggestions"] == sg
+    assert len({s["schedule_id"] for s in sg}) == 3 and len({s["title"] for s in sg}) == 3
+    assert sg[0]["head_chef_pick"] and sg[0]["schedule_id"] == h["handoff_result"]["next_experiment"]["schedules"]["A"]["schedule_id"]
+    for s in sg:
+        assert len(s["title"].split()) <= 6 and s["station"] == "A" and s["provenance"] in ("simulated", "estimated")
+        assert set(s["predicted"]) == {"ph_16h", "peak_rise", "overproof_h"} and s["risk"] and s["why"] and s["target"]
+        assert s["points"] and s["points"][0][0] == 0.0
+        assert f"{s['rank']}. {s['title']}" in h["reply"]
+    # the three are different routes, not three near-identical steady holds
+    from fermentai.agents.suggestions import category
+    from fermentai.agents import schedules as S
+    assert len({category(S.LIBRARY_BY_ID[s["schedule_id"]].to_dict()) for s in sg}) == 3
+    bad = chat_turn("sg", "hmm, I don't know", ctx)
+    assert bad["stage"] == "choosing" and bad["chosen_suggestion"] is None and "Reply 1, 2 or 3" in bad["reply"]
+    ok = chat_turn("sg", "2", ctx)
+    assert ok["stage"] == "done" and ok["chosen_suggestion"]["schedule_id"] == sg[1]["schedule_id"]
+    assert f"Station A will run '{sg[1]['title']}' next. The operator applies it." in ok["reply"]
+    assert chat_turn("sg", "thanks", ctx)["chosen_suggestion"] is None
+
+
+@pytest.mark.parametrize("reply,idx", [("the third one", 2), ("first", 0), ("option 2", 1), ("number three", 2)])
+def test_choice_phrasings(ctx, reply, idx):
+    run("ph", SINGLE, ctx, station="A")
+    r = chat_turn("ph", reply, ctx)
+    assert r["chosen_suggestion"]["rank"] == idx + 1
+
+
+def test_choice_by_title_fragment_and_ambiguity(ctx):
+    r = run("tf", SINGLE, ctx, station="A")[-1]
+    sg = r["handoff_result"]["suggestions"]
+    assert chat_turn("tf", "2 or 3", ctx)["chosen_suggestion"] is None
+    word = next(w for w in sg[2]["title"].lower().split() if w not in sg[0]["title"].lower() and w not in sg[1]["title"].lower())
+    assert chat_turn("tf", f"let's go with the {word}", ctx)["chosen_suggestion"]["rank"] == 3
+
+
+def test_start_over_resets_from_choosing(ctx):
+    run("so", SINGLE, ctx, station="A")
+    assert chat_turn("so", "what?", ctx)["stage"] == "choosing"
+    assert chat_turn("so", "start over", ctx)["stage"] == "greeting"

@@ -87,11 +87,10 @@ def test_other_rejection_is_not_deferred(client):
     assert len(door_cmds(client)) == 1
 
 
-def test_legacy_device_defers_without_issuing_while_open(client):
+def test_legacy_device_fires_on_open(client):
+    # firmware no longer refuses the motor with the door open: legacy devices fire on open too
     tel(client, False, legacy=True)
     tel(client, True, legacy=True, opens=1)
-    assert door_cmds(client) == []
-    tel(client, False, legacy=True, opens=1)
     assert len(door_cmds(client)) == 1
 
 

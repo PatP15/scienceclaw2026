@@ -825,3 +825,54 @@ main { padding: var(--gap); }
 /* grid-card hat dance button */
 .lab-dance { display: flex; justify-content: flex-end; margin-top: 10px; }
 .lab-dance .btn { min-width: 120px; }
+
+/* ------------------------------------------------------------------ manual setpoint + embedded twin */
+.lab-setpoint { margin-top: var(--gap); padding: 8px 12px; }
+.sp-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.sp-input { width: 5.5em; padding: 4px 6px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-1); color: var(--text-primary); font: inherit; }
+.sp-line { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; margin-top: 4px; color: var(--text-muted); }
+.lab-twin { margin-top: var(--gap); padding: 8px 12px; }
+.lab-twin-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.lab-twin-head h3 { margin: 0; font-size: var(--fs-body); }
+#lab-twin-body { margin-top: 8px; }
+.cmp-bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin-bottom: var(--gap); }
+.cmp-chips { display: flex; gap: 6px; }
+.cmp-chip { cursor: pointer; opacity: .45; border: 1px solid var(--border); background: transparent; }
+.cmp-chip.on { opacity: 1; }
+.cmp-grid { grid-template-columns: repeat(2, 1fr); margin-top: var(--gap); }
+.cmp-door { display: flex; align-items: center; gap: 8px; margin: 4px 6px; }
+.cmp-door .door-line { flex: 1; height: 14px; }
+@media (max-width: 900px) { .cmp-grid { grid-template-columns: 1fr; } }
+
+/* demo-lab station colours (teal, plum, olive, rose) */
+.chip-C { background: rgba(34,184,168,.14); color: #6fdccf; border: 1px solid #22b8a8; }
+.lab-card[data-chamber="C"], #lab-detail[data-chamber="C"] { --c: #22b8a8; --c-soft: rgba(34,184,168,.14); --c-text: #6fdccf; }
+.chip-D { background: rgba(184,107,208,.14); color: #d6a3e6; border: 1px solid #b86bd0; }
+.lab-card[data-chamber="D"], #lab-detail[data-chamber="D"] { --c: #b86bd0; --c-soft: rgba(184,107,208,.14); --c-text: #d6a3e6; }
+.chip-E { background: rgba(163,176,48,.14); color: #cbd66b; border: 1px solid #a3b030; }
+.lab-card[data-chamber="E"], #lab-detail[data-chamber="E"] { --c: #a3b030; --c-soft: rgba(163,176,48,.14); --c-text: #cbd66b; }
+.chip-F { background: rgba(232,101,143,.14); color: #f5a3bf; border: 1px solid #e8658f; }
+.lab-card[data-chamber="F"], #lab-detail[data-chamber="F"] { --c: #e8658f; --c-soft: rgba(232,101,143,.14); --c-text: #f5a3bf; }
+.lab-grid { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); }
+.lab-pin { font-size: var(--fs-caption); color: var(--text-muted); }
+.lab-tag { display: inline-block; margin-left: 6px; padding: 0 6px; border: 1px solid var(--border); border-radius: 999px; font-size: 10px; letter-spacing: .06em; color: var(--text-muted); vertical-align: middle; }
+.lab-tag.demo { color: var(--text-secondary, var(--text-muted)); border-style: dashed; }
+.demo-chat-note { padding: 14px; color: var(--text-muted); text-align: center; }
+
+/* Head Chef suggestion cards + kitchen ticket */
+.sg-list { display: grid; gap: 6px; margin: 6px 0; }
+.sg-card { text-align: left; background: var(--surface-2); color: var(--text-primary); border: 1px solid var(--border); border-radius: var(--radius); padding: 6px 10px; cursor: pointer; font: inherit; }
+.sg-card:hover:not(:disabled) { border-color: var(--accent); }
+.sg-card:disabled { opacity: .6; cursor: default; }
+.sg-top { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.sg-title { font-weight: 600; }
+.sg-pick { font-size: 10px; color: var(--accent); letter-spacing: .04em; white-space: nowrap; }
+.sg-card .spark, .sg-ticket .spark { height: 26px; width: 100%; color: var(--accent); }
+.sg-chips { display: flex; flex-wrap: wrap; gap: 4px; margin: 2px 0; }
+.sg-chip { font-size: var(--fs-caption); padding: 0 6px; border: 1px solid var(--border); border-radius: 999px; color: var(--text-muted); }
+.sg-risk { border-style: dashed; }
+.sg-why { font-size: var(--fs-caption); color: var(--text-muted); }
+.sg-ticket { background: #f3ead6; color: #2a2418; border-radius: 4px; padding: 8px 12px; margin: 6px 0; border-top: 4px dashed #c9b88f; }
+.sg-ticket .sg-chip, .sg-ticket .sg-why { color: #5b5136; border-color: #c9b88f; }
+.sg-ticket-h { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #7a6a42; }
+.sg-ticket .spark { color: #8a5a14; }

@@ -1,8 +1,8 @@
 // Small DOM / formatting / data helpers shared by every panel. No dependencies.
 
 export const COLORS = {
-  A: "#3987e5", B: "#d95926",
-  Aband: "rgba(57,135,229,0.18)", Bband: "rgba(217,89,38,0.18)",
+  A: "#3987e5", B: "#d95926", C: "#22b8a8", D: "#b86bd0", E: "#a3b030", F: "#e8658f",   // teal, plum, olive, rose for demo labs
+  Aband: "rgba(57,135,229,0.18)", Bband: "rgba(217,89,38,0.18)", Cband: "rgba(34,184,168,0.18)", Dband: "rgba(184,107,208,0.18)", Eband: "rgba(163,176,48,0.18)", Fband: "rgba(232,101,143,0.18)",
   text: "#f3efe6", text2: "#cdc6b8", muted: "#a39d92", grid: "#2b3038", border: "#353a43", surface: "#1e2126",
   acetic: "#199e70", lactic: "#9085e9", accent: "#e8b45a",
 };

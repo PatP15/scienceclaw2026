@@ -1,12 +1,12 @@
-// Section 2: Digital Twin - model predictions (from /api/v1/predictions) vs observed telemetry.
+// Digital twin, embedded per station in the lab detail view (#lab/<id>, collapsed by default):
+// that chamber's model forecast (median + 5-95 % band) vs its own observed telemetry.
 import { get, getText } from "./api.js";
 import { h, clear, fmt, num, parseCSV, provBadge, normProv, PROV_LABEL, statusBadge, plotLayout, PLOT_CONFIG, whenPlotly, COLORS, timeAgo } from "./util.js";
 
-const CHAMBERS = ["A", "B"];
+const ALL_CHAMBERS = ["A", "B"];
 const CHARTS = [
-  { key: "temperature", title: "Temperature", unit: "°C", col: "temperature_c", obs: (r) => num(r.chamber_temperature_c), obsLabel: "chamber temperature" },
   { key: "ph", title: "pH — predicted vs observed", unit: "pH", col: "ph", obs: (r) => num(r.ph), obsLabel: "pH" },
-  { key: "expansion", title: "Expansion — predicted vs observed", unit: "× initial volume", col: "expansion_ratio", obsRatio: true, obsLabel: "starter height ÷ first height" },
+  { key: "expansion", title: "Rise (expansion) — predicted vs observed", unit: "× initial volume", col: "expansion_ratio", obsRatio: true, obsLabel: "starter height ÷ first height" },
   { key: "lactic", title: "Lactic acid (estimate)", unit: "g / kg dough", col: "lactic_acid" },
   { key: "acetic", title: "Acetic acid (estimate)", unit: "g / kg dough", col: "acetic_acid" },
   { key: "co2", title: "Cumulative CO₂ (model output)", unit: "g / kg dough", col: "co2_cumulative", sub: "Modelled production — the BME680 gas sensor does not measure CO₂." },
@@ -17,22 +17,32 @@ function findFile(files, re) { return files.find((f) => re.test(f.path)); }
 export class TwinPanel {
   constructor(store) {
     this.store = store;
-    this.root = document.getElementById("tab-twin");
+    this.root = document.getElementById("lab-twin");
     this.chartsEl = document.getElementById("twin-charts");
     this.statusEl = document.getElementById("twin-status");
-    this.summaryEl = document.getElementById("twin-summary");
-    this.morphEl = document.getElementById("twin-morphology");
-    this.chainEl = document.getElementById("twin-chain");
-    this.benchEl = document.getElementById("twin-bench");
+    this.chamber = null;
+    this.chambers = [];
     this.loaded = false;
     this.visible = false;
     document.getElementById("twin-reload").addEventListener("click", () => this.load(true));
-    // Refresh the observed overlay occasionally while the tab is open.
-    setInterval(() => { if (this.visible && this.loaded) this.loadObserved().then(() => this.draw()); }, 30000);
+    // Refresh the observed overlay occasionally while the section is open.
+    setInterval(() => { if (this.visible && this.loaded) this.loadObserved().then(() => { this.renderStatus(); this.draw(); }); }, 30000);
   }
 
-  show() { this.visible = true; if (!this.loaded) this.load(); else this.resize(); }
-  hide() { this.visible = false; }
+  /** Called by the lab detail view: which station the section shows, and whether it is open. */
+  setChamber(c) {
+    if (c === this.chamber) return;
+    this.chamber = c; this.chambers = [c];
+    delete this.chartsEl.dataset.built;
+    clear(this.chartsEl);
+    if (this.loaded) { this.needsRefresh = true; if (this.visible) this.refresh(); }
+  }
+  setOpen(open) {
+    this.visible = open;
+    if (!open) return;
+    if (!this.loaded) this.load(); else if (this.needsRefresh) this.refresh(); else this.resize();
+  }
+  async refresh() { this.needsRefresh = false; await this.loadObserved(); this.renderStatus(); await this.draw(); }
   resize() { if (window.Plotly) document.querySelectorAll("#twin-charts .chart").forEach((el) => { try { window.Plotly.Plots.resize(el); } catch { /* not drawn */ } }); }
 
   async load(force = false) {
@@ -44,7 +54,7 @@ export class TwinPanel {
     const files = listing.files || [];
     this.files = files;
     const want = {};
-    for (const c of CHAMBERS) {
+    for (const c of ALL_CHAMBERS) {
       want[`pred${c}`] = findFile(files, new RegExp(`(^|/)chamber_${c}_prediction\\.csv$`));
       want[`unc${c}`] = findFile(files, new RegExp(`(^|/)chamber_${c}_(uncertainty|envelope)\\.csv$`));
       want[`sum${c}`] = findFile(files, new RegExp(`(^|/)chamber_${c}_summary\\.json$`));
@@ -63,14 +73,11 @@ export class TwinPanel {
     await this.loadObserved();
     this.renderStatus();
     await this.draw();
-    this.renderSummary();
-    this.renderMorphology();
-    this.renderBenchmark();
   }
 
   async loadObserved() {
     this.obs = {};
-    await Promise.all(CHAMBERS.map(async (c) => {
+    await Promise.all(this.chambers.map(async (c) => {
       try { this.obs[c] = await get(`/api/v1/chambers/${c}/telemetry?limit=5000`); } catch { this.obs[c] = []; }
     }));
   }
@@ -100,7 +107,7 @@ export class TwinPanel {
 
   renderStatus() {
     const d = this.data;
-    const have = CHAMBERS.filter((c) => Array.isArray(d[`pred${c}`]) && d[`pred${c}`].length);
+    const have = this.chambers.filter((c) => Array.isArray(d[`pred${c}`]) && d[`pred${c}`].length);
     const man = d.manifest && !d.manifest.__error ? d.manifest : null;
     const cards = [];
     cards.push(h("div", { class: "card" },
@@ -112,7 +119,7 @@ export class TwinPanel {
     // Calibration status: honest about whether a fit to observed data exists.
     const cal = d.calib && !d.calib.__error ? d.calib : null;
     const nObs = (c, key) => (this.obs[c] || []).filter((r) => num(r[key]) !== null).length;
-    const obsTxt = CHAMBERS.map((c) => `${c}: ${nObs(c, "ph")} pH, ${nObs(c, "starter_height_mm")} height`).join(" · ");
+    const obsTxt = this.chambers.map((c) => `${c}: ${nObs(c, "ph")} pH, ${nObs(c, "starter_height_mm")} height`).join(" · ");
     cards.push(h("div", { class: "card" },
       h("b", null, "Model calibration "),
       cal ? statusBadge(cal.success === false ? "fit failed" : "fitted to observations", cal.success === false ? "bad" : "good") : statusBadge("not fitted to observations", "warn"),
@@ -132,8 +139,7 @@ export class TwinPanel {
       clear(this.chartsEl,
         h("div", { class: "card", style: { gridColumn: "1 / -1", padding: "6px 12px" } },
           h("span", { class: "small legend-strip" },
-            h("span", { style: { color: "#8cbcf5", fontWeight: 700 } }, "━ A predicted"),
-            h("span", { style: { color: "#f6a17c", fontWeight: 700 } }, "━ B predicted"),
+            h("span", { style: { color: this.chamber === "B" ? COLORS.B : COLORS.A, fontWeight: 700 } }, `━ ${this.chamber} predicted`),
             h("span", { class: "muted" }, "▒ 5–95 % band"),
             h("span", { class: "muted" }, "● observed (h since first record)"),
             provBadge("simulated"))),
@@ -144,7 +150,7 @@ export class TwinPanel {
     }
     for (const spec of CHARTS) {
       const traces = [], annotations = [];
-      for (const c of CHAMBERS) {
+      for (const c of this.chambers) {
         const col = c === "A" ? COLORS.A : COLORS.B;
         const unc = d[`unc${c}`];
         if (Array.isArray(unc) && unc.length && `${spec.col}_p05` in unc[0]) {
@@ -180,131 +186,4 @@ export class TwinPanel {
       await Plotly.react(el, traces, layout, PLOT_CONFIG);
     }
   }
-
-  renderSummary() {
-    const d = this.data;
-    const sums = CHAMBERS.map((c) => (d[`sum${c}`] && !d[`sum${c}`].__error ? d[`sum${c}`] : null));
-    if (!sums.some(Boolean)) { clear(this.summaryEl, h("h3", null, "Prediction summary"), h("div", { class: "empty" }, "No chamber summary JSON yet.")); return; }
-    const band = (s, k) => (s && Array.isArray(s[`${k}_p05_p95`]) ? h("span", { class: "tiny faint" }, ` (${fmt(s[`${k}_p05_p95`][0], 2)}–${fmt(s[`${k}_p05_p95`][1], 2)})`) : null);
-    const rows = [
-      ["pH at 12 h", "ph_at_12h", 2], ["pH at 16 h", "ph_at_16h", 2], ["Final pH", "final_ph", 2],
-      ["Peak expansion (×)", "peak_expansion_ratio", 2], ["Peak at (h)", "peak_expansion_time_h", 1],
-      ["Time to double (h)", "time_to_double_h", 1], ["Over-proof onset (h)", "overproof_onset_h", 1],
-      ["Final lactic (g/kg)", "final_lactic_g_per_kg", 2], ["Final acetic (g/kg)", "final_acetic_g_per_kg", 2],
-      ["Fermentation quotient", "final_fermentation_quotient", 2], ["Final CO₂ (g/kg, model)", "final_co2_g_per_kg", 1],
-    ];
-    const tbl = h("table", { class: "tbl" },
-      h("thead", null, h("tr", null, h("th", null, "Predicted (nominal run; 5–95 % band)"), CHAMBERS.map((c, i) => h("th", { class: "num" }, h("span", { class: `chip chip-${c}` }, c), sums[i] ? ` ${sums[i].schedule?.breakpoints ? describeSchedule(sums[i].schedule) : ""}` : "")))),
-      h("tbody", null, rows.map(([lbl, k, dg]) => h("tr", null, h("td", null, lbl), sums.map((s) => h("td", { class: "num" }, s ? fmt(s[k], dg) : "—", band(s, k)))))));
-    const hyp = CHAMBERS.map((c, i) => sums[i] ? h("div", { class: "small", style: { marginTop: "6px" } },
-      h("span", { class: `chip chip-${c}` }, c), " ", h("b", null, sums[i].hypothesis || sums[i].name || ""),
-      sums[i].caveat ? h("div", { class: "tiny faint" }, "Caveat: ", sums[i].caveat) : null) : null);
-    const cmp = d.compare && !d.compare.__error ? d.compare : null;
-    const cmpEl = cmp ? h("div", { class: "small", style: { marginTop: "8px" } }, provBadge(cmp.provenance || "simulated"), " ",
-      `Paired Monte-Carlo (${cmp.n_samples ?? "?"} draws): B − A pH at 12 h = ${fmt(cmp.ph_12h_B_minus_A_median, 2)}`,
-      Array.isArray(cmp.ph_12h_B_minus_A_p05_p95) ? ` (5–95 %: ${fmt(cmp.ph_12h_B_minus_A_p05_p95[0], 2)} to ${fmt(cmp.ph_12h_B_minus_A_p05_p95[1], 2)})` : "",
-      cmp.peak_time_B_minus_A_median_h !== undefined ? `; B peaks ${fmt(Math.abs(cmp.peak_time_B_minus_A_median_h), 1)} h ${cmp.peak_time_B_minus_A_median_h < 0 ? "earlier" : "later"}` : "", ".") : null;
-    clear(this.summaryEl, h("h3", null, "Prediction summary ", provBadge("simulated")), h("div", { class: "tbl-wrap" }, tbl), hyp, cmpEl);
-  }
-
-  async renderMorphology() {
-    let list, chain = null;
-    try { list = await get("/api/v1/stl"); } catch { list = { files: [] }; }
-    const files = list.files || [];
-    const byName = (n) => files.find((f) => f.name === n);
-    if (byName("chain_summary.json")) { try { chain = await get(byName("chain_summary.json").url); } catch { chain = null; } }
-    const base = byName("crumb_comparison.png"), sim = byName("crumb_chamber_comparison.png");
-    const stls = files.filter((f) => f.suffix === ".stl");
-    const ch = chain?.chambers || {};
-    const cmp = chain?.comparison_B_minus_A;
-    const specRow = (c) => {
-      const x = ch[c];
-      if (!x) return null;
-      const p = x.crumb_params || {}, m = x.measured_on_mesh || {};
-      return h("tr", null, h("td", null, h("span", { class: `chip chip-${c}` }, c), ` ${fmt(x.temperature_c, 0)} °C`),
-        h("td", { class: "num" }, fmt(p.porosity_target, 3)), h("td", { class: "num" }, fmt(p.pore_diam_mean_mm, 2)),
-        h("td", { class: "num" }, fmt(p.eccentricity, 2)), h("td", { class: "num" }, fmt(p.clustering, 2)),
-        h("td", { class: "num" }, fmt(m.cut_face_pore_area_fraction, 3)), h("td", { class: "num" }, m.cut_face_pore_count ?? "—"),
-        h("td", null, x.validation_passed ? statusBadge("valid STL", "good") : statusBadge("validation failed", "bad")));
-    };
-    clear(this.morphEl,
-      h("h3", null, "Crumb morphology specimens (Formlabs) ", provBadge("simulated")),
-      h("p", { class: "tiny faint" }, chain?.disclaimer || "Stochastic pore-model STLs: illustrative hypotheses about crumb structure — not ALCHEMI predictions, and sourness does not determine crumb."),
-      h("div", { class: "img-pair" },
-        h("figure", null, base ? h("img", { src: base.url, alt: "baseline mild vs sour crumb hypotheses", loading: "lazy" }) : h("div", { class: "empty" }, "No baseline render."),
-          h("figcaption", null, "Baseline hypotheses: crumb_mild / crumb_sour (hand-set parameters).")),
-        h("figure", null, sim ? h("img", { src: sim.url, alt: "simulation-derived chamber A vs B crumb specimens", loading: "lazy" }) : h("div", { class: "empty" }, "No model-derived specimens yet."),
-          h("figcaption", null, "Modeled from the kinetics forecast: crumb_chamber_A / crumb_chamber_B (kinetics → morphology mapping)."))),
-      Object.keys(ch).length ? h("div", { class: "tbl-wrap", style: { marginTop: "8px" } }, h("table", { class: "tbl" },
-        h("thead", null, h("tr", null, h("th", null, "Specimen"), h("th", { class: "num" }, "Porosity target"), h("th", { class: "num" }, "Pore Ø mean (mm)"),
-          h("th", { class: "num" }, "Eccentricity"), h("th", { class: "num" }, "Clustering"), h("th", { class: "num" }, "Cut-face pore fraction"), h("th", { class: "num" }, "Pores on cut face"), h("th", null, "Mesh"))),
-        h("tbody", null, ["A", "B"].map(specRow)))) : null,
-      cmp ? h("div", { class: "tiny faint", style: { marginTop: "4px" } }, `B − A: porosity ${fmt(cmp.porosity_target, 3)}, pore Ø ${cmp.pore_diam_mean_mm > 0 ? "+" : ""}${fmt(cmp.pore_diam_mean_mm, 2)} mm, eccentricity ${cmp.eccentricity > 0 ? "+" : ""}${fmt(cmp.eccentricity, 2)}, clustering ${cmp.clustering > 0 ? "+" : ""}${fmt(cmp.clustering, 2)}.`) : null,
-      stls.length ? h("div", { class: "tiny faint", style: { marginTop: "4px" } }, "STL files: ", stls.map((f) => `${f.name} (${(f.bytes / 1e6).toFixed(1)} MB)`).join(", ")) : null,
-      chain?.how_to_test ? h("div", { class: "tiny faint" }, "How to test: ", chain.how_to_test) : null);
-    this.renderChain(chain);
-  }
-
-  renderChain(chain) {
-    if (!chain || !Array.isArray(chain.chain)) { clear(this.chainEl, h("h3", null, "Evidence chain"), h("div", { class: "empty" }, "data/stl/chain_summary.json not available.")); return; }
-    const badgeFor = (p) => {
-      const s = String(p || "").toLowerCase();
-      if (s.includes("alchemi-informed")) return provBadge(p, "estimated · alchemi-informed");
-      if (s.includes("assumption")) return provBadge(p, "estimated · assumption");
-      if (normProv(p) === "computed") return provBadge(p, "computed · NVIDIA GPU");
-      return provBadge(p);
-    };
-    const short = { "ALCHEMI descriptors": "ALCHEMI", "kinetic parameter nudge": "Kinetics nudge", "kinetics ODE + morphology summary at window end": "Kinetics ODE", "morphology mapping": "Morphology map", "stochastic crumb geometry -> STL": "STL" };
-    const steps = chain.chain.flatMap((st, i) => [
-      i ? h("span", { class: "chain-arrow" }, "→") : null,
-      h("div", { class: "chain-step", title: `${st.step}\n${st.provenance}\n${st.artifact}` }, h("b", null, short[st.step] || st.step), badgeFor(st.provenance),
-        h("div", { class: "tiny faint", style: { marginTop: "3px", overflowWrap: "anywhere" } }, st.artifact)),
-    ]);
-    const moved = Object.entries(chain.chambers?.A?.alchemi?.changed_kinetic_parameters || {});
-    clear(this.chainEl,
-      h("h3", null, "Evidence chain: ALCHEMI → kinetics → morphology → STL"),
-      h("div", { class: "chain" }, steps),
-      moved.length ? h("div", { class: "small", style: { marginTop: "6px" } }, "ALCHEMI changed ", moved.map(([k, p]) => `${k.replace(/_/g, " ")} ${fmt(p.literature_value, 3)} → ${fmt(p.value, 3)}`).join("; "),
-        " (small, bounded nudge). Everything downstream is model output, labelled modeled.") : null);
-  }
-
-  async renderBenchmark() {
-    let b = null, src = "";
-    try { b = await get("/snapshots/benchmarks/summary.json"); src = "snapshot of data/benchmarks/summary.json (no API route serves data/benchmarks)"; }
-    catch { b = null; }
-    if (!b) { clear(this.benchEl, h("h3", null, "Agent-collaboration benchmark ", h("span", { class: "insilico" }, "IN-SILICO")), h("div", { class: "empty" }, "No benchmark summary available.")); return; }
-    const defs = b.metric_definitions || {};
-    const better = (m) => (/higher is better/i.test(defs[m] || "") ? "higher" : "lower");
-    const metrics = ["redundant_cum", "distinct_schedules", "pooled_info_gain_nats", "pooled_sd_ratio_mean", "pooled_rmse_ph", "pooled_rmse_expansion", "agent_regret", "time_to_objective"];
-    const variants = ["well_specified", "misspecified"].filter((v) => b.variants?.[v]?.paired_final?.agent);
-    const cell = (d, m) => {
-      if (!d) return h("td", null, "—");
-      const dir = better(m) === "higher" ? 1 : -1;
-      const sig = d.lo > 0 || d.hi < 0;
-      const good = sig && Math.sign(d.mean) === dir;
-      const cls = !sig ? "verdict-none" : good ? "verdict-good" : "verdict-bad";
-      const word = !sig ? "no clear difference" : good ? "collaborative better" : "collaborative worse";
-      return h("td", { class: "num" }, `${d.mean > 0 ? "+" : ""}${fmt(d.mean, 3)} `, h("span", { class: "tiny faint" }, `[${fmt(d.lo, 3)}, ${fmt(d.hi, 3)}]`), h("div", { class: `tiny ${cls}` }, word));
-    };
-    const label = (m) => (defs[m] || m.replace(/_/g, " ")).replace(/\s*\((lower|higher) is better\)/i, "") + (m === "time_to_objective" ? " (experiments to reach objective)" : "");
-    const reached = (v, mode) => b.variants[v].arms?.[`agent/${mode}`]?.fraction_reached_objective;
-    clear(this.benchEl,
-      h("h3", null, "Agent-collaboration benchmark ", h("span", { class: "insilico" }, "IN-SILICO"), " ", provBadge("simulated")),
-      h("p", { class: "tiny faint" }, `${b.label || "In-silico benchmark"}. Paired difference collaborative − independent after ${2 * (b.config?.n_rounds || 4)} experiments (agent selector), mean [95 % CI] over ${b.variants?.well_specified?.n_worlds ?? "?"} simulated worlds per variant. Results are reported as observed — collaboration is not forced to win. Source: ${src}.`),
-      h("div", { class: "twin-extra" },
-        h("div", { class: "tbl-wrap" }, h("table", { class: "tbl" },
-          h("thead", null, h("tr", null, h("th", null, "Metric"), variants.map((v) => h("th", { class: "num" }, v.replace("_", "-"))))),
-          h("tbody", null,
-            metrics.map((m) => h("tr", null, h("td", null, label(m), h("div", { class: "tiny faint" }, `${better(m)} is better`)), variants.map((v) => cell(b.variants[v].paired_final.agent[m], m)))),
-            h("tr", null, h("td", null, "Fraction of worlds reaching the objective"), variants.map((v) => h("td", { class: "num" }, `collab ${fmt(reached(v, "collaborative"), 2)} · indep ${fmt(reached(v, "independent"), 2)}`)))))),
-        h("figure", { style: { margin: 0 } }, h("img", { class: "bench-img", src: "snapshots/benchmarks/paired_differences_well_specified.png", alt: "paired differences, well-specified worlds", loading: "lazy" }),
-          h("figcaption", { class: "tiny faint" }, "paired_differences_well_specified.png (> 0 = collaborative better, sign-adjusted)."))));
-  }
-}
-
-function describeSchedule(s) {
-  const bp = s.breakpoints || [];
-  if (!bp.length) return "";
-  if (bp.length === 1) return `${fmt(bp[0][1], 0)} °C`;
-  return bp.map((p) => `${fmt(p[1], 0)}°`).join("→");
 }
