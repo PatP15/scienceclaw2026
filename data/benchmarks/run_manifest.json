@@ -1,0 +1,63 @@
+{
+ "label": "IN-SILICO BENCHMARK \u2014 simulated worlds",
+ "provenance": "simulated",
+ "command": "scripts/benchmark_agents.py",
+ "git_head": "cfcae768a3dd68bd5f4d1cb2aaf23d488e665557",
+ "python": "3.12.9",
+ "platform": "macOS-26.2-arm64-arm-64bit",
+ "workers": 10,
+ "n_jobs": 60,
+ "runtime_s": 297.4,
+ "lambda": 0.8628563730321065,
+ "free_params": [
+  "mu_max_lab",
+  "t_opt_lab",
+  "qs_yeast",
+  "t_opt_yeast",
+  "expansion_max"
+ ],
+ "variants": {
+  "well_specified": {
+   "n_rounds": 4,
+   "selectors": [
+    "agent",
+    "info"
+   ],
+   "modes": [
+    "independent",
+    "collaborative"
+   ],
+   "misspecified": false,
+   "lam": 0.8628563730321065,
+   "regret_tol": 0.01,
+   "max_nfev": 60,
+   "evidence_dt_h": 0.05
+  },
+  "misspecified": {
+   "n_rounds": 4,
+   "selectors": [
+    "agent",
+    "info"
+   ],
+   "modes": [
+    "independent",
+    "collaborative"
+   ],
+   "misspecified": true,
+   "lam": 0.8628563730321065,
+   "regret_tol": 0.01,
+   "max_nfev": 60,
+   "evidence_dt_h": 0.05
+  }
+ },
+ "files": [
+  "benchmark_results.csv",
+  "curves_misspecified.png",
+  "curves_well_specified.png",
+  "paired_differences_misspecified.png",
+  "paired_differences_well_specified.png",
+  "redundancy.png",
+  "summary.json",
+  "time_to_objective.csv"
+ ]
+}
