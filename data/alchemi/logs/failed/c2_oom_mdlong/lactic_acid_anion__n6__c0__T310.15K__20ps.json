@@ -1,0 +1,114 @@
+{
+ "id": "lactic_acid_anion__n6__c0__T310.15K__20ps",
+ "start_structure": "lactic_acid_anion__n6__c0",
+ "temperature_k": 310.15,
+ "n_steps": 40000,
+ "timestep_fs": 0.5,
+ "friction_per_fs": 0.01,
+ "seeds": [
+  20261110,
+  20261211,
+  20261312
+ ],
+ "replicas": 3,
+ "integrator": "nvalchemi.dynamics.NVTLangevin (BAOAB), batched replicas",
+ "checkpoint": "aimnet2_wb97m_d3_3",
+ "versions": {
+  "python": "3.12.16",
+  "platform": "Linux-6.8.0-90-generic-x86_64-with-glibc2.35",
+  "nvalchemi-toolkit": "0.2.0",
+  "nvalchemi-toolkit-ops": "0.5.0",
+  "aimnet": "0.2.5",
+  "torch": "2.10.0",
+  "warp-lang": "1.18.0+cu12",
+  "ase": "3.29.0",
+  "nvidia-physicsnemo": "2.2.2",
+  "numpy": "2.2.6",
+  "torch_cuda": "12.8",
+  "cudnn": 91002,
+  "gpu": "NVIDIA RTX A6000",
+  "gpu_capability": "8.6",
+  "gpu_memory_gb": 50.91
+ },
+ "charge": -1,
+ "symbols": [
+  "C",
+  "C",
+  "C",
+  "O",
+  "O",
+  "O",
+  "H",
+  "H",
+  "H",
+  "H",
+  "H",
+  "O",
+  "H",
+  "H",
+  "O",
+  "H",
+  "H",
+  "O",
+  "H",
+  "H",
+  "O",
+  "H",
+  "H",
+  "O",
+  "H",
+  "H",
+  "O",
+  "H",
+  "H"
+ ],
+ "fragments": [
+  {
+   "name": "lactate",
+   "smiles": "C[C@@H](C(=O)[O-])O",
+   "start": 0,
+   "stop": 11
+  },
+  {
+   "name": "water",
+   "smiles": "O",
+   "start": 11,
+   "stop": 14
+  },
+  {
+   "name": "water",
+   "smiles": "O",
+   "start": 14,
+   "stop": 17
+  },
+  {
+   "name": "water",
+   "smiles": "O",
+   "start": 17,
+   "stop": 20
+  },
+  {
+   "name": "water",
+   "smiles": "O",
+   "start": 20,
+   "stop": 23
+  },
+  {
+   "name": "water",
+   "smiles": "O",
+   "start": 23,
+   "stop": 26
+  },
+  {
+   "name": "water",
+   "smiles": "O",
+   "start": 26,
+   "stop": 29
+  }
+ ],
+ "provenance": "real: ALCHEMI/AIMNet2 on NVIDIA RTX A6000",
+ "started_at_utc": "2026-10-31T05:14:34Z",
+ "status": "failed",
+ "error": "Traceback (most recent call last):\n  File \"/home/shadeform/fermentai/remote/run_alchemi_c2.py\", line 433, in mode_mdlong\n    frames, rows, idx, wall = _nvt_batch(bundle, cfg, [(syms, x0, q)] * len(seeds), T, n_steps,\n                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/shadeform/fermentai/remote/run_alchemi_c2.py\", line 246, in _nvt_batch\n    batch = nvt.run(batch)\n            ^^^^^^^^^^^^^^\n  File \"/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemi/dynamics/base.py\", line 1994, in run\n    batch, _converged = self.step(batch)\n                        ^^^^^^^^^^^^^^^^\n  File \"/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemi/dynamics/base.py\", line 1928, in step\n    self._call_hooks(DynamicsStage.BEFORE_COMPUTE, batch)\n  File \"/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemi/dynamics/base.py\", line 1491, in _call_hooks\n    super()._call_hooks(stage, batch)\n  File \"/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemi/hooks/_registry.py\", line 179, in _call_hooks\n    hook(ctx, stage)\n  File \"/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemi/models/pipeline.py\", line 169, in __call__\n    hook(ctx, stage)\n  File \"/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py\", line 953, in compile_wrapper\n    return fn(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^\n  File \"/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemi/hooks/neighbor_list.py\", line 214, in __call__\n    self._rebuild(ctx.batch)\n  File \"/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemi/hooks/neighbor_list.py\", line 297, in _rebuild\n    neighbor_list(\n  File \"/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemiops/torch/neighbors/__init__.py\", line 102, in neighbor_list\n    def neighbor_list(\n  File \"/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py\", line 1181, in _fn\n    return fn(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^\n  File \"/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_functorch/aot_autograd.py\", line 1148, in forward\n    return compiled_fn(full_args)\n           ^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py\", line 1962, in __call__\n    return self.compiled_fn(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py\", line 357, in runtime_wrapper\n    all_outs = call_func_at_runtime_with_args(\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/utils.py\", line 134, in call_func_at_runtime_with_args\n    out = normalize_as_list(f(args))\n                            ^^^^^^^\n  File \"/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py\", line 531, in wrapper\n    return compiled_fn(runtime_args)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_inductor/output_code.py\", line 638, in __call__\n    return self.current_callable(inputs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_inductor/utils.py\", line 3220, in run\n    out = model(new_inputs)\n          ^^^^^^^^^^^^^^^^^\n  File \"/tmp/torchinductor_shadeform/a5/ca5r4azdrupoje5z6g4xlafepdecbzysjvzw73kp7h7iuzfnprz3.py\", line 66, in call\n    torch.ops.nvalchemiops._batch_naive_neighbor_matrix_pbc.default(arg5_1, arg0_1, arg1_1, 71.78386688232422, arg4_1, arg2_1, arg7_1, arg10_1, arg8_1, arg13_1, arg12_1, s86, False, 29, arg3_1, True, None, None, None, 'tile', target_indices=None, reuse_inv_cell=False)\n  File \"/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_ops.py\", line 819, in __call__\n    return self._op(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_library/autograd.py\", line 112, in autograd_impl\n    result = forward_no_grad(*args, Metadata(keyset, keyword_only_args))\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_library/autograd.py\", line 41, in forward_no_grad\n    result = op.redispatch(keyset & _C._after_autograd_keyset, *args, **kwargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_ops.py\", line 826, in redispatch\n    return self._handle.redispatch_boxed(keyset, *args, **kwargs)  # type: ignore[return-value]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_library/custom_ops.py\", line 662, in adinplaceorview_impl\n    return original_kernel.call_boxed(keyset, *args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_library/custom_ops.py\", line 347, in backend_impl\n    result = self._backend_fns[device_type](*args, **kwargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_compile.py\", line 54, in inner\n    return disable_fn(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py\", line 1181, in _fn\n    return fn(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^\n  File \"/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_library/custom_ops.py\", line 382, in wrapped_fn\n    return fn(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^\n  File \"/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemiops/torch/_warp_op_helpers.py\", line 119, in wrapped\n    return function(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemiops/torch/neighbors/batch_naive.py\", line 336, in _batch_naive_neighbor_matrix_pbc\n    batch_naive_neighbor_matrix_pbc(\n  File \"/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemiops/neighbors/naive/launchers.py\", line 1707, in batch_naive_neighbor_matrix_pbc\n    _launch_naive_neighbor_matrix_pbc(\n  File \"/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemiops/neighbors/naive/launchers.py\", line 538, in _launch_naive_neighbor_matrix_pbc\n    positions_work, per_atom_cell_offsets = _prepare_pbc_positions(\n                                            ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemiops/neighbors/naive/launchers.py\", line 185, in _prepare_pbc_positions\n    inv_cell_buffer = wp.empty((cell.shape[0],), dtype=mat_dtype, device=device)\n                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/warp/_src/context.py\", line 10227, in empty\n    arr = warp.array(\n          ^^^^^^^^^^^\n  File \"/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/warp/_src/types.py\", line 3433, in __init__\n    self._init_new(dtype, shape, strides, device, pinned)\n  File \"/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/warp/_src/types.py\", line 3916, in _init_new\n    ptr = allocator.allocate(capacity)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/warp/_src/context.py\", line 5383, in allocate\n    raise RuntimeError(f\"Failed to allocate {size_in_bytes} bytes on device '{self.device}'\")\nRuntimeError: Failed to allocate 108 bytes on device 'cuda:0'\n",
+ "finished_at_utc": "2026-10-31T05:20:33Z"
+}

@@ -1,0 +1,211 @@
+{
+ "id": "acetic_acid_anion__n0__s06",
+ "kind": "anion_monomer",
+ "acid": "acetic_acid",
+ "n_water": 0,
+ "conformer_index": 6,
+ "seeds": {
+  "base_seed": 20261101,
+  "etkdg_seed": 1678415808,
+  "placement_seed": 750782738
+ },
+ "charge": -1,
+ "multiplicity": 1,
+ "formula": "C2H3O2",
+ "fragments": [
+  {
+   "name": "acetate",
+   "smiles": "CC(=O)[O-]",
+   "start": 0,
+   "stop": 7
+  }
+ ],
+ "n_atoms": 7,
+ "input_sha256": "a0833160fa871302b6335eac1dbf8c2a55bb29adaf85dfff023e98a466b37ac5",
+ "input_meta": {
+  "campaign": 2,
+  "species": "acetic_acid_anion",
+  "set": "sampling"
+ },
+ "provenance": "real: ALCHEMI/AIMNet2 on NVIDIA RTX A6000",
+ "method": {
+  "engine": "nvalchemi-toolkit",
+  "optimizer": "FIRE2 (batched)",
+  "model": "PipelineModelWrapper[[AIMNet2Wrapper+EwaldModelWrapper](autograd)+[DFTD3ModelWrapper]]",
+  "checkpoint": "aimnet2_wb97m_d3_3",
+  "d3_bj": {
+   "s6": 1.0,
+   "a1": 0.566,
+   "s8": 0.3908,
+   "a2": 3.128
+  },
+  "box_size_angstrom": 60.0,
+  "ewald_accuracy": 1e-06,
+  "fmax_threshold_ev_per_angstrom": 0.01,
+  "max_steps": 4000,
+  "fire2_dt": 0.01
+ },
+ "versions": {
+  "python": "3.12.16",
+  "platform": "Linux-6.8.0-90-generic-x86_64-with-glibc2.35",
+  "nvalchemi-toolkit": "0.2.0",
+  "nvalchemi-toolkit-ops": "0.5.0",
+  "aimnet": "0.2.5",
+  "torch": "2.10.0",
+  "warp-lang": "1.18.0+cu12",
+  "ase": "3.29.0",
+  "nvidia-physicsnemo": "2.2.2",
+  "numpy": "2.2.6",
+  "torch_cuda": "12.8",
+  "cudnn": 91002,
+  "gpu": "NVIDIA RTX A6000",
+  "gpu_capability": "8.6",
+  "gpu_memory_gb": 50.91
+ },
+ "campaign": 2,
+ "batch_size": 16,
+ "started_at_utc": "2026-10-31T05:14:53Z",
+ "status": "converged",
+ "converged": true,
+ "iterations": 144,
+ "batch_steps": 596,
+ "wall_seconds_batch": 66.07886457443237,
+ "energy_periodic_raw_ev": -6222.905713143179,
+ "makov_payne_monopole_ev": -0.3404672463297083,
+ "energy_ev": -6222.56524589685,
+ "energy_hartree": -228.67505498049715,
+ "energy_definition": "gas-phase = periodic Ewald energy - Makov-Payne monopole (0 for neutral)",
+ "max_force_ev_per_angstrom": 0.0001264519320239523,
+ "charges_e": [
+  -0.310320109128952,
+  0.51319420337677,
+  -0.6821854114532471,
+  -0.6793402433395386,
+  0.052277643233537674,
+  0.052280813455581665,
+  0.054093096405267715
+ ],
+ "forces_ev_per_angstrom": [
+  [
+   -1.582922413945198e-05,
+   -6.068800576031208e-05,
+   3.321911208331585e-06
+  ],
+  [
+   -2.8360635042190552e-05,
+   -0.00012322724796831608,
+   9.004725143313408e-07
+  ],
+  [
+   -1.647602766752243e-05,
+   4.236586391925812e-05,
+   7.799826562404633e-07
+  ],
+  [
+   5.414057523012161e-05,
+   8.1685371696949e-05,
+   6.845337338745594e-06
+  ],
+  [
+   1.7165206372737885e-05,
+   4.410417750477791e-05,
+   -2.631125971674919e-05
+  ],
+  [
+   5.216337740421295e-06,
+   1.7904676496982574e-07,
+   2.70036980509758e-06
+  ],
+  [
+   -1.6028061509132385e-05,
+   1.5583820641040802e-05,
+   1.1799857020378113e-05
+  ]
+ ],
+ "symbols": [
+  "C",
+  "C",
+  "O",
+  "O",
+  "H",
+  "H",
+  "H"
+ ],
+ "initial_positions_angstrom": [
+  [
+   29.342037200927734,
+   29.93162727355957,
+   30.1126651763916
+  ],
+  [
+   30.807096481323242,
+   30.0343074798584,
+   29.83841323852539
+  ],
+  [
+   31.4197998046875,
+   29.055442810058594,
+   29.329044342041016
+  ],
+  [
+   31.43627166748047,
+   31.232006072998047,
+   30.166215896606445
+  ],
+  [
+   29.212570190429688,
+   29.331398010253906,
+   31.032756805419922
+  ],
+  [
+   28.876567840576172,
+   29.462181091308594,
+   29.226144790649414
+  ],
+  [
+   28.905656814575195,
+   30.953035354614258,
+   30.294761657714844
+  ]
+ ],
+ "optimized_positions_angstrom": [
+  [
+   29.35226058959961,
+   29.95363426208496,
+   30.119800567626953
+  ],
+  [
+   30.879253387451172,
+   30.082841873168945,
+   29.841636657714844
+  ],
+  [
+   31.442928314208984,
+   29.02025604248047,
+   29.503570556640625
+  ],
+  [
+   31.36591339111328,
+   31.22429847717285,
+   29.98623275756836
+  ],
+  [
+   29.183910369873047,
+   29.222646713256836,
+   30.914813995361328
+  ],
+  [
+   28.845863342285156,
+   29.58135414123535,
+   29.225540161132812
+  ],
+  [
+   28.92987632751465,
+   30.914955139160156,
+   30.408435821533203
+  ]
+ ],
+ "initial_energy_ev": -6222.31640625,
+ "min_interatomic_distance_final_angstrom": 1.0889704327277234,
+ "finished_at_utc": "2026-10-31T05:14:53Z"
+}

@@ -1,0 +1,119 @@
+{
+ "id": "acetic_acid__n6__c4__T295.15K__20ps",
+ "start_structure": "acetic_acid__n6__c4",
+ "temperature_k": 295.15,
+ "n_steps": 40000,
+ "timestep_fs": 0.5,
+ "friction_per_fs": 0.01,
+ "seeds": [
+  20261110,
+  20261211,
+  20261312
+ ],
+ "replicas": 3,
+ "integrator": "nvalchemi.dynamics.NVTLangevin (BAOAB), batched replicas",
+ "checkpoint": "aimnet2_wb97m_d3_3",
+ "versions": {
+  "python": "3.12.16",
+  "platform": "Linux-6.8.0-90-generic-x86_64-with-glibc2.35",
+  "nvalchemi-toolkit": "0.2.0",
+  "nvalchemi-toolkit-ops": "0.5.0",
+  "aimnet": "0.2.5",
+  "torch": "2.10.0",
+  "warp-lang": "1.18.0+cu12",
+  "ase": "3.29.0",
+  "nvidia-physicsnemo": "2.2.2",
+  "numpy": "2.2.6",
+  "torch_cuda": "12.8",
+  "cudnn": 91002,
+  "gpu": "NVIDIA RTX A6000",
+  "gpu_capability": "8.6",
+  "gpu_memory_gb": 50.91
+ },
+ "charge": 0,
+ "symbols": [
+  "C",
+  "C",
+  "O",
+  "O",
+  "H",
+  "H",
+  "H",
+  "H",
+  "O",
+  "H",
+  "H",
+  "O",
+  "H",
+  "H",
+  "O",
+  "H",
+  "H",
+  "O",
+  "H",
+  "H",
+  "O",
+  "H",
+  "H",
+  "O",
+  "H",
+  "H"
+ ],
+ "fragments": [
+  {
+   "name": "acetic_acid",
+   "smiles": "CC(=O)O",
+   "start": 0,
+   "stop": 8
+  },
+  {
+   "name": "water",
+   "smiles": "O",
+   "start": 8,
+   "stop": 11
+  },
+  {
+   "name": "water",
+   "smiles": "O",
+   "start": 11,
+   "stop": 14
+  },
+  {
+   "name": "water",
+   "smiles": "O",
+   "start": 14,
+   "stop": 17
+  },
+  {
+   "name": "water",
+   "smiles": "O",
+   "start": 17,
+   "stop": 20
+  },
+  {
+   "name": "water",
+   "smiles": "O",
+   "start": 20,
+   "stop": 23
+  },
+  {
+   "name": "water",
+   "smiles": "O",
+   "start": 23,
+   "stop": 26
+  }
+ ],
+ "provenance": "real: ALCHEMI/AIMNet2 on NVIDIA RTX A6000",
+ "started_at_utc": "2026-10-31T05:14:27Z",
+ "status": "completed",
+ "wall_seconds": 1403.5504281520844,
+ "n_frames": 2000,
+ "frame_every_steps": 20,
+ "mean_temperature_second_half_k": [
+  305.5204062347412,
+  296.3919872589111,
+  298.0189184112549
+ ],
+ "ns_per_day_per_replica": 1.2311634589966862,
+ "finished_at_utc": "2026-10-31T05:37:54Z"
+}

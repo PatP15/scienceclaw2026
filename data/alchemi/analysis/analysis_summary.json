@@ -149,6 +149,16 @@
     "md_summary": "data/alchemi/analysis/md_summary.csv",
     "md_hbond_timeseries": "data/alchemi/analysis/md_hbond_timeseries.csv",
     "md_hbonds_vs_temperature_html": "data/alchemi/analysis/md_hbonds_vs_temperature.html",
+    "c2_summary": "data/alchemi/analysis/c2_summary.json",
+    "c2_species_minima": "data/alchemi/analysis/c2_species_minima.csv",
+    "c2_association_by_n": "data/alchemi/analysis/c2_association_by_n.csv",
+    "c2_lactic_minus_acetic_by_n": "data/alchemi/analysis/c2_lactic_minus_acetic_by_n.csv",
+    "c2_relative_pka_png": "data/alchemi/analysis/c2_relative_pka.png",
+    "c2_convergence_vs_n_png": "data/alchemi/analysis/c2_convergence_vs_n.png",
+    "c2_pair_and_cosolute_energies_png": "data/alchemi/analysis/c2_pair_and_cosolute_energies.png",
+    "c2_md_long_hbond_dynamics_png": "data/alchemi/analysis/c2_md_long_hbond_dynamics.png",
+    "c2_convergence_vs_n_html": "data/alchemi/analysis/c2_convergence_vs_n.html",
+    "c2_molecular_explorer_html": "data/alchemi/analysis/c2_molecular_explorer.html",
     "deprotonation_energy_html": "data/alchemi/analysis/deprotonation_energy.html",
     "deprotonation_energy_png": "data/alchemi/analysis/deprotonation_energy.png",
     "md_hbonds_vs_temperature_png": "data/alchemi/analysis/md_hbonds_vs_temperature.png"
@@ -172,13 +182,13 @@
       "n_anion_starts": 6,
       "anion_gap_to_2nd_kcal_mol": 0.027716928915782528,
       "dE_deprot_separated_ions_kcal_mol": 171.44988758134423,
-      "n_ion_pair_starts": NaN,
-      "n_ion_pairs_surviving": NaN,
-      "n_ion_pairs_collapsed_to_neutral": NaN,
-      "E_ion_pair_min_ev": NaN,
-      "ion_pair_id": NaN,
-      "ion_pair_type": NaN,
-      "dE_deprot_ion_pair_kcal_mol": NaN
+      "n_ion_pair_starts": null,
+      "n_ion_pairs_surviving": null,
+      "n_ion_pairs_collapsed_to_neutral": null,
+      "E_ion_pair_min_ev": null,
+      "ion_pair_id": null,
+      "ion_pair_type": null,
+      "dE_deprot_ion_pair_kcal_mol": null
     },
     {
       "acid": "lactic_acid",
@@ -195,10 +205,10 @@
       "n_ion_pair_starts": 6.0,
       "n_ion_pairs_surviving": 0.0,
       "n_ion_pairs_collapsed_to_neutral": 6.0,
-      "E_ion_pair_min_ev": NaN,
-      "ion_pair_id": NaN,
-      "ion_pair_type": NaN,
-      "dE_deprot_ion_pair_kcal_mol": NaN
+      "E_ion_pair_min_ev": null,
+      "ion_pair_id": null,
+      "ion_pair_type": null,
+      "dE_deprot_ion_pair_kcal_mol": null
     },
     {
       "acid": "lactic_acid",
@@ -215,10 +225,10 @@
       "n_ion_pair_starts": 9.0,
       "n_ion_pairs_surviving": 0.0,
       "n_ion_pairs_collapsed_to_neutral": 9.0,
-      "E_ion_pair_min_ev": NaN,
-      "ion_pair_id": NaN,
-      "ion_pair_type": NaN,
-      "dE_deprot_ion_pair_kcal_mol": NaN
+      "E_ion_pair_min_ev": null,
+      "ion_pair_id": null,
+      "ion_pair_type": null,
+      "dE_deprot_ion_pair_kcal_mol": null
     },
     {
       "acid": "lactic_acid",
@@ -252,13 +262,13 @@
       "n_anion_starts": 6,
       "anion_gap_to_2nd_kcal_mol": 0.011151730628354221,
       "dE_deprot_separated_ions_kcal_mol": 185.10668497327202,
-      "n_ion_pair_starts": NaN,
-      "n_ion_pairs_surviving": NaN,
-      "n_ion_pairs_collapsed_to_neutral": NaN,
-      "E_ion_pair_min_ev": NaN,
-      "ion_pair_id": NaN,
-      "ion_pair_type": NaN,
-      "dE_deprot_ion_pair_kcal_mol": NaN
+      "n_ion_pair_starts": null,
+      "n_ion_pairs_surviving": null,
+      "n_ion_pairs_collapsed_to_neutral": null,
+      "E_ion_pair_min_ev": null,
+      "ion_pair_id": null,
+      "ion_pair_type": null,
+      "dE_deprot_ion_pair_kcal_mol": null
     },
     {
       "acid": "acetic_acid",
@@ -275,10 +285,10 @@
       "n_ion_pair_starts": 6.0,
       "n_ion_pairs_surviving": 0.0,
       "n_ion_pairs_collapsed_to_neutral": 6.0,
-      "E_ion_pair_min_ev": NaN,
-      "ion_pair_id": NaN,
-      "ion_pair_type": NaN,
-      "dE_deprot_ion_pair_kcal_mol": NaN
+      "E_ion_pair_min_ev": null,
+      "ion_pair_id": null,
+      "ion_pair_type": null,
+      "dE_deprot_ion_pair_kcal_mol": null
     },
     {
       "acid": "acetic_acid",
@@ -295,10 +305,10 @@
       "n_ion_pair_starts": 9.0,
       "n_ion_pairs_surviving": 0.0,
       "n_ion_pairs_collapsed_to_neutral": 9.0,
-      "E_ion_pair_min_ev": NaN,
-      "ion_pair_id": NaN,
-      "ion_pair_type": NaN,
-      "dE_deprot_ion_pair_kcal_mol": NaN
+      "E_ion_pair_min_ev": null,
+      "ion_pair_id": null,
+      "ion_pair_type": null,
+      "dE_deprot_ion_pair_kcal_mol": null
     },
     {
       "acid": "acetic_acid",
@@ -315,10 +325,10 @@
       "n_ion_pair_starts": 12.0,
       "n_ion_pairs_surviving": 0.0,
       "n_ion_pairs_collapsed_to_neutral": 12.0,
-      "E_ion_pair_min_ev": NaN,
-      "ion_pair_id": NaN,
-      "ion_pair_type": NaN,
-      "dE_deprot_ion_pair_kcal_mol": NaN
+      "E_ion_pair_min_ev": null,
+      "ion_pair_id": null,
+      "ion_pair_type": null,
+      "dE_deprot_ion_pair_kcal_mol": null
     }
   ],
   "md": {
@@ -1766,5 +1776,309 @@
         "mean_potential_energy_second_half_ev": -21830.872470703125
       }
     ]
+  },
+  "campaign2": {
+    "provenance": "real: ALCHEMI/AIMNet2 on NVIDIA RTX A6000",
+    "relative_pka_estimate": {
+      "value": -3.885729964356191,
+      "uncertainty": 1.7285352227747122,
+      "units": "pKa units (lactic - acetic)",
+      "ddG_kcal": -5.301093740330543,
+      "ddG_uncertainty_kcal": 2.3581482330077677,
+      "experiment": -0.8999999999999999,
+      "experiment_pka": {
+        "lactic_acid": 3.86,
+        "acetic_acid": 4.76
+      },
+      "experiment_ddG_kcal": -1.2278219047802441,
+      "deviation_from_experiment": -2.985729964356191,
+      "per_n": {
+        "6": {
+          "ddG_qh_kcal": -6.3467837574426085,
+          "dpKa": -4.652226320005832,
+          "ddG_qh_lowest_kcal": -6.6313937122467905,
+          "sampling_sd_kcal": 2.106599988526782
+        },
+        "10": {
+          "ddG_qh_kcal": -4.255403723218478,
+          "dpKa": -3.119233608706549,
+          "ddG_qh_lowest_kcal": -4.195734923006967,
+          "sampling_sd_kcal": 1.8397344459875857
+        }
+      },
+      "uncertainty_components_kcal": {
+        "conformer_sampling_bootstrap_sd": 2.106599988526782,
+        "half_range_over_n": 1.045690017112065,
+        "lowest_vs_boltzmann_choice": 0.1721393775078468
+      },
+      "method": "cluster-phase thermodynamic cycle HA.nW + A'-.nW -> A-.nW + HA'.nW with AIMNet2 (ALCHEMI) electronic energies + quasi-harmonic (100 cm-1) ideal-gas G corrections at 298.15 K; Boltzmann average over vibrationally characterised minima; dpKa = ddG / (RT ln 10)",
+      "note": "cluster-phase relative estimate with 6-15 explicit waters and no bulk continuum; not an absolute pKa and not a solution-phase prediction"
+    },
+    "relative_deprotonation_by_n": [
+      {
+        "n_water": 0,
+        "ddE_kcal": -13.615900939010317,
+        "ddF_boltzmann_kcal": -14.102652051136829,
+        "ddE_bootstrap_sd_kcal": 0.1511951051072737,
+        "ddE_bootstrap_ci95_kcal": [
+          -13.638309119531186,
+          -13.58267876401078
+        ],
+        "n_minima": {
+          "lactic_acid_anion": 18,
+          "lactic_acid": 18,
+          "acetic_acid_anion": 18,
+          "acetic_acid": 18
+        }
+      },
+      {
+        "n_water": 1,
+        "ddE_kcal": -11.34871402621502,
+        "ddF_boltzmann_kcal": -11.263068087486317,
+        "ddE_bootstrap_sd_kcal": 1.363090526134664,
+        "ddE_bootstrap_ci95_kcal": [
+          -12.859327110345475,
+          -6.431541763187852
+        ],
+        "n_minima": {
+          "lactic_acid_anion": 6,
+          "lactic_acid": 6,
+          "acetic_acid_anion": 6,
+          "acetic_acid": 6
+        }
+      },
+      {
+        "n_water": 3,
+        "ddE_kcal": -7.479897560551763,
+        "ddF_boltzmann_kcal": -7.585691667976789,
+        "ddE_bootstrap_sd_kcal": 0.6771700828290563,
+        "ddE_bootstrap_ci95_kcal": [
+          -9.305435147194657,
+          -6.619440881884657
+        ],
+        "n_minima": {
+          "lactic_acid_anion": 71,
+          "lactic_acid": 71,
+          "acetic_acid_anion": 71,
+          "acetic_acid": 71
+        }
+      },
+      {
+        "n_water": 6,
+        "ddE_kcal": -8.9643271722598,
+        "ddF_boltzmann_kcal": -8.688547209254466,
+        "ddE_bootstrap_sd_kcal": 2.106599988526782,
+        "ddE_bootstrap_ci95_kcal": [
+          -11.021939417056274,
+          -4.326299827545881
+        ],
+        "n_minima": {
+          "lactic_acid_anion": 71,
+          "lactic_acid": 71,
+          "acetic_acid_anion": 71,
+          "acetic_acid": 70
+        }
+      },
+      {
+        "n_water": 10,
+        "ddE_kcal": -4.053833298501559,
+        "ddF_boltzmann_kcal": -4.752579592517577,
+        "ddE_bootstrap_sd_kcal": 1.8397344459875857,
+        "ddE_bootstrap_ci95_kcal": [
+          -8.841864400840132,
+          -1.5557417346863076
+        ],
+        "n_minima": {
+          "lactic_acid_anion": 37,
+          "lactic_acid": 37,
+          "acetic_acid_anion": 37,
+          "acetic_acid": 34
+        }
+      },
+      {
+        "n_water": 15,
+        "ddE_kcal": 3.9361086155986413,
+        "ddF_boltzmann_kcal": 3.9220254549290985,
+        "ddE_bootstrap_sd_kcal": 6.97287506623632,
+        "ddE_bootstrap_ci95_kcal": [
+          -10.685091518913396,
+          15.625150920590386
+        ],
+        "n_minima": {
+          "lactic_acid_anion": 12,
+          "lactic_acid": 12,
+          "acetic_acid_anion": 12,
+          "acetic_acid": 12
+        }
+      }
+    ],
+    "acid_pairs": {
+      "acetic_dimer_kcal": -15.264069121098146,
+      "acetic_dimer_literature_kcal": [
+        -16.0,
+        -14.0
+      ],
+      "lactic_acetic_dimer_kcal": -14.950308919709641,
+      "mixed_cluster_total_kcal": -76.07488757319516,
+      "mixed_cluster_pairing_kcal": 17.72312877245713,
+      "mixed_cluster_pairing_definition": "E(L.A.6W) + E((H2O)6) - E(L.6W) - E(A.6W)",
+      "acetic_acid_acetic_acid_best_id": "acetic_acid__acetic_acid__n0__cyc",
+      "acetic_acid_acetic_acid_hbonds": [
+        {
+          "donor_site": "carboxyl_OH",
+          "acceptor_site": "carbonyl_O",
+          "d_HA_angstrom": 1.6866529435790778,
+          "d_DA_angstrom": 2.6758121384992566
+        },
+        {
+          "donor_site": "carboxyl_OH",
+          "acceptor_site": "carbonyl_O",
+          "d_HA_angstrom": 1.6866519840278449,
+          "d_DA_angstrom": 2.6758105453770624
+        }
+      ],
+      "lactic_acid_acetic_acid_best_id": "lactic_acid__acetic_acid__n0__s00",
+      "lactic_acid_acetic_acid_hbonds": [
+        {
+          "donor_site": "carboxyl_OH",
+          "acceptor_site": "carbonyl_O",
+          "d_HA_angstrom": 1.6611757809405716,
+          "d_DA_angstrom": 2.6530438749877607
+        },
+        {
+          "donor_site": "carboxyl_OH",
+          "acceptor_site": "carbonyl_O",
+          "d_HA_angstrom": 1.7114562649928888,
+          "d_DA_angstrom": 2.6961580128597826
+        }
+      ]
+    },
+    "cosolutes": {
+      "lactic_acid": {
+        "ethanol": {
+          "total_kcal": -41.53673037607223,
+          "cosolute_to_hydrated_acid_kcal": -8.305870462907478,
+          "acid_to_hydrated_cosolute_kcal": -9.75413659735932,
+          "gap_to_2nd_kcal": 1.3528316922020167,
+          "best_id": "lactic_acid__ethanol__n3__s05",
+          "acid_cosolute_hbonds": [
+            {
+              "type": "acid->ethanol",
+              "donor_site": "carboxyl_OH",
+              "acceptor_site": "ethanol_O",
+              "d_HA_angstrom": 1.5788953624103719,
+              "d_DA_angstrom": 2.5853798330066793,
+              "angle_DHA_deg": 178.42298338170062
+            }
+          ]
+        },
+        "gln_gln": {
+          "total_kcal": -52.30089508389938,
+          "cosolute_to_hydrated_acid_kcal": -19.070035170647316,
+          "acid_to_hydrated_cosolute_kcal": -18.263536464161007,
+          "gap_to_2nd_kcal": 6.408179622841999,
+          "best_id": "lactic_acid__gln_gln__n3__s02",
+          "acid_cosolute_hbonds": [
+            {
+              "type": "acid->gln_gln",
+              "donor_site": "carboxyl_OH",
+              "acceptor_site": "gln_gln_O",
+              "d_HA_angstrom": 1.8277603108015281,
+              "d_DA_angstrom": 2.7522010707607114,
+              "angle_DHA_deg": 157.69832382739136
+            },
+            {
+              "type": "gln_gln->acid",
+              "donor_site": "gln_gln_O",
+              "acceptor_site": "hydroxyl_OH",
+              "d_HA_angstrom": 1.9207900817316779,
+              "d_DA_angstrom": 2.827743521660758,
+              "angle_DHA_deg": 147.22955751104874
+            }
+          ]
+        },
+        "glucose": {
+          "total_kcal": -44.350780844310066,
+          "cosolute_to_hydrated_acid_kcal": -11.119920931116212,
+          "acid_to_hydrated_cosolute_kcal": -18.25472597530461,
+          "gap_to_2nd_kcal": 1.7864275908796117,
+          "best_id": "lactic_acid__glucose__n3__s07",
+          "acid_cosolute_hbonds": [
+            {
+              "type": "acid->glucose",
+              "donor_site": "hydroxyl_OH",
+              "acceptor_site": "glucose_O",
+              "d_HA_angstrom": 1.8716971731637673,
+              "d_DA_angstrom": 2.7957520942545067,
+              "angle_DHA_deg": 157.66359182928912
+            }
+          ]
+        }
+      },
+      "acetic_acid": {
+        "ethanol": {
+          "total_kcal": -42.20634204952512,
+          "cosolute_to_hydrated_acid_kcal": -9.118140481354203,
+          "acid_to_hydrated_cosolute_kcal": -10.423748270812212,
+          "gap_to_2nd_kcal": 1.7238201792351902,
+          "best_id": "acetic_acid__ethanol__n3__s05",
+          "acid_cosolute_hbonds": [
+            {
+              "type": "ethanol->acid",
+              "donor_site": "ethanol_O",
+              "acceptor_site": "carbonyl_O",
+              "d_HA_angstrom": 1.7908262582860885,
+              "d_DA_angstrom": 2.7428874686847755,
+              "angle_DHA_deg": 165.58912044455357
+            }
+          ]
+        },
+        "gln_gln": {
+          "total_kcal": -48.85313447887893,
+          "cosolute_to_hydrated_acid_kcal": -15.764932910678908,
+          "acid_to_hydrated_cosolute_kcal": -14.815775859140558,
+          "gap_to_2nd_kcal": 10.718086586333811,
+          "best_id": "acetic_acid__gln_gln__n3__s05",
+          "acid_cosolute_hbonds": [
+            {
+              "type": "acid->gln_gln",
+              "donor_site": "carboxyl_OH",
+              "acceptor_site": "gln_gln_O",
+              "d_HA_angstrom": 1.6806762450004022,
+              "d_DA_angstrom": 2.658128454710815,
+              "angle_DHA_deg": 169.69032350892704
+            },
+            {
+              "type": "gln_gln->acid",
+              "donor_site": "gln_gln_O",
+              "acceptor_site": "carbonyl_O",
+              "d_HA_angstrom": 2.1256397362224924,
+              "d_DA_angstrom": 3.1225299178394548,
+              "angle_DHA_deg": 169.29800363116004
+            }
+          ]
+        },
+        "glucose": {
+          "total_kcal": -43.85560855976655,
+          "cosolute_to_hydrated_acid_kcal": -10.767406991566531,
+          "acid_to_hydrated_cosolute_kcal": -17.759553690761095,
+          "gap_to_2nd_kcal": 5.6575807011686265,
+          "best_id": "acetic_acid__glucose__n3__s07",
+          "acid_cosolute_hbonds": [
+            {
+              "type": "acid->glucose",
+              "donor_site": "carboxyl_OH",
+              "acceptor_site": "glucose_O",
+              "d_HA_angstrom": 1.6814704195472054,
+              "d_DA_angstrom": 2.6624779897175985,
+              "angle_DHA_deg": 169.4430586833691
+            }
+          ]
+        }
+      }
+    },
+    "n_minima_pooled": 1009,
+    "n_minima_rejected": 4,
+    "n_anneal_quench_minima": 300
   }
 }

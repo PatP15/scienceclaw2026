@@ -1,0 +1,45 @@
+[2026-10-31T13:05:03Z] c2 mode=anneal versions={"python": "3.12.16", "platform": "Linux-6.8.0-90-generic-x86_64-with-glibc2.35", "nvalchemi-toolkit": "0.2.0", "nvalchemi-toolkit-ops": "0.5.0", "aimnet": "0.2.5", "torch": "2.10.0", "warp-lang": "1.18.0+cu12", "ase": "3.29.0", "nvidia-physicsnemo": "2.2.2", "numpy": "2.2.6", "torch_cuda": "12.8", "cudnn": 91002, "gpu": "NVIDIA RTX A6000", "gpu_capability": "8.6", "gpu_memory_gb": 50.91}
+Warp 1.18.0 initialized:
+   CUDA Toolkit 12.9, Driver 12.8
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA RTX A6000" (47 GiB, sm_86, mempool enabled)
+   Kernel cache:
+     /home/shadeform/.cache/warp/1.18.0
+/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemi/models/aimnet2.py:353: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  values = [float(v) for v in (rc_s, rc_v) if v is not None]
+[2026-10-31T13:05:20Z] AIMNet2 'aimnet2_wb97m_d3_3' loaded on cuda:0 in 13.7s; D3(BJ) params used: {'s6': 1.0, 'a1': 0.566, 's8': 0.3908, 'a2': 3.128}
+[2026-10-31T13:09:43Z] anneal lactic_acid__n10: 5 systems x 10000 steps at 400.0 K, 5 snapshots, 261.2s
+W1031 13:10:17.368000 71515 torch/_dynamo/convert_frame.py:1676] [5/8] torch._dynamo hit config.recompile_limit (8)
+W1031 13:10:17.368000 71515 torch/_dynamo/convert_frame.py:1676] [5/8]    function: 'neighbor_list' (/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemiops/torch/neighbors/__init__.py:102)
+W1031 13:10:17.368000 71515 torch/_dynamo/convert_frame.py:1676] [5/8]    last reason: 5/7: ___as_tensor(cutoff).item() == 67.48670959472656  # (unknown source ___as_tensor(cutoff).item(), please file a bug)
+W1031 13:10:17.368000 71515 torch/_dynamo/convert_frame.py:1676] [5/8] To log all recompilation reasons, use TORCH_LOGS="recompiles".
+W1031 13:10:17.368000 71515 torch/_dynamo/convert_frame.py:1676] [5/8] To diagnose recompilation issues, see https://pytorch.org/docs/main/compile/programming_model.recompilation.html
+[2026-10-31T13:10:17Z]   lactic_acid__n10__s08__aq0: E=-30171.954222 it=60 converged
+[2026-10-31T13:10:17Z]   lactic_acid__n10__s04__aq0: E=-30171.918384 it=58 converged
+[2026-10-31T13:10:17Z]   lactic_acid__n10__s10__aq0: E=-30171.845588 it=98 converged
+[2026-10-31T13:10:17Z]   lactic_acid__n10__s09__aq0: E=-30171.758749 it=92 converged
+[2026-10-31T13:10:17Z]   lactic_acid__n10__s05__aq0: E=-30171.730717 it=70 converged
+[2026-10-31T13:10:17Z]   lactic_acid__n10__s08__aq1: E=-30172.036746 it=78 converged
+[2026-10-31T13:10:17Z]   lactic_acid__n10__s04__aq1: E=-30172.004058 it=46 converged
+[2026-10-31T13:10:17Z]   lactic_acid__n10__s10__aq1: E=-30171.515717 it=92 converged
+[2026-10-31T13:10:17Z]   lactic_acid__n10__s09__aq1: E=-30171.836487 it=76 converged
+[2026-10-31T13:10:17Z]   lactic_acid__n10__s05__aq1: E=-30171.685215 it=92 converged
+[2026-10-31T13:10:18Z]   lactic_acid__n10__s08__aq2: E=-30171.719813 it=66 converged
+[2026-10-31T13:10:18Z]   lactic_acid__n10__s04__aq2: E=-30172.186870 it=20 converged
+[2026-10-31T13:10:18Z]   lactic_acid__n10__s10__aq2: E=-30171.915470 it=46 converged
+[2026-10-31T13:10:18Z]   lactic_acid__n10__s09__aq2: E=-30171.827670 it=114 converged
+[2026-10-31T13:10:18Z]   lactic_acid__n10__s05__aq2: E=-30171.698723 it=60 converged
+[2026-10-31T13:10:18Z]   lactic_acid__n10__s08__aq3: E=-30171.764159 it=52 converged
+[2026-10-31T13:10:47Z]   lactic_acid__n10__s04__aq3: E=-30172.245712 it=47 converged
+[2026-10-31T13:10:47Z]   lactic_acid__n10__s10__aq3: E=-30171.718324 it=47 converged
+[2026-10-31T13:10:48Z]   lactic_acid__n10__s09__aq3: E=-30172.098145 it=47 converged
+[2026-10-31T13:10:48Z]   lactic_acid__n10__s05__aq3: E=-30171.882253 it=47 converged
+[2026-10-31T13:10:48Z]   lactic_acid__n10__s08__aq4: E=-30172.004708 it=32 converged
+[2026-10-31T13:10:48Z]   lactic_acid__n10__s04__aq4: E=-30172.173692 it=32 converged
+[2026-10-31T13:10:48Z]   lactic_acid__n10__s10__aq4: E=-30172.074739 it=32 converged
+[2026-10-31T13:10:48Z]   lactic_acid__n10__s09__aq4: E=-30172.087295 it=32 converged
+[2026-10-31T13:10:48Z]   lactic_acid__n10__s05__aq4: E=-30171.759973 it=32 converged
+[2026-10-31T13:10:48Z] total wall time 344.8s
+exit_code=0

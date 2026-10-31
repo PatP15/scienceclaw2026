@@ -100,8 +100,33 @@ def _parse_utc(s: str) -> datetime:
     return datetime.strptime(s.strip(), "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=UTC)
 
 
+def _session_lines(sessions, rate: float, first_hours: float) -> list[str]:
+    if not sessions:
+        return []
+    out, total = [], first_hours
+    for label, start, stop in sessions:
+        t0 = _parse_utc(start)
+        t1 = _parse_utc(stop) if stop else datetime.now(UTC)
+        h = (t1 - t0).total_seconds() / 3600
+        total += h
+        out.append(f"- {label}: instance created {start}; deleted {stop or '(still running at report time)'}; "
+                   f"{h:.2f} h × ${rate:.2f}/h ≈ ${h * rate:.2f}")
+    out.append(f"- **Total across sessions: {total:.2f} h ≈ ${total * rate:.2f}**")
+    c2 = ALCHEMI_DIR / "results_c2" / "json"
+    if c2.exists():
+        recs = [json.loads(p.read_text()) for p in c2.glob("*.json")]
+        vib = list((ALCHEMI_DIR / "vib_c2").glob("*.json"))
+        mdl = list((ALCHEMI_DIR / "md_long").glob("*.json"))
+        out.append(f"- Campaign 2: {len(recs)} optimisations ({sum(1 for r in recs if r.get('converged'))} converged), "
+                   f"{len(vib)} vibrational analyses, {len(mdl)} long-MD runs")
+    return out
+
+
 def write_environment_report(rate_per_hour: float, started_utc: str, stopped_utc: str | None,
-                             instance_type: str = "hyperstack_A6000", notes: list[str] | None = None) -> Path:
+                             instance_type: str = "hyperstack_A6000", notes: list[str] | None = None,
+                             extra_sessions: list[tuple[str, str, str | None]] | None = None) -> Path:
+    """Write environment/report.md. ``extra_sessions`` = [(label, start_utc, stop_utc)] for later
+    instance sessions (e.g. campaign 2) billed at the same rate; the total cost sums all sessions."""
     env = ALCHEMI_DIR / "environment"
     remote = load_json("environment/remote_environment.json") or {}
     st = load_json("selftest/selftest.json") or {}
@@ -160,6 +185,7 @@ def write_environment_report(rate_per_hour: float, started_utc: str, stopped_utc
         f"- Instance created {started_utc}; stopped/deleted {stopped_utc or '(still running at report time)'}",
         f"- Elapsed instance time {hours:.2f} h × ${rate_per_hour:.2f}/h ≈ **${hours * rate_per_hour:.2f}** (estimate; "
         "Brev's invoice is authoritative)",
+        *_session_lines(extra_sessions or [], rate_per_hour, hours),
         f"- Sum of per-structure optimisation wall time: {wall / 60:.1f} min; MD wall time: {md_wall / 60:.1f} min",
         f"- Calculations: {status['n_optimisations']} optimisations ({status['n_converged']} converged, "
         f"{status['n_failed']} failed), {status['n_md_runs']} MD runs ({status['n_md_completed']} completed)",
@@ -194,6 +220,8 @@ def main(argv: list[str] | None = None) -> None:
     rep.add_argument("--stop", default=None, help="instance stop/delete time, UTC ISO")
     rep.add_argument("--type", default="hyperstack_A6000")
     rep.add_argument("--note", action="append", default=[])
+    rep.add_argument("--session", action="append", default=[],
+                     help="extra session 'label,start_utc,stop_utc' (same rate), e.g. campaign 2")
     a = ap.parse_args(argv)
     if a.cmd == "status":
         print(json.dumps(cached_status(), indent=2))
@@ -206,7 +234,8 @@ def main(argv: list[str] | None = None) -> None:
     elif a.cmd == "stop":
         stop(a.delete_if_unstoppable)
     elif a.cmd == "report":
-        print(write_environment_report(a.rate, a.start, a.stop, a.type, a.note))
+        sess = [tuple(x.split(",", 2)) for x in a.session]
+        print(write_environment_report(a.rate, a.start, a.stop, a.type, a.note, sess))
 
 
 if __name__ == "__main__":

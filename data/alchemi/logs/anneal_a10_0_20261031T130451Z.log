@@ -1,0 +1,45 @@
+[2026-10-31T13:04:53Z] c2 mode=anneal versions={"python": "3.12.16", "platform": "Linux-6.8.0-90-generic-x86_64-with-glibc2.35", "nvalchemi-toolkit": "0.2.0", "nvalchemi-toolkit-ops": "0.5.0", "aimnet": "0.2.5", "torch": "2.10.0", "warp-lang": "1.18.0+cu12", "ase": "3.29.0", "nvidia-physicsnemo": "2.2.2", "numpy": "2.2.6", "torch_cuda": "12.8", "cudnn": 91002, "gpu": "NVIDIA RTX A6000", "gpu_capability": "8.6", "gpu_memory_gb": 50.91}
+Warp 1.18.0 initialized:
+   CUDA Toolkit 12.9, Driver 12.8
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA RTX A6000" (47 GiB, sm_86, mempool enabled)
+   Kernel cache:
+     /home/shadeform/.cache/warp/1.18.0
+/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemi/models/aimnet2.py:353: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  values = [float(v) for v in (rc_s, rc_v) if v is not None]
+[2026-10-31T13:05:08Z] AIMNet2 'aimnet2_wb97m_d3_3' loaded on cuda:0 in 12.0s; D3(BJ) params used: {'s6': 1.0, 'a1': 0.566, 's8': 0.3908, 'a2': 3.128}
+[2026-10-31T13:09:40Z] anneal acetic_acid__n10: 5 systems x 10000 steps at 400.0 K, 5 snapshots, 270.9s
+W1031 13:10:12.480000 71345 torch/_dynamo/convert_frame.py:1676] [5/8] torch._dynamo hit config.recompile_limit (8)
+W1031 13:10:12.480000 71345 torch/_dynamo/convert_frame.py:1676] [5/8]    function: 'neighbor_list' (/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemiops/torch/neighbors/__init__.py:102)
+W1031 13:10:12.480000 71345 torch/_dynamo/convert_frame.py:1676] [5/8]    last reason: 5/7: ___as_tensor(cutoff).item() == 68.62187194824219  # (unknown source ___as_tensor(cutoff).item(), please file a bug)
+W1031 13:10:12.480000 71345 torch/_dynamo/convert_frame.py:1676] [5/8] To log all recompilation reasons, use TORCH_LOGS="recompiles".
+W1031 13:10:12.480000 71345 torch/_dynamo/convert_frame.py:1676] [5/8] To diagnose recompilation issues, see https://pytorch.org/docs/main/compile/programming_model.recompilation.html
+[2026-10-31T13:10:12Z]   acetic_acid__n10__s02__aq0: E=-27052.922038 it=117 converged
+[2026-10-31T13:10:12Z]   acetic_acid__n10__s05__aq0: E=-27052.887465 it=117 converged
+[2026-10-31T13:10:12Z]   acetic_acid__n10__s10__aq0: E=-27052.773134 it=106 converged
+[2026-10-31T13:10:12Z]   acetic_acid__n10__s08__aq0: E=-27052.739701 it=84 converged
+[2026-10-31T13:10:12Z]   acetic_acid__n10__s07__aq0: E=-27052.711873 it=117 converged
+[2026-10-31T13:10:12Z]   acetic_acid__n10__s02__aq1: E=-27052.780550 it=117 converged
+[2026-10-31T13:10:12Z]   acetic_acid__n10__s05__aq1: E=-27053.202511 it=117 converged
+[2026-10-31T13:10:12Z]   acetic_acid__n10__s10__aq1: E=-27053.044425 it=117 converged
+[2026-10-31T13:10:13Z]   acetic_acid__n10__s08__aq1: E=-27052.728717 it=117 converged
+[2026-10-31T13:10:13Z]   acetic_acid__n10__s07__aq1: E=-27052.695024 it=117 converged
+[2026-10-31T13:10:13Z]   acetic_acid__n10__s02__aq2: E=-27053.024422 it=117 converged
+[2026-10-31T13:10:13Z]   acetic_acid__n10__s05__aq2: E=-27052.664148 it=117 converged
+[2026-10-31T13:10:13Z]   acetic_acid__n10__s10__aq2: E=-27053.169549 it=117 converged
+[2026-10-31T13:10:13Z]   acetic_acid__n10__s08__aq2: E=-27052.793004 it=84 converged
+[2026-10-31T13:10:13Z]   acetic_acid__n10__s07__aq2: E=-27052.780408 it=84 converged
+[2026-10-31T13:10:13Z]   acetic_acid__n10__s02__aq3: E=-27052.960973 it=117 converged
+[2026-10-31T13:11:17Z]   acetic_acid__n10__s05__aq3: E=-27053.293283 it=280 converged
+[2026-10-31T13:11:17Z]   acetic_acid__n10__s10__aq3: E=-27053.310839 it=292 converged
+[2026-10-31T13:11:17Z]   acetic_acid__n10__s08__aq3: E=-27052.752028 it=292 converged
+[2026-10-31T13:11:17Z]   acetic_acid__n10__s07__aq3: E=-27052.896970 it=292 converged
+[2026-10-31T13:11:17Z]   acetic_acid__n10__s02__aq4: E=-27052.948850 it=292 converged
+[2026-10-31T13:11:17Z]   acetic_acid__n10__s05__aq4: E=-27052.854458 it=271 converged
+[2026-10-31T13:11:18Z]   acetic_acid__n10__s10__aq4: E=-27053.307094 it=280 converged
+[2026-10-31T13:11:18Z]   acetic_acid__n10__s08__aq4: E=-27053.019713 it=292 converged
+[2026-10-31T13:11:18Z]   acetic_acid__n10__s07__aq4: E=-27052.644198 it=282 converged
+[2026-10-31T13:11:18Z] total wall time 384.7s
+exit_code=0

@@ -935,7 +935,9 @@ def md_static_figure(runs: pd.DataFrame, prov: str, out_dir: Path) -> Path | Non
 
 
 def run(results_dir: Path | None = None, out_dir: Path | None = None, figures: bool = True,
-        md_dir: Path | None = None) -> dict:
+        md_dir: Path | None = None, c2_base: Path | None = None) -> dict:
+    """Campaign-1 analysis; campaign 2 (fermentai.molecular.campaign2) is added when its data exist.
+    Campaign 2 runs for the default data location, or when ``c2_base`` is given explicitly."""
     out_dir = Path(out_dir) if out_dir else ALCHEMI_DIR / "analysis"
     out_dir.mkdir(parents=True, exist_ok=True)
     recs = load_results(results_dir)
@@ -1013,7 +1015,11 @@ def run(results_dir: Path | None = None, out_dir: Path | None = None, figures: b
         digest["files"]["md_hbond_timeseries"] = "data/alchemi/analysis/md_hbond_timeseries.csv"
         digest["files"]["md_hbonds_vs_temperature_html"] = "data/alchemi/analysis/md_hbonds_vs_temperature.html"
         _md_descriptors(md_runs, descriptors)
-    (out_dir / "molecular_descriptors.json").write_text(json.dumps(descriptors, indent=2, default=_json_default))
+    if c2_base is not None or results_dir is None:
+        from fermentai.molecular import campaign2
+
+        campaign2.run(out_dir, descriptors, digest, base=c2_base, figures_on=figures)
+    dump_json(out_dir / "molecular_descriptors.json", descriptors)
     if figures:
         if not assoc.empty and "dE_assoc_kcal_mol" in assoc:
             association_figure(assoc, prov).write_html(out_dir / "association_energy.html", include_plotlyjs=True,
@@ -1031,7 +1037,7 @@ def run(results_dir: Path | None = None, out_dir: Path | None = None, figures: b
                 digest["files"]["md_hbonds_vs_temperature_png"] = "data/alchemi/analysis/md_hbonds_vs_temperature.png"
         explorer_figure(recs, assoc, prov).write_html(out_dir / "molecular_explorer.html", include_plotlyjs=True,
                                                       full_html=True, config={"displaylogo": False})
-    (out_dir / "analysis_summary.json").write_text(json.dumps(digest, indent=2, default=_json_default))
+    dump_json(out_dir / "analysis_summary.json", digest)
     return digest
 
 
@@ -1059,6 +1065,28 @@ def _md_descriptors(md_runs: pd.DataFrame, descriptors: dict) -> None:
     descriptors["provenance"]["definitions"]["md_hbonds_by_species_and_T"] = (
         "NVT Langevin (BAOAB) 2 ps per run at T (K), mean over the 2nd ps of acid(or anion)-water geometric H-bonds; "
         "mean and SEM over independent velocity/noise seeds")
+
+
+def json_clean(o):
+    """Recursively convert NaN/inf (Python or NumPy) to None and NumPy scalars to Python types so the
+    output is strict JSON (json.dumps(..., allow_nan=False) succeeds)."""
+    if isinstance(o, dict):
+        return {str(k): json_clean(v) for k, v in o.items()}
+    if isinstance(o, (list, tuple)):
+        return [json_clean(v) for v in o]
+    if isinstance(o, np.ndarray):
+        return [json_clean(v) for v in o.tolist()]
+    if isinstance(o, (np.bool_,)):
+        return bool(o)
+    if isinstance(o, (np.integer,)):
+        return int(o)
+    if isinstance(o, (float, np.floating)):
+        return None if not math.isfinite(float(o)) else float(o)
+    return o
+
+
+def dump_json(path: Path, obj, indent: int | None = 2) -> None:
+    Path(path).write_text(json.dumps(json_clean(obj), indent=indent, allow_nan=False))
 
 
 def _json_default(o):

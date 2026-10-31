@@ -65,3 +65,60 @@ md:
   log_frequency: 10                        # energy/temperature rows every N steps
   frame_every_steps: 20                    # coordinates saved every N steps (10 fs)
   seed: 20261031
+
+# ----------------------------------------------------------------------------------------------
+# Campaign 2 (additive): sampling, larger clusters, co-solutes, thermochemistry, long MD.
+# Inputs -> data/alchemi/inputs_c2/, results -> data/alchemi/results_c2/, vib_c2/, md_long/.
+campaign2:
+  output_dir: data/alchemi/inputs_c2
+  base_seed: 20261101                     # assumption; independent of campaign-1 seeds
+  sampling:                               # priority 2: many seeded starts at n = 3, 6
+    water_counts: [0, 3, 6]
+    n_starts: 40                          # per (species, n); n = 0 uses min(n_starts, 12) ETKDG conformers
+  large:                                  # priority 3
+    water_counts: [10, 15]
+    n_starts: 12
+    water_cluster_starts: 10              # pure (H2O)n references
+  species:
+    lactic_acid: {smiles: "C[C@@H](C(=O)O)O", charge: 0}
+    acetic_acid: {smiles: "CC(=O)O", charge: 0}
+    lactic_acid_anion: {smiles: "C[C@@H](C(=O)[O-])O", charge: -1}
+    acetic_acid_anion: {smiles: "CC(=O)[O-]", charge: -1}
+  cosolutes:                              # priority 4 (CHNO only; AIMNet2 has no Na/Cl in this use)
+    ethanol: {smiles: "CCO"}
+    glucose: {smiles: "OC[C@H]1O[C@@H](O)[C@H](O)[C@@H](O)[C@@H]1O"}   # beta-D-glucopyranose
+    gln_gln: {smiles: "CC(=O)N[C@@H](CCC(N)=O)C(=O)N[C@@H](CCC(N)=O)C(=O)NC"}  # Ac-Gln-Gln-NHMe (capped)
+  cosolute_waters: 3
+  cosolute_starts: 8
+  cosolute_monomer_starts: 8
+  dimer_starts: 8                         # acetic-acetic, lactic-acetic gas-phase dimers (+1 explicit cyclic AA dimer)
+  mixed_cluster_waters: 6                 # lactic + acetic + 6 H2O
+  optimization:
+    fmax_ev_per_angstrom: 0.01
+    max_steps: 4000
+    batch_size: 16
+  anneal:                                 # MD anneal-and-quench (priority 2)
+    temperature_k: 400.0
+    n_steps: 10000                        # 5 ps at 0.5 fs
+    snapshot_every_steps: 2000            # 5 snapshots per run, each quenched with FIRE2
+    top_k_per_species: 5
+    friction_per_fs: 0.01
+    seed: 20261103
+  vib:                                    # priority 1
+    tight_fmax_ev_per_angstrom: 0.002
+    tight_max_steps: 8000
+    delta_angstrom: 0.01
+    nfree: 2
+    temperature_k: 298.15
+    pressure_pa: 101325.0
+    quasi_harmonic_cutoff_cm1: 100.0      # Ribeiro/Marenich/Cramer/Truhlar 2011: raise real modes < 100 cm-1
+    top_k_per_species: 5
+  md_long:                                # priority 5
+    temperatures_k: [295.15, 310.15]
+    n_steps: 40000                        # 20 ps at 0.5 fs
+    timestep_fs: 0.5
+    friction_per_fs: 0.01
+    replicas: 3
+    seeds_base: 20261110
+    log_frequency: 20
+    frame_every_steps: 20                 # 10 fs, stored as float32 .npz

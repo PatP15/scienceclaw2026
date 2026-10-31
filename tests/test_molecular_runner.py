@@ -48,3 +48,12 @@ def test_environment_report_cost(tmp_path, monkeypatch):
     assert "2.50 h" in text and "$1.50" in text
     assert "570.195.03" in text and "12.8" in text
     assert "TEST-GPU" in text
+
+
+def test_environment_report_sessions(tmp_path, monkeypatch):
+    _setup(tmp_path, monkeypatch)
+    out = ar.write_environment_report(0.60, "2026-10-31T03:00:00Z", "2026-10-31T04:00:00Z",
+                                      extra_sessions=[("campaign 2", "2026-10-31T05:00:00Z", "2026-10-31T07:00:00Z")])
+    text = out.read_text()
+    assert "campaign 2" in text and "2.00 h" in text
+    assert "Total across sessions: 3.00 h ≈ $1.80" in text

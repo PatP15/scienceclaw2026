@@ -51,6 +51,7 @@ _WATER_LOCAL = np.array(
     ]
 )
 _WATER_SYMBOLS = ["O", "H", "H"]
+COV_RADII_PLACEMENT = {"H": 0.31, "C": 0.76, "N": 0.71, "O": 0.66}  # Angstrom (Cordero 2008)
 
 
 @dataclass
@@ -534,7 +535,7 @@ def write_inputs(structures: list[Structure], out_dir: str | Path, cfg: dict[str
         "numpy_version": np.__version__,
         "config": cfg["structures"],
         "lactic_acid_cip": cip_label(cfg["structures"]["acids"]["lactic_acid"]["smiles"])
-        if "lactic_acid" in cfg["structures"]["acids"]
+        if "lactic_acid" in cfg["structures"].get("acids", {})
         else None,
         "units": {"coordinates": "angstrom"},
         "structures": entries,

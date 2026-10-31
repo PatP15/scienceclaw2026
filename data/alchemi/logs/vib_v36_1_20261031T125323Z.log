@@ -1,0 +1,28 @@
+[2026-10-31T12:53:25Z] c2 mode=vib versions={"python": "3.12.16", "platform": "Linux-6.8.0-90-generic-x86_64-with-glibc2.35", "nvalchemi-toolkit": "0.2.0", "nvalchemi-toolkit-ops": "0.5.0", "aimnet": "0.2.5", "torch": "2.10.0", "warp-lang": "1.18.0+cu12", "ase": "3.29.0", "nvidia-physicsnemo": "2.2.2", "numpy": "2.2.6", "torch_cuda": "12.8", "cudnn": 91002, "gpu": "NVIDIA RTX A6000", "gpu_capability": "8.6", "gpu_memory_gb": 50.91}
+Warp 1.18.0 initialized:
+   CUDA Toolkit 12.9, Driver 12.8
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA RTX A6000" (47 GiB, sm_86, mempool enabled)
+   Kernel cache:
+     /home/shadeform/.cache/warp/1.18.0
+/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemi/models/aimnet2.py:353: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  values = [float(v) for v in (rc_s, rc_v) if v is not None]
+[2026-10-31T12:53:41Z] AIMNet2 'aimnet2_wb97m_d3_3' loaded on cuda:0 in 12.8s; D3(BJ) params used: {'s6': 1.0, 'a1': 0.566, 's8': 0.3908, 'a2': 3.128}
+[2026-10-31T12:53:54Z] vib lactic_acid__n3__s12__aq4: E=-15601.287648 fmax=0.0010 n_imag=0 lowest=25.84199557777734 G_qh-E=82.24 kcal/mol
+[2026-10-31T12:54:03Z] vib lactic_acid__n6__s03__aq2: E=-21845.964300 fmax=0.0002 n_imag=0 lowest=34.90469931642948 G_qh-E=127.60 kcal/mol
+[2026-10-31T12:54:12Z] vib lactic_acid__n6__s17__aq1: E=-21845.907891 fmax=0.0007 n_imag=0 lowest=22.383947088914226 G_qh-E=125.44 kcal/mol
+[2026-10-31T12:54:16Z] vib acetic_acid__n3__s06__aq2: E=-12482.614822 fmax=0.0018 n_imag=0 lowest=28.105134372004642 G_qh-E=61.97 kcal/mol
+[2026-10-31T12:54:21Z] vib lactic_acid_anion__n3__s35__aq0: E=-15587.053807 fmax=0.0002 n_imag=0 lowest=44.881489553854045 G_qh-E=75.80 kcal/mol
+W1031 12:54:21.936000 69454 torch/_dynamo/convert_frame.py:1676] [5/8] torch._dynamo hit config.recompile_limit (8)
+W1031 12:54:21.936000 69454 torch/_dynamo/convert_frame.py:1676] [5/8]    function: 'neighbor_list' (/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemiops/torch/neighbors/__init__.py:102)
+W1031 12:54:21.936000 69454 torch/_dynamo/convert_frame.py:1676] [5/8]    last reason: 5/5: ___as_tensor(cutoff).item() == 5.0  # (unknown source ___as_tensor(cutoff).item(), please file a bug)
+W1031 12:54:21.936000 69454 torch/_dynamo/convert_frame.py:1676] [5/8] To log all recompilation reasons, use TORCH_LOGS="recompiles".
+W1031 12:54:21.936000 69454 torch/_dynamo/convert_frame.py:1676] [5/8] To diagnose recompilation issues, see https://pytorch.org/docs/main/compile/programming_model.recompilation.html
+[2026-10-31T12:54:29Z] vib lactic_acid_anion__n6__s35__aq0: E=-21832.005387 fmax=0.0001 n_imag=0 lowest=34.68995357638024 G_qh-E=121.97 kcal/mol
+[2026-10-31T12:54:37Z] vib lactic_acid_anion__n6__s20__aq3: E=-21831.912958 fmax=0.0007 n_imag=0 lowest=35.58739439628596 G_qh-E=120.97 kcal/mol
+[2026-10-31T12:54:41Z] vib acetic_acid_anion__n3__s36: E=-12468.014627 fmax=0.0019 n_imag=0 lowest=30.921994017416427 G_qh-E=56.65 kcal/mol
+[2026-10-31T12:54:53Z] vib acetic_acid_anion__n6__s01__aq1: E=-18712.999473 fmax=0.0018 n_imag=0 lowest=14.304028785410546 G_qh-E=101.13 kcal/mol
+[2026-10-31T12:54:53Z] total wall time 88.3s
+exit_code=0

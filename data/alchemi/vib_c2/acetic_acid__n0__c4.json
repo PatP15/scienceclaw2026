@@ -1,0 +1,151 @@
+{
+ "id": "acetic_acid__n0__c4",
+ "started_at_utc": "2026-10-31T12:35:26Z",
+ "versions": {
+  "python": "3.12.16",
+  "platform": "Linux-6.8.0-90-generic-x86_64-with-glibc2.35",
+  "nvalchemi-toolkit": "0.2.0",
+  "nvalchemi-toolkit-ops": "0.5.0",
+  "aimnet": "0.2.5",
+  "torch": "2.10.0",
+  "warp-lang": "1.18.0+cu12",
+  "ase": "3.29.0",
+  "nvidia-physicsnemo": "2.2.2",
+  "numpy": "2.2.6",
+  "torch_cuda": "12.8",
+  "cudnn": 91002,
+  "gpu": "NVIDIA RTX A6000",
+  "gpu_capability": "8.6",
+  "gpu_memory_gb": 50.91
+ },
+ "checkpoint": "aimnet2_wb97m_d3_3",
+ "provenance": "real: ALCHEMI/AIMNet2 on NVIDIA RTX A6000",
+ "method": {
+  "tight_optimizer": "FIRE2",
+  "tight_fmax_ev_per_angstrom": 0.002,
+  "hessian": "ASE Vibrations finite differences of ALCHEMI forces, delta=0.01 A, nfree=2",
+  "thermo": "ase.thermochemistry.IdealGasThermo, nonlinear, symmetry number 1, spin 0; qh = real modes < cutoff raised to cutoff",
+  "temperature_k": 298.15,
+  "pressure_pa": 101325.0,
+  "quasi_harmonic_cutoff_cm1": 100.0
+ },
+ "status": "completed",
+ "charge": 0,
+ "symbols": [
+  "C",
+  "C",
+  "O",
+  "O",
+  "H",
+  "H",
+  "H",
+  "H"
+ ],
+ "fragments": [
+  {
+   "name": "acetic_acid",
+   "smiles": "CC(=O)O",
+   "start": 0,
+   "stop": 8
+  }
+ ],
+ "kind": "acid_monomer",
+ "acid": "acetic_acid",
+ "n_water": 0,
+ "source_energy_ev": -6238.0475869185975,
+ "tight_energy_ev": -6238.04725461136,
+ "tight_fmax_ev_per_angstrom": 0.001898936474312747,
+ "tight_steps": 141,
+ "tight_positions_angstrom": [
+  [
+   29.04060173034668,
+   30.003387451171875,
+   30.097238540649414
+  ],
+  [
+   30.49114418029785,
+   30.25109100341797,
+   29.809022903442383
+  ],
+  [
+   30.949079513549805,
+   31.20379638671875,
+   29.240015029907227
+  ],
+  [
+   31.26797866821289,
+   29.249399185180664,
+   30.277677536010742
+  ],
+  [
+   28.741077423095703,
+   29.044597625732422,
+   29.67942237854004
+  ],
+  [
+   28.447589874267578,
+   30.802698135375977,
+   29.669445037841797
+  ],
+  [
+   28.886919021606445,
+   29.958723068237305,
+   31.173776626586914
+  ],
+  [
+   32.17561721801758,
+   29.486318588256836,
+   30.053377151489258
+  ]
+ ],
+ "frequencies_cm1": [
+  -9.71062129230923,
+  -7.071948098786578,
+  -3.196402203031042,
+  -0.16512663884455386,
+  0.48801284614299534,
+  0.7712082079442129,
+  87.45517606795802,
+  437.28563142078053,
+  498.6300623993523,
+  585.9041320876177,
+  612.2906101872605,
+  887.1266875562063,
+  1002.7649731294011,
+  1049.6584309731113,
+  1217.3842462856974,
+  1351.9046900977764,
+  1419.1916082331002,
+  1442.4942397527457,
+  1446.2038266087347,
+  1844.586955825212,
+  3070.992248230654,
+  3124.859700552013,
+  3185.1771461524368,
+  3824.5869039935333
+ ],
+ "thermo": {
+  "n_modes": 18,
+  "n_imag": 0,
+  "imag_cm1": [],
+  "lowest_real_cm1": 87.45517606795802,
+  "n_atoms": 8,
+  "rrho": {
+   "zpe_ev": 1.6792728099130956,
+   "h_corr_ev": 1.8296265631991722,
+   "s_ev_per_k": 0.002973243335148209,
+   "g_corr_ev": 0.9431540628247337
+  },
+  "qh": {
+   "zpe_ev": 1.680050489882737,
+   "h_corr_ev": 1.8297430140909527,
+   "s_ev_per_k": 0.002961886960594983,
+   "g_corr_ev": 0.9466564167895587
+  }
+ },
+ "vib_wall_seconds": 2.648303508758545,
+ "G_rrho_ev": -6237.104100548535,
+ "G_qh_ev": -6237.10059819457,
+ "E_plus_zpe_ev": -6236.367981801446,
+ "finished_at_utc": "2026-10-31T12:35:33Z"
+}

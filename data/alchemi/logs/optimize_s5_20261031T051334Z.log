@@ -1,0 +1,199 @@
+[2026-10-31T05:13:37Z] c2 mode=optimize versions={"python": "3.12.16", "platform": "Linux-6.8.0-90-generic-x86_64-with-glibc2.35", "nvalchemi-toolkit": "0.2.0", "nvalchemi-toolkit-ops": "0.5.0", "aimnet": "0.2.5", "torch": "2.10.0", "warp-lang": "1.18.0+cu12", "ase": "3.29.0", "nvidia-physicsnemo": "2.2.2", "numpy": "2.2.6", "torch_cuda": "12.8", "cudnn": 91002, "gpu": "NVIDIA RTX A6000", "gpu_capability": "8.6", "gpu_memory_gb": 50.91}
+Warp 1.18.0 initialized:
+   CUDA Toolkit 12.9, Driver 12.8
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA RTX A6000" (47 GiB, sm_86, mempool enabled)
+   Kernel cache:
+     /home/shadeform/.cache/warp/1.18.0
+/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemi/models/aimnet2.py:353: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  values = [float(v) for v in (rc_s, rc_v) if v is not None]
+[2026-10-31T05:14:08Z] AIMNet2 'aimnet2_wb97m_d3_3' loaded on cuda:0 in 26.2s; D3(BJ) params used: {'s6': 1.0, 'a1': 0.566, 's8': 0.3908, 'a2': 3.128}
+[2026-10-31T05:14:08Z] optimize shard 5/6: 101 structures, batch size 16
+[2026-10-31T05:14:59Z] acetic_acid_anion__n0__s03: E=-6222.565245 fmax=0.0001 it=144 converged
+[2026-10-31T05:14:59Z] acetic_acid_anion__n0__s09: E=-6222.565245 fmax=0.0000 it=161 converged
+W1031 05:14:59.979000 18976 torch/_dynamo/convert_frame.py:1676] [5/8] torch._dynamo hit config.recompile_limit (8)
+W1031 05:14:59.979000 18976 torch/_dynamo/convert_frame.py:1676] [5/8]    function: 'neighbor_list' (/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemiops/torch/neighbors/__init__.py:102)
+W1031 05:14:59.979000 18976 torch/_dynamo/convert_frame.py:1676] [5/8]    last reason: 5/7: method == 'naive_tile'                                   # if method is None:  # nvalchemiops/torch/neighbors/__init__.py:462 in neighbor_list
+W1031 05:14:59.979000 18976 torch/_dynamo/convert_frame.py:1676] [5/8] To log all recompilation reasons, use TORCH_LOGS="recompiles".
+W1031 05:14:59.979000 18976 torch/_dynamo/convert_frame.py:1676] [5/8] To diagnose recompilation issues, see https://pytorch.org/docs/main/compile/programming_model.recompilation.html
+[2026-10-31T05:15:00Z] acetic_acid__n0__s01: E=-6238.047241 fmax=0.0001 it=142 converged
+[2026-10-31T05:15:00Z] acetic_acid__n0__s07: E=-6238.047241 fmax=0.0001 it=180 converged
+[2026-10-31T05:15:00Z] ethanol__n0__s05: E=-4221.567759 fmax=0.0001 it=181 converged
+[2026-10-31T05:15:00Z] lactic_acid_anion__n0__s05: E=-9341.838987 fmax=0.0002 it=232 converged
+[2026-10-31T05:15:00Z] lactic_acid_anion__n0__s11: E=-9341.838989 fmax=0.0002 it=177 converged
+[2026-10-31T05:15:00Z] lactic_acid__n0__s03: E=-9356.521951 fmax=0.0001 it=336 converged
+[2026-10-31T05:15:00Z] lactic_acid__n0__s09: E=-9356.731019 fmax=0.0001 it=236 converged
+[2026-10-31T05:15:00Z] acetic_acid_anion__n3__s03: E=-12467.847114 fmax=0.0008 it=336 converged
+[2026-10-31T05:15:01Z] acetic_acid_anion__n3__s09: E=-12467.920781 fmax=0.0084 it=336 converged
+[2026-10-31T05:15:01Z] acetic_acid_anion__n3__s15: E=-12467.529982 fmax=0.0094 it=336 converged
+[2026-10-31T05:15:01Z] acetic_acid_anion__n3__s21: E=-12467.858347 fmax=0.0029 it=327 converged
+[2026-10-31T05:15:01Z] acetic_acid_anion__n3__s27: E=-12467.535075 fmax=0.0031 it=336 converged
+[2026-10-31T05:15:01Z] acetic_acid_anion__n3__s33: E=-12467.935700 fmax=0.0008 it=245 converged
+[2026-10-31T05:15:01Z] acetic_acid_anion__n3__s39: E=-12467.897200 fmax=0.0012 it=328 converged
+[2026-10-31T05:15:01Z] batch 0: 16 systems, 600 steps, 46.6s
+[2026-10-31T05:16:38Z] acetic_acid__acetic_acid__n0__s05: E=-12476.308862 fmax=0.0001 it=188 converged
+[2026-10-31T05:16:38Z] acetic_acid__n3__s01: E=-12482.108038 fmax=0.0001 it=188 converged
+[2026-10-31T05:16:39Z] acetic_acid__n3__s07: E=-12482.197976 fmax=0.0023 it=202 converged
+[2026-10-31T05:16:39Z] acetic_acid__n3__s13: E=-12482.155672 fmax=0.0006 it=202 converged
+[2026-10-31T05:16:39Z] acetic_acid__n3__s19: E=-12482.201294 fmax=0.0005 it=343 converged
+[2026-10-31T05:16:39Z] acetic_acid__n3__s25: E=-12482.163428 fmax=0.0001 it=322 converged
+[2026-10-31T05:16:39Z] acetic_acid__n3__s31: E=-12482.173144 fmax=0.0001 it=304 converged
+[2026-10-31T05:16:39Z] acetic_acid__n3__s37: E=-12482.493139 fmax=0.0005 it=120 converged
+[2026-10-31T05:16:39Z] ethanol__n3__s03: E=-10465.741558 fmax=0.0002 it=112 converged
+[2026-10-31T05:16:39Z] lactic_acid_anion__n3__s05: E=-15586.790466 fmax=0.0014 it=130 converged
+[2026-10-31T05:16:40Z] lactic_acid_anion__n3__s11: E=-15586.935438 fmax=0.0013 it=168 converged
+[2026-10-31T05:16:40Z] lactic_acid_anion__n3__s17: E=-15586.878532 fmax=0.0001 it=118 converged
+[2026-10-31T05:16:40Z] lactic_acid_anion__n3__s23: E=-15586.570952 fmax=0.0001 it=158 converged
+[2026-10-31T05:16:40Z] lactic_acid_anion__n3__s29: E=-15586.829352 fmax=0.0097 it=212 converged
+[2026-10-31T05:16:40Z] lactic_acid_anion__n3__s35: E=-15587.053726 fmax=0.0041 it=172 converged
+[2026-10-31T05:16:40Z] lactic_acid__acetic_acid__n0__s02: E=-15595.107701 fmax=0.0001 it=154 converged
+[2026-10-31T05:16:40Z] batch 1: 16 systems, 1433 steps, 96.9s
+[2026-10-31T05:17:54Z] lactic_acid__n3__s03: E=-15600.655741 fmax=0.0004 it=231 converged
+[2026-10-31T05:17:54Z] lactic_acid__n3__s09: E=-15601.254101 fmax=0.0002 it=263 converged
+[2026-10-31T05:17:54Z] lactic_acid__n3__s15: E=-15600.921193 fmax=0.0006 it=244 converged
+[2026-10-31T05:17:54Z] lactic_acid__n3__s21: E=-15600.605600 fmax=0.0069 it=264 converged
+[2026-10-31T05:17:55Z] lactic_acid__n3__s27: E=-15600.920555 fmax=0.0002 it=254 converged
+[2026-10-31T05:17:55Z] lactic_acid__n3__s33: E=-15601.109907 fmax=0.0018 it=228 converged
+[2026-10-31T05:17:55Z] lactic_acid__n3__s39: E=-15601.104295 fmax=0.0009 it=244 converged
+[2026-10-31T05:17:55Z] glucose__n0__s03: E=-18712.068379 fmax=0.0001 it=4291783141421107201 converged
+[2026-10-31T05:17:55Z] acetic_acid_anion__n6__s05: E=-18712.704076 fmax=0.0032 it=231 converged
+[2026-10-31T05:17:55Z] acetic_acid_anion__n6__s11: E=-18712.536034 fmax=0.0097 it=259 converged
+[2026-10-31T05:17:55Z] acetic_acid_anion__n6__s17: E=-18712.417393 fmax=0.0072 it=231 converged
+[2026-10-31T05:17:55Z] acetic_acid_anion__n6__s23: E=-18712.454028 fmax=0.0015 it=288 converged
+[2026-10-31T05:17:56Z] acetic_acid_anion__n6__s29: E=-18712.401126 fmax=0.0058 it=293 converged
+[2026-10-31T05:17:56Z] acetic_acid_anion__n6__s35: E=-18712.346452 fmax=0.0012 it=244 converged
+[2026-10-31T05:17:56Z] acetic_acid__n6__s03: E=-18726.764642 fmax=0.0012 it=244 converged
+[2026-10-31T05:17:56Z] acetic_acid__n6__s09: E=-18726.713778 fmax=0.0009 it=149 converged
+[2026-10-31T05:17:56Z] batch 2: 16 systems, 1100 steps, 73.7s
+[2026-10-31T05:19:07Z] acetic_acid__n6__s15: E=-18726.476003 fmax=0.0022 it=110 converged
+[2026-10-31T05:19:08Z] acetic_acid__n6__s21: E=-18727.009259 fmax=0.0015 it=124 converged
+[2026-10-31T05:19:08Z] acetic_acid__n6__s27: E=-18726.372930 fmax=0.0038 it=132 converged
+[2026-10-31T05:19:08Z] acetic_acid__n6__s33: E=-18726.937977 fmax=0.0013 it=132 converged
+[2026-10-31T05:19:08Z] acetic_acid__n6__s39: E=-18726.972971 fmax=0.0010 it=234 converged
+[2026-10-31T05:19:08Z] acetic_acid__ethanol__n3__s05: E=-16704.581897 fmax=0.0023 it=84 converged
+[2026-10-31T05:19:08Z] lactic_acid_anion__n6__s01: E=-21831.378604 fmax=0.0017 it=124 converged
+[2026-10-31T05:19:08Z] lactic_acid_anion__n6__s07: E=-21831.092802 fmax=0.0084 it=134 converged
+[2026-10-31T05:19:08Z] lactic_acid_anion__n6__s13: E=-21831.129852 fmax=0.0045 it=244 converged
+[2026-10-31T05:19:09Z] lactic_acid_anion__n6__s19: E=-21831.423074 fmax=0.0012 it=252 converged
+[2026-10-31T05:19:09Z] lactic_acid_anion__n6__s25: E=-21831.363045 fmax=0.0043 it=128 converged
+[2026-10-31T05:19:09Z] lactic_acid_anion__n6__s31: E=-21831.405139 fmax=0.0093 it=256 converged
+[2026-10-31T05:19:09Z] lactic_acid_anion__n6__s37: E=-21831.609407 fmax=0.0006 it=282 converged
+[2026-10-31T05:19:09Z] lactic_acid__n6__s05: E=-21845.287210 fmax=0.0057 it=196 converged
+[2026-10-31T05:19:09Z] lactic_acid__n6__s11: E=-21845.660534 fmax=0.0045 it=244 converged
+[2026-10-31T05:19:09Z] lactic_acid__n6__s17: E=-21845.934808 fmax=0.0033 it=270 converged
+[2026-10-31T05:19:09Z] batch 3: 16 systems, 1106 steps, 71.3s
+Warp CUDA error 2: out of memory (in function wp_alloc_device_async, /builds/omniverse/warp/warp/native/warp.cu:814)
+[2026-10-31T05:20:33Z] batch 4 FAILED
+Traceback (most recent call last):
+  File "/home/shadeform/fermentai/remote/run_alchemi_c2.py", line 176, in mode_optimize
+    x0s, xfs, rows, steps, wall = batched_fire(bundle, items, cfg, thr, max_steps)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shadeform/fermentai/remote/run_alchemi_c2.py", line 89, in batched_fire
+    batch = opt.run(batch)
+            ^^^^^^^^^^^^^^
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemi/dynamics/base.py", line 1994, in run
+    batch, _converged = self.step(batch)
+                        ^^^^^^^^^^^^^^^^
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemi/dynamics/base.py", line 1928, in step
+    self._call_hooks(DynamicsStage.BEFORE_COMPUTE, batch)
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemi/dynamics/base.py", line 1491, in _call_hooks
+    super()._call_hooks(stage, batch)
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemi/hooks/_registry.py", line 179, in _call_hooks
+    hook(ctx, stage)
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemi/models/pipeline.py", line 169, in __call__
+    hook(ctx, stage)
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 953, in compile_wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemi/hooks/neighbor_list.py", line 214, in __call__
+    self._rebuild(ctx.batch)
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemi/hooks/neighbor_list.py", line 297, in _rebuild
+    neighbor_list(
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemiops/torch/neighbors/__init__.py", line 556, in neighbor_list
+    return batch_naive_neighbor_list(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemiops/torch/neighbors/batch_naive.py", line 1995, in batch_naive_neighbor_list
+    _batch_naive_neighbor_matrix_pbc(
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_library/custom_ops.py", line 698, in __call__
+    return self._opoverload(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_ops.py", line 819, in __call__
+    return self._op(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_library/autograd.py", line 112, in autograd_impl
+    result = forward_no_grad(*args, Metadata(keyset, keyword_only_args))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_library/autograd.py", line 41, in forward_no_grad
+    result = op.redispatch(keyset & _C._after_autograd_keyset, *args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_ops.py", line 826, in redispatch
+    return self._handle.redispatch_boxed(keyset, *args, **kwargs)  # type: ignore[return-value]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_library/custom_ops.py", line 662, in adinplaceorview_impl
+    return original_kernel.call_boxed(keyset, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_library/custom_ops.py", line 347, in backend_impl
+    result = self._backend_fns[device_type](*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_compile.py", line 54, in inner
+    return disable_fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 1181, in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_library/custom_ops.py", line 382, in wrapped_fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemiops/torch/_warp_op_helpers.py", line 119, in wrapped
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemiops/torch/neighbors/batch_naive.py", line 336, in _batch_naive_neighbor_matrix_pbc
+    batch_naive_neighbor_matrix_pbc(
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemiops/neighbors/naive/launchers.py", line 1707, in batch_naive_neighbor_matrix_pbc
+    _launch_naive_neighbor_matrix_pbc(
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemiops/neighbors/naive/launchers.py", line 538, in _launch_naive_neighbor_matrix_pbc
+    positions_work, per_atom_cell_offsets = _prepare_pbc_positions(
+                                            ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemiops/neighbors/naive/launchers.py", line 185, in _prepare_pbc_positions
+    inv_cell_buffer = wp.empty((cell.shape[0],), dtype=mat_dtype, device=device)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/warp/_src/context.py", line 10227, in empty
+    arr = warp.array(
+          ^^^^^^^^^^^
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/warp/_src/types.py", line 3433, in __init__
+    self._init_new(dtype, shape, strides, device, pinned)
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/warp/_src/types.py", line 3916, in _init_new
+    ptr = allocator.allocate(capacity)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/warp/_src/context.py", line 5383, in allocate
+    raise RuntimeError(f"Failed to allocate {size_in_bytes} bytes on device '{self.device}'")
+RuntimeError: Failed to allocate 576 bytes on device 'cuda:0'
+
+[2026-10-31T05:22:44Z] lactic_acid_anion__n10__s07: E=-30158.109509 fmax=0.0003 it=109 converged
+[2026-10-31T05:22:45Z] acetic_acid__glucose__n3__s03: E=-31195.028792 fmax=0.0095 it=223 converged
+[2026-10-31T05:22:45Z] lactic_acid__n10__s01: E=-30171.123409 fmax=0.0005 it=241 converged
+[2026-10-31T05:22:45Z] lactic_acid__n10__s07: E=-30171.131893 fmax=0.0023 it=238 converged
+[2026-10-31T05:22:45Z] water_cluster__n15__s03: E=-31221.886356 fmax=0.0035 it=241 converged
+[2026-10-31T05:22:45Z] water_cluster__n15__s09: E=-31222.068854 fmax=0.0009 it=97 converged
+[2026-10-31T05:22:45Z] lactic_acid__glucose__n3__s05: E=-34313.611207 fmax=0.0003 it=187 converged
+[2026-10-31T05:22:45Z] gln_gln__n0__s01: E=-31565.992535 fmax=0.0009 it=136 converged
+[2026-10-31T05:22:45Z] gln_gln__n0__s07: E=-31566.262067 fmax=0.0014 it=232 converged
+[2026-10-31T05:22:45Z] acetic_acid_anion__n15__s01: E=-37447.004469 fmax=0.0020 it=85 converged
+[2026-10-31T05:22:46Z] acetic_acid_anion__n15__s07: E=-37447.152894 fmax=0.0023 it=253 converged
+[2026-10-31T05:22:46Z] acetic_acid__n15__s01: E=-37460.260634 fmax=0.0003 it=241 converged
+[2026-10-31T05:22:46Z] acetic_acid__n15__s07: E=-37460.113225 fmax=0.0015 it=253 converged
+[2026-10-31T05:22:46Z] gln_gln__n3__s05: E=-37811.253727 fmax=0.0018 it=181 converged
+[2026-10-31T05:22:46Z] lactic_acid_anion__n15__s01: E=-40566.042393 fmax=0.0019 it=163 converged
+[2026-10-31T05:22:46Z] lactic_acid_anion__n15__s07: E=-40566.072489 fmax=0.0016 it=238 converged
+[2026-10-31T05:22:46Z] batch 5: 16 systems, 2027 steps, 130.9s
+[2026-10-31T05:23:40Z] lactic_acid__n15__s01: E=-40578.127839 fmax=0.0099 it=11 converged
+[2026-10-31T05:23:40Z] lactic_acid__n15__s07: E=-40579.118290 fmax=0.0036 it=11 converged
+[2026-10-31T05:23:40Z] acetic_acid__gln_gln__n3__s01: E=-44049.331064 fmax=0.0041 it=11 converged
+[2026-10-31T05:23:40Z] acetic_acid__gln_gln__n3__s07: E=-44049.291740 fmax=0.0015 it=11 converged
+[2026-10-31T05:23:40Z] lactic_acid__gln_gln__n3__s03: E=-47167.928334 fmax=0.0087 it=11 converged
+[2026-10-31T05:23:40Z] batch 6: 5 systems, 1065 steps, 53.5s
+[2026-10-31T05:23:40Z] optimize shard done: 16 failed
+[2026-10-31T05:23:40Z] total wall time 603.2s
+exit_code=1

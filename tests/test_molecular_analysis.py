@@ -186,3 +186,13 @@ def test_deprotonation_and_descriptors(fixture_dir, tmp_path):
     assert desc["acetic_acid"]["deprot_energy_n1_kcal"] == pytest.approx(0.5 * an.EV_TO_KCAL)
     assert "not a solution-phase pKa" in desc["provenance"]["note"]
     assert (out / "deprotonation_energy.png").exists() and (out / "deprotonation_energy.html").exists()
+
+
+def test_json_clean_and_dump_strict(tmp_path):
+    obj = {"a": float("nan"), "b": [np.float64("inf"), 1.5, np.int64(3)], "c": {"d": np.nan, "e": np.bool_(True)}}
+    c = an.json_clean(obj)
+    assert c == {"a": None, "b": [None, 1.5, 3], "c": {"d": None, "e": True}}
+    p = tmp_path / "x.json"
+    an.dump_json(p, obj)
+    assert "NaN" not in p.read_text() and "Infinity" not in p.read_text()
+    json.loads(p.read_text())

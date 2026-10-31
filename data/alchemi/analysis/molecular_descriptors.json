@@ -114,6 +114,133 @@
           "n_seeds": 3
         }
       }
+    },
+    "c2_assoc_energy_per_water_kcal_by_n_neutral": {
+      "1": -9.482560380107316,
+      "3": -11.07695330438825,
+      "6": -11.375365870917449,
+      "10": -11.667155289597577,
+      "15": -11.26311120953566
+    },
+    "c2_boltzmann_assoc_energy_per_water_kcal_by_n_neutral": {
+      "1": -9.720347295813554,
+      "3": -11.288631468283711,
+      "6": -11.45303794296342,
+      "10": -11.673017717240146,
+      "15": -11.260858788628441
+    },
+    "c2_assoc_energy_per_water_kcal_by_n_anion": {
+      "1": -17.406400840474817,
+      "3": -16.237571415452596,
+      "6": -14.961231265304377,
+      "10": -14.12146228167112,
+      "15": -13.304336909996346
+    },
+    "c2_boltzmann_assoc_energy_per_water_kcal_by_n_anion": {
+      "1": -17.406719574100862,
+      "3": -16.33116713022658,
+      "6": -15.030593389557907,
+      "10": -14.151642279542283,
+      "15": -13.30528218151691
+    },
+    "c2_cosolute_interaction_kcal": {
+      "ethanol": {
+        "total_kcal": -41.53673037607223,
+        "cosolute_to_hydrated_acid_kcal": -8.305870462907478,
+        "acid_to_hydrated_cosolute_kcal": -9.75413659735932,
+        "gap_to_2nd_kcal": 1.3528316922020167,
+        "best_id": "lactic_acid__ethanol__n3__s05",
+        "acid_cosolute_hbonds": [
+          {
+            "type": "acid->ethanol",
+            "donor_site": "carboxyl_OH",
+            "acceptor_site": "ethanol_O",
+            "d_HA_angstrom": 1.5788953624103719,
+            "d_DA_angstrom": 2.5853798330066793,
+            "angle_DHA_deg": 178.42298338170062
+          }
+        ]
+      },
+      "gln_gln": {
+        "total_kcal": -52.30089508389938,
+        "cosolute_to_hydrated_acid_kcal": -19.070035170647316,
+        "acid_to_hydrated_cosolute_kcal": -18.263536464161007,
+        "gap_to_2nd_kcal": 6.408179622841999,
+        "best_id": "lactic_acid__gln_gln__n3__s02",
+        "acid_cosolute_hbonds": [
+          {
+            "type": "acid->gln_gln",
+            "donor_site": "carboxyl_OH",
+            "acceptor_site": "gln_gln_O",
+            "d_HA_angstrom": 1.8277603108015281,
+            "d_DA_angstrom": 2.7522010707607114,
+            "angle_DHA_deg": 157.69832382739136
+          },
+          {
+            "type": "gln_gln->acid",
+            "donor_site": "gln_gln_O",
+            "acceptor_site": "hydroxyl_OH",
+            "d_HA_angstrom": 1.9207900817316779,
+            "d_DA_angstrom": 2.827743521660758,
+            "angle_DHA_deg": 147.22955751104874
+          }
+        ]
+      },
+      "glucose": {
+        "total_kcal": -44.350780844310066,
+        "cosolute_to_hydrated_acid_kcal": -11.119920931116212,
+        "acid_to_hydrated_cosolute_kcal": -18.25472597530461,
+        "gap_to_2nd_kcal": 1.7864275908796117,
+        "best_id": "lactic_acid__glucose__n3__s07",
+        "acid_cosolute_hbonds": [
+          {
+            "type": "acid->glucose",
+            "donor_site": "hydroxyl_OH",
+            "acceptor_site": "glucose_O",
+            "d_HA_angstrom": 1.8716971731637673,
+            "d_DA_angstrom": 2.7957520942545067,
+            "angle_DHA_deg": 157.66359182928912
+          }
+        ]
+      }
+    },
+    "c2_md_long": {
+      "lactic_acid__295.15K": {
+        "mean_acid_water_hbonds": 3.9781666666666666,
+        "mean_continuous_lifetime_ps": 0.3409857142857143,
+        "intermittent_tau_ps": 3.601298686495194,
+        "water_exchange_events_per_ps": 6.433333333333333,
+        "proton_state_changes": 0,
+        "replicas": 3,
+        "length_ps": 20.0
+      },
+      "lactic_acid__310.15K": {
+        "mean_acid_water_hbonds": 3.2588333333333335,
+        "mean_continuous_lifetime_ps": 0.3359621993127148,
+        "intermittent_tau_ps": 3.229658094870337,
+        "water_exchange_events_per_ps": 6.233333333333333,
+        "proton_state_changes": 0,
+        "replicas": 3,
+        "length_ps": 20.0
+      },
+      "lactic_acid_anion__295.15K": {
+        "mean_acid_water_hbonds": 3.9758333333333336,
+        "mean_continuous_lifetime_ps": 0.3715732087227414,
+        "intermittent_tau_ps": 2.8782652089525773,
+        "water_exchange_events_per_ps": 4.066666666666666,
+        "proton_state_changes": 0,
+        "replicas": 3,
+        "length_ps": 20.0
+      },
+      "lactic_acid_anion__310.15K": {
+        "mean_acid_water_hbonds": 3.9465000000000003,
+        "mean_continuous_lifetime_ps": 0.35931714719271624,
+        "intermittent_tau_ps": 3.2255866154246506,
+        "water_exchange_events_per_ps": 4.033333333333333,
+        "proton_state_changes": 0,
+        "replicas": 3,
+        "length_ps": 20.0
+      }
     }
   },
   "acetic_acid": {
@@ -231,6 +358,133 @@
           "n_seeds": 3
         }
       }
+    },
+    "c2_assoc_energy_per_water_kcal_by_n_neutral": {
+      "1": -10.290420197889034,
+      "3": -11.02940052272364,
+      "6": -11.838372824451653,
+      "10": -11.08954719164758,
+      "15": -10.844455241730126
+    },
+    "c2_boltzmann_assoc_energy_per_water_kcal_by_n_neutral": {
+      "1": -10.345647318732517,
+      "3": -11.177749716424538,
+      "6": -11.752022325051561,
+      "10": -11.089068219537149,
+      "15": -10.809750313746433
+    },
+    "c2_assoc_energy_per_water_kcal_by_n_anion": {
+      "1": -20.48144757105183,
+      "3": -18.23535309327417,
+      "6": -16.199500513301853,
+      "10": -14.50006094776909,
+      "15": -14.055814912496135
+    },
+    "c2_boltzmann_assoc_energy_per_water_kcal_by_n_anion": {
+      "1": -20.871603560670337,
+      "3": -18.39260550608742,
+      "6": -16.23192857862644,
+      "10": -14.502700027701213,
+      "15": -14.055818873705963
+    },
+    "c2_cosolute_interaction_kcal": {
+      "ethanol": {
+        "total_kcal": -42.20634204952512,
+        "cosolute_to_hydrated_acid_kcal": -9.118140481354203,
+        "acid_to_hydrated_cosolute_kcal": -10.423748270812212,
+        "gap_to_2nd_kcal": 1.7238201792351902,
+        "best_id": "acetic_acid__ethanol__n3__s05",
+        "acid_cosolute_hbonds": [
+          {
+            "type": "ethanol->acid",
+            "donor_site": "ethanol_O",
+            "acceptor_site": "carbonyl_O",
+            "d_HA_angstrom": 1.7908262582860885,
+            "d_DA_angstrom": 2.7428874686847755,
+            "angle_DHA_deg": 165.58912044455357
+          }
+        ]
+      },
+      "gln_gln": {
+        "total_kcal": -48.85313447887893,
+        "cosolute_to_hydrated_acid_kcal": -15.764932910678908,
+        "acid_to_hydrated_cosolute_kcal": -14.815775859140558,
+        "gap_to_2nd_kcal": 10.718086586333811,
+        "best_id": "acetic_acid__gln_gln__n3__s05",
+        "acid_cosolute_hbonds": [
+          {
+            "type": "acid->gln_gln",
+            "donor_site": "carboxyl_OH",
+            "acceptor_site": "gln_gln_O",
+            "d_HA_angstrom": 1.6806762450004022,
+            "d_DA_angstrom": 2.658128454710815,
+            "angle_DHA_deg": 169.69032350892704
+          },
+          {
+            "type": "gln_gln->acid",
+            "donor_site": "gln_gln_O",
+            "acceptor_site": "carbonyl_O",
+            "d_HA_angstrom": 2.1256397362224924,
+            "d_DA_angstrom": 3.1225299178394548,
+            "angle_DHA_deg": 169.29800363116004
+          }
+        ]
+      },
+      "glucose": {
+        "total_kcal": -43.85560855976655,
+        "cosolute_to_hydrated_acid_kcal": -10.767406991566531,
+        "acid_to_hydrated_cosolute_kcal": -17.759553690761095,
+        "gap_to_2nd_kcal": 5.6575807011686265,
+        "best_id": "acetic_acid__glucose__n3__s07",
+        "acid_cosolute_hbonds": [
+          {
+            "type": "acid->glucose",
+            "donor_site": "carboxyl_OH",
+            "acceptor_site": "glucose_O",
+            "d_HA_angstrom": 1.6814704195472054,
+            "d_DA_angstrom": 2.6624779897175985,
+            "angle_DHA_deg": 169.4430586833691
+          }
+        ]
+      }
+    },
+    "c2_md_long": {
+      "acetic_acid__295.15K": {
+        "mean_acid_water_hbonds": 2.3339999999999996,
+        "mean_continuous_lifetime_ps": 0.6279820627802691,
+        "intermittent_tau_ps": 3.8822963097306213,
+        "water_exchange_events_per_ps": 3.7166666666666663,
+        "proton_state_changes": 0,
+        "replicas": 3,
+        "length_ps": 20.0
+      },
+      "acetic_acid__310.15K": {
+        "mean_acid_water_hbonds": 2.4306666666666668,
+        "mean_continuous_lifetime_ps": 0.43927710843373485,
+        "intermittent_tau_ps": 3.482611155809445,
+        "water_exchange_events_per_ps": 5.616666666666666,
+        "proton_state_changes": 0,
+        "replicas": 3,
+        "length_ps": 20.0
+      },
+      "acetic_acid_anion__295.15K": {
+        "mean_acid_water_hbonds": 3.7693333333333334,
+        "mean_continuous_lifetime_ps": 0.3933217391304348,
+        "intermittent_tau_ps": 3.4240794550629157,
+        "water_exchange_events_per_ps": 2.95,
+        "proton_state_changes": 0,
+        "replicas": 3,
+        "length_ps": 20.0
+      },
+      "acetic_acid_anion__310.15K": {
+        "mean_acid_water_hbonds": 3.6635000000000004,
+        "mean_continuous_lifetime_ps": 0.41085981308411207,
+        "intermittent_tau_ps": 3.248404463796105,
+        "water_exchange_events_per_ps": 3.15,
+        "proton_state_changes": 0,
+        "replicas": 3,
+        "length_ps": 20.0
+      }
     }
   },
   "lactic_minus_acetic": {
@@ -285,6 +539,139 @@
       "max_abs_delta_energy_ev": 0.005875076116353739,
       "mean_abs_delta_energy_ev": 0.0010959692859935058,
       "max_abs_force_diff_ev_per_angstrom": 0.0014574527740478516
+    },
+    "campaign2": {
+      "sources": [
+        "data/alchemi/results_c2/json/",
+        "data/alchemi/vib_c2/",
+        "data/alchemi/md_long/"
+      ],
+      "definitions": {
+        "relative_pka_estimate": "see relative_pka_estimate.method; value = lactic - acetic pKa units",
+        "c2_assoc_energy_per_water_kcal_by_n_*": "lowest pooled minimum (campaign 1 + 2), per water",
+        "c2_boltzmann_assoc_energy_per_water_kcal_by_n_*": "Boltzmann conformational free energy (298 K) of the pooled unique minima, per water",
+        "c2_cosolute_interaction_kcal": "total = E(acid.X.3W) - E(acid) - E(X) - 3E(W); cosolute_to_hydrated_acid = E(acid.X.3W) - E(acid.3W) - E(X); acid_to_hydrated_cosolute = E(acid.X.3W) - E(X.3W) - E(acid); Gln-Gln = Ac-Gln-Gln-NHMe proxy for gluten amide contacts (hypothesis-level)",
+        "c2_md_long": "20 ps NVT Langevin x 3 replicas; geometric acid(anion)-water H-bonds; continuous lifetimes and Luzar-Chandler intermittent tau; exchange events of first-shell waters per ps"
+      },
+      "note": "existing campaign-1 keys are unchanged; campaign-2 values are under new keys"
     }
-  }
+  },
+  "relative_pka_estimate": {
+    "value": -3.885729964356191,
+    "uncertainty": 1.7285352227747122,
+    "units": "pKa units (lactic - acetic)",
+    "ddG_kcal": -5.301093740330543,
+    "ddG_uncertainty_kcal": 2.3581482330077677,
+    "experiment": -0.8999999999999999,
+    "experiment_pka": {
+      "lactic_acid": 3.86,
+      "acetic_acid": 4.76
+    },
+    "experiment_ddG_kcal": -1.2278219047802441,
+    "deviation_from_experiment": -2.985729964356191,
+    "per_n": {
+      "6": {
+        "ddG_qh_kcal": -6.3467837574426085,
+        "dpKa": -4.652226320005832,
+        "ddG_qh_lowest_kcal": -6.6313937122467905,
+        "sampling_sd_kcal": 2.106599988526782
+      },
+      "10": {
+        "ddG_qh_kcal": -4.255403723218478,
+        "dpKa": -3.119233608706549,
+        "ddG_qh_lowest_kcal": -4.195734923006967,
+        "sampling_sd_kcal": 1.8397344459875857
+      }
+    },
+    "uncertainty_components_kcal": {
+      "conformer_sampling_bootstrap_sd": 2.106599988526782,
+      "half_range_over_n": 1.045690017112065,
+      "lowest_vs_boltzmann_choice": 0.1721393775078468
+    },
+    "method": "cluster-phase thermodynamic cycle HA.nW + A'-.nW -> A-.nW + HA'.nW with AIMNet2 (ALCHEMI) electronic energies + quasi-harmonic (100 cm-1) ideal-gas G corrections at 298.15 K; Boltzmann average over vibrationally characterised minima; dpKa = ddG / (RT ln 10)",
+    "note": "cluster-phase relative estimate with 6-15 explicit waters and no bulk continuum; not an absolute pKa and not a solution-phase prediction"
+  },
+  "acid_pairs": {
+    "acetic_dimer_kcal": -15.264069121098146,
+    "acetic_dimer_literature_kcal": [
+      -16.0,
+      -14.0
+    ],
+    "lactic_acetic_dimer_kcal": -14.950308919709641,
+    "mixed_cluster_total_kcal": -76.07488757319516,
+    "mixed_cluster_pairing_kcal": 17.72312877245713,
+    "mixed_cluster_pairing_definition": "E(L.A.6W) + E((H2O)6) - E(L.6W) - E(A.6W)",
+    "acetic_acid_acetic_acid_best_id": "acetic_acid__acetic_acid__n0__cyc",
+    "acetic_acid_acetic_acid_hbonds": [
+      {
+        "donor_site": "carboxyl_OH",
+        "acceptor_site": "carbonyl_O",
+        "d_HA_angstrom": 1.6866529435790778,
+        "d_DA_angstrom": 2.6758121384992566
+      },
+      {
+        "donor_site": "carboxyl_OH",
+        "acceptor_site": "carbonyl_O",
+        "d_HA_angstrom": 1.6866519840278449,
+        "d_DA_angstrom": 2.6758105453770624
+      }
+    ],
+    "lactic_acid_acetic_acid_best_id": "lactic_acid__acetic_acid__n0__s00",
+    "lactic_acid_acetic_acid_hbonds": [
+      {
+        "donor_site": "carboxyl_OH",
+        "acceptor_site": "carbonyl_O",
+        "d_HA_angstrom": 1.6611757809405716,
+        "d_DA_angstrom": 2.6530438749877607
+      },
+      {
+        "donor_site": "carboxyl_OH",
+        "acceptor_site": "carbonyl_O",
+        "d_HA_angstrom": 1.7114562649928888,
+        "d_DA_angstrom": 2.6961580128597826
+      }
+    ]
+  },
+  "lactic_minus_acetic_c2_by_n": [
+    {
+      "n_water": 1,
+      "d_assoc_per_water_neutral_kcal": 0.8078598177817184,
+      "d_assoc_per_water_anion_kcal": 3.0750467305770144,
+      "ddE_deprot_kcal": -11.34871402621502,
+      "ddE_deprot_sd_kcal": 1.363090526134664,
+      "ddF_deprot_boltzmann_kcal": -11.263068087486317
+    },
+    {
+      "n_water": 3,
+      "d_assoc_per_water_neutral_kcal": -0.04755278166460997,
+      "d_assoc_per_water_anion_kcal": 1.9977816778215747,
+      "ddE_deprot_kcal": -7.479897560551763,
+      "ddE_deprot_sd_kcal": 0.6771700828290563,
+      "ddF_deprot_boltzmann_kcal": -7.585691667976789
+    },
+    {
+      "n_water": 6,
+      "d_assoc_per_water_neutral_kcal": 0.4630069535342045,
+      "d_assoc_per_water_anion_kcal": 1.2382692479974757,
+      "ddE_deprot_kcal": -8.9643271722598,
+      "ddE_deprot_sd_kcal": 2.106599988526782,
+      "ddF_deprot_boltzmann_kcal": -8.688547209254466
+    },
+    {
+      "n_water": 10,
+      "d_assoc_per_water_neutral_kcal": -0.577608097949998,
+      "d_assoc_per_water_anion_kcal": 0.3785986660979699,
+      "ddE_deprot_kcal": -4.053833298501559,
+      "ddE_deprot_sd_kcal": 1.8397344459875857,
+      "ddF_deprot_boltzmann_kcal": -4.752579592517577
+    },
+    {
+      "n_water": 15,
+      "d_assoc_per_water_neutral_kcal": -0.4186559678055346,
+      "d_assoc_per_water_anion_kcal": 0.7514780024997894,
+      "ddE_deprot_kcal": 3.9361086155986413,
+      "ddE_deprot_sd_kcal": 6.97287506623632,
+      "ddF_deprot_boltzmann_kcal": 3.9220254549290985
+    }
+  ]
 }

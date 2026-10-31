@@ -1,0 +1,71 @@
+[2026-10-31T12:34:20Z] c2 mode=anneal versions={"python": "3.12.16", "platform": "Linux-6.8.0-90-generic-x86_64-with-glibc2.35", "nvalchemi-toolkit": "0.2.0", "nvalchemi-toolkit-ops": "0.5.0", "aimnet": "0.2.5", "torch": "2.10.0", "warp-lang": "1.18.0+cu12", "ase": "3.29.0", "nvidia-physicsnemo": "2.2.2", "numpy": "2.2.6", "torch_cuda": "12.8", "cudnn": 91002, "gpu": "NVIDIA RTX A6000", "gpu_capability": "8.6", "gpu_memory_gb": 50.91}
+Warp 1.18.0 initialized:
+   CUDA Toolkit 12.9, Driver 12.8
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA RTX A6000" (47 GiB, sm_86, mempool enabled)
+   Kernel cache:
+     /home/shadeform/.cache/warp/1.18.0
+/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemi/models/aimnet2.py:353: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  values = [float(v) for v in (rc_s, rc_v) if v is not None]
+[2026-10-31T12:34:38Z] AIMNet2 'aimnet2_wb97m_d3_3' loaded on cuda:0 in 14.8s; D3(BJ) params used: {'s6': 1.0, 'a1': 0.566, 's8': 0.3908, 'a2': 3.128}
+[2026-10-31T12:39:28Z] anneal acetic_acid_anion__n6: 5 systems x 10000 steps at 400.0 K, 5 snapshots, 288.7s
+W1031 12:39:46.303000 65866 torch/_dynamo/convert_frame.py:1676] [5/8] torch._dynamo hit config.recompile_limit (8)
+W1031 12:39:46.303000 65866 torch/_dynamo/convert_frame.py:1676] [5/8]    function: 'neighbor_list' (/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemiops/torch/neighbors/__init__.py:102)
+W1031 12:39:46.303000 65866 torch/_dynamo/convert_frame.py:1676] [5/8]    last reason: 5/7: ___as_tensor(cutoff).item() == 73.58169555664062  # (unknown source ___as_tensor(cutoff).item(), please file a bug)
+W1031 12:39:46.303000 65866 torch/_dynamo/convert_frame.py:1676] [5/8] To log all recompilation reasons, use TORCH_LOGS="recompiles".
+W1031 12:39:46.303000 65866 torch/_dynamo/convert_frame.py:1676] [5/8] To diagnose recompilation issues, see https://pytorch.org/docs/main/compile/programming_model.recompilation.html
+[2026-10-31T12:39:46Z]   acetic_acid_anion__n6__c4__aq0: E=-18712.957956 it=109 converged
+[2026-10-31T12:39:46Z]   acetic_acid_anion__n6__s04__aq0: E=-18712.896271 it=146 converged
+[2026-10-31T12:39:46Z]   acetic_acid_anion__n6__s01__aq0: E=-18712.892029 it=120 converged
+[2026-10-31T12:39:46Z]   acetic_acid_anion__n6__s39__aq0: E=-18712.855917 it=115 converged
+[2026-10-31T12:39:46Z]   acetic_acid_anion__n6__s20__aq0: E=-18712.841514 it=109 converged
+[2026-10-31T12:39:46Z]   acetic_acid_anion__n6__c4__aq1: E=-18712.963601 it=176 converged
+[2026-10-31T12:39:46Z]   acetic_acid_anion__n6__s04__aq1: E=-18712.864200 it=166 converged
+[2026-10-31T12:39:46Z]   acetic_acid_anion__n6__s01__aq1: E=-18712.992996 it=176 converged
+[2026-10-31T12:39:46Z]   acetic_acid_anion__n6__s39__aq1: E=-18712.816843 it=181 converged
+[2026-10-31T12:39:46Z]   acetic_acid_anion__n6__s20__aq1: E=-18712.617997 it=178 converged
+[2026-10-31T12:39:46Z]   acetic_acid_anion__n6__c4__aq2: E=-18713.011377 it=148 converged
+[2026-10-31T12:39:47Z]   acetic_acid_anion__n6__s04__aq2: E=-18712.634262 it=176 converged
+[2026-10-31T12:39:47Z]   acetic_acid_anion__n6__s01__aq2: E=-18713.052729 it=176 converged
+[2026-10-31T12:39:47Z]   acetic_acid_anion__n6__s39__aq2: E=-18712.892460 it=166 converged
+[2026-10-31T12:39:47Z]   acetic_acid_anion__n6__s20__aq2: E=-18712.656785 it=148 converged
+[2026-10-31T12:39:47Z]   acetic_acid_anion__n6__c4__aq3: E=-18712.854620 it=166 converged
+[2026-10-31T12:40:01Z]   acetic_acid_anion__n6__s04__aq3: E=-18712.545062 it=387 converged
+[2026-10-31T12:40:01Z]   acetic_acid_anion__n6__s01__aq3: E=-18712.955584 it=380 converged
+[2026-10-31T12:40:01Z]   acetic_acid_anion__n6__s39__aq3: E=-18712.958947 it=240 converged
+[2026-10-31T12:40:01Z]   acetic_acid_anion__n6__s20__aq3: E=-18712.619915 it=351 converged
+[2026-10-31T12:40:01Z]   acetic_acid_anion__n6__c4__aq4: E=-18712.743500 it=392 converged
+[2026-10-31T12:40:01Z]   acetic_acid_anion__n6__s04__aq4: E=-18712.724601 it=456 converged
+[2026-10-31T12:40:01Z]   acetic_acid_anion__n6__s01__aq4: E=-18712.906220 it=269 converged
+[2026-10-31T12:40:01Z]   acetic_acid_anion__n6__s39__aq4: E=-18712.724474 it=316 converged
+[2026-10-31T12:40:02Z]   acetic_acid_anion__n6__s20__aq4: E=-18712.815863 it=309 converged
+[2026-10-31T12:44:39Z] anneal lactic_acid_anion__n6: 5 systems x 10000 steps at 400.0 K, 5 snapshots, 277.8s
+[2026-10-31T12:44:58Z]   lactic_acid_anion__n6__s35__aq0: E=-21832.005389 it=116 converged
+[2026-10-31T12:44:58Z]   lactic_acid_anion__n6__s04__aq0: E=-21831.890452 it=124 converged
+[2026-10-31T12:44:59Z]   lactic_acid_anion__n6__s29__aq0: E=-21831.885118 it=115 converged
+[2026-10-31T12:44:59Z]   lactic_acid_anion__n6__s20__aq0: E=-21831.816302 it=117 converged
+[2026-10-31T12:44:59Z]   lactic_acid_anion__n6__s21__aq0: E=-21831.759938 it=113 converged
+[2026-10-31T12:44:59Z]   lactic_acid_anion__n6__s35__aq1: E=-21832.005080 it=457 converged
+[2026-10-31T12:44:59Z]   lactic_acid_anion__n6__s04__aq1: E=-21831.821910 it=511 converged
+[2026-10-31T12:44:59Z]   lactic_acid_anion__n6__s29__aq1: E=-21831.741474 it=270 converged
+[2026-10-31T12:44:59Z]   lactic_acid_anion__n6__s20__aq1: E=-21831.823620 it=425 converged
+[2026-10-31T12:44:59Z]   lactic_acid_anion__n6__s21__aq1: E=-21831.853372 it=303 converged
+[2026-10-31T12:44:59Z]   lactic_acid_anion__n6__s35__aq2: E=-21831.537022 it=555 converged
+[2026-10-31T12:44:59Z]   lactic_acid_anion__n6__s04__aq2: E=-21831.755839 it=227 converged
+[2026-10-31T12:44:59Z]   lactic_acid_anion__n6__s29__aq2: E=-21831.781450 it=439 converged
+[2026-10-31T12:44:59Z]   lactic_acid_anion__n6__s20__aq2: E=-21831.935026 it=326 converged
+[2026-10-31T12:44:59Z]   lactic_acid_anion__n6__s21__aq2: E=-21831.656083 it=305 converged
+[2026-10-31T12:44:59Z]   lactic_acid_anion__n6__s35__aq3: E=-21831.602443 it=253 converged
+[2026-10-31T12:45:16Z]   lactic_acid_anion__n6__s04__aq3: E=-21831.735056 it=549 converged
+[2026-10-31T12:45:16Z]   lactic_acid_anion__n6__s29__aq3: E=-21831.517320 it=478 converged
+[2026-10-31T12:45:16Z]   lactic_acid_anion__n6__s20__aq3: E=-21831.912958 it=497 converged
+[2026-10-31T12:45:16Z]   lactic_acid_anion__n6__s21__aq3: E=-21831.549557 it=294 converged
+[2026-10-31T12:45:16Z]   lactic_acid_anion__n6__s35__aq4: E=-21831.506176 it=338 converged
+[2026-10-31T12:45:16Z]   lactic_acid_anion__n6__s04__aq4: E=-21831.682756 it=208 converged
+[2026-10-31T12:45:16Z]   lactic_acid_anion__n6__s29__aq4: E=-21831.840619 it=373 converged
+[2026-10-31T12:45:17Z]   lactic_acid_anion__n6__s20__aq4: E=-21831.927949 it=379 converged
+[2026-10-31T12:45:17Z]   lactic_acid_anion__n6__s21__aq4: E=-21831.826758 it=315 converged
+[2026-10-31T12:45:17Z] total wall time 656.7s
+exit_code=0

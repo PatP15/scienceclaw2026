@@ -1,0 +1,157 @@
+{
+ "id": "hydronium__n0__s00",
+ "kind": "hydronium",
+ "acid": null,
+ "n_water": 0,
+ "conformer_index": 0,
+ "seeds": {
+  "base_seed": 20261101
+ },
+ "charge": 1,
+ "multiplicity": 1,
+ "formula": "H3O",
+ "fragments": [
+  {
+   "name": "hydronium",
+   "smiles": "[OH3+]",
+   "start": 0,
+   "stop": 4
+  }
+ ],
+ "n_atoms": 4,
+ "input_sha256": "289e5276387b1f8a60f40bed48e2d7a6c5da4ce364b3c4410c22d617c468f364",
+ "input_meta": {
+  "campaign": 2,
+  "species": "H3O(+)"
+ },
+ "provenance": "real: ALCHEMI/AIMNet2 on NVIDIA RTX A6000",
+ "method": {
+  "engine": "nvalchemi-toolkit",
+  "optimizer": "FIRE2 (batched)",
+  "model": "PipelineModelWrapper[[AIMNet2Wrapper+EwaldModelWrapper](autograd)+[DFTD3ModelWrapper]]",
+  "checkpoint": "aimnet2_wb97m_d3_3",
+  "d3_bj": {
+   "s6": 1.0,
+   "a1": 0.566,
+   "s8": 0.3908,
+   "a2": 3.128
+  },
+  "box_size_angstrom": 60.0,
+  "ewald_accuracy": 1e-06,
+  "fmax_threshold_ev_per_angstrom": 0.01,
+  "max_steps": 4000,
+  "fire2_dt": 0.01
+ },
+ "versions": {
+  "python": "3.12.16",
+  "platform": "Linux-6.8.0-90-generic-x86_64-with-glibc2.35",
+  "nvalchemi-toolkit": "0.2.0",
+  "nvalchemi-toolkit-ops": "0.5.0",
+  "aimnet": "0.2.5",
+  "torch": "2.10.0",
+  "warp-lang": "1.18.0+cu12",
+  "ase": "3.29.0",
+  "nvidia-physicsnemo": "2.2.2",
+  "numpy": "2.2.6",
+  "torch_cuda": "12.8",
+  "cudnn": 91002,
+  "gpu": "NVIDIA RTX A6000",
+  "gpu_capability": "8.6",
+  "gpu_memory_gb": 50.91
+ },
+ "campaign": 2,
+ "batch_size": 16,
+ "started_at_utc": "2026-10-31T05:14:19Z",
+ "status": "converged",
+ "converged": true,
+ "iterations": 110,
+ "batch_steps": 528,
+ "wall_seconds_batch": 45.24478530883789,
+ "energy_periodic_raw_ev": -2088.8418323672354,
+ "makov_payne_monopole_ev": -0.3404672463297083,
+ "energy_ev": -2088.5013651209056,
+ "energy_hartree": -76.75100953112342,
+ "energy_definition": "gas-phase = periodic Ewald energy - Makov-Payne monopole (0 for neutral)",
+ "max_force_ev_per_angstrom": 3.345970914439526e-05,
+ "charges_e": [
+  -0.35253217816352844,
+  0.4508439898490906,
+  0.4508441090583801,
+  0.4508441090583801
+ ],
+ "forces_ev_per_angstrom": [
+  [
+   3.6620045307245164e-07,
+   -2.833771941368468e-05,
+   -1.7787402612157166e-05
+  ],
+  [
+   -5.812094805435208e-09,
+   2.946017775684595e-05,
+   -1.1910742614418268e-08
+  ],
+  [
+   -4.14741225540638e-06,
+   -5.88421244174242e-07,
+   9.017534466693178e-06
+  ],
+  [
+   3.825407475233078e-06,
+   -7.498310878872871e-07,
+   8.7817752500996e-06
+  ]
+ ],
+ "symbols": [
+  "O",
+  "H",
+  "H",
+  "H"
+ ],
+ "initial_positions_angstrom": [
+  [
+   30.0,
+   30.0,
+   30.262500762939453
+  ],
+  [
+   30.0,
+   30.940000534057617,
+   29.912500381469727
+  ],
+  [
+   30.809999465942383,
+   29.530000686645508,
+   29.912500381469727
+  ],
+  [
+   29.190000534057617,
+   29.530000686645508,
+   29.912500381469727
+  ]
+ ],
+ "optimized_positions_angstrom": [
+  [
+   30.0,
+   29.99998664855957,
+   30.215909957885742
+  ],
+  [
+   30.0,
+   30.932714462280273,
+   29.928075790405273
+  ],
+  [
+   30.807754516601562,
+   29.53364372253418,
+   29.928007125854492
+  ],
+  [
+   29.192245483398438,
+   29.53364372253418,
+   29.928007125854492
+  ]
+ ],
+ "initial_energy_ev": -2088.7958984375,
+ "min_interatomic_distance_final_angstrom": 0.9761299516239511,
+ "finished_at_utc": "2026-10-31T05:14:24Z"
+}

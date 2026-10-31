@@ -1,6 +1,6 @@
 # ALCHEMI environment report
 
-Generated 2026-10-31T04:45:01Z by `fermentai.molecular.alchemi_runner report`.
+Generated 2026-10-31T13:50:20Z by `fermentai.molecular.alchemi_runner report`.
 Provenance of all numbers below: **real** (read from files produced on the Brev GPU instance).
 
 ## Hardware / instance
@@ -29,11 +29,16 @@ Provenance of all numbers below: **real** (read from files produced on the Brev 
 ## Runtime and cost
 - Instance created 2026-10-31T03:36:39Z; stopped/deleted 2026-10-31T04:44:50Z
 - Elapsed instance time 1.14 h × $0.60/h ≈ **$0.68** (estimate; Brev's invoice is authoritative)
+- Campaign 2 (instance vjdcojwux; STILL RUNNING at report time - SSH gateway unreachable since ~13:20Z; delete pending human decision; see environment/c2_release_note.md): instance created 2026-10-31T04:59:48Z; deleted (still running at report time); 8.84 h × $0.60/h ≈ $5.31
+- **Total across sessions: 9.98 h ≈ $5.99**
+- Campaign 2: 907 optimisations (907 converged), 79 vibrational analyses, 8 long-MD runs
 - Sum of per-structure optimisation wall time: 21.5 min; MD wall time: 154.3 min
 - Calculations: 159 optimisations (159 converged, 0 failed), 72 MD runs (72 completed)
 
 ## Notes
 - PyPI `warp-lang` ≥1.10 is built with CUDA 13 and needs an R580+ driver. On this instance (driver 570.195.03, CUDA 12.8) the first run of example 08 failed with `ValueError: Invalid device identifier: cuda:0` (log preserved: `official_example/08_aimnet2_ewald_pipeline__attempt1_FAILED_warp_cu13_driver12.8.log`). Fixed per Warp's install guide by installing the `+cu12` wheel from GitHub Releases (automated in `remote/setup_env.sh`).
-- hyperstack_A6000 has no stop support ('instance "fermentai-gpu" does not support stop'); after verifying (rsync dry-run: 0 differences) that all results were on the Mac, the instance was DELETED at 2026-10-31T04:44:01Z (gone at 04:44:50Z). A re-run needs a fresh create + scripts/setup_brev.sh (~10 min incl. boot).
-- Concurrency: up to 9 runner processes shared the GPU; per-structure wall times in results/json include that contention.
-- Bug found and fixed during the run: v1 ion-pair builder placed the transferred proton on top of existing H in 7/53 inputs; those results are archived in data/alchemi/superseded/ionpair_v1/ and are not used.
+- hyperstack_A6000 has no stop support; campaign-1 instance deleted 04:44:01Z after an rsync dry-run with 0 differences.
+- Campaign 2: ~7 h of the billed time (about 05:50Z to 12:33Z) were idle while the operator session was paused by a usage limit.
+- Campaign 2: GPU out-of-memory event at 05:20Z with 14 concurrent processes; affected jobs re-run (logs/failed/c2_oom_*).
+- Campaign 2 relative pKa (lactic - acetic): -3.89 +- 1.73 (cluster-phase, n=6 and 10) vs experiment -0.90; acetic acid cyclic dimer -15.26 kcal/mol vs literature -14 to -16.
+- Bug found and fixed during campaign 1: v1 ion-pair builder placed the transferred proton on top of existing H in 7/53 inputs; those results are archived in data/alchemi/superseded/ionpair_v1/ and are not used.

@@ -1,4 +1,4 @@
 You have 1 instances in Org ppuma-f24f6a-4ukc
- NAME           STATUS   BUILD      SHELL  ID         MACHINE           GPU 
- fermentai-gpu  RUNNING  COMPLETED  READY  og64kprp7  hyperstack_A6000  -   
+ NAME           STATUS   BUILD      SHELL  ID         MACHINE           GPU   
+ fermentai-gpu  RUNNING  COMPLETED  READY  vjdcojwux  hyperstack_A6000  A6000 
 

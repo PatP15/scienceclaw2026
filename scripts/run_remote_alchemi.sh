@@ -18,24 +18,32 @@ rsync_to() { rsync -az -e "ssh ${SSH_OPTS[*]}" "$@"; }
 # --- end shared settings ---
 MODE="${1:?usage: run_remote_alchemi.sh <example|selftest|optimize|md> [args]}"; shift || true
 EXTRA="$*"
+RUNNER="${RUNNER:-run_alchemi.py}"        # campaign 2: RUNNER=run_alchemi_c2.py
+LABEL="${LABEL:-}"                        # optional log-name suffix for parallel shards
 [ -f "$ALCHEMI_DIR/inputs/manifest.json" ] || { echo "missing inputs; run structures.py first" >&2; exit 2; }
 
 rssh "mkdir -p $REMOTE_ROOT/remote $REMOTE_ROOT/configs $REMOTE_ROOT/inputs $REMOTE_ROOT/results/logs"
 rsync_to --delete "$REPO_ROOT/remote/" "$BREV_INSTANCE:$REMOTE_ROOT/remote/"
 rsync_to "$REPO_ROOT/configs/molecular.yaml" "$BREV_INSTANCE:$REMOTE_ROOT/configs/molecular.yaml"
 rsync_to --delete "$ALCHEMI_DIR/inputs/" "$BREV_INSTANCE:$REMOTE_ROOT/inputs/"
+if [ -d "$ALCHEMI_DIR/inputs_c2" ]; then
+  rsync_to "$ALCHEMI_DIR/inputs_c2/" "$BREV_INSTANCE:$REMOTE_ROOT/inputs_c2/"
+fi
+if [ -d "$ALCHEMI_DIR/c2_jobs" ]; then
+  rsync_to "$ALCHEMI_DIR/c2_jobs/" "$BREV_INSTANCE:$REMOTE_ROOT/c2_jobs/"
+fi
 
 STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
-LOG="results/logs/${MODE}_${STAMP}.log"
+LOG="results/logs/${MODE}${LABEL:+_$LABEL}_${STAMP}.log"
 echo "launching $MODE on $BREV_INSTANCE, log $LOG"
-rssh "cd $REMOTE_ROOT; nohup bash -c 'source .venv/bin/activate && python -u remote/run_alchemi.py $MODE $EXTRA; echo \"exit_code=\$?\"' > $LOG 2>&1 < /dev/null & echo \$! > results/logs/${MODE}_${STAMP}.pid"
+rssh "cd $REMOTE_ROOT; nohup bash -c 'source .venv/bin/activate && python -u remote/$RUNNER $MODE $EXTRA; echo \"exit_code=\$?\"' > $LOG 2>&1 < /dev/null & echo \$! > results/logs/${MODE}${LABEL:+_$LABEL}_${STAMP}.pid"
 
 # Wait (poll every 30 s) and pull partial results incrementally.
-while rssh "kill -0 \$(cat $REMOTE_ROOT/results/logs/${MODE}_${STAMP}.pid) 2>/dev/null"; do
+while rssh "kill -0 \$(cat $REMOTE_ROOT/results/logs/${MODE}${LABEL:+_$LABEL}_${STAMP}.pid) 2>/dev/null"; do
   sleep 30
   rssh "tail -n 2 $REMOTE_ROOT/$LOG" || true
   "$(dirname "$0")/collect_brev_results.sh" >/dev/null || true
 done
 "$(dirname "$0")/collect_brev_results.sh"
-tail -n 5 "$ALCHEMI_DIR/logs/${MODE}_${STAMP}.log"
-grep -q '^exit_code=0$' "$ALCHEMI_DIR/logs/${MODE}_${STAMP}.log"
+tail -n 5 "$ALCHEMI_DIR/logs/${MODE}${LABEL:+_$LABEL}_${STAMP}.log"
+grep -q '^exit_code=0$' "$ALCHEMI_DIR/logs/${MODE}${LABEL:+_$LABEL}_${STAMP}.log"

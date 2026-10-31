@@ -1,0 +1,106 @@
+{
+ "id": "water__n1__s00",
+ "started_at_utc": "2026-10-31T05:11:57Z",
+ "versions": {
+  "python": "3.12.16",
+  "platform": "Linux-6.8.0-90-generic-x86_64-with-glibc2.35",
+  "nvalchemi-toolkit": "0.2.0",
+  "nvalchemi-toolkit-ops": "0.5.0",
+  "aimnet": "0.2.5",
+  "torch": "2.10.0",
+  "warp-lang": "1.18.0+cu12",
+  "ase": "3.29.0",
+  "nvidia-physicsnemo": "2.2.2",
+  "numpy": "2.2.6",
+  "torch_cuda": "12.8",
+  "cudnn": 91002,
+  "gpu": "NVIDIA RTX A6000",
+  "gpu_capability": "8.6",
+  "gpu_memory_gb": 50.91
+ },
+ "checkpoint": "aimnet2_wb97m_d3_3",
+ "provenance": "real: ALCHEMI/AIMNet2 on NVIDIA RTX A6000",
+ "method": {
+  "tight_optimizer": "FIRE2",
+  "tight_fmax_ev_per_angstrom": 0.002,
+  "hessian": "ASE Vibrations finite differences of ALCHEMI forces, delta=0.01 A, nfree=2",
+  "thermo": "ase.thermochemistry.IdealGasThermo, nonlinear, symmetry number 1, spin 0; qh = real modes < cutoff raised to cutoff",
+  "temperature_k": 298.15,
+  "pressure_pa": 101325.0,
+  "quasi_harmonic_cutoff_cm1": 100.0
+ },
+ "status": "completed",
+ "charge": 0,
+ "symbols": [
+  "O",
+  "H",
+  "H"
+ ],
+ "fragments": [
+  {
+   "name": "water",
+   "smiles": "O",
+   "start": 0,
+   "stop": 3
+  }
+ ],
+ "kind": "water_monomer",
+ "acid": null,
+ "n_water": 1,
+ "source_energy_ev": -2081.0454369242125,
+ "tight_energy_ev": -2081.0454369242125,
+ "tight_fmax_ev_per_angstrom": 7.314129568025838e-05,
+ "tight_steps": 1,
+ "tight_positions_angstrom": [
+  [
+   30.0,
+   30.0,
+   29.610036849975586
+  ],
+  [
+   30.75896453857422,
+   30.0,
+   30.19498062133789
+  ],
+  [
+   29.241037368774414,
+   30.0,
+   30.19498062133789
+  ]
+ ],
+ "frequencies_cm1": [
+  -53.20094760630303,
+  -1.2702896277403888,
+  -0.6105463855463382,
+  0.7619582873422281,
+  28.000442439704855,
+  29.565391299298607,
+  1631.5049189457322,
+  3868.781437119043,
+  3911.25198112685
+ ],
+ "thermo": {
+  "n_modes": 3,
+  "n_imag": 0,
+  "imag_cm1": [],
+  "lowest_real_cm1": 1631.5049189457322,
+  "n_atoms": 3,
+  "rrho": {
+   "zpe_ev": 0.5834410182237864,
+   "h_corr_ev": 0.6862883730725349,
+   "s_ev_per_k": 0.0020139984266943447,
+   "g_corr_ev": 0.08581474215361606
+  },
+  "qh": {
+   "zpe_ev": 0.5834410182237864,
+   "h_corr_ev": 0.6862883730725349,
+   "s_ev_per_k": 0.0020139984266943447,
+   "g_corr_ev": 0.08581474215361606
+  }
+ },
+ "vib_wall_seconds": 0.5879888534545898,
+ "G_rrho_ev": -2080.959622182059,
+ "G_qh_ev": -2080.959622182059,
+ "E_plus_zpe_ev": -2080.4619959059887,
+ "finished_at_utc": "2026-10-31T05:12:08Z"
+}
