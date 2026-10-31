@@ -594,7 +594,11 @@ def fig_architecture():
     for w in widths:
         xs.append(x)
         x += w + gap
-    titles = ("Guest\ntastes", "Head Chef\nsets the goal", "Sous chefs\ncook & argue", "Agreed trial\n→ stations")
+    from fermentai.agents.schedules import LIBRARY  # the candidate schedules the cycle simulates
+
+    n_sims = len(LIBRARY)
+    titles = ("Guest\ntastes", "Head Chef →\nline cooks", "Sous chefs argue\nat the pass",
+              "Agreed trial\n→ stations")
     for k, (x0, w, t) in enumerate(zip(xs, widths, titles)):
         rbox(ax, x0, 2.0, w, 86.0, fc="#f7f6f2", ec="none", r=2.6, zorder=0)
         ax.add_patch(Circle((x0 + 3.8, 81.8), 2.6, fc=INK, ec="none", zorder=2))
@@ -602,46 +606,49 @@ def fig_architecture():
                 zorder=3)
         ax.text(x0 + 7.6, 81.8, t, fontsize=22, fontweight="bold", color=INK, ha="left", va="center",
                 linespacing=1.05)
-    # 1. guest tastes -> head chef
+    # 1. the guest tells Sous Chef A, who writes it down (the chat)
     x0 = xs[0]
     ax.add_patch(Circle((x0 + 8.0, 63.0), 3.0, fc=HUMAN, ec="none", zorder=3))
     ax.add_patch(Wedge((x0 + 8.0, 52.5), 6.0, 0, 180, fc=HUMAN, ec="none", zorder=3))
-    _bubble(ax, x0 + 13.0, 62.0, 20.0, 12.0, "more sour,\nstill airy", "#fbe3ec", HUMAN, x0 + 13.5, 60.5)
-    arrow(ax, (x0 + 17.0, 50.0), (x0 + 17.0, 31.0), color=INK, lw=4, head=24)
-    _chef(ax, x0 + 4.0, 12.0, 26.0, 18.0, INK, label="Head\nChef")
-    # 2. head chef -> one goal, split to A and B
+    _bubble(ax, x0 + 4.0, 34.0, 26.0, 12.0, "more sour,\nstill airy", "#fbe3ec", HUMAN, x0 + 10.0, 50.5)
+    _chef(ax, x0 + 4.0, 10.0, 15.0, 17.0, A_COL, letter="A")
+    rbox(ax, x0 + 21.0, 10.5, 9.0, 12.0, fc="white", ec=INK, lw=1.8, r=0.8, zorder=2)  # notepad
+    for k in range(4):
+        ax.plot([x0 + 22.5, x0 + 28.5], [19.5 - k * 2.4] * 2, color=FAINT, lw=1.6, zorder=3)
+    # 2. A hands the note up; the Head Chef sets the goal and sends out the line cooks
     x0 = xs[1]
-    _chef(ax, x0 + 4.0, 60.0, 26.0, 16.0, INK, label="Head\nChef")
-    ax.plot([x0 + 17.0, x0 + 17.0], [59.6, 47.0], color=INK, lw=4, zorder=1)
-    ax.text(x0 + 18.8, 53.5, "goal", fontsize=24, fontweight="bold", color=INK, va="center")
-    for tx in (x0 + 8.5, x0 + 25.5):
-        ax.add_patch(FancyArrowPatch((x0 + 17.0, 47.0), (tx, 33.4), arrowstyle="-|>,head_length=0.9,head_width=0.5",
-                                     mutation_scale=22, color=INK, lw=4, zorder=1, shrinkA=0, shrinkB=0))
-    _chef(ax, x0 + 1.5, 16.0, 14.5, 17.0, A_COL, letter="A")
-    _chef(ax, x0 + 18.0, 16.0, 14.5, 17.0, B_COL, letter="B")
-    # 3. sous chefs cook from the shared pantry, run line cooks, and argue at the pass
+    _chef(ax, x0 + 4.0, 60.0, 26.0, 15.0, INK, label="Head\nChef")
+    _chef(ax, x0 + 1.5, 41.0, 11.0, 12.0, A_COL, letter="A")
+    arrow(ax, (x0 + 7.0, 53.4), (x0 + 7.0, 59.6), color=INK, lw=3.5, head=18)
+    arrow(ax, (x0 + 22.0, 59.6), (x0 + 22.0, 33.0), color=INK, lw=4, head=24)
+    ax.text(x0 + 23.6, 47.0, "goal", fontsize=24, fontweight="bold", color=INK, va="center")
+    for r in range(2):
+        for k in range(5):
+            _pan(ax, x0 + 5.0 + k * 5.6, 28.0 - r * 5.0, 1.3)
+    ax.text(x0 + 17.0, 13.0, f"{n_sims} simulations", fontsize=20, color=MUTED, ha="center", va="center")
+    # 3. the sous chefs argue over the line cooks' results at the pass
     x0 = xs[2]
     ax_, bx_ = x0 + 1.5, x0 + 39.5
-    ax.add_patch(Rectangle((x0 + 1.5, 60.0), 49.0, 1.3, fc="#9aa3ab", ec="none", zorder=2))  # the pass counter
-    _bubble(ax, x0 + 1.5, 63.6, 23.5, 11.4, "32 °C,\nthen cool", "#e3eef8", A_COL, ax_ + 5.5, 61.4)
-    _bubble(ax, x0 + 27.0, 63.6, 23.5, 11.4, "overproof:\n24 °C", "#fde9d8", "#c2560a", bx_ + 5.5, 61.4)
-    _chef(ax, ax_, 46.0, 11.0, 12.5, A_COL, letter="A")
-    _chef(ax, bx_, 46.0, 11.0, 12.5, B_COL, letter="B")
-    ax.text(x0 + 26.0, 54.5, "at the pass", fontsize=18, color=MUTED, ha="center", va="center")
-    ax.text(x0 + 26.0, 50.5, "on the Mac", fontsize=18, color=MUTED, ha="center", va="center")
-    for cx0 in (ax_, bx_):  # three line cooks under each sous chef
-        for k in range(3):
-            _pan(ax, cx0 + 1.6 + k * 3.6, 41.8, 1.05)
-    ax.text(x0 + 26.0, 36.8, "line cooks = simulations", fontsize=17, color=MUTED, ha="center", va="center")
-    rbox(ax, x0 + 3.0, 10.0, 46.0, 22.0, fc="#efe6d4", ec="none", r=2.0, zorder=1)
-    ax.plot([x0 + 3.0, x0 + 49.0], [10.6, 10.6], color="#b98a52", lw=4, zorder=2)
+    _bubble(ax, x0 + 1.5, 64.0, 23.5, 11.4, "32 °C,\nthen cool", "#e3eef8", A_COL, ax_ + 5.5, 58.4)
+    _bubble(ax, x0 + 27.0, 64.0, 23.5, 11.4, "overproof:\n24 °C", "#fde9d8", "#c2560a", bx_ + 5.5, 58.4)
+    _chef(ax, ax_, 46.0, 11.0, 12.0, A_COL, letter="A")
+    _chef(ax, bx_, 46.0, 11.0, 12.0, B_COL, letter="B")
+    ax.add_patch(Rectangle((x0 + 1.5, 44.2), 49.0, 1.3, fc="#9aa3ab", ec="none", zorder=2))  # the pass counter
+    for k in range(3):  # stack of result tickets from the line cooks
+        tx, ty = x0 + 20.0 + k * 1.2, 46.0 + k * 1.4
+        rbox(ax, tx, ty, 11.0, 7.0, fc="white", ec=FAINT, lw=1.4, r=0.6, zorder=3 + k)
+        for j in range(2):
+            ax.plot([tx + 1.5, tx + 9.5], [ty + 4.8 - j * 2.2] * 2, color=LINE, lw=1.4, zorder=3 + k)
+    ax.text(x0 + 26.0, 40.6, "at the pass · on the Mac", fontsize=18, color=MUTED, ha="center", va="center")
+    rbox(ax, x0 + 3.0, 8.0, 46.0, 25.0, fc="#efe6d4", ec="none", r=2.0, zorder=1)  # the pantry shelf
+    ax.plot([x0 + 3.0, x0 + 49.0], [8.6, 8.6], color="#b98a52", lw=4, zorder=2)
     for k, (name, kind, word) in enumerate((("ALCHEMI", "computed", "COMPUTED"), ("forecasts", "modeled", "MODELED"))):
         jx = x0 + 5.0 + k * 22.5
         col = BADGES[kind][1]
-        rbox(ax, jx, 12.0, 20.0, 15.0, fc="white", ec=col, lw=3, r=2.2, zorder=3)
-        rbox(ax, jx + 3.0, 26.4, 14.0, 2.6, fc=col, ec=col, r=0.8, zorder=3)  # lid
-        ax.text(jx + 10.0, 22.0, name, fontsize=21, fontweight="bold", color=INK, ha="center", va="center", zorder=4)
-        _b(ax, jx + 10.0, 16.0, word, kind, size=15)
+        rbox(ax, jx, 10.0, 20.0, 16.0, fc="white", ec=col, lw=3, r=2.2, zorder=3)
+        rbox(ax, jx + 3.0, 25.4, 14.0, 2.6, fc=col, ec=col, r=0.8, zorder=3)  # lid
+        ax.text(jx + 10.0, 20.6, name, fontsize=21, fontweight="bold", color=INK, ha="center", va="center", zorder=4)
+        _b(ax, jx + 10.0, 14.2, word, kind, size=15)
     # 4. one agreed ticket -> both stations
     x0 = xs[3]
     rbox(ax, x0 + 5.0, 62.0, 24.0, 12.0, fc=INK, ec=INK, r=1.2, zorder=2)

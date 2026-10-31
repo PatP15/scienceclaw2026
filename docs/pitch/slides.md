@@ -28,8 +28,8 @@ EXAMPLE is grey. The figures live in
 every number from the data files. Partner names appear as plain-text wordmarks only. The deck
 sources in `docs/pitch/deck/slides/*.html` mirror this file.
 
-Timing assumes about 140 words per minute. The spoken notes total 414 words, which is
-2 min 57 s (see the table at the end).
+Timing assumes about 140 words per minute. The spoken notes total 410 words, which is
+2 min 56 s (see the table at the end).
 
 ---
 
@@ -63,22 +63,20 @@ slate = AI agent, crimson = the human judge.
 **Headline:** A head chef, two sous chefs, two stations
 
 **Figure:** `data/figures/architecture.png`, a four-panel strip read left → right, numbered 1–4.
-No line crosses another, and there are 5 arrows in total.
+No line crosses another, and there are 4 arrows in total.
 
-1. **"Guest tastes":** the guest, with a bubble saying "more sour, still airy", above an arrow down to
-   the Head Chef (toque).
-2. **"Head Chef sets the goal":** a single "goal" arrow that splits to Sous Chef A (blue) and Sous
-   Chef B (orange).
-3. **"Sous chefs cook & argue":**
-   - Bubbles with tails sit on the pass counter: A says "32 °C, then cool", and B replies
-     "overproof: 24 °C". The caption reads "at the pass · on the Mac".
-   - Under each sous chef are three line cooks (pan glyphs), captioned "line cooks = simulations".
-   - Below them is the shared Pantry shelf, with two jars: "ALCHEMI · COMPUTED" and "forecasts ·
-     MODELED".
-4. **"Agreed trial → stations":** a "trial 002" ticket with one arrow each to Station A and Station B
-   (dashed green, lock glyph). The badge MEASURED · pending appears once.
-
-The notes narrate these four steps in order.
+1. **"Guest tastes":** the guest says "more sour, still airy" (the bubble's tail points at the guest)
+   to Sous Chef A, who writes it down. This is the chat.
+2. **"Head Chef → line cooks":** Sous Chef A hands the note up to the Head Chef. The Head Chef's one
+   "goal" arrow goes down to a grid of line-cook pans, captioned "17 simulations". That is the size
+   of the schedule library that `run_taste_feedback_cycle` evaluates.
+3. **"Sous chefs argue at the pass":** the line cooks' result tickets sit on the pass counter between
+   A and B.
+   - Tailed bubbles: A says "32 °C, then cool", and B replies "overproof: 24 °C".
+   - The caption reads "at the pass · on the Mac".
+   - Below is the Pantry shelf, with jars "ALCHEMI · COMPUTED" and "forecasts · MODELED".
+4. **"Agreed trial → stations":** unchanged. A "trial 002" ticket → Station A / Station B (dashed
+   green, lock), with MEASURED · pending.
 
 `data/figures/scale.png` ("one kitchen → many kitchens") is a separate figure for the roadmap or Q&A,
 and is not in the deck yet.
@@ -95,19 +93,19 @@ and is not in the deck yet.
 | Guest | The judge (tells the Sous Chef at the laptop how it tasted, in the dashboard chat on the Mac) |
 | Head Chef | The orchestrator: `fermentai.agents.pipeline`, the taste-feedback cycle that sets the goal, assigns the agents and calls the plan |
 | Sous Chef A · B | The scientist agents, Scientist A / B (`ScientistAgent`, `agent_id` `scientist_A` / `scientist_B`) |
-| Line cooks | Candidate simulations: the schedule library run through the kinetics model |
+| Line cooks | Candidate simulations, dispatched by the Head Chef: the 17-schedule library run through the kinetics model |
 | Pantry | Shared evidence: NVIDIA ALCHEMI results (computed) and fermentation forecasts (modeled) |
 | Stations | The chambers: ESP32 + Peltier, setpoints clamped by API and firmware |
 | The pass | The shared append-only findings log, where proposals and critiques are exchanged |
 
-**Speaker notes (98 words, 42 s)**
+**Speaker notes (94 words, 40 s)**
 
-> Think of it as a kitchen brigade. The guest tastes and tells us what they think. Our Head Chef
-> turns that into the dish, more sour but still airy, and assigns the work. Two sous chefs
-> (Scientist A and B) each run their own station. Both draw on the same pantry: computed acid
-> chemistry from NVIDIA ALCHEMI and our modeled fermentation forecasts. Each sous chef sends out a
-> dozen line cooks, candidate simulations, and keeps the best. Then they argue across the pass until
-> they agree on a trial. Every station is safety-locked, because firmware clamps each setpoint.
+> Think of it as a kitchen brigade. The guest tastes and tells Sous Chef A what they think. The Head
+> Chef sets the dish, more sour but still airy, and sends out seventeen line cooks: candidate
+> simulations. The two sous chefs (Scientist A and B), each running their own station, argue over
+> the results across the pass. They draw on the same pantry: computed acid chemistry from NVIDIA
+> ALCHEMI and our modeled fermentation forecasts. When they agree on a trial, each station gets its
+> schedule. Every station is safety-locked, because firmware clamps each setpoint.
 
 ---
 
@@ -179,10 +177,10 @@ and is not in the deck yet.
 | Slide | Spoken words | At 140 wpm |
 |---|---|---|
 | 1 | 94 | 40 s |
-| 2 | 98 | 42 s |
+| 2 | 94 | 40 s |
 | 3 | 110 | 47 s |
 | 4 | 112 | 48 s |
-| **Total** | **414** | **2 min 57 s** |
+| **Total** | **410** | **2 min 56 s** |
 
 Recount with `sed -n '/^> /p' docs/pitch/slides.md | sed 's/^> //' | wc -w`.
 
