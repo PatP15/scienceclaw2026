@@ -57,3 +57,16 @@
 - Chamber default outputs + default fixture re-recorded (chamber STLs had been regenerated).
 - Tests: 32 passed, 1 skipped (+ live opt-in passed); provenance audit passes.
 - Resume: `uv run python scripts/prepare_print.py prepare --job data/stl/print/jobs/hackathon_six.yaml --backend live --port 44390 --update-fixture`
+
+## Regrouped by resin (2026-10-31, done) — supersedes the Grey six-part job (removed)
+- Form 4 catalog (PreForm 3.64.2): Clear V5 = FLGPCL05, Black V5 = FLGPBK05 (no V4 for Form 4); profiles
+  form4-clear-v5 / form4-black-v5. Per-part `supports` (raft|mini_raft|mini_rafts_on_bp|none) + `upright`.
+- Fit study (live, `python -m fermentai.formlabs.fit_study`, data/stl/print/clear_fit_study/): one Clear plate
+  only with slabs directly on the platform (no raft) + hats upright/on side.
+- LIVE: clear_form4_build1 (A,B on platform + 2 hats upright) 2.40 h / 238.7 mL / 714 layers;
+  black_form4_build1 (2 clawds) 1.20 h / 56.2 mL / 429 layers; alternative clear_form4_split_build1+2
+  (A,B rafted + hat | hat) 2.39 h + 1.68 h. PRINT_SHEET.md regenerated. Fixture
+  fixtures/preform_3.64.2_job_hackathon_by_resin.json.
+- Tests 33 passed / 1 skipped (+live opt-in passed); provenance audit passes.
+- Resume: J=data/stl/print/jobs; uv run python scripts/prepare_print.py prepare --job $J/clear_form4.yaml
+  --job $J/black_form4.yaml --job $J/clear_form4_split.yaml --name hackathon_by_resin --backend live --port 44390 --update-fixture

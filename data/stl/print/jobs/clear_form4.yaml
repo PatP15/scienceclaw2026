@@ -1,0 +1,28 @@
+# CLEAR resin (Form 4 / Clear V5 FLGPCL05 / 0.1 mm): crumb A + crumb B + 2 chef hats on ONE plate.
+# A live PreForm feasibility study (clear_fit_attempts.json) found one plate is possible only with the
+# slabs printed directly on the build platform (no raft) and the hats upright; with rafts under the
+# slabs PreForm cannot fit all four (see jobs/clear_form4_split.yaml for that alternative).
+name: clear_form4
+profile: form4-clear-v5
+role: primary
+note: "All four Clear parts on one plate. Slabs: crumb face up, flat floor printed directly on the build platform (no supports, no raft). Hats: upright as modelled, mini-raft supports."
+spacing_mm: 0.5
+layout_attempts: 20
+build_name_template: "{name}_build{k}"
+parts:
+  - chamber: A
+    label: "mild, 22 °C"
+    orientation: open_face_up
+    supports: none
+  - chamber: B
+    label: "sour, 27 °C"
+    orientation: open_face_up
+    supports: none
+  - name: hat
+    stl: data/stl/external/hat.stl
+    count: 2
+    orientation: upright
+    supports: mini_raft
+    repair: error_then_repair
+    label: "chef hat, user-supplied"
+    provenance: imported_human

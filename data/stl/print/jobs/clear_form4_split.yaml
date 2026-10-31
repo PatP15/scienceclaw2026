@@ -1,0 +1,26 @@
+# ALTERNATIVE for Clear: keep the slabs on a full raft with floor-only supports (the setup used for
+# the Grey crumb prints). Then the four parts do not fit one plate and PreForm splits them.
+name: clear_form4_split
+profile: form4-clear-v5
+role: alternative
+note: "Only if you prefer rafts + floor-only supports under the slabs (easier release, no platform texture). Needs more than one Clear build."
+spacing_mm: 1
+layout_attempts: 20
+build_name_template: "{name}_build{k}"
+parts:
+  - chamber: A
+    label: "mild, 22 °C"
+    orientation: open_face_up
+    supports: raft
+  - chamber: B
+    label: "sour, 27 °C"
+    orientation: open_face_up
+    supports: raft
+  - name: hat
+    stl: data/stl/external/hat.stl
+    count: 2
+    orientation: upright
+    supports: mini_raft
+    repair: error_then_repair
+    label: "chef hat, user-supplied"
+    provenance: imported_human

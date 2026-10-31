@@ -174,46 +174,72 @@ food-safe. Never place a printed crumb specimen in contact with bread, dough or 
 put one in a fermentation chamber. They sit next to the real loaf cross-section for visual
 comparison.
 
-## 10. Any parts: job files (the six-part hackathon print)
+## 10. Any parts: job files (the six-part hackathon print, grouped by resin)
 
 ```bash
-uv run python scripts/prepare_print.py prepare --job data/stl/print/jobs/hackathon_six.yaml \
-    --backend live --port 44390
+J=data/stl/print/jobs
+uv run python scripts/prepare_print.py prepare --job $J/clear_form4.yaml --job $J/black_form4.yaml \
+    --job $J/clear_form4_split.yaml --name hackathon_by_resin --backend live --port 44390
 uv run python scripts/prepare_print.py prepare --part ~/model.stl:2 --part slab.stl:1:open_face_up
 ```
 
-A job file lists parts in **priority order**, each with `count`, `orientation` (`open_face_up` or
-`preform_auto`), `repair` and `label`. `chamber: A` pulls the hash and validation from
-`chain_summary.json`. All copies are imported into one scene, oriented and supported, then laid
-out. If they do not all fit (`auto-layout` fails with `OPERATION_FAILED`), the lowest-priority
-copy is deleted and the layout retried. This is Formlabs' own "layout across builds" pattern.
-Deferred copies start the next build. Every attempt is recorded in the manifest under
-`layout.attempts`. **Parts are never scaled.** User files are imported strictly first; PreForm's
-repair is used only if PreForm refuses the mesh, and that is recorded per copy under
-`inputs[].import`.
+A job file names a printer/resin `profile` and lists parts in **priority order**. Each part has:
+- `count`;
+- `orientation`: `open_face_up`, `upright` or `preform_auto`;
+- `supports`: `raft`, `mini_raft`, `mini_rafts_on_bp`, or `none` (printed directly on the build
+  platform);
+- `repair` and `label`.
+
+`chamber: A` pulls the hash and validation from `chain_summary.json`. All jobs in one command run
+in a single PreForm session and share one `PRINT_SHEET.md`. If the copies don't all fit,
+`auto-layout` fails with `OPERATION_FAILED`; the lowest-priority copy is then deleted and the
+layout retried. This is Formlabs' own "layout across builds" pattern. Deferred copies start the
+next build, and every attempt is recorded under `layout.attempts`. **Parts are never scaled.**
+User files are imported strictly first; PreForm's repair is used only if PreForm refuses the
+mesh, and that is recorded per copy.
+
+**Resins (from PreForm 3.64.2's own catalog for `FORM-4-0`; both validated live with
+`/v1/print-setting/validate/`):**
+- Clear V5 = `FLGPCL05`
+- Black V5 = `FLGPBK05`
+
+These are the newest Clear and Black general-purpose resins for Form 4. No V4 is listed for
+Form 4.
 
 **User parts (`data/stl/external/`, copied unchanged from `~/Downloads/`; see
 `parts_report.json`):**
-- `hat.stl`: 67.9 × 42.7 × 64.9 mm, so millimetres are plausible. It is a chef's hat: a hollow band
-  with 0.8 mm walls, open at the bottom, under a solid puff. Volume 47.1 cm³.
-- `clawd.stl`: 45.8 × 22.5 × 33.0 mm, so millimetres are plausible. It is a blocky solid with one
+- `hat.stl`: 67.9 × 42.7 × 64.9 mm, so millimetres are plausible. Chef's hat: a hollow band with
+  0.8 mm walls, open at the bottom, under a solid puff. Volume 47.1 cm³.
+- `clawd.stl`: 45.8 × 22.5 × 33.0 mm, so millimetres are plausible. Blocky solid with one
   through-hole and walls of 2 mm or more. Volume 24.4 cm³.
-- Neither file is watertight as supplied, because of 62 and 32 zero-area triangles respectively.
-  Without those triangles each is one watertight solid with the same volume. PreForm imported
-  both under its strict `repair_behavior=ERROR` setting, so no repair was applied.
+- Both have zero-area triangles: 62 in the hat and 32 in the Clawd. Without them each is one
+  watertight solid with the same volume. PreForm accepted both under strict import, so no repair
+  was applied.
 
-**Live result, Form 4 / Grey V5 / 0.1 mm:** 2 builds is the minimum, because A + B + one hat does
-not fit on one platform.
+**Can all four Clear parts share one plate?**
+`python -m fermentai.formlabs.fit_study` ran live and saved its results to
+`data/stl/print/clear_fit_study/`. PreForm's auto-layout could **not** fit them in these setups:
+- slabs on full rafts, or on mini rafts, with the hats auto-oriented;
+- slabs directly on the platform, with the hats auto-oriented.
 
-| Build | `.form` | Parts | Time | Resin | Layers | PreForm warnings |
-|---|---|---|---|---|---|---|
-| 1 | `hackathon_job1_form4-grey-v5.form` | crumb A (mild, 22 °C), crumb B (sour, 27 °C) | 1.36 h | 150.3 mL | 185 | cups: A 1, B 2 |
-| 2 | `hackathon_job2_form4-grey-v5.form` | 2× hat, 2× Clawd (PreForm auto-orient, tilted) | 2.30 h | 165.1 mL | 772 | cups: 1 per hat; 0.06% undersupported per hat |
+With rafts under the slabs and the hats upright, only one hat fits (`clear_form4_split`). It
+**does** fit when the slabs are printed **directly on the build platform** (no raft, no supports)
+and the hats stand upright or lie on their side. PreForm then places the slabs in opposite
+corners with the hats between them. This is the primary Clear build. The crumb faces stay
+completely support-free, and the floors sit on the platform.
 
-`data/stl/print/PRINT_SHEET.md` is the one-page operator sheet: the file to open, parts,
-estimates, warnings, the PreForm desktop click path, and wash/cure notes.
-`hackathon_jobs.json` summarises the builds. Each build has its own manifest. On the
-auto-oriented parts (hat, Clawd), support touchpoints land on visible surfaces.
+| Build (live) | Parts | Time | Resin | Layers | PreForm warnings |
+|---|---|---|---|---|---|
+| `clear_form4_build1.form` (Clear V5) | crumb A (mild, 22 °C), crumb B (sour, 27 °C): face up, on the platform; 2× hat upright, mini rafts | 2.40 h | 238.7 mL | 714 | cups: A 1, B 2, hats 0; B 0.045% undersupported (pore-lip overhangs, slab has no supports by design) |
+| `black_form4_build1.form` (Black V5) | 2× Clawd, PreForm auto-orient, full raft | 1.20 h | 56.2 mL | 429 | none |
+| *alternative* `clear_form4_split_build1.form` + `_build2.form` (Clear V5) | A + B on full rafts + hat; then the second hat | 2.39 h + 1.68 h | 206.2 + 55.9 mL | 714 / 714 | cups: A 1, B 2 |
+
+`data/stl/print/PRINT_SHEET.md` is the one-page operator sheet. Per build it gives the file to
+open, parts, estimates, warnings and the PreForm desktop click path. It also has the resin notes:
+Clear shows supports and cups, and yellows if over-cured. The Clear/Black V5 data sheets give a
+5 min wash in ≥99% IPA and a 15 min post-cure at 60 °C. `<job>_jobs.json` summarises each job,
+and each build has its own manifest. The earlier Grey six-part grouping is superseded and was
+removed.
 
 **PreForm desktop and the headless server together:** with the PreForm Insider desktop app open,
 the headless PreFormServer started and ran normally on port 44390, then shut down. The desktop
@@ -231,7 +257,8 @@ the scenes then appear in the desktop window. To do it all by hand in the deskto
 - `tests/test_formlabs_manifest.py`: manifest provenance rules, plus a check that the committed
   **live** manifest matches the files on disk (sha256).
 - `tests/test_formlabs_submit.py`: the print gate refuses without both confirmations; CLI help.
-- `tests/test_formlabs_parts.py`: job files, STL inspection, and the six-part job through the
-  **mock** (replays `fixtures/preform_3.64.2_job_hackathon.json`, recorded live).
+- `tests/test_formlabs_parts.py`: job files, STL inspection, and the Clear/Black/split jobs
+  through the **mock** (replays `fixtures/preform_3.64.2_job_hackathon_by_resin.json`, recorded
+  live), plus the committed fit study.
 - `tests/test_formlabs_live.py`: **live**, opt-in (`FERMENTAI_FORMLABS_LIVE=1`). It starts
   PreFormServer and prepares chamber B for real.

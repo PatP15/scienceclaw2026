@@ -1,0 +1,16 @@
+# BLACK resin (Form 4 / Black V5 FLGPBK05 / 0.1 mm): 2 Clawd figures.
+name: black_form4
+profile: form4-black-v5
+role: primary
+note: "Both Clawd figures on one plate, PreForm auto-orient + auto-supports (full raft)."
+spacing_mm: 5
+build_name_template: "{name}_build{k}"
+parts:
+  - name: clawd
+    stl: data/stl/external/clawd.stl
+    count: 2
+    orientation: preform_auto
+    supports: raft
+    repair: error_then_repair
+    label: "Clawd figure, user-supplied"
+    provenance: imported_human

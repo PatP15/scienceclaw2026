@@ -153,9 +153,12 @@ def write_parts_report(paths: list[Path], out: Path = EXTERNAL_DIR / "parts_repo
 def load_job(path: str | Path) -> dict:
     """Load a YAML/JSON job file -> {"name", "profile", "parts": [PartSpec], ...}.
 
+    Job keys: ``name``, ``profile``, ``spacing_mm`` [5], ``layout_attempts``, ``role``
+    (primary | alternative), ``note``, ``build_name_template`` [``{name}_job{k}_{profile}``].
     Each part: ``stl`` (repo-relative or absolute), ``count``, ``name``, ``label``,
-    ``orientation`` (open_face_up | preform_auto), ``repair`` (error | error_then_repair |
-    repair), ``provenance``, or ``chamber: A`` to pull hash/validation from chain_summary.json.
+    ``orientation`` (open_face_up | upright | preform_auto), ``supports`` (raft | mini_raft |
+    mini_rafts_on_bp | none), ``repair`` (error | error_then_repair | repair), ``provenance``,
+    or ``chamber: A`` to pull hash/validation from chain_summary.json.
     """
     import yaml
 
@@ -173,6 +176,9 @@ def load_job(path: str | Path) -> dict:
             p.count = int(item.get("count", 1))
             if item.get("label"):
                 p.label = item["label"]
+            p.supports = item.get("supports", p.supports)
+            p.orientation = item.get("orientation", p.orientation)
+            p.__post_init__()
         else:
             stl = Path(item["stl"])
             stl = stl if stl.is_absolute() else REPO_ROOT / stl
@@ -180,13 +186,19 @@ def load_job(path: str | Path) -> dict:
                          display_name=item.get("name", stl.stem), count=item.get("count", 1),
                          orientation=item.get("orientation", "preform_auto"),
                          repair=item.get("repair", "error_then_repair"),
+                         supports=item.get("supports", "raft"),
                          label=item.get("label"),
                          provenance=item.get("provenance", "imported_human"))
             if stl.is_file():
                 p.sha256_actual = sha256_file(stl)
         parts.append(p)
     return {"name": spec.get("name", path.stem), "profile": profile, "parts": parts,
-            "spacing_mm": float(spec.get("spacing_mm", 5.0)), "source": str(path)}
+            "spacing_mm": float(spec.get("spacing_mm", 5.0)),
+            "layout_attempts": spec.get("layout_attempts"),
+            "role": spec.get("role", "primary"), "note": spec.get("note"),
+            "build_name_template": spec.get("build_name_template", "{name}_job{k}_{profile}"),
+            "source": str(path.resolve().relative_to(REPO_ROOT))
+            if path.resolve().is_relative_to(REPO_ROOT) else str(path)}
 
 
 def parse_part_arg(arg: str) -> PartSpec:
@@ -208,50 +220,84 @@ def parse_part_arg(arg: str) -> PartSpec:
 # ---------------------------------------------------------------------------------------------
 
 
-def render_print_sheet(job_name: str, jobs: list[dict], profile_key: str, source: str,
+MATERIAL_NOTES = {
+    "FLGPCL05": [
+        ("Clear shows everything: support touchpoints, raft marks and any trapped resin or cups "
+        "are visible through the part. Sand touchpoints (wet, fine grit) and clear-coat or "
+        "polish if you want glass-like faces."),
+        ("Clear V5 TDS reference: Form Wash 5 min in ≥99% IPA; post-cure 15 min at 60 °C in a "
+        "Form Cure. Clear yellows slightly with longer or hotter cure (and with UV over time): "
+        "for display parts, do not over-cure; check the current Clear V5 TDS."),
+    ],
+    "FLGPBK05": [
+        ("Black V5 TDS reference: Form Wash 5 min in ≥99% IPA; post-cure 15 min at 60 °C in a "
+        "Form Cure (some TDS versions: 5 min at room temperature). Check the current sheet."),
+    ],
+    "FLGPGR05": [
+        ("Grey V5 TDS reference: Form Wash 5 min in ≥99% IPA; cure per the current Grey V5 TDS "
+        "(published versions list 5 min at room temperature and 15 min at 60 °C)."),
+    ],
+}
+
+
+def render_print_sheet(run: str, sections: list[dict], source: str | None,
                        server_version: str | None) -> str:
-    """Markdown print sheet for the human operator (one section per build)."""
-    prof = PROFILES[profile_key]
+    """Markdown print sheet for the human operator: one section per job (e.g. per resin)."""
     lines = [
-        f"# Print sheet — {job_name}",
+        f"# Print sheet — {run}",
         "",
         (f"Prepared with the Formlabs PreForm API ({source}, PreForm {server_version}). "
         "**Nothing has been sent to a printer.** Printing requires a person at PreForm and at "
-        "the printer."),
-        "",
-        (f"Printer **{prof.printer_label}**, resin **{prof.material_label}** "
-        f"(`{prof.material_code}`), **{prof.layer_thickness_mm} mm** layers. "
-        "All times and volumes are PreForm estimates."),
+        "the printer. All times and volumes are PreForm estimates."),
         "",
     ]
-    total_s = sum(j["estimates"]["print_time_s"] or 0 for j in jobs)
-    total_ml = sum(j["estimates"]["material_volume_ml"] or 0 for j in jobs)
-    lines += [(f"**{len(jobs)} build(s)** — total ≈ {total_s / 3600:.2f} h printing, "
-              f"≈ {total_ml:.0f} mL resin."), ""]
-    for k, j in enumerate(jobs, 1):
-        e = j["estimates"]
-        form = j["outputs"]["form"]
-        lines += [
-            f"## Build {k}: `{Path(form).name}`",
-            "",
-            f"- **Open:** `{_rel(form)}`",
-            f"- **Parts ({len(j['placed'])}):** "
-            + "; ".join(f"{p} — {j['labels'][p]}" if j["labels"].get(p) else p
-                        for p in j["placed"]),
-            "- **Orientation:** " + _orientation_note(j),
-            (f"- **Estimate:** {e['print_time_h']} h ({e['print_time_s']} s), "
-            f"{e['material_volume_ml']} mL resin (models {e['models_volume_ml']}, raft "
-            f"{e['raft_volume_ml']}, supports {e['supports_volume_ml_derived']}), "
-            f"{e['layer_count']} layers"),
-            (f"- **Preview:** `{_rel(j['outputs'].get('preview_iso', ''))}`, "
-            f"`{_rel(j['outputs'].get('preview_top', ''))}`"),
-            f"- **Manifest:** `{_rel(j['manifest'])}`",
-        ]
-        repaired = [k2 for k2, v in (j.get("imports") or {}).items() if v.get("needed_repair")]
-        if repaired:
-            lines.append(f"- **Mesh repair on import (PreForm):** {', '.join(repaired)}")
-        lines.append("- **Warnings:** " + ("none" if not j["warnings"] else ""))
-        lines += [f"  - {w}" for w in j["warnings"]]
+    primary = [s for s in sections if s["job"].get("role", "primary") == "primary"]
+    tot_s = sum(b["estimates"]["print_time_s"] or 0 for s in primary for b in s["builds"])
+    tot_ml = {}
+    for s in primary:
+        lab = PROFILES[s["profile"]].material_label
+        tot_ml[lab] = tot_ml.get(lab, 0) + sum(b["estimates"]["material_volume_ml"] or 0
+                                               for b in s["builds"])
+    nb = sum(len(s["builds"]) for s in primary)
+    lines += [f"**To print: {nb} build(s)**, ≈ {tot_s / 3600:.2f} h of printer time; resin: "
+              + ", ".join(f"{lab} ≈ {ml:.0f} mL" for lab, ml in tot_ml.items()) + ".", ""]
+    for sec in sections:
+        job, prof = sec["job"], PROFILES[sec["profile"]]
+        alt = job.get("role") == "alternative"
+        lines += [(f"## {'ALTERNATIVE — ' if alt else ''}{prof.material_label} "
+                  f"(`{prof.material_code}`) · {prof.printer_label} · "
+                  f"{prof.layer_thickness_mm} mm — job `{job['name']}`"), ""]
+        if job.get("note"):
+            lines += [f"_{job['note']}_", ""]
+        for k, j in enumerate(sec["builds"], 1):
+            e = j["estimates"]
+            form = j["outputs"]["form"]
+            lines += [
+                f"### Build {k} of {len(sec['builds'])}: `{Path(form).name}`",
+                "",
+                f"- **Open:** `{_rel(form)}`",
+                f"- **Parts ({len(j['placed'])}):** "
+                + "; ".join(f"{p} — {j['labels'][p]}" if j["labels"].get(p) else p
+                            for p in j["placed"]),
+                "- **Orientation / supports:** " + _orientation_note(j),
+                (f"- **Estimate:** {e['print_time_h']} h ({e['print_time_s']} s), "
+                f"{e['material_volume_ml']} mL resin (models {e['models_volume_ml']}, raft "
+                f"{e['raft_volume_ml']}, supports {e['supports_volume_ml_derived']}), "
+                f"{e['layer_count']} layers"),
+                (f"- **Preview:** `{_rel(j['outputs'].get('preview_iso', ''))}`, "
+                f"`{_rel(j['outputs'].get('preview_top', ''))}`"),
+                f"- **Manifest:** `{_rel(j['manifest'])}`",
+            ]
+            repaired = [k2 for k2, v in (j.get("imports") or {}).items()
+                        if v.get("needed_repair")]
+            if repaired:
+                lines.append(f"- **Mesh repair on import (PreForm):** {', '.join(repaired)}")
+            lines.extend(f"- **Note:** {n}" for n in j.get("placement_notes", []))
+            lines.append("- **PreForm warnings:** " + ("none" if not j["warnings"] else ""))
+            lines += [f"  - {w}" for w in j["warnings"]]
+            lines.append("")
+        lines += [f"**{prof.material_label} notes:**", ""]
+        lines += [f"- {n}" for n in MATERIAL_NOTES.get(prof.material_code, [])]
         lines.append("")
     lines += [
         "## How to print each build (PreForm desktop)",
@@ -262,23 +308,22 @@ def render_print_sheet(job_name: str, jobs: list[dict], profile_key: str, source
         ("2. Check the job: the job-info / print-validation panel shows the warnings listed "
         "above (cups, unsupported areas). Inspect the flagged parts; do not add or move supports "
         "on the crumb faces."),
-        ("3. Confirm the job setup reads **Form 4 · Grey V5 · 0.1 mm** (Job Setup / printer "
-        "selector at the top of the window)."),
-        ("4. Click **Print** › select the Form 4 from the printer list "
-        "(or its Dashboard group) › **Upload** (adds the job to the printer's queue)."),
-        ("5. At the printer: load the Grey V5 cartridge, a Form 4 resin tank and a clean build "
+        ("3. Confirm the job setup (printer type, resin, 0.1 mm) matches the section heading — "
+        "Clear and Black are different cartridges *and* need their own resin tank."),
+        ("4. Click **Print** › select the Form 4 from the printer list (or its Dashboard group) "
+        "› **Upload** (adds the job to the printer's queue)."),
+        ("5. At the printer: load the matching cartridge, its resin tank and a clean build "
         "platform › select the job on the touchscreen › **confirm** › Print."),
         "",
         "## After printing",
         "",
         ("- Remove the build platform and release the parts (flex the platform or use the "
-        "part-removal tool)."),
-        ("- **Wash:** Form Wash, ≥99% IPA, **5 min** (Grey V5 TDS reference). Let dry "
-        "completely (≥30 min, or compressed air)."),
-        ("- **Cure:** Form Cure per the current Grey V5 TDS (published versions list 5 min at "
-        "room temperature and 15 min at 60 °C). Check the current sheet."),
+        "part-removal tool). Slabs printed directly on the platform need a careful, flat "
+        "release."),
+        ("- Wash in a Form Wash (≥99% IPA, see the resin notes above); let parts dry completely "
+        "before curing; cure in a Form Cure per the resin notes."),
         ("- Clip supports after curing and sand the touchpoints. The crumb faces carry no "
-        "supports; on auto-oriented parts (hat, Clawd) touchpoints are on visible surfaces."),
+        "supports; on the hats and Clawds touchpoints are on the surfaces PreForm chose."),
         "- **Display only — not food-safe. Never place prints in contact with bread.**",
         "",
     ]
@@ -287,14 +332,20 @@ def render_print_sheet(job_name: str, jobs: list[dict], profile_key: str, source
 
 def _orientation_note(j: dict) -> str:
     pol = j.get("orientation_policy_per_model") or {}
-    face_up = [k for k, v in pol.items() if v == "open_face_up"]
-    auto = [k for k, v in pol.items() if v == "preform_auto"]
+    sup = (j.get("support_parameters") or {}).get("per_model") or {}
     bits = []
-    if face_up:
-        bits.append(f"{', '.join(face_up)}: crumb face up, supports only under the flat floor")
-    if auto:
-        bits.append(f"{', '.join(auto)}: PreForm auto-orient (tilted); supports touch visible "
-                    "surfaces")
+    for k, v in pol.items():
+        s = sup.get(k, "FULL_RAFT")
+        on_bp = s.startswith("none")
+        if v == "open_face_up":
+            bits.append(f"{k}: crumb face up, " + ("directly on the build platform (no "
+                        "supports, no raft)" if on_bp else f"{s}, supports only under the "
+                        "flat floor"))
+        elif v == "upright":
+            bits.append(f"{k}: upright (as modelled), {s}")
+        else:
+            bits.append(f"{k}: PreForm auto-orient (tilted), {s}; supports touch visible "
+                        "surfaces")
     return "; ".join(bits) or "n/a"
 
 

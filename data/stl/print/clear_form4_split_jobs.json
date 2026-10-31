@@ -1,0 +1,93 @@
+{
+  "provenance": "estimated",
+  "source": "preform_local_api",
+  "job": "clear_form4_split",
+  "role": "alternative",
+  "note": "Only if you prefer rafts + floor-only supports under the slabs (easier release, no platform texture). Needs more than one Clear build.",
+  "job_file": "data/stl/print/jobs/clear_form4_split.yaml",
+  "profile": "form4-clear-v5",
+  "material": {
+    "label": "Clear V5",
+    "code": "FLGPCL05"
+  },
+  "job_submitted": false,
+  "builds": [
+    {
+      "build": 1,
+      "form": "data/stl/print/clear_form4_split_build1.form",
+      "manifest": "data/stl/print/clear_form4_split_build1_manifest.json",
+      "placed": [
+        "A",
+        "B",
+        "hat_1"
+      ],
+      "estimates": {
+        "print_time_s": 8612,
+        "print_time_h": 2.39,
+        "print_time_source": "POST /v1/scene/calculate-print-time/ total_print_time_s",
+        "material_volume_ml": 206.22,
+        "material_volume_source": "POST /v1/scene/get/ material_usage.volume_ml (models + supports + raft)",
+        "models_volume_ml": 174.58,
+        "raft_volume_ml": 24.91,
+        "supports_volume_ml_derived": 6.73,
+        "layer_count": 714,
+        "provenance": "estimated"
+      },
+      "warnings": [
+        "B: PreForm reports 2 cup(s) \u2014 concave pockets under overhanging pore lips that can add peel suction. All pores open to the cut face (mesh validation: no enclosed cavities), so resin drains in the wash; a human should review them in PreForm.",
+        "A: PreForm reports 1 cup(s) \u2014 concave pockets under overhanging pore lips that can add peel suction. All pores open to the cut face (mesh validation: no enclosed cavities), so resin drains in the wash; a human should review them in PreForm."
+      ],
+      "placement_notes": [],
+      "form_roundtrip_ok": true
+    },
+    {
+      "build": 2,
+      "form": "data/stl/print/clear_form4_split_build2.form",
+      "manifest": "data/stl/print/clear_form4_split_build2_manifest.json",
+      "placed": [
+        "hat_2"
+      ],
+      "estimates": {
+        "print_time_s": 6044,
+        "print_time_h": 1.68,
+        "print_time_source": "POST /v1/scene/calculate-print-time/ total_print_time_s",
+        "material_volume_ml": 55.88,
+        "material_volume_source": "POST /v1/scene/get/ material_usage.volume_ml (models + supports + raft)",
+        "models_volume_ml": 47.6,
+        "raft_volume_ml": 3.63,
+        "supports_volume_ml_derived": 4.65,
+        "layer_count": 714,
+        "provenance": "estimated"
+      },
+      "warnings": [],
+      "placement_notes": [],
+      "form_roundtrip_ok": true
+    }
+  ],
+  "parts": {
+    "A": {
+      "count": 1,
+      "label": "mild, 22 \u00b0C",
+      "stl": "data/stl/crumb_chamber_A.stl",
+      "sha256": "88bc2dd6cc8ad6ff134c9de9136b8fc0ca2a1915c8e254553cf0cde263038abc",
+      "orientation": "open_face_up",
+      "supports": "raft"
+    },
+    "B": {
+      "count": 1,
+      "label": "sour, 27 \u00b0C",
+      "stl": "data/stl/crumb_chamber_B.stl",
+      "sha256": "976a17927aa03d158e6f0ce53ebba743086fb1a031c401ba82dcf6fd25e6abd2",
+      "orientation": "open_face_up",
+      "supports": "raft"
+    },
+    "hat": {
+      "count": 2,
+      "label": "chef hat, user-supplied",
+      "stl": "data/stl/external/hat.stl",
+      "sha256": "d11ed5e0ec996b7984eeb8207e1601fcc19da2a6683b5b66a61a3356b0428d2f",
+      "orientation": "upright",
+      "supports": "mini_raft"
+    }
+  }
+}

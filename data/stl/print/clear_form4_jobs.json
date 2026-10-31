@@ -1,0 +1,74 @@
+{
+  "provenance": "estimated",
+  "source": "preform_local_api",
+  "job": "clear_form4",
+  "role": "primary",
+  "note": "All four Clear parts on one plate. Slabs: crumb face up, flat floor printed directly on the build platform (no supports, no raft). Hats: upright as modelled, mini-raft supports.",
+  "job_file": "data/stl/print/jobs/clear_form4.yaml",
+  "profile": "form4-clear-v5",
+  "material": {
+    "label": "Clear V5",
+    "code": "FLGPCL05"
+  },
+  "job_submitted": false,
+  "builds": [
+    {
+      "build": 1,
+      "form": "data/stl/print/clear_form4_build1.form",
+      "manifest": "data/stl/print/clear_form4_build1_manifest.json",
+      "placed": [
+        "A",
+        "B",
+        "hat_1",
+        "hat_2"
+      ],
+      "estimates": {
+        "print_time_s": 8654,
+        "print_time_h": 2.4,
+        "print_time_source": "POST /v1/scene/calculate-print-time/ total_print_time_s",
+        "material_volume_ml": 238.74,
+        "material_volume_source": "POST /v1/scene/get/ material_usage.volume_ml (models + supports + raft)",
+        "models_volume_ml": 222.18,
+        "raft_volume_ml": 7.26,
+        "supports_volume_ml_derived": 9.3,
+        "layer_count": 714,
+        "provenance": "estimated"
+      },
+      "warnings": [
+        "B: PreForm reports 2 cup(s) \u2014 concave pockets under overhanging pore lips that can add peel suction. All pores open to the cut face (mesh validation: no enclosed cavities), so resin drains in the wash; a human should review them in PreForm.",
+        "A: PreForm reports 1 cup(s) \u2014 concave pockets under overhanging pore lips that can add peel suction. All pores open to the cut face (mesh validation: no enclosed cavities), so resin drains in the wash; a human should review them in PreForm.",
+        "B: 0.0448% of its area is undersupported (slab printed without supports by design: this is overhang area under pore lips inside craters; review in PreForm)"
+      ],
+      "placement_notes": [
+        "A, B: no supports or raft \u2014 printed directly on the build platform (flat floor on the platform, crumb face up). Release with the platform flex / removal tool; the underside takes the platform texture."
+      ],
+      "form_roundtrip_ok": true
+    }
+  ],
+  "parts": {
+    "A": {
+      "count": 1,
+      "label": "mild, 22 \u00b0C",
+      "stl": "data/stl/crumb_chamber_A.stl",
+      "sha256": "88bc2dd6cc8ad6ff134c9de9136b8fc0ca2a1915c8e254553cf0cde263038abc",
+      "orientation": "open_face_up",
+      "supports": "none"
+    },
+    "B": {
+      "count": 1,
+      "label": "sour, 27 \u00b0C",
+      "stl": "data/stl/crumb_chamber_B.stl",
+      "sha256": "976a17927aa03d158e6f0ce53ebba743086fb1a031c401ba82dcf6fd25e6abd2",
+      "orientation": "open_face_up",
+      "supports": "none"
+    },
+    "hat": {
+      "count": 2,
+      "label": "chef hat, user-supplied",
+      "stl": "data/stl/external/hat.stl",
+      "sha256": "d11ed5e0ec996b7984eeb8207e1601fcc19da2a6683b5b66a61a3356b0428d2f",
+      "orientation": "upright",
+      "supports": "mini_raft"
+    }
+  }
+}

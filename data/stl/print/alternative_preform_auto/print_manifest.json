@@ -10,7 +10,7 @@
     "pitch_claim": "Prepared and validated with the Formlabs PreForm API; printing requires human confirmation."
   },
   "food_contact": "Printed resin parts are display objects only. Standard resins (Grey/White V5) are not food-safe; never place the prints in contact with bread.",
-  "generated_utc": "2026-10-31T15:29:36+00:00",
+  "generated_utc": "2026-10-31T16:26:49+00:00",
   "host": {
     "platform": "macOS-26.2-arm64-arm-64bit",
     "machine": "arm64"
@@ -96,15 +96,6 @@
     "policy": "preform_auto",
     "rationale": "Open crumb face up (model +Z = scene +Z): the flat solid floor faces the build platform, so raft and supports touch only the floor; the crumb face stays support-free and its craters open away from the platform. PreForm's cup check still flags a few pockets under overhanging pore lips (see printability_warnings). PreForm's own auto-orient suggestion (~9-12 deg tilt) is recorded for comparison.",
     "preform_auto_orient_suggestion": {
-      "A": {
-        "orientation_euler_deg": {
-          "x": 9.917787551879883,
-          "y": 5.863925933837891,
-          "z": 0.5092326402664185
-        },
-        "open_face_up": false,
-        "height_mm": 29.558
-      },
       "B": {
         "orientation_euler_deg": {
           "x": 11.465630531311035,
@@ -113,6 +104,15 @@
         },
         "open_face_up": false,
         "height_mm": 27.552
+      },
+      "A": {
+        "orientation_euler_deg": {
+          "x": 9.917787551879883,
+          "y": 5.863925933837891,
+          "z": 0.5092326402664185
+        },
+        "open_face_up": false,
+        "height_mm": 29.558
       }
     },
     "per_model_policy": {
@@ -120,17 +120,6 @@
       "B": "preform_auto"
     },
     "final": {
-      "A": {
-        "orientation_euler_deg": {
-          "x": -9.86604118347168,
-          "y": -5.951143741607666,
-          "z": -178.9830780029297
-        },
-        "open_face_up": false,
-        "height_mm": 36.058,
-        "has_supports": true,
-        "in_bounds": true
-      },
       "B": {
         "orientation_euler_deg": {
           "x": 0.052743155509233475,
@@ -141,10 +130,25 @@
         "height_mm": 34.052,
         "has_supports": true,
         "in_bounds": true
+      },
+      "A": {
+        "orientation_euler_deg": {
+          "x": -9.86604118347168,
+          "y": -5.951143741607666,
+          "z": -178.9830780029297
+        },
+        "open_face_up": false,
+        "height_mm": 36.058,
+        "has_supports": true,
+        "in_bounds": true
       }
     }
   },
   "supports": {
+    "per_model": {
+      "A": "FULL_RAFT",
+      "B": "FULL_RAFT"
+    },
     "raft_type": "FULL_RAFT",
     "other": "PreForm defaults for the material / layer (density, touchpoint size, slope multiplier)"
   },
@@ -169,61 +173,61 @@
   "printability_checks": {
     "in_bounds": {
       "per_model_results": {
-        "A": {
+        "B": {
           "in_bounds": true
         },
-        "B": {
+        "A": {
           "in_bounds": true
         }
       },
       "all_in_bounds": true
     },
     "manifoldness": {
-      "A": {
+      "B": {
         "is_manifold": true,
         "status": "MANIFOLD"
       },
-      "B": {
+      "A": {
         "is_manifold": true,
         "status": "MANIFOLD"
       }
     },
     "supportedness": {
-      "A": {
+      "B": {
         "percent_unsupported": 0
       },
-      "B": {
+      "A": {
         "percent_unsupported": 0
       }
     },
     "minima": {
-      "A": {
+      "B": {
         "minima_count": 0
       },
-      "B": {
+      "A": {
         "minima_count": 0
       }
     },
     "cups": {
-      "A": {
-        "cup_count": 0
-      },
       "B": {
         "cup_count": 1
+      },
+      "A": {
+        "cup_count": 0
       }
     },
     "interferences": {
       "model_ids": []
     },
     "thin_features": {
-      "A": {
+      "B": {
         "status": "ANALYZED",
         "has_thin_walls": false,
         "thin_volume_mm3": 0,
         "thin_region_count": 0,
         "thin_regions": []
       },
-      "B": {
+      "A": {
         "status": "ANALYZED",
         "has_thin_walls": false,
         "thin_volume_mm3": 0,
@@ -243,7 +247,7 @@
       "B"
     ],
     "estimates": {
-      "print_time_s": 5822,
+      "print_time_s": 5815,
       "print_time_h": 1.62,
       "print_time_source": "POST /v1/scene/calculate-print-time/ total_print_time_s",
       "material_volume_ml": 159.99,
@@ -255,27 +259,11 @@
       "provenance": "estimated"
     },
     "print_time_breakdown_s": {
-      "total_print_time_s": 5822,
+      "total_print_time_s": 5815,
       "preprint_time_s": 0,
-      "printing_time_s": 5822
+      "printing_time_s": 5815
     },
     "per_model": [
-      {
-        "chamber": "B",
-        "name": "crumb_chamber_B",
-        "model_volume_ml": 62.28729151285768,
-        "raft_volume_ml": 10.698312407536799,
-        "total_volume_ml": 78.33742733504981,
-        "model_bbox_size_mm": [
-          80.49818420410156,
-          81.13317108154297,
-          27.551803588867188
-        ],
-        "layers": [
-          0,
-          341
-        ]
-      },
       {
         "chamber": "A",
         "name": "crumb_chamber_A",
@@ -291,28 +279,44 @@
           0,
           360
         ]
+      },
+      {
+        "chamber": "B",
+        "name": "crumb_chamber_B",
+        "model_volume_ml": 62.28729151285768,
+        "raft_volume_ml": 10.698312407536799,
+        "total_volume_ml": 78.33742733504981,
+        "model_bbox_size_mm": [
+          80.49818420410156,
+          81.13317108154297,
+          27.551803588867188
+        ],
+        "layers": [
+          0,
+          341
+        ]
       }
     ],
     "outputs": {
       "preview_iso": {
         "path": "data/stl/print/alternative_preform_auto/crumb_chambers_AB_form4-grey-v5_iso.png",
         "exists": true,
-        "bytes": 240359,
-        "sha256": "963ec1ea2e2318ac3c7f762c85a5683c2fabf00098bba5c00fcfa5f8aafbecb3",
+        "bytes": 241713,
+        "sha256": "3e10f404553ac2492e30dca6b2b1e971dd6e7a8c80c3315154fcf12fb0226ad1",
         "kind": "written by PreFormServer"
       },
       "preview_top": {
         "path": "data/stl/print/alternative_preform_auto/crumb_chambers_AB_form4-grey-v5_top.png",
         "exists": true,
-        "bytes": 385399,
-        "sha256": "c7d57a38557318a98174cef4257093cee51bd19b4cdc9bd48963b1133249d970",
+        "bytes": 386082,
+        "sha256": "6c98c043fa8bb7345e9600adcb8482799e6ecf6ef71ead07d47ab9cbea0cccec",
         "kind": "written by PreFormServer"
       },
       "form": {
         "path": "data/stl/print/alternative_preform_auto/crumb_chambers_AB_form4-grey-v5.form",
         "exists": true,
-        "bytes": 5441819,
-        "sha256": "91066846a6e6a710a8fe76663d1f4276398dc5889b38918c7705ee6598be8de9",
+        "bytes": 5441989,
+        "sha256": "9d3b7c25f50dc61eb5af1ebbe86a0785634f04f760926498c619493abf7b5147",
         "kind": "written by PreFormServer"
       }
     },
@@ -333,17 +337,17 @@
       {
         "step": "check printer/material/layer combination against PreForm's catalog",
         "endpoint": "POST /v1/print-setting/validate/",
-        "duration_s": 0.004
+        "duration_s": 0.003
       },
       {
         "step": "create scene (Job Setup: printer, material, layer)",
         "endpoint": "POST /v1/scene/create/",
-        "duration_s": 0.015
+        "duration_s": 0.014
       },
       {
         "step": "import crumb_chamber_A.stl as crumb_chamber_A (mm, repair_behavior=ERROR)",
         "endpoint": "POST /v1/scene/model/import/",
-        "duration_s": 0.26
+        "duration_s": 0.263
       },
       {
         "step": "import crumb_chamber_B.stl as crumb_chamber_B (mm, repair_behavior=ERROR)",
@@ -353,12 +357,12 @@
       {
         "step": "list models (as imported)",
         "endpoint": "POST /v1/scene/model/list/",
-        "duration_s": 0.099
+        "duration_s": 0.085
       },
       {
         "step": "auto-orient (PreForm's suggestion, recorded)",
         "endpoint": "POST /v1/scene/model/auto-orient/",
-        "duration_s": 0.511
+        "duration_s": 0.512
       },
       {
         "step": "list models (after auto-orient)",
@@ -368,17 +372,17 @@
       {
         "step": "auto-generate supports (raft + supports; crumb slabs: under the flat floor only)",
         "endpoint": "POST /v1/scene/model/auto-support/",
-        "duration_s": 7.307
+        "duration_s": 7.68
       },
       {
         "step": "auto-layout 2 model(s) on one build platform",
         "endpoint": "POST /v1/scene/model/auto-layout/",
-        "duration_s": 1.019
+        "duration_s": 1.022
       },
       {
         "step": "list models (final)",
         "endpoint": "POST /v1/scene/model/list/",
-        "duration_s": 0.005
+        "duration_s": 0.006
       },
       {
         "step": "printability: fits build volume",
@@ -388,22 +392,22 @@
       {
         "step": "printability: closed solid",
         "endpoint": "POST /v1/scene/model/validate/manifoldness/",
-        "duration_s": 0.258
+        "duration_s": 0.265
       },
       {
         "step": "printability: undersupported area",
         "endpoint": "POST /v1/scene/model/validate/supportedness/",
-        "duration_s": 3.589
+        "duration_s": 3.667
       },
       {
         "step": "printability: unsupported minima",
         "endpoint": "POST /v1/scene/model/validate/minima/",
-        "duration_s": 0.776
+        "duration_s": 0.767
       },
       {
         "step": "printability: cups (suction / trapped resin)",
         "endpoint": "POST /v1/scene/model/validate/cups/",
-        "duration_s": 0.78
+        "duration_s": 0.767
       },
       {
         "step": "printability: model/support collisions",
@@ -413,27 +417,27 @@
       {
         "step": "printability: walls thinner than 0.5 mm",
         "endpoint": "POST /v1/scene/model/validate/thin-features/",
-        "duration_s": 23.323
+        "duration_s": 24.32
       },
       {
         "step": "scene: material usage + layer count",
         "endpoint": "POST /v1/scene/get/",
-        "duration_s": 0.003
+        "duration_s": 0.009
       },
       {
         "step": "full print-time calculation (slices internally)",
         "endpoint": "POST /v1/scene/calculate-print-time/",
-        "duration_s": 2.084
+        "duration_s": 2.068
       },
       {
         "step": "print-job metadata (per-model / raft volumes)",
         "endpoint": "POST /v1/scene/metadata/",
-        "duration_s": 0.005
+        "duration_s": 0.006
       },
       {
         "step": "render preview (iso)",
         "endpoint": "POST /v1/scene/render/",
-        "duration_s": 0.281
+        "duration_s": 0.288
       },
       {
         "step": "render preview (top)",
@@ -443,12 +447,12 @@
       {
         "step": "save prepared scene as .form (for a human to open in PreForm)",
         "endpoint": "POST /v1/scene/save/",
-        "duration_s": 0.516
+        "duration_s": 0.523
       },
       {
         "step": "re-open the saved .form to verify it loads",
         "endpoint": "POST /v1/scene/open/",
-        "duration_s": 0.262
+        "duration_s": 0.269
       },
       {
         "step": "delete the verification scene",
@@ -489,7 +493,7 @@
       {
         "method": "GET",
         "path": "/v1/operation/get/",
-        "calls": 175
+        "calls": 180
       },
       {
         "method": "POST",
@@ -582,7 +586,7 @@
         "calls": 1
       }
     ],
-    "http_requests": 201
+    "http_requests": 206
   },
   "preform_server": {
     "version": "3.64.2.665",
@@ -592,7 +596,7 @@
     "started_by_fermentai": true,
     "ready_after_s": 0.51,
     "download_url": "https://downloads.formlabs.com/PreFormServer/Release/3.64.2/PreForm_Server_mac-arm64_3.64.2_release_releaser_665_161434.zip",
-    "log_lines": 213
+    "log_lines": 218
   },
   "outputs": {
     "transcript": "data/stl/print/alternative_preform_auto/preform_api_transcript.json",

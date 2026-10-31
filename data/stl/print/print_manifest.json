@@ -10,7 +10,7 @@
     "pitch_claim": "Prepared and validated with the Formlabs PreForm API; printing requires human confirmation."
   },
   "food_contact": "Printed resin parts are display objects only. Standard resins (Grey/White V5) are not food-safe; never place the prints in contact with bread.",
-  "generated_utc": "2026-10-31T15:28:52+00:00",
+  "generated_utc": "2026-10-31T16:26:04+00:00",
   "host": {
     "platform": "macOS-26.2-arm64-arm-64bit",
     "machine": "arm64"
@@ -122,9 +122,9 @@
     "final": {
       "A": {
         "orientation_euler_deg": {
-          "x": 0,
-          "y": 0,
-          "z": -11.249861717224121
+          "x": 6.694674539176049e-07,
+          "y": 6.797302376071457e-06,
+          "z": 168.75013732910156
         },
         "open_face_up": true,
         "height_mm": 18.5,
@@ -133,9 +133,9 @@
       },
       "B": {
         "orientation_euler_deg": {
-          "x": -5.957911525911186e-06,
-          "y": 7.259736776177306e-06,
-          "z": 78.75
+          "x": -4.196551344648469e-06,
+          "y": -5.652977961290162e-06,
+          "z": -101.25000762939453
         },
         "open_face_up": true,
         "height_mm": 18.5,
@@ -145,6 +145,10 @@
     }
   },
   "supports": {
+    "per_model": {
+      "A": "FULL_RAFT",
+      "B": "FULL_RAFT"
+    },
     "raft_type": "FULL_RAFT",
     "other": "PreForm defaults for the material / layer (density, touchpoint size, slope multiplier)"
   },
@@ -244,7 +248,7 @@
       "B"
     ],
     "estimates": {
-      "print_time_s": 4892,
+      "print_time_s": 4891,
       "print_time_h": 1.36,
       "print_time_source": "POST /v1/scene/calculate-print-time/ total_print_time_s",
       "material_volume_ml": 150.3,
@@ -256,20 +260,20 @@
       "provenance": "estimated"
     },
     "print_time_breakdown_s": {
-      "total_print_time_s": 4892,
+      "total_print_time_s": 4891,
       "preprint_time_s": 0,
-      "printing_time_s": 4892
+      "printing_time_s": 4891
     },
     "per_model": [
       {
-        "chamber": "B",
-        "name": "crumb_chamber_B",
-        "model_volume_ml": 62.28729427819118,
-        "raft_volume_ml": 10.727160657958432,
-        "total_volume_ml": 74.05695394119257,
+        "chamber": "A",
+        "name": "crumb_chamber_A",
+        "model_volume_ml": 64.6099762953744,
+        "raft_volume_ml": 10.615122919818079,
+        "total_volume_ml": 76.24366980447927,
         "model_bbox_size_mm": [
-          84.15567016601562,
-          84.56896209716797,
+          84.57022094726562,
+          84.15693664550781,
           11.999999046325684
         ],
         "layers": [
@@ -278,14 +282,14 @@
         ]
       },
       {
-        "chamber": "A",
-        "name": "crumb_chamber_A",
-        "model_volume_ml": 64.6099755477164,
-        "raft_volume_ml": 10.615122796981296,
-        "total_volume_ml": 76.24366892219774,
+        "chamber": "B",
+        "name": "crumb_chamber_B",
+        "model_volume_ml": 62.287293917796596,
+        "raft_volume_ml": 10.727160595891029,
+        "total_volume_ml": 74.05695351269868,
         "model_bbox_size_mm": [
-          84.57022094726562,
-          84.15693664550781,
+          84.15567016601562,
+          84.56896209716797,
           11.999999046325684
         ],
         "layers": [
@@ -298,22 +302,22 @@
       "preview_iso": {
         "path": "data/stl/print/crumb_chambers_AB_form4-grey-v5_iso.png",
         "exists": true,
-        "bytes": 256896,
-        "sha256": "bd8b1cc7864ca5bb3d60ccea6cadbe55e8762fa23794976c56784c3b391eff0b",
+        "bytes": 250083,
+        "sha256": "90477915bcfb5bdbb08faea744ac0ec002472cf8a2b7bd93ac5f674cf4c52ddb",
         "kind": "written by PreFormServer"
       },
       "preview_top": {
         "path": "data/stl/print/crumb_chambers_AB_form4-grey-v5_top.png",
         "exists": true,
-        "bytes": 417579,
-        "sha256": "0729316736b20856007e88f14f07a8437795d567f501b2ae5196c915fa3a2782",
+        "bytes": 418623,
+        "sha256": "453251df5c292beb14bbea1af0e60887e94256eb244152e3ec22296588ffc84b",
         "kind": "written by PreFormServer"
       },
       "form": {
         "path": "data/stl/print/crumb_chambers_AB_form4-grey-v5.form",
         "exists": true,
-        "bytes": 4123828,
-        "sha256": "7c2fcb2af5e0c4bc03ad0f5678196093e1c0559a83e165a0c63e035754343327",
+        "bytes": 4120591,
+        "sha256": "6970c03ebb35d6a291efede249830f4a6add63f542a0aefd7ab9637b95389b77",
         "kind": "written by PreFormServer"
       }
     },
@@ -334,32 +338,32 @@
       {
         "step": "check printer/material/layer combination against PreForm's catalog",
         "endpoint": "POST /v1/print-setting/validate/",
-        "duration_s": 0.004
+        "duration_s": 0.003
       },
       {
         "step": "create scene (Job Setup: printer, material, layer)",
         "endpoint": "POST /v1/scene/create/",
-        "duration_s": 0.031
+        "duration_s": 0.015
       },
       {
         "step": "import crumb_chamber_A.stl as crumb_chamber_A (mm, repair_behavior=ERROR)",
         "endpoint": "POST /v1/scene/model/import/",
-        "duration_s": 0.261
+        "duration_s": 0.258
       },
       {
         "step": "import crumb_chamber_B.stl as crumb_chamber_B (mm, repair_behavior=ERROR)",
         "endpoint": "POST /v1/scene/model/import/",
-        "duration_s": 0.262
+        "duration_s": 0.265
       },
       {
         "step": "list models (as imported)",
         "endpoint": "POST /v1/scene/model/list/",
-        "duration_s": 0.1
+        "duration_s": 0.106
       },
       {
         "step": "auto-orient (PreForm's suggestion, recorded)",
         "endpoint": "POST /v1/scene/model/auto-orient/",
-        "duration_s": 0.512
+        "duration_s": 0.511
       },
       {
         "step": "list models (after auto-orient)",
@@ -367,14 +371,14 @@
         "duration_s": 0.003
       },
       {
-        "step": "enforce open crumb face up (model +Z -> scene +Z)",
+        "step": "enforce model +Z -> scene +Z (crumb face up / part upright)",
         "endpoint": "POST /v1/scene/model/orient/",
         "duration_s": 0.011
       },
       {
         "step": "auto-generate supports (raft + supports; crumb slabs: under the flat floor only)",
         "endpoint": "POST /v1/scene/model/auto-support/",
-        "duration_s": 6.923
+        "duration_s": 6.646
       },
       {
         "step": "auto-layout 2 model(s) on one build platform",
@@ -384,7 +388,7 @@
       {
         "step": "list models (final)",
         "endpoint": "POST /v1/scene/model/list/",
-        "duration_s": 0.005
+        "duration_s": 0.006
       },
       {
         "step": "printability: fits build volume",
@@ -394,22 +398,22 @@
       {
         "step": "printability: closed solid",
         "endpoint": "POST /v1/scene/model/validate/manifoldness/",
-        "duration_s": 0.262
+        "duration_s": 0.263
       },
       {
         "step": "printability: undersupported area",
         "endpoint": "POST /v1/scene/model/validate/supportedness/",
-        "duration_s": 3.087
+        "duration_s": 3.086
       },
       {
         "step": "printability: unsupported minima",
         "endpoint": "POST /v1/scene/model/validate/minima/",
-        "duration_s": 0.518
+        "duration_s": 0.517
       },
       {
         "step": "printability: cups (suction / trapped resin)",
         "endpoint": "POST /v1/scene/model/validate/cups/",
-        "duration_s": 0.775
+        "duration_s": 0.771
       },
       {
         "step": "printability: model/support collisions",
@@ -419,32 +423,32 @@
       {
         "step": "printability: walls thinner than 0.5 mm",
         "endpoint": "POST /v1/scene/model/validate/thin-features/",
-        "duration_s": 24.48
+        "duration_s": 23.292
       },
       {
         "step": "scene: material usage + layer count",
         "endpoint": "POST /v1/scene/get/",
-        "duration_s": 0.004
+        "duration_s": 0.01
       },
       {
         "step": "full print-time calculation (slices internally)",
         "endpoint": "POST /v1/scene/calculate-print-time/",
-        "duration_s": 1.542
+        "duration_s": 1.285
       },
       {
         "step": "print-job metadata (per-model / raft volumes)",
         "endpoint": "POST /v1/scene/metadata/",
-        "duration_s": 0.01
+        "duration_s": 0.006
       },
       {
         "step": "render preview (iso)",
         "endpoint": "POST /v1/scene/render/",
-        "duration_s": 0.294
+        "duration_s": 0.291
       },
       {
         "step": "render preview (top)",
         "endpoint": "POST /v1/scene/render/",
-        "duration_s": 0.264
+        "duration_s": 0.263
       },
       {
         "step": "save prepared scene as .form (for a human to open in PreForm)",
@@ -454,20 +458,20 @@
       {
         "step": "re-open the saved .form to verify it loads",
         "endpoint": "POST /v1/scene/open/",
-        "duration_s": 0.261
+        "duration_s": 0.262
       },
       {
         "step": "delete the verification scene",
         "endpoint": "POST /v1/scene/delete/",
-        "duration_s": 0.005
+        "duration_s": 0.007
       }
     ]
   },
   "per_chamber_builds": {
     "A": {
       "estimates": {
-        "print_time_s": 3810,
-        "print_time_h": 1.06,
+        "print_time_s": 3835,
+        "print_time_h": 1.07,
         "print_time_source": "POST /v1/scene/calculate-print-time/ total_print_time_s",
         "material_volume_ml": 76.24,
         "material_volume_source": "POST /v1/scene/get/ material_usage.volume_ml (models + supports + raft)",
@@ -481,15 +485,15 @@
         "preview_iso": {
           "path": "data/stl/print/crumb_chamber_A_form4-grey-v5_iso.png",
           "exists": true,
-          "bytes": 258302,
-          "sha256": "b979f2cb7dc422814e69a7eaa2aa77f2c7b4dabd939024bfd324593c48bacc04",
+          "bytes": 253185,
+          "sha256": "7015ceb482690789520f3317a3fc790310d16294e960f0189d69545e3cf4ea4e",
           "kind": "written by PreFormServer"
         },
         "form": {
           "path": "data/stl/print/crumb_chamber_A_form4-grey-v5.form",
           "exists": true,
-          "bytes": 3185742,
-          "sha256": "d7029e9ee287cae2b46c3cae71c231966d410649599737d6e9a69c8bdc85c5a5",
+          "bytes": 3182200,
+          "sha256": "4bce8168201359e25023381a5835a7e330d8588acf7209193edae39291052653",
           "kind": "written by PreFormServer"
         }
       },
@@ -556,7 +560,7 @@
     },
     "B": {
       "estimates": {
-        "print_time_s": 3797,
+        "print_time_s": 3788,
         "print_time_h": 1.05,
         "print_time_source": "POST /v1/scene/calculate-print-time/ total_print_time_s",
         "material_volume_ml": 74.06,
@@ -571,15 +575,15 @@
         "preview_iso": {
           "path": "data/stl/print/crumb_chamber_B_form4-grey-v5_iso.png",
           "exists": true,
-          "bytes": 211879,
-          "sha256": "513e39ee0d024a2c2e87691be19bf9581e63f0dbd85b461d3b0c9c13c8397ce8",
+          "bytes": 211896,
+          "sha256": "5818e7d26c6a11db758d87fab8fdab50041cf3ba4aac6c3fdf299ce270d72d51",
           "kind": "written by PreFormServer"
         },
         "form": {
           "path": "data/stl/print/crumb_chamber_B_form4-grey-v5.form",
           "exists": true,
-          "bytes": 1148093,
-          "sha256": "d3c8af442ac4ad292778f9f007d6ce2cddd8f5d8aef06b8f0a443f58e6dc5219",
+          "bytes": 1148155,
+          "sha256": "e3c1e01a6093b2f728205c1bb6f8136588104555efcbe92e161730a74dc8b622",
           "kind": "written by PreFormServer"
         }
       },
@@ -676,7 +680,7 @@
       {
         "method": "GET",
         "path": "/v1/operation/get/",
-        "calls": 352
+        "calls": 350
       },
       {
         "method": "POST",
@@ -774,7 +778,7 @@
         "calls": 3
       }
     ],
-    "http_requests": 427
+    "http_requests": 425
   },
   "preform_server": {
     "version": "3.64.2.665",
@@ -784,7 +788,7 @@
     "started_by_fermentai": true,
     "ready_after_s": 0.77,
     "download_url": "https://downloads.formlabs.com/PreFormServer/Release/3.64.2/PreForm_Server_mac-arm64_3.64.2_release_releaser_665_161434.zip",
-    "log_lines": 439
+    "log_lines": 437
   },
   "outputs": {
     "transcript": "data/stl/print/preform_api_transcript.json",

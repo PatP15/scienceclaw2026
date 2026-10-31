@@ -1,0 +1,50 @@
+{
+  "provenance": "estimated",
+  "source": "preform_local_api",
+  "job": "black_form4",
+  "role": "primary",
+  "note": "Both Clawd figures on one plate, PreForm auto-orient + auto-supports (full raft).",
+  "job_file": "data/stl/print/jobs/black_form4.yaml",
+  "profile": "form4-black-v5",
+  "material": {
+    "label": "Black V5",
+    "code": "FLGPBK05"
+  },
+  "job_submitted": false,
+  "builds": [
+    {
+      "build": 1,
+      "form": "data/stl/print/black_form4_build1.form",
+      "manifest": "data/stl/print/black_form4_build1_manifest.json",
+      "placed": [
+        "clawd_1",
+        "clawd_2"
+      ],
+      "estimates": {
+        "print_time_s": 4318,
+        "print_time_h": 1.2,
+        "print_time_source": "POST /v1/scene/calculate-print-time/ total_print_time_s",
+        "material_volume_ml": 56.2,
+        "material_volume_source": "POST /v1/scene/get/ material_usage.volume_ml (models + supports + raft)",
+        "models_volume_ml": 49.39,
+        "raft_volume_ml": 4.71,
+        "supports_volume_ml_derived": 2.11,
+        "layer_count": 429,
+        "provenance": "estimated"
+      },
+      "warnings": [],
+      "placement_notes": [],
+      "form_roundtrip_ok": true
+    }
+  ],
+  "parts": {
+    "clawd": {
+      "count": 2,
+      "label": "Clawd figure, user-supplied",
+      "stl": "data/stl/external/clawd.stl",
+      "sha256": "1bd06366a547fcae9e3efaa0696f76db9463e3e2ed11f30b0a7e361dd17c898d",
+      "orientation": "preform_auto",
+      "supports": "raft"
+    }
+  }
+}

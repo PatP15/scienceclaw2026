@@ -67,12 +67,23 @@ PROFILES: dict[str, PrintProfile] = {
     "form4l-grey-v5": PrintProfile(
         "form4l-grey-v5", "Form 4L", "FRML-4-0", "Grey V5", "FLGPGR05", 0.1, "DEFAULT",
         "Large-format alternative (353 x 196 mm platform)."),
+    "form4-clear-v5": PrintProfile(
+        "form4-clear-v5", "Form 4", "FORM-4-0", "Clear V5", "FLGPCL05", 0.1, "DEFAULT",
+        "Newest Form 4 clear general-purpose resin in PreForm 3.64's catalog (no V4 listed for "
+        "Form 4). Transparent: supports, touchpoints and cups show more than in opaque resins."),
+    "form4-black-v5": PrintProfile(
+        "form4-black-v5", "Form 4", "FORM-4-0", "Black V5", "FLGPBK05", 0.1, "DEFAULT",
+        "Newest Form 4 black general-purpose resin in PreForm 3.64's catalog (no V4 listed for "
+        "Form 4)."),
 }
 DEFAULT_PROFILE = "form4-grey-v5"
 
 
-ORIENTATIONS = ("open_face_up", "preform_auto")
+ORIENTATIONS = ("open_face_up", "upright", "preform_auto")
 REPAIR_POLICIES = ("error", "error_then_repair", "repair")
+#: support style per part -> PreForm raft_type (None = no supports, printed on the platform)
+SUPPORT_STYLES = {"raft": "FULL_RAFT", "mini_raft": "MINI_RAFT",
+                  "mini_rafts_on_bp": "MINI_RAFTS_ON_BP", "none": None}
 
 
 @dataclass
@@ -100,6 +111,7 @@ class PartSpec:
     label: str | None = None  # human description, e.g. "mild, 22 °C"
     provenance: str = "simulated"
     inspection: dict | None = None
+    supports: str = "raft"  # raft | mini_raft | mini_rafts_on_bp | none (directly on platform)
 
     def __post_init__(self) -> None:
         self.stl = Path(self.stl)
@@ -107,6 +119,8 @@ class PartSpec:
             raise ValueError(f"{self.name}: orientation must be one of {ORIENTATIONS}")
         if self.repair not in REPAIR_POLICIES:
             raise ValueError(f"{self.name}: repair must be one of {REPAIR_POLICIES}")
+        if self.supports not in SUPPORT_STYLES:
+            raise ValueError(f"{self.name}: supports must be one of {sorted(SUPPORT_STYLES)}")
         if int(self.count) < 1:
             raise ValueError(f"{self.name}: count must be >= 1")
         self.count = int(self.count)
@@ -227,6 +241,7 @@ def prepare_build(
     allow_eject: bool = False,
     model_spacing_mm: float = 5.0,
     thin_feature_threshold_mm: float = 0.5,
+    layout_attempts: int | None = None,
     views: tuple[str, ...] = ("iso", "top"),
     echo: Callable[[str], None] | None = None,
 ) -> dict:
@@ -346,10 +361,10 @@ def prepare_build(
     log.run("auto-orient (PreForm's suggestion, recorded)", "POST /v1/scene/model/auto-orient/",
             lambda: api.auto_orient_models(scene_id=scene_id))
     r["preform_auto_orient_suggestion"] = models_snapshot("after auto-orient")
-    face_up = [model_ids[k] for k, v in policy.items() if v == "open_face_up"]
+    face_up = [model_ids[k] for k, v in policy.items() if v in ("open_face_up", "upright")]
     if face_up:
         all_face_up = len(face_up) == len(instances)
-        log.run("enforce open crumb face up (model +Z -> scene +Z)",
+        log.run("enforce model +Z -> scene +Z (crumb face up / part upright)",
                 "POST /v1/scene/model/orient/",
                 lambda: api.orient_models(
                     scene_id=scene_id,
@@ -360,13 +375,32 @@ def prepare_build(
     r["orientation_policy"] = policies.pop() if len(policies) == 1 else "per_part"
     r["orientation_policy_per_model"] = policy
 
-    support_params = {"raft_type": "FULL_RAFT"}
-    log.run("auto-generate supports (raft + supports; crumb slabs: under the flat floor only)",
-            "POST /v1/scene/model/auto-support/",
-            lambda: api.auto_support_models(scene_id=scene_id, raft_type=RaftType.FULL_RAFT))
-    r["support_parameters"] = {**support_params,
-                               "other": "PreForm defaults for the material / layer (density, "
-                                        "touchpoint size, slope multiplier)"}
+    style = {i.key: i.part.supports for i in instances}
+    groups: dict[str, list[str]] = {}
+    for k, st in style.items():
+        groups.setdefault(st, []).append(k)
+    r["placement_notes"] = []
+    for st, keys in groups.items():
+        raft = SUPPORT_STYLES[st]
+        if raft is None:
+            r["placement_notes"].append(
+                f"{', '.join(keys)}: no supports or raft — printed directly on the build platform "
+                "(flat floor on the platform, crumb face up). Release with the platform flex / "
+                "removal tool; the underside takes the platform texture.")
+            continue
+        only = {} if len(groups) == 1 else {"model_ids": [model_ids[k] for k in keys]}
+        log.run(f"auto-generate supports ({raft}) for {', '.join(keys)}"
+                if only else "auto-generate supports (raft + supports; crumb slabs: under the "
+                             "flat floor only)",
+                "POST /v1/scene/model/auto-support/",
+                lambda raft=raft, only=only: api.auto_support_models(
+                    scene_id=scene_id, raft_type=RaftType(raft), **only))
+    r["support_parameters"] = {
+        "per_model": {k: SUPPORT_STYLES[v] or "none (directly on build platform)"
+                      for k, v in style.items()},
+        "raft_type": SUPPORT_STYLES[next(iter(groups))] if len(groups) == 1 else "per_model",
+        "other": "PreForm defaults for the material / layer (density, touchpoint size, slope "
+                 "multiplier)"}
 
     remaining = list(instances)
     deferred: list[Instance] = []
@@ -378,7 +412,8 @@ def prepare_build(
                 "POST /v1/scene/model/auto-layout/",
                 lambda: api.auto_layout_models(
                     scene_id=scene_id, model_ids=[model_ids[i.key] for i in remaining],
-                    model_spacing_mm=model_spacing_mm)))
+                    model_spacing_mm=model_spacing_mm,
+                    **({"layout_attempts": layout_attempts} if layout_attempts else {}))))
             attempts.append({"models": [i.key for i in remaining], "fit": True})
             break
         except PreFormApiError as exc:
@@ -398,6 +433,10 @@ def prepare_build(
     r["model_ids"] = model_ids
     r["chambers"] = [i.key for i in remaining]
     r["placed"] = [i.key for i in remaining]
+    placed_keys = set(r["placed"])
+    r["orientation_policy_per_model"] = {k: v for k, v in policy.items() if k in placed_keys}
+    r["support_parameters"]["per_model"] = {
+        k: v for k, v in r["support_parameters"]["per_model"].items() if k in placed_keys}
     r["deferred"] = [i.key for i in deferred]
     r["_deferred_instances"] = deferred
     r["_placed_instances"] = remaining
@@ -437,7 +476,8 @@ def prepare_build(
     checks["thin_feature_threshold_mm"] = thin_feature_threshold_mm
     r["printability_checks"] = {k: _rekey(v, by_id) for k, v in checks.items()}
     r["warnings"] = _warnings(r["printability_checks"],
-                              {k for k, v in policy.items() if v == "open_face_up"})
+                              {k for k, v in policy.items() if v == "open_face_up"},
+                              {k for k, v in style.items() if v == "none"})
 
     scene = _d(log.run("scene: material usage + layer count", "POST /v1/scene/get/",
                        lambda: api.get_scene(scene_id=scene_id)))
@@ -494,7 +534,8 @@ def prepare_build(
     return r
 
 
-def _warnings(checks: dict, crumb_keys: set[str] | frozenset = frozenset()) -> list[str]:
+def _warnings(checks: dict, crumb_keys: set[str] | frozenset = frozenset(),
+              no_support_keys: set[str] | frozenset = frozenset()) -> list[str]:
     """Human-readable printability warnings reported by PreForm (never silently dropped)."""
     out = []
     for name, res in (checks.get("cups") or {}).items():
@@ -512,7 +553,10 @@ def _warnings(checks: dict, crumb_keys: set[str] | frozenset = frozenset()) -> l
             out.append(f"{name}: {res['minima_count']} unsupported minima")
     for name, res in (checks.get("supportedness") or {}).items():
         if isinstance(res, dict) and res.get("percent_unsupported"):
-            out.append(f"{name}: {res['percent_unsupported']:.3g}% of its area is undersupported")
+            out.append(f"{name}: {res['percent_unsupported']:.3g}% of its area is undersupported"
+                       + (" (slab printed without supports by design: this is overhang area "
+                          "under pore lips inside craters; review in PreForm)"
+                          if name in no_support_keys else ""))
     for name, res in (checks.get("thin_features") or {}).items():
         if isinstance(res, dict) and res.get("has_thin_walls"):
             out.append(f"{name}: thin walls ({res.get('thin_volume_mm3')} mm^3)")
