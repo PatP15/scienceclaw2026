@@ -97,6 +97,14 @@ class ThinkingPulsesCfg(_Cfg):
     pattern: str = "nod"
 
 
+class DoorMotorCfg(_Cfg):
+    enabled: bool = True
+    duration_ms: int = 3000
+    pattern: str = "wiggle"
+    cooldown_s: float = 10.0
+    retry_on_close_if_rejected: bool = True
+
+
 class RequestLimitsCfg(_Cfg):
     telemetry_max_bytes: int = 64 * 1024
     ack_max_bytes: int = 16 * 1024
@@ -131,6 +139,7 @@ class HardwareConfig(_Cfg):
     taste_feedback: TasteFeedbackCfg = Field(default_factory=TasteFeedbackCfg)
     request_limits: RequestLimitsCfg = Field(default_factory=RequestLimitsCfg)
     thinking_pulses: ThinkingPulsesCfg = Field(default_factory=ThinkingPulsesCfg)
+    door_motor: DoorMotorCfg = Field(default_factory=DoorMotorCfg)
     capture_image: CaptureCfg = Field(default_factory=CaptureCfg)
     firmware_local_limits: dict[str, float] = Field(default_factory=dict)
 

@@ -816,3 +816,8 @@ main { padding: var(--gap); }
 .detail-charts { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
 .dchart { height: 120px; }
 #pass-replay .plan-card { display: none; }
+
+/* door opened (SSE `door` open=true): brief pulse on the station's door icon / tile */
+@keyframes door-flash { 0%, 100% { box-shadow: 0 0 0 0 rgba(232,180,90,0); transform: scale(1); } 30% { box-shadow: 0 0 0 8px rgba(232,180,90,.55); transform: scale(1.25); } 60% { transform: scale(1.1); } }
+.door-ico.door-flash { border-radius: 50%; animation: door-flash .6s ease-out 3; }
+.tile.door-tile.door-flash { animation: door-flash .6s ease-out 3; }

@@ -37,6 +37,7 @@ additionally bound to their chamber (auth.py).
 from __future__ import annotations
 
 import json
+import logging
 import math
 import re
 import uuid
@@ -115,6 +116,8 @@ class ControlService:
         self.db = db
         self.hw = hw
         self.clock = clock
+        from .door import DoorRule
+        self.door_rule = DoorRule(self)
         self._ensure_chambers()
 
     # ------------------------------------------------------------------ chambers / devices
@@ -692,6 +695,11 @@ class ControlService:
                    "device_id": device_id, "result": ack.result,
                    "motor_ran": (ack.status == "completed") if row["command_type"] == "motor" else None}
             self.db.emit("ack", evt, ack.chamber_id, conn=conn)
+            cmd_source = row["source"]
+        try:
+            self.door_rule.on_ack(ack.chamber_id, cmd_source, ack.status, message)
+        except Exception:
+            logging.getLogger("fermentai.api.door").exception("door rule failed")
         return {"ok": True, "command_id": ack.command_id, "command_type": row["command_type"],
                 "action": action, "command_status": new_status, "late": late,
                 "server_time_utc": iso(now)}
@@ -758,6 +766,7 @@ class ControlService:
         for b in ("door_open", "motor_running"):
             cols[b] = None if cols[b] is None else int(cols[b])
         health = (t.diagnostics.sensor_health if t.diagnostics else {}) or {}
+        prev_door = self.door_rule.previous_door(t.chamber_id)
         with self.db.tx() as conn:
             tid = conn.execute(
                 f"INSERT INTO telemetry(chamber_id, experiment_id, timestamp_utc, received_at_utc, source,"
@@ -800,6 +809,14 @@ class ControlService:
             evt = {**data, "telemetry_id": tid, "timestamp_utc": ts_iso, "received_at_utc": iso(now),
                    "quality_flags": flags, "peltier_mode": cols["peltier_mode"]}
             self.db.emit("telemetry", evt, t.chamber_id, conn=conn)
+        extra = (data.get("diagnostics") or {})
+        opens = extra.get("door_opens")
+        try:
+            self.door_rule.on_telemetry(
+                t.chamber_id, prev_door, t.door_open, opens if isinstance(opens, int) else None,
+                legacy="legacy_status_log" in flags)
+        except Exception:  # the door rule must never break telemetry ingest
+            logging.getLogger("fermentai.api.door").exception("door rule failed")
         return {"ok": True, "telemetry_id": tid, "chamber_id": t.chamber_id,
                 "received_at_utc": iso(now), "server_time_utc": iso(now), "quality_flags": flags,
                 "duplicate": False}

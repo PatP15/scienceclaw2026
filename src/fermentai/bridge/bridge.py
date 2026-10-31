@@ -97,6 +97,8 @@ class BridgeConfig:
     legacy_console: bool = True         # map animate_motor -> "motor test <ms>" on a legacy console
     console_reply_timeout_s: float = 3.0
     console_motor_max_ms: int = 10_000
+    legacy_status_poll_s: float = 0.0   # >0: write `status` to legacy consoles at this interval (CLI default 2.0)
+    legacy_status_max_gap_s: float = 30.0   # forward at least this often even if nothing changed
 
 
 class ReplayChannel:
@@ -202,6 +204,10 @@ class PortSession:
         self.legacy_armed: dict | None = None           # last status block's armed(peltier=, motor=)
         self.setpoint_reject_cache: dict | None = None  # last rejected console setpoint (anti-spam)
         self.protocol: str | None = None        # "serial_v1" | "legacy_status_log"
+        self._status_poll_at = 0.0
+        self._status_inflight_until = 0.0       # a `status` reply may still be streaming
+        self._last_fwd: dict | None = None      # last legacy record forwarded (change filter)
+        self._last_fwd_mono = 0.0
 
     # ---------------------------------------------------------------- lifecycle
     async def run(self, stop: asyncio.Event) -> None:
@@ -307,6 +313,7 @@ class PortSession:
                     await self._poll_commands()
                 if self.protocol == "legacy_status_log":
                     await self._console_tick(now)
+                    await self._status_poll(now)
                 if self.protocol != "serial_v1":
                     # time/ping only for devices that have spoken serial_v1: an unidentified or legacy
                     # fw 0.3.x port is a text console that would answer "ERR unknown command"
@@ -479,7 +486,78 @@ class PortSession:
             self.device_id = rec.get("device_id") or self.device_id
             self.boot_id = rec.get("boot_id") or self.boot_id
             self.firmware_version = rec.get("firmware_version") or self.firmware_version
+        if self.cfg.legacy_status_poll_s > 0:
+            self._status_inflight_until = 0.0
+            for r in self._filter_legacy(rec):
+                await self._forward_telemetry(r, False)
+            return
         await self._forward_telemetry(rec, False)
+
+    # ---- fast door sensing: poll the console `status` command, forward only changes
+    async def _status_poll(self, now: float) -> None:
+        interval = self.cfg.legacy_status_poll_s
+        if interval <= 0 or self.channel is None or now < self._status_poll_at:
+            return
+        # never interleave with a console command awaiting its reply, or queued to be sent
+        if self.console_pending or self.console_waiting or now < self._status_inflight_until:
+            return
+        self._status_poll_at = now + interval
+        self._status_inflight_until = now + max(1.5, interval)
+        await self.channel.write_line(b"status\n")
+        self.counters["tx_console_status"] += 1
+        self.bridge.record(self.name, "tx", "status")
+
+    _DEADBAND = {"chamber_temperature_c": 0.1, "starter_temperature_c": 0.1,
+                 "internal_heatsink_temperature_c": 0.2, "external_heatsink_temperature_c": 0.2,
+                 "relative_humidity_percent": 0.5, "pressure_pa": 30.0, "gas_resistance_ohms": 1e9,
+                 "ph": 0.02, "peltier_output_fraction": 0.02, "temperature_setpoint_c": 0.005}
+    _EXACT = ("door_open", "peltier_mode", "motor_running", "quality_flags", "fault_codes", "boot_id")
+
+    def _changed(self, a: dict, b: dict) -> bool:
+        for k in self._EXACT:
+            if a.get(k) != b.get(k):
+                return True
+        for k, db in self._DEADBAND.items():
+            x, y = a.get(k), b.get(k)
+            if (x is None) != (y is None):
+                return True
+            if x is not None and abs(x - y) > db:
+                return True
+        da, db_ = a.get("diagnostics") or {}, b.get("diagnostics") or {}
+        return da.get("door_opens") != db_.get("door_opens") or da.get("armed") != db_.get("armed")
+
+    def _filter_legacy(self, rec: dict) -> list[dict]:
+        now = time.monotonic()
+        prev = self._last_fwd
+        out: list[dict] = []
+        if prev is not None and prev.get("boot_id") == rec.get("boot_id"):
+            n0 = (prev.get("diagnostics") or {}).get("door_opens")
+            n1 = (rec.get("diagnostics") or {}).get("door_opens")
+            if isinstance(n0, int) and isinstance(n1, int) and n1 > n0:
+                was_open, is_open = bool(prev.get("door_open")), bool(rec.get("door_open"))
+                missed = (n1 - n0) - (1 if (not was_open and is_open) else 0)
+                if missed > 0:
+                    # opened (and closed) between two polls: the counter proves it happened
+                    seq = self.status_parser.alloc_seq
+                    for state in (True, False):
+                        inf = {**rec, "door_open": state, "sequence_number": seq(rec["boot_id"]),
+                               "quality_flags": list(dict.fromkeys(
+                                   [*(rec.get("quality_flags") or []), "door_event_inferred_from_counter"])),
+                               "diagnostics": {**(rec.get("diagnostics") or {}), "door_opens": n0 + missed,
+                                               "door_openings_inferred": missed}}
+                        out.append(inf)
+                    rec = {**rec, "sequence_number": seq(rec["boot_id"])}
+                    self.counters["door_events_inferred"] += missed
+        if (not out and prev is not None and now - self._last_fwd_mono < self.cfg.legacy_status_max_gap_s
+                and not self._changed(prev, rec)):
+            self.counters["legacy_blocks_suppressed"] += 1
+            return []
+        out.append(rec)
+        self._last_fwd, self._last_fwd_mono = rec, now
+        if prev is not None and prev.get("door_open") != rec.get("door_open"):
+            log.info("[%s] door %s (opens=%s)", self.name, "OPEN" if rec.get("door_open") else "closed",
+                     (rec.get("diagnostics") or {}).get("door_opens"))
+        return out
 
     async def _on_telemetry(self, msg: dict, p) -> None:
         payload = msg.get("payload")
@@ -743,7 +821,7 @@ class PortSession:
             await self._legacy_ack(st["command_id"], "completed",
                                    "legacy console has no stop; motor stopped at the end of its bounded run")
         # one console request in flight at a time; a motor test also waits for the motor to be idle
-        while self.console_waiting and not self.console_pending:
+        while self.console_waiting and not self.console_pending and now >= self._status_inflight_until:
             w = next((x for x in self.console_waiting
                       if x["kind"] == "setpoint" or not self.console_running), None)
             if w is None:

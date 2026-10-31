@@ -90,6 +90,16 @@ thinking_pulses:
   max_pulses_per_cycle: 4       # per station, per chat turn / taste cycle
   pattern: "nod"
 
+# Door -> chef-hat: when the door opens the hat wiggles (bounded animate_motor, source "door_event").
+# The firmware refuses the motor while the door is open ("ERR door open"); that interlock is never
+# bypassed: a refused/legacy case queues ONE wiggle for the next door-close.
+door_motor:
+  enabled: true
+  duration_ms: 3000             # <= motor.max_duration_s
+  pattern: "wiggle"
+  cooldown_s: 10                # min time between door-triggered wiggles per station
+  retry_on_close_if_rejected: true
+
 # Max HTTP request body sizes (bytes); larger requests get 413 before parsing.
 request_limits:
   telemetry_max_bytes: 65536

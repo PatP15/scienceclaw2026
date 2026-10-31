@@ -154,6 +154,12 @@ class StatusLogParser:
         rec = self._to_telemetry(blk)
         return [rec] if rec else []
 
+    def alloc_seq(self, boot: str) -> int:
+        """Next sequence number for a boot (used for bridge-inferred records)."""
+        n = self.seq.get(boot, 0) + 1
+        self.seq[boot] = n
+        return self.seq_base + n
+
     # ---------------------------------------------------------------- mapping
     def _to_telemetry(self, blk: dict) -> dict | None:
         hdr, m, ph = blk.get("header", {}), blk.get("measure", {}), blk.get("ph", {})

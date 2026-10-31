@@ -6,7 +6,7 @@ import { TwinPanel } from "./twin.js";
 import { MolecularPanel } from "./molecular.js";
 import { TastePanel } from "./taste.js";
 
-const EVENT_TYPES = ["telemetry", "image", "setpoint", "command", "ack", "experiment", "feedback", "feedback_result", "message", "simulation", "chat", "device"];
+const EVENT_TYPES = ["telemetry", "image", "setpoint", "command", "ack", "experiment", "feedback", "feedback_result", "message", "simulation", "chat", "device", "door"];
 const TAB_KEY = "fermentai.tab";
 const AUTO_KEY = "fermentai.token.auto";
 // The documented dev default operator token (.env.example / api/config.py DEFAULT_TOKEN). Used automatically

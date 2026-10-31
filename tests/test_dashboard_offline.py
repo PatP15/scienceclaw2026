@@ -110,5 +110,8 @@ def test_live_cards_never_invent_missing_values():
     assert "SENSORS.filter((s) => s.get(tel) !== null)" in live
     assert "not fitted:" in live and "device clock unsynced" in live
     assert "not fermentation evidence" in live and "hs.some((x) => x !== null)" in live   # safety strip only if a heatsink reports
-    assert "stale_image_from_other_device" in live and "No frame from this device yet" in live
+    # camera is hidden behind one flag; the image-from-other-device rule stays for when it returns
+    assert "const SHOW_CAMERA = false;" in live and "if (SHOW_CAMERA) s.on(\"image\"" in live
+    assert "stale_image_from_other_device" in live and "SHOW_CAMERA ? [[\"starter_height_mm\", \"rise camera\"]]" in live
+    assert 's.on("door"' in live and "door-flash" in live
     assert 's.startsWith("measured")' in util

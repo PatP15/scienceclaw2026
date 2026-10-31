@@ -67,6 +67,9 @@ def build_parser() -> argparse.ArgumentParser:
     ap.add_argument("--legacy-console", action=argparse.BooleanOptionalAction, default=True,
                     help="on a legacy fw 0.3.x port, map animate_motor to the console's `motor test <ms>` "
                          "(the only thing ever written to it); --no-legacy-console = never write")
+    ap.add_argument("--legacy-status-poll", type=float, default=2.0, metavar="SECONDS",
+                    help="on a legacy fw 0.3.x console, write `status` every N s (0 = off) for fast door "
+                         "sensing; telemetry is forwarded only on change or every 30 s")
     ap.add_argument("--duration", type=float, default=0.0, help="seconds to run (0 = forever)")
     ap.add_argument("-v", "--verbose", action="store_true")
     return ap
@@ -105,6 +108,7 @@ def config_from_args(args: argparse.Namespace) -> BridgeConfig:
         record_path=args.record,
         parse_status_log=args.parse_status_log,
         legacy_console=args.legacy_console,
+        legacy_status_poll_s=max(0.0, args.legacy_status_poll),
     )
 
 

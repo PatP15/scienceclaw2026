@@ -7,6 +7,9 @@ import { h, clear, fmt, timeAgo, hhmmss, statusBadge, sparkline, agentSide, toas
 import { messageText, messageSender } from "./messages.js";
 import { ChatPanel } from "./chat.js";
 
+const SHOW_CAMERA = false;       // camera frames are hidden for now (API endpoints untouched); flip to bring them back
+const DOOR_FLASH_MS = 1800;     // door icon/tile pulse after an SSE `door` open event
+
 const STALE_AFTER_S = 60;       // configs/hardware.yaml telemetry.stale_after_s; the server flag wins on refresh
 const HISTORY_MAX = 720;        // rows kept per chamber (~2 h at 10 s)
 const WINDOW_MIN = 60;          // history window shown on cards and charts
@@ -46,7 +49,7 @@ const SENSORS = [
   { key: "peltier", label: "Peltier", unit: "%", dp: 0, text: (r) => tfield(r, "peltier_mode"),
     get: (r) => { const f = num(tfield(r, "peltier_output_fraction")); return f === null ? (tfield(r, "peltier_mode") ? 0 : null) : f * 100; } },
 ];
-const NOT_FITTED = [["ph", "pH"], ["pressure_pa", "pressure"], ["gas_resistance_ohms", "gas"], ["starter_height_mm", "rise camera"],
+const NOT_FITTED = [["ph", "pH"], ["pressure_pa", "pressure"], ["gas_resistance_ohms", "gas"], ...(SHOW_CAMERA ? [["starter_height_mm", "rise camera"]] : []),
   ["relative_humidity_percent", "humidity"], ["internal_heatsink_temperature_c", "heatsinks"]];
 
 const rowTime = (r) => Date.parse(r.timestamp_utc || r.received_at_utc);
@@ -86,7 +89,8 @@ export class LivePanel {
   wire() {
     const s = this.stream;
     s.on("telemetry", (f) => this.onTelemetry(f));
-    s.on("image", (f) => {
+    s.on("door", (f) => this.onDoor(f.data || {}, f.chamber_id));
+    if (SHOW_CAMERA) s.on("image", (f) => {
       const c = f.chamber_id || f.data?.chamber_id;
       if (!this.state[c]) return;
       this.state[c].latest_image = { id: f.data.image_id, url: f.data.url, timestamp_utc: f.data.timestamp_utc, source: f.data.source,
@@ -113,6 +117,18 @@ export class LivePanel {
     setInterval(() => this.ids.forEach((c) => this.refreshAgent(c)), 30000);
     setInterval(() => this.renderHats(), 1000);
   }
+
+  // ------------------------------------------------------------------ door flash
+  onDoor(d, chamber) {
+    const c = d.chamber_id || chamber;
+    if (!c || !this.state[c]) return;
+    if (this.state[c].latest_telemetry) this.state[c].latest_telemetry.door_open = !!d.open;
+    if (d.open !== true) { this.render(c); return; }
+    (this.doorFlash ||= {})[c] = Date.now() + DOOR_FLASH_MS;
+    this.render(c);
+    setTimeout(() => this.render(c), DOOR_FLASH_MS + 50);
+  }
+  doorFlashing(c) { return Date.now() < ((this.doorFlash || {})[c] || 0); }
 
   // ------------------------------------------------------------------ thinking (hat wiggle)
   setThinking(station, on) {
@@ -299,14 +315,14 @@ export class LivePanel {
         h("span", { class: `usb-chip usb-${f.link.cls}`, title: f.link.title }, f.link.text),
         f.tel ? h("span", { class: `fresh-dot ${f.stale ? "stale" : "fresh"}`, title: f.stale ? `stale — last reading ${timeAgo(f.tel.received_at_utc, this.serverNow())}` : "fresh" }, f.stale ? "stale" : "live") : null,
         f.usb?.realLinked && f.tel && !(f.prov === "measured") ? h("span", { class: "usb-chip usb-warn", title: "A real USB device is linked, but the latest telemetry is labelled simulated — shown as recorded." }, "data ≠ USB device") : null),
-      h("div", { class: "lab-icons" }, this.doorIcon(f.tel), this.hat(c, big ? 30 : 26)),
+      h("div", { class: "lab-icons" }, this.doorIcon(f.tel, c), this.hat(c, big ? 30 : 26)),
     ];
   }
 
-  doorIcon(tel) {
+  doorIcon(tel, c) {
     const d = tfield(tel, "door_open");
     if (d === null) return null;
-    return h("span", { class: `door-ico ${d ? "open" : "closed"}`, title: d ? "door open" : "door closed" }, icon(d ? "door_open" : "door_closed", { size: 22 }));
+    return h("span", { class: `door-ico ${d ? "open" : "closed"}${c && this.doorFlashing(c) ? " door-flash" : ""}`, title: d ? "door open" : "door closed" }, icon(d ? "door_open" : "door_closed", { size: 22 }));
   }
 
   /** Big air number + air/setpoint line; tiles for the other reporting sensors. */
@@ -352,7 +368,7 @@ export class LivePanel {
       const seg = document.createElementNS(NS, "rect"); seg.setAttribute("x", x); seg.setAttribute("y", 2); seg.setAttribute("width", w); seg.setAttribute("height", 10); seg.setAttribute("rx", 2); seg.setAttribute("fill", "#fab219"); svg.append(seg);
     });
     const nowOpen = tfield(this.state[c]?.latest_telemetry, "door_open") === true;
-    return h("div", { class: "tile door-tile", title: `door state over the last ${WINDOW_MIN} min (amber = open)` },
+    return h("div", { class: `tile door-tile${this.doorFlashing(c) ? " door-flash" : ""}`, title: `door state over the last ${WINDOW_MIN} min (amber = open)` },
       h("div", { class: "tile-lbl" }, "Door"),
       h("div", { class: "tile-val" }, nowOpen ? "open" : "closed", h("span", { class: "unit" }, ` · ${opens} open${opens === 1 ? "" : "s"}`)),
       svg);
@@ -449,24 +465,27 @@ export class LivePanel {
     }
   }
 
-  /** Camera frame (only from this device), device drawer, Sous Chef status with a "why" disclosure. */
+  /** Camera frame (only when SHOW_CAMERA), device drawer, Sous Chef status with a "why" disclosure. */
   renderDetailSide(c, f) {
     const box = document.getElementById("lab-detail-side");
     if (!box) return;
-    // Image rule: never show a frame from another device than the latest telemetry's.
-    const img = f.st.latest_image;
-    const telKind = normProv(f.tel?.source, "device");
-    const otherDevice = img && (img.stale_image_from_other_device === true
-      || (img.device_id && f.tel && tfield(f.tel, "device_id") && img.device_id !== tfield(f.tel, "device_id"))
-      || (f.tel && img.source && normProv(img.source, "device") !== telKind));
-    let snap = box.querySelector(".snap");
-    const key = img && !otherDevice ? img.url : "none";
-    if (!snap || snap.dataset.key !== key) {
-      snap = h("div", { class: "snap", dataset: { key } },
-        img && !otherDevice ? h("img", { src: img.url, alt: `Station ${c} camera frame`, loading: "lazy" }) : emptyCard({ icon: "camera", title: "No frame from this device yet", compact: true }),
-        img && !otherDevice ? h("div", { class: "snap-cap" }, h("span", null, hhmmss(img.timestamp_utc)), deviceBadge(img.source)) : null);
+    let snap = null;
+    if (SHOW_CAMERA) {
+      // Image rule: never show a frame from another device than the latest telemetry's.
+      const img = f.st.latest_image;
+      const telKind = normProv(f.tel?.source, "device");
+      const otherDevice = img && (img.stale_image_from_other_device === true
+        || (img.device_id && f.tel && tfield(f.tel, "device_id") && img.device_id !== tfield(f.tel, "device_id"))
+        || (f.tel && img.source && normProv(img.source, "device") !== telKind));
+      snap = box.querySelector(".snap");
+      const key = img && !otherDevice ? img.url : "none";
+      if (!snap || snap.dataset.key !== key) {
+        snap = h("div", { class: "snap", dataset: { key } },
+          img && !otherDevice ? h("img", { src: img.url, alt: `Station ${c} camera frame`, loading: "lazy" }) : emptyCard({ icon: "camera", title: "No frame from this device yet", compact: true }),
+          img && !otherDevice ? h("div", { class: "snap-cap" }, h("span", null, hhmmss(img.timestamp_utc)), deviceBadge(img.source)) : null);
+      }
     }
-    clear(box, snap, this.deviceDrawer(c, f), this.agentBox(c, f.st));
+    clear(box, ...(snap ? [snap] : []), this.deviceDrawer(c, f), this.agentBox(c, f.st));
   }
 
   deviceDrawer(c, f) {
