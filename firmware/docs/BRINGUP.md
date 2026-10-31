@@ -204,7 +204,7 @@ able to reach the supply switch.
 | 3 | | | | |
 | 4 | A | pass (bench, bare reed on GPIO39): magnet near = `closed`, away = `open`, tracked every move; open count rose faster than the moves (possible bounce or threshold hover), recheck debounce once mounted on the door. | 2026-10-31 | PP + Claude |
 | 5 | A | ENS160+AHT21 on I²C 41/42 (instead of BME680): AHT21 0x38 23–25 °C / 21 % RH; ENS160 found at 0x53, first data after ~20 s (AQI 1, TVOC 9–24 ppb, eCO2 400 ppm, `warmup=1`). Pressure/gas null as expected. Breath test: RH 21→54 %, TVOC 22→91 ppb, eCO2 400→535, AQI 1→2, back to baseline within 15 s. Reference-thermometer comparison and unplug test pending. | 2026-10-31 | PP + Claude |
-| 6 | A | in progress: probe 1 found after the OneWire GPIO47 fix, ROM `283e4825000000c6` → starter. Hand-warm, reboot-persistence and unplug tests pending; probes 2 and 3 pending. | 2026-10-31 | PP + Claude |
+| 6 | A | in progress: probe 1 found after the OneWire GPIO47 fix, ROM `283e4825000000c6` → starter (cable label 00C6). Hand-warm: 23.5 → 27.1 °C in 40 s, pass. Role persisted across several resets (NVS), pass. Side finding: AHT21 reads ≈3 °C above the DS18B20 in the same air (ENS160 self-heating). Unplug test and probes 2 and 3 pending. | 2026-10-31 | PP + Claude |
 | 7 | | | | |
 | 8 | | | | |
 | 9 | | | | |
