@@ -167,6 +167,8 @@ def main():
     arrow(ax, (px, y0 - 1.2), (px, by + bbh + 1.2))
     dx = xs[1] + bw / 2
     arrow(ax, (bx - 1.2, by + bbh / 2), (dx, y0 - 1.2), color=GREEN, rad=-0.35)
+    ax_ = xs[0] + bw / 2  # tasting also updates which molecules ALCHEMI runs next
+    arrow(ax, (bx - 1.2, by + bbh / 2), (ax_, y0 - 1.2), color=GREEN, rad=-0.25)
 
     OUT.mkdir(parents=True, exist_ok=True)
     fig.savefig(OUT / "dataflow_simple.png", dpi=200, metadata={"Software": None})
