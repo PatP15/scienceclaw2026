@@ -445,24 +445,45 @@ _ACID_KEYS = {
     "lactic": ("lactic_acid", "lactic", "LA", "lactate"),
     "acetic": ("acetic_acid", "acetic", "AA", "acetate"),
 }
-_FIELD_ALIASES = {
-    "assoc_energy_per_water_kcal": (
-        "assoc_energy_per_water_kcal",
-        "assoc_energy_per_water_kcal_mol",
-        "dE_assoc_per_water_kcal_mol",
+
+# Candidate inputs in order of preference: (field, kind, campaign label). A candidate is used only
+# if BOTH acids have a finite value for that same field (never mixes definitions across acids).
+# kind "by_n": dict {n: value} -> mean over the n values present (finite) for both acids.
+_ASSOC_CANDIDATES = (
+    (
+        "c2_boltzmann_assoc_energy_per_water_kcal_by_n_neutral",
+        "by_n",
+        "campaign 2 (Boltzmann-averaged neutral clusters, mean over common n)",
     ),
-    # preferred: ion pair in the n=6 cluster; fallback: separated gas-phase ions (same caveats,
-    # larger absolute errors - only the lactic-acetic difference is used, shrunk and capped)
-    "deprot_energy_n6_kcal": (
-        "deprot_energy_n6_kcal",
-        "deprot_energy_n6_kcal_mol",
+    (
+        "c2_assoc_energy_per_water_kcal_by_n_neutral",
+        "by_n",
+        "campaign 2 (lowest-minimum neutral clusters, mean over common n)",
+    ),
+    ("assoc_energy_per_water_kcal", "scalar", "campaign 1 (lowest conformers, mean over n=1,3,6)"),
+    ("assoc_energy_per_water_kcal_mol", "scalar", "campaign 1"),
+    ("dE_assoc_per_water_kcal_mol", "scalar", "campaign 1"),
+)
+_HBOND_CANDIDATES = (
+    ("hbond_min_A", "scalar", "campaign 1 (shortest acid-water H...O contact)"),
+    ("hbond_min_angstrom", "scalar", "campaign 1"),
+    ("hbond_min_a", "scalar", "campaign 1"),
+)
+# Fallback for the relative pKa when the top-level relative_pka_estimate is absent.
+_DEPROT_CANDIDATES = (
+    ("deprot_energy_n6_kcal", "scalar", "campaign 1 (n=6 contact ion pair, 0 K electronic)"),
+    ("deprot_energy_n6_kcal_mol", "scalar", "campaign 1 (n=6 contact ion pair)"),
+    (
         "deprot_energy_separated_ions_n6_kcal",
+        "scalar",
+        "campaign 1 (separated gas-phase ions, n=6, 0 K electronic)",
     ),
-    "hbond_min_A": ("hbond_min_A", "hbond_min_angstrom", "hbond_min_a"),
-}
+)
 
 
 def _finite(x: Any) -> float | None:
+    if isinstance(x, bool):
+        return None
     try:
         v = float(x)
     except (TypeError, ValueError):
@@ -494,11 +515,73 @@ def _acid_block(data: Any, acid: str) -> dict | None:
     return None
 
 
-def read_molecular_descriptors(path: str | Path | None = None) -> dict[str, Any]:
-    """Parse the ALCHEMI descriptor file into ``{"lactic": {...}, "acetic": {...}, ...}``.
+def _pair_value(lac: dict, ace: dict, candidates) -> dict | None:
+    """First candidate field with finite values for both acids -> selection record."""
+    for fld, kind, campaign in candidates:
+        if fld not in lac or fld not in ace:
+            continue
+        if kind == "by_n":
+            a, b = lac[fld], ace[fld]
+            if not (isinstance(a, dict) and isinstance(b, dict)):
+                continue
+            ns = sorted(
+                (
+                    n
+                    for n in a
+                    if n in b and _finite(a[n]) is not None and _finite(b[n]) is not None
+                ),
+                key=lambda n: float(n) if _finite(n) is not None else 0.0,
+            )
+            if not ns:
+                continue
+            va = float(np.mean([_finite(a[n]) for n in ns]))
+            vb = float(np.mean([_finite(b[n]) for n in ns]))
+            return {
+                "field": fld,
+                "campaign": campaign,
+                "lactic": va,
+                "acetic": vb,
+                "difference": va - vb,
+                "n_used": [str(n) for n in ns],
+            }
+        va, vb = _finite(lac[fld]), _finite(ace[fld])
+        if va is not None and vb is not None:
+            return {
+                "field": fld,
+                "campaign": campaign,
+                "lactic": va,
+                "acetic": vb,
+                "difference": va - vb,
+            }
+    return None
 
-    Only finite numeric values of the known fields are kept. Returns ``{"status": "absent"}`` /
-    ``{"status": "invalid", "error": ...}`` instead of raising.
+
+def _relative_pka_estimate(data: Any) -> dict | None:
+    """Top-level campaign-2 ``relative_pka_estimate`` (cluster-phase dpKa lactic - acetic)."""
+    if not isinstance(data, dict):
+        return None
+    est = data.get("relative_pka_estimate")
+    if not isinstance(est, dict):
+        return None
+    val = _finite(est.get("value"))
+    if val is None:
+        return None
+    return {
+        "value": val,
+        "uncertainty": _finite(est.get("uncertainty")),
+        "experiment": _finite(est.get("experiment")),
+        "per_n": est.get("per_n") if isinstance(est.get("per_n"), dict) else None,
+        "method": est.get("method"),
+        "note": est.get("note"),
+    }
+
+
+def read_molecular_descriptors(path: str | Path | None = None) -> dict[str, Any]:
+    """Parse the ALCHEMI descriptor file. Never raises.
+
+    Returns ``{"status": "read", "path", "descriptor_provenance", "lactic": {...},
+    "acetic": {...}, "relative_pka_estimate": {...} | None}`` where the per-acid dicts are the raw
+    blocks, or ``{"status": "absent" | "invalid", ...}``.
     """
     p = Path(path) if path is not None else Path(DEFAULT_DESCRIPTORS_PATH)
     if not p.is_absolute() and not p.exists():
@@ -515,14 +598,13 @@ def read_molecular_descriptors(path: str | Path | None = None) -> dict[str, Any]
     if isinstance(data, dict):
         out["descriptor_provenance"] = data.get("provenance", data.get("source"))
     for acid in ("lactic", "acetic"):
-        blk = _acid_block(data, acid) or {}
-        vals = {}
-        for fld, aliases in _FIELD_ALIASES.items():
-            v = next((_finite(blk[a]) for a in aliases if a in blk), None)
-            if v is not None:
-                vals[fld] = v
-        out[acid] = vals
+        out[acid] = _acid_block(data, acid) or {}
+    out["relative_pka_estimate"] = _relative_pka_estimate(data)
     return out
+
+
+def _label(prov: Any) -> Any:
+    return prov.get("label", prov) if isinstance(prov, dict) else prov
 
 
 def apply_molecular_descriptors(
@@ -534,24 +616,25 @@ def apply_molecular_descriptors(
 
     Returns a new full parameter dict (defaults overlaid with ``params``), or
     ``(params, report)`` when ``return_report=True``. If the descriptor file is absent, invalid
-    or lacks a pair of lactic+acetic values for a mapping, the affected parameters are returned
+    or lacks a usable lactic+acetic pair for a mapping, the affected parameters are returned
     unchanged with ``source: "literature"`` / ``"assumption"`` (never NaN, never out of range).
 
-    Mappings (documented in docs/scientific_assumptions.md §9; config: ``molecular_coupling`` in
-    kinetics.yaml). Only lactic-minus-acetic *differences* are used:
+    Mappings (docs/scientific_assumptions.md §9; config ``molecular_coupling`` in kinetics.yaml).
+    Only lactic-minus-acetic *differences* are used; the report records which field and which
+    ALCHEMI campaign each input came from.
 
-    1. ``undissociated_lactic_rel_potency`` (yeast inhibition by undissociated lactic acid,
-       relative to acetic). Hydrophilicity score
-       ``h = mean(-(dAssoc)/assoc_scale, -(dHbond)/hbond_scale)`` where
-       ``dAssoc = assoc_energy_per_water_kcal(lactic) - (acetic)`` and
-       ``dHbond = hbond_min_A(lactic) - (acetic)``. More strongly hydrated (h > 0) -> lower
-       membrane permeation -> potency moves toward ``min`` by ``tanh(h)`` of the gap; h < 0
-       moves it toward ``max``.
-    2. ``pka_lactic`` / ``pka_acetic``: the cluster-implied pKa difference
-       ``(deprot_energy_n6_kcal(lactic) - (acetic)) / (RT ln10)`` is compared with the
-       literature difference; ``dpka_shrinkage`` of the discrepancy is applied, capped at
-       ``dpka_cap`` per acid and clipped to each pKa's [min, max]. With the defaults the
-       lactic-acetic gap can change by at most 0.05 pKa units.
+    1. ``undissociated_lactic_rel_potency``: hydrophilicity score
+       ``h = mean(-dAssoc/assoc_scale, -dHbond/hbond_scale)``. dAssoc prefers the campaign-2
+       Boltzmann-averaged association energy per water (mean over the cluster sizes n present
+       for both acids), then campaign-2 lowest-minimum, then campaign-1. dHbond is the campaign-1
+       shortest acid-water H-bond. h > 0 (lactic more strongly hydrated) moves the potency toward
+       ``min`` by ``tanh(h)`` of the gap; h < 0 toward ``max``.
+    2. ``pka_lactic`` / ``pka_acetic``: the cluster-phase relative pKa (lactic - acetic) is taken
+       from the top-level campaign-2 ``relative_pka_estimate.value`` when present, otherwise from
+       a deprotonation-energy difference / (RT ln 10) (n=6 ion pair, then separated ions, same
+       field for both acids). ``dpka_shrinkage`` (10 %) of its discrepancy from the literature
+       gap (-0.90) is applied to the gap, capped at ``2 * dpka_cap`` (0.05), split equally
+       between the two acids and clipped to their [min, max].
     """
     specs = parameter_specs()
     p = resolve_params(params)
@@ -569,6 +652,7 @@ def apply_molecular_descriptors(
             }
             for n in targets
         },
+        "inputs": {},
         "notes": [],
     }
     desc = read_molecular_descriptors(path)
@@ -578,23 +662,20 @@ def apply_molecular_descriptors(
         if "error" in desc:
             report["notes"].append(desc["error"])
         return (p, report) if return_report else p
-    report["descriptor_provenance"] = desc.get("descriptor_provenance")
-    report["descriptors"] = {"lactic": desc["lactic"], "acetic": desc["acetic"]}
+    report["descriptor_provenance"] = _label(desc.get("descriptor_provenance"))
     lac, ace = desc["lactic"], desc["acetic"]
 
-    def diff(field_name: str) -> float | None:
-        a, b = lac.get(field_name), ace.get(field_name)
-        return None if a is None or b is None else a - b
-
     applied = []
-    # 1) relative inhibition potency of undissociated lactic acid
+    # 1) relative inhibition potency of undissociated lactic acid -------------------------------
+    assoc = _pair_value(lac, ace, _ASSOC_CANDIDATES)
+    hb = _pair_value(lac, ace, _HBOND_CANDIDATES)
     comps = []
-    d_assoc = diff("assoc_energy_per_water_kcal")
-    if d_assoc is not None:
-        comps.append(-d_assoc / float(cfg.get("assoc_scale_kcal", 2.0)))
-    d_hb = diff("hbond_min_A")
-    if d_hb is not None:
-        comps.append(-d_hb / float(cfg.get("hbond_scale_A", 0.50)))
+    if assoc is not None:
+        report["inputs"]["association_energy_per_water"] = assoc
+        comps.append(-assoc["difference"] / float(cfg.get("assoc_scale_kcal", 2.0)))
+    if hb is not None:
+        report["inputs"]["hbond_min"] = hb
+        comps.append(-hb["difference"] / float(cfg.get("hbond_scale_A", 0.50)))
     n = "undissociated_lactic_rel_potency"
     if comps:
         h = float(np.mean(comps))
@@ -606,27 +687,50 @@ def apply_molecular_descriptors(
         report["parameters"][n].update(
             value=r,
             source="alchemi-informed",
-            inputs={"d_assoc_per_water_kcal": d_assoc, "d_hbond_min_A": d_hb},
+            inputs={
+                "d_assoc_per_water_kcal": assoc["difference"] if assoc else None,
+                "d_assoc_campaign": assoc["campaign"] if assoc else None,
+                "d_hbond_min_A": hb["difference"] if hb else None,
+                "d_hbond_campaign": hb["campaign"] if hb else None,
+            },
             mapping=f"hydrophilicity score h={h:.3f}; tanh-bounded move within [{s.min}, {s.max}]",
         )
         applied.append(n)
     else:
         report["notes"].append(
-            "potency: need assoc_energy_per_water_kcal or hbond_min_A for both acids"
+            "potency: no association-energy or H-bond field with finite values for both acids"
         )
 
-    # 2) small relative pKa correction
-    d_dep = diff("deprot_energy_n6_kcal")
-    if d_dep is not None:
-        rt = float(cfg.get("rt_ln10_kcal", 1.364))
+    # 2) small relative pKa correction ----------------------------------------------------------
+    rt = float(cfg.get("rt_ln10_kcal", 1.364))
+    lit_gap = specs["pka_lactic"].value - specs["pka_acetic"].value
+    est = desc.get("relative_pka_estimate")
+    rel = None
+    if est is not None:
+        rel = {
+            "field": "relative_pka_estimate.value",
+            "campaign": "campaign 2 (cluster-phase quasi-harmonic exchange cycle, n=6 and n=10)",
+            "cluster_dpka": est["value"],
+            "uncertainty": est["uncertainty"],
+            "per_n": est["per_n"],
+            "method": est["method"],
+        }
+    else:
+        dep = _pair_value(lac, ace, _DEPROT_CANDIDATES)
+        if dep is not None:
+            rel = {
+                "field": dep["field"],
+                "campaign": dep["campaign"],
+                "cluster_dpka": dep["difference"] / rt,
+                "uncertainty": None,
+                "d_deprot_energy_kcal": dep["difference"],
+            }
+    if rel is not None:
         cap = float(cfg.get("dpka_cap", 0.025))
-        lit_gap = specs["pka_lactic"].value - specs["pka_acetic"].value
-        cluster_gap = d_dep / rt
-        shift = float(
-            np.clip(
-                float(cfg.get("dpka_shrinkage", 0.10)) * (cluster_gap - lit_gap), -2 * cap, 2 * cap
-            )
-        )
+        shrink = float(cfg.get("dpka_shrinkage", 0.10))
+        cluster_gap = rel["cluster_dpka"]
+        raw_shift = shrink * (cluster_gap - lit_gap)
+        shift = float(np.clip(raw_shift, -2 * cap, 2 * cap))
         new_la = float(
             np.clip(p["pka_lactic"] + shift / 2, specs["pka_lactic"].min, specs["pka_lactic"].max)
         )
@@ -634,26 +738,55 @@ def apply_molecular_descriptors(
             np.clip(p["pka_acetic"] - shift / 2, specs["pka_acetic"].min, specs["pka_acetic"].max)
         )
         p["pka_lactic"], p["pka_acetic"] = new_la, new_ac
-        info = {
-            "d_deprot_energy_n6_kcal": d_dep,
-            "cluster_implied_dpka": cluster_gap,
-            "literature_dpka": lit_gap,
-            "sign_agrees_with_literature": bool(cluster_gap < 0),
+        exp_gap = (
+            est["experiment"] if est is not None and est["experiment"] is not None else lit_gap
+        )
+        dev = cluster_gap - exp_gap
+        unc = rel.get("uncertainty")
+        comparison = {
+            "cluster_dpka_lactic_minus_acetic": cluster_gap,
+            "cluster_uncertainty": unc,
+            "experimental_dpka": exp_gap,
+            "literature_dpka_used_by_model": lit_gap,
+            "deviation_from_experiment": dev,
+            "deviation_in_sigma": (dev / unc) if unc else None,
+            "sign_agrees_with_experiment": bool(cluster_gap < 0) == bool(exp_gap < 0),
+            "raw_shift_before_cap": raw_shift,
+            "applied_gap_shift": shift,
+            "cap_binding": abs(raw_shift) > 2 * cap,
+            "resulting_model_dpka": new_la - new_ac,
         }
+        rel["comparison_to_experiment"] = comparison
+        report["inputs"]["relative_pka"] = rel
         for nm, v in (("pka_lactic", new_la), ("pka_acetic", new_ac)):
             report["parameters"][nm].update(
                 value=v,
                 source="alchemi-informed",
-                inputs=info,
-                mapping=f"shift of lactic-acetic gap = {shift:+.4f} (shrinkage, capped)",
+                inputs={
+                    "field": rel["field"],
+                    "campaign": rel["campaign"],
+                    "cluster_dpka": cluster_gap,
+                    "experimental_dpka": exp_gap,
+                },
+                mapping=(
+                    f"gap shift = clip({shrink:g} x ({cluster_gap:+.3f} - ({lit_gap:+.2f})), "
+                    f"+-{2 * cap:g}) = {shift:+.4f}"
+                ),
             )
         applied += ["pka_lactic", "pka_acetic"]
-        if cluster_gap >= 0:
+        if not comparison["sign_agrees_with_experiment"]:
             report["notes"].append(
-                "cluster energetics do not reproduce lactic < acetic pKa ordering; correction capped"
+                "cluster estimate does not reproduce lactic < acetic pKa ordering; correction capped"
+            )
+        if comparison["cap_binding"]:
+            report["notes"].append(
+                "pKa: the 0.05 cap binds; the applied shift reflects only the sign of the "
+                "cluster-vs-experiment discrepancy"
             )
     else:
-        report["notes"].append("pKa: need deprot_energy_n6_kcal for both acids")
+        report["notes"].append(
+            "pKa: no relative_pka_estimate and no deprotonation field with finite values for both acids"
+        )
 
     report["applied"] = applied
     report["status"] = (

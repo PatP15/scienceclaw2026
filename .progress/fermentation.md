@@ -26,6 +26,13 @@ tests/test_fermentation_*.py
   file present -> status partial (potency 0.10->0.124; no deprot data -> pKa literature).
   tests: 40 passing (added tests/test_fermentation_coupling.py). Docs §9-§10 added.
 
+- FOLLOW-UP (campaign 2): apply_molecular_descriptors rewritten: prefers top-level
+  relative_pka_estimate (c2), c2 Boltzmann assoc-per-water (mean over common n) > c2 lowest > c1;
+  same-field-for-both-acids rule (fixes null acetic deprot_n6 no-op); report records field+campaign
+  and relative-pKa comparison to experiment. Real file -> status applied: potency 0.10->0.127,
+  pKa 3.835/4.785 (cap binds; raw shift -0.30). Effect: A pH12 -0.007, pH16 -0.009; B -0.011/-0.013;
+  peak/overproof times unchanged. 44 tests pass. Docs §9 rewritten.
+
 ## Next
 - DONE. docs/scientific_assumptions.md written. Remaining optional work: calibrate against real
   pH/rise data once available (calibrate(observations, schedule=None, free_params=[...])).

@@ -330,28 +330,47 @@ end fermentation. A few pH readings constrain the buffer/LAB parameters that con
 ## 9. Upstream coupling: ALCHEMI molecular descriptors → relative acid terms
 
 `kinetics.apply_molecular_descriptors(params, path="data/alchemi/analysis/molecular_descriptors.json", return_report=False)`
-reads per-acid descriptors from the ALCHEMI/AIMNet2 acid–water cluster calculations. The fields are
-`assoc_energy_per_water_kcal`, `deprot_energy_n6_kcal` and `hbond_min_A`. The hook uses only
-**lactic-minus-acetic differences** to nudge three acid-strength parameters, always inside their
-configured `[min, max]`.
+reads the ALCHEMI/AIMNet2 acid–water cluster descriptors. Campaign 1 and campaign 2 are described in
+`docs/simulation_provenance.md`. The hook uses only **lactic-minus-acetic differences** to nudge
+three acid-strength parameters, always inside their configured `[min, max]`.
 
-| Parameter | Default (`source`) | ALCHEMI signal used | Mapping |
+A field is used only if **both** acids have a finite value for that **same** field. The hook never
+mixes definitions, for example an ion-pair energy for one acid with a separated-ion energy for the
+other. The report records, for every input, the field it used and which campaign that field came
+from.
+
+| Parameter | Default (`source`) | ALCHEMI input, in order of preference | Mapping |
 |---|---|---|---|
-| `undissociated_lactic_rel_potency` | 0.10 (assumption) | Δ association energy per water; Δ shortest H-bond | See note 1 below |
-| `pka_lactic`, `pka_acetic` | 3.86 / 4.76 (literature) | Δ deprotonation energy in the n = 6 cluster | See note 2 below |
+| `undissociated_lactic_rel_potency` | 0.10 (assumption) | Δ association energy per water, plus Δ shortest H-bond (both used) | See note 1 below |
+| `pka_lactic`, `pka_acetic` | 3.86 / 4.76 (literature) | Cluster-phase relative pKa | See note 2 below |
 
 1. **Potency mapping.** A hydrophilicity score is computed as
    `h = mean(−ΔE_assoc/2 kcal, −Δd_HB/0.50 Å)`. h > 0 means lactic acid is more strongly hydrated.
    In that case the potency moves toward its minimum by `tanh(h)` of the gap; otherwise it moves
    toward its maximum.
-2. **pKa mapping.** The cluster-implied gap is `ΔE_deprot / (RT ln 10)`. 10 % of its discrepancy
-   from the literature gap (−0.90) is applied, capped at ±0.025 per acid. The lactic–acetic gap
-   therefore moves by at most 0.05.
+   - **ΔE_assoc** prefers the campaign-2 Boltzmann-averaged neutral-cluster values
+     (`c2_boltzmann_assoc_energy_per_water_kcal_by_n_neutral`), averaged over the cluster sizes n
+     that are present for both acids. If those are missing it uses the campaign-2 lowest-minimum
+     values, and then the campaign-1 `assoc_energy_per_water_kcal`, which came from under-sampled
+     lowest conformers.
+   - **Δd_HB** is the campaign-1 `hbond_min_A`.
+2. **pKa mapping.** The cluster-phase relative pKa, ΔpKa(lactic − acetic), comes from:
+   1. the campaign-2 top-level `relative_pka_estimate.value`, a quasi-harmonic exchange cycle at
+      n = 6 and n = 10;
+   2. otherwise a deprotonation-energy difference ÷ (RT ln 10), using the n = 6 ion pair and then the
+      separated gas-phase ions.
+
+   10 % of its discrepancy from the literature gap (−0.90) is applied to the gap, capped at ±0.05
+   and split equally between the two acids.
 
 **What happens with each kind of input:**
 
 - Every adjusted parameter is reported with `source: "alchemi-informed"` alongside its
-  `literature_value`, the input differences and the mapping applied (`return_report=True`).
+  `literature_value`, the input differences, the campaign and the mapping applied
+  (`return_report=True`).
+- The report also records the relative-pKa comparison to experiment: cluster ΔpKa ± uncertainty,
+  the experimental −0.90, the deviation and deviation/σ, sign agreement, the raw and applied shift,
+  and whether the cap binds.
 - If the file is **absent, unreadable, partial or non-numeric**, the affected parameters are returned
   unchanged and labelled `literature` or `assumption`. Values are never NaN and never out of range.
 - `scripts/simulate_loaves.py` writes `data/predictions/molecular_coupling_report.json`. The baseline
@@ -360,56 +379,68 @@ configured `[min, max]`.
 
 **Rationale.** The direction of the potency mapping follows standard weak-acid preservative
 reasoning: undissociated acids act after crossing membranes, so a more strongly hydrated, more
-hydrophilic undissociated acid is expected to be a weaker inhibitor. Lactic acid carries an extra
-hydroxyl group and is the more hydrophilic of the two. The cluster energetics test that relative
-ordering. They are not used as an absolute potency.
+hydrophilic undissociated acid is expected to be a weaker inhibitor. The cluster energetics test that
+relative ordering. They are not used as an absolute potency.
 
 **Limits, stated honestly:**
 
-- **Cluster-phase energetics are not solution pKa.** The descriptors are 0 K electronic energies of
-  small microsolvated clusters (≤ 6 waters) from a machine-learned potential. They contain no
-  zero-point, thermal or entropic terms, no bulk dielectric, no conformational averaging, and no ions
-  or flour matrix. Solution pKa is a free-energy property of fully solvated species. Errors of several
-  kcal/mol, i.e. several pKa units, are normal for this kind of estimate. That is why the pKa
-  correction is shrunk to 10 % and capped at a few hundredths of a unit. It works as a consistency
-  check on the *relative* ordering, and the report flags whether the cluster reproduces "lactic is
-  the stronger acid". It is not a pKa prediction.
+- **Cluster-phase energetics are not solution pKa.** Campaign 2 adds Boltzmann averaging and
+  quasi-harmonic free energies, but the clusters are still 6–10 explicit waters with no bulk
+  dielectric, no ions and no flour matrix. In the provenance document's own words, the relative pKa is
+  a validation check of the approach, not a prediction of dough pH.
+- **The pKa correction reduces to a sign.** The 10 % / 0.05 rule therefore transfers at most a few
+  hundredths of a pKa unit, and with the current data the cap binds (see below). In practice the
+  applied shift encodes only the *sign* of the cluster-vs-experiment discrepancy.
+- **The cluster overestimates the gap, and the correction follows that bias.** The cluster ΔpKa is
+  biased toward too large a gap, as `simulation_provenance.md` §C2.4 explains. The capped correction
+  therefore moves the model slightly in the direction of a known bias. That is why it is capped at
+  0.05.
+  - A precision-weighted update would give an essentially zero shift. Such an update combines the
+    literature gap, known to ±0.02, with the cluster estimate at ±1.73.
+  - The 10 % rule is kept because the coordinator specified it.
 - **Hydration energy is not inhibitory potency.** Microbial inhibition also depends on membrane
   transport, intracellular pH buffering and anion accumulation. The hook only moves the potency within
   an already-assumed plausible range.
 - **The H-bond signal is deliberately down-weighted.** `hbond_min_A` is the single shortest
-  acid–water contact across the optimised structures. It is an extreme value and therefore noisy, so
-  its scale is loose (0.50 Å).
+  acid–water contact. It is an extreme value and therefore noisy, so its scale is loose (0.50 Å).
 - **The scales are assumptions.** The 2 kcal/mol and 0.50 Å scales, the 10 % shrinkage and the ±0.025
-  cap (`molecular_coupling` in `configs/kinetics.yaml`) are design choices, not fitted values.
-- **The effect is small by design.** With a synthetic test descriptor set that maximally pushes both
-  mappings, pH at 12 h changes by about 0.01 and peak timing by ≤ 0.05 h. The molecular evidence
-  informs the model; it does not drive it.
+  cap per acid (`molecular_coupling` in `configs/kinetics.yaml`) are design choices, not fitted values.
 
-### Result with the real descriptor file
+### Result with the real descriptor file (campaigns 1 + 2)
 
-This is the file present on 2026-10-31. Its provenance is "real: ALCHEMI/AIMNet2 on NVIDIA RTX
-A6000", checkpoint `aimnet2_wb97m_d3_3`. The hook returns `status: partial`.
+The file's provenance is "real: ALCHEMI/AIMNet2 on NVIDIA RTX A6000", checkpoint
+`aimnet2_wb97m_d3_3`. The hook returns `status: applied`.
 
-| Input (lactic − acetic) | Value | What it means |
+| Input (lactic − acetic) | Field and campaign | Value |
 |---|---|---|
-| ΔE_assoc per water | −0.115 kcal/mol | Lactic acid is marginally more strongly hydrated |
-| Δ shortest H-bond | +0.148 Å | Lactic acid's shortest acid→water contact is longer |
+| ΔE_assoc per water | `c2_boltzmann_assoc_energy_per_water_kcal_by_n_neutral`, campaign 2, mean over n = 1, 3, 6, 10, 15 | −0.044 kcal/mol (lactic −11.08, acetic −11.03) |
+| Δ shortest H-bond | `hbond_min_A`, campaign 1 | +0.148 Å |
+| Cluster ΔpKa | `relative_pka_estimate.value`, campaign 2 | −3.89 ± 1.73 |
 
-The combined score is h = −0.12. `undissociated_lactic_rel_potency` therefore moves from 0.10 to
-0.124 and is labelled `alchemi-informed`. No deprotonation energies are present, because no ion
-pair survived optimisation, so `pka_lactic` and `pka_acetic` stay at their literature values.
+**Comparison to experiment.** The experimental ΔpKa is −0.90.
 
-The effect on the chamber predictions is negligible:
+- The deviation is −2.99, which is −1.7σ.
+- The sign agrees with experiment: lactic is the stronger acid.
+- The raw shift is −0.30, which the cap reduces to −0.05.
 
-- pH changes by ≤ 0.002 at 12 h and 16 h.
-- Peak time is unchanged.
-- B's overproof onset shifts by 0.05 h.
+**Parameters applied:**
 
-The details are in `data/predictions/molecular_coupling_report.json`. The two signals point in
-mildly opposite directions, and both differences are small relative to the method's error. This is
-the expected outcome for cluster energetics of two similar carboxylic acids. The coupling is
-transparent and traceable, but it is not decisive for the fermentation forecast.
+- `undissociated_lactic_rel_potency` moves from 0.10 to **0.127** (h = −0.137).
+- `pka_lactic` moves from 3.86 to **3.835**, and `pka_acetic` from 4.76 to **4.785**. The model gap
+  becomes −0.95.
+- All three are labelled `alchemi-informed`, with the literature values kept alongside.
+
+**Effect on the chamber predictions** (alchemi-informed minus literature). The change is small, as
+expected:
+
+| | pH at 12 h | pH at 16 h | Peak time | Overproof onset |
+|---|---|---|---|---|
+| A | −0.007 | −0.009 | unchanged (9.5 h) | unchanged (12.85 h) |
+| B | −0.011 | −0.013 | unchanged (7.2 h) | unchanged (9.5 h) |
+
+These shifts are more than 10× smaller than the 5–95 % parameter envelopes, which span about 0.5 pH
+units, and smaller than the resolution of a dough pH probe. The molecular evidence is traceably wired
+into the model, but it does not change any fermentation decision.
 
 ## 10. Downstream hand-off: crumb morphology
 
