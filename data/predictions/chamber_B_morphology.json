@@ -1,0 +1,92 @@
+{
+  "provenance": "simulated",
+  "chamber_id": "B",
+  "schedule": {
+    "mode": "piecewise_constant",
+    "breakpoints": [
+      [
+        0.0,
+        27.0
+      ]
+    ]
+  },
+  "note": "Baseline schedule held for the whole run (no agent intervention). Simulated.",
+  "at_window_end": {
+    "provenance": "simulated",
+    "t_end_h": 16.0,
+    "co2_cumulative_g_per_kg": 9.680340203492282,
+    "co2_retained_g_per_kg": 1.2608922068657131,
+    "co2_retained_peak_g_per_kg": 1.6883144044423166,
+    "expansion_ratio_final": 1.811079191658673,
+    "expansion_ratio_peak": 2.086022004866437,
+    "peak_expansion_time_h": 7.2,
+    "max_expansion_rate_per_h": 0.2635658602786606,
+    "max_expansion_rate_time_h": 3.7,
+    "overproof_flag": true,
+    "overproof_onset_h": 9.5,
+    "overproof_risk_final": 1.0,
+    "expansion_fall_from_peak_fraction": 0.25316504819953195,
+    "final_ph": 3.9008120235229193,
+    "gluten_weakening_index": 0.768176398980181,
+    "final_tta_ml_per_10g": 10.823102123120888,
+    "final_fermentation_quotient": 4.076117905887641,
+    "units": {
+      "co2": "g CO2 / kg dough (modelled; not a sensor value)",
+      "expansion_ratio": "V/V0 (= relative height)",
+      "max_expansion_rate_per_h": "(V/V0) per h",
+      "gluten_weakening_index": "0-1 (phenomenological)"
+    }
+  },
+  "at_window_start": {
+    "provenance": "simulated",
+    "t_end_h": 12.0,
+    "co2_cumulative_g_per_kg": 7.234059094403682,
+    "co2_retained_g_per_kg": 1.4692202628773356,
+    "co2_retained_peak_g_per_kg": 1.6883144044423166,
+    "expansion_ratio_final": 1.9450879121104803,
+    "expansion_ratio_peak": 2.086022004866437,
+    "peak_expansion_time_h": 7.2,
+    "max_expansion_rate_per_h": 0.2635658602786606,
+    "max_expansion_rate_time_h": 3.7,
+    "overproof_flag": true,
+    "overproof_onset_h": 9.5,
+    "overproof_risk_final": 1.0,
+    "expansion_fall_from_peak_fraction": 0.12977093661494382,
+    "final_ph": 4.015833883337738,
+    "gluten_weakening_index": 0.5758768566532737,
+    "final_tta_ml_per_10g": 9.453559532807153,
+    "final_fermentation_quotient": 4.046630382576338,
+    "units": {
+      "co2": "g CO2 / kg dough (modelled; not a sensor value)",
+      "expansion_ratio": "V/V0 (= relative height)",
+      "max_expansion_rate_per_h": "(V/V0) per h",
+      "gluten_weakening_index": "0-1 (phenomenological)"
+    }
+  },
+  "at_horizon": {
+    "provenance": "simulated",
+    "t_end_h": 24.0,
+    "co2_cumulative_g_per_kg": 10.007422302811676,
+    "co2_retained_g_per_kg": 0.9175419219459208,
+    "co2_retained_peak_g_per_kg": 1.6883144044423166,
+    "expansion_ratio_final": 1.5902163216749114,
+    "expansion_ratio_peak": 2.086022004866437,
+    "peak_expansion_time_h": 7.2,
+    "max_expansion_rate_per_h": 0.2635658602786606,
+    "max_expansion_rate_time_h": 3.7,
+    "overproof_flag": true,
+    "overproof_onset_h": 9.5,
+    "overproof_risk_final": 1.0,
+    "expansion_fall_from_peak_fraction": 0.45653373593705543,
+    "final_ph": 3.8906032792908314,
+    "gluten_weakening_index": 0.9351170160198591,
+    "final_tta_ml_per_10g": 10.959390904377463,
+    "final_fermentation_quotient": 4.078585202941456,
+    "units": {
+      "co2": "g CO2 / kg dough (modelled; not a sensor value)",
+      "expansion_ratio": "V/V0 (= relative height)",
+      "max_expansion_rate_per_h": "(V/V0) per h",
+      "gluten_weakening_index": "0-1 (phenomenological)"
+    }
+  }
+}

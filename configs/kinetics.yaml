@@ -99,8 +99,17 @@ parameters:
     units: "mmol/L undissociated acetic acid (aqueous phase)"
     min: 100.0
     max: 200.0
+    source: literature
     reference: "Gänzle, Ehmann & Hammes (1998) Appl Environ Microbiol 64:2616-2623"
-    note: "Complete inhibition of C. milleri at 150 mmol/L undissociated acetic acid (abstract). Linear inhibition term is an assumption."
+    note: "Complete inhibition of C. milleri at 150 mmol/L undissociated acetic acid (abstract). Linear inhibition term is an assumption. Inhibitor concentration is in acetic-acid equivalents: [HAc] + undissociated_lactic_rel_potency * [HLa]."
+  undissociated_lactic_rel_potency:
+    value: 0.10
+    units: "mol HAc-equivalent per mol undissociated lactic acid (yeast inhibition)"
+    min: 0.0
+    max: 0.30
+    source: assumption
+    reference: "assumption (qualitative consensus that undissociated acetic acid is the more potent antifungal of the two; Gänzle et al. 1998 quantify acetic acid only)"
+    note: "Relative lactic-vs-acetic inhibition potency. Adjusted within [min, max] by apply_molecular_descriptors() when ALCHEMI descriptors exist (source then 'alchemi-informed')."
   ph_min_yeast:
     value: 2.8
     units: "pH"
@@ -208,17 +217,21 @@ parameters:
   pka_lactic:
     value: 3.86
     units: "pKa"
-    min: 3.86
-    max: 3.86
+    min: 3.835
+    max: 3.885
     sampled: false
+    source: literature
     reference: "Standard dissociation constant of lactic acid at 25 degC (e.g. CRC Handbook of Chemistry and Physics)"
+    note: "min/max is only the window for a small ALCHEMI-informed relative correction (+-0.025), not the full uncertainty: the apparent pKa in salty dough liquor (I ~ 0.5 M) is likely ~0.1-0.2 lower; that shift is absorbed by the buffer parameters / calibration."
   pka_acetic:
     value: 4.76
     units: "pKa"
-    min: 4.76
-    max: 4.76
+    min: 4.735
+    max: 4.785
     sampled: false
+    source: literature
     reference: "Standard dissociation constant of acetic acid at 25 degC (e.g. CRC Handbook of Chemistry and Physics)"
+    note: "See pka_lactic note."
   ph_flour:
     value: 6.0
     units: "pH"
@@ -330,6 +343,13 @@ parameters:
     min: 4.6
     max: 5.4
     reference: "assumption"
+  gwi_dose_ref:
+    value: 8.0
+    units: "pH-unit x h (temperature-weighted acid exposure below gluten_ph_onset)"
+    min: 4.0
+    max: 16.0
+    reference: "assumption"
+    note: "Downstream-only (crumb-morphology hand-off): gluten_weakening_index = 1 - exp(-dose / gwi_dose_ref), dose = integral of max(0, gluten_ph_onset - pH) * q10_gluten^((T-25)/10) dt. Does not feed back into the ODE."
 
 initial_conditions:
   # Dough at t = 0 (after mixing). Starter fraction = 40 g / 379.4 g = 0.1054.
@@ -366,3 +386,17 @@ initial_conditions:
     min: 0.08
     max: 0.35
     reference: "assumption (carry-over from a ripe starter with ~1-3 g acetic/kg diluted by 0.105)"
+
+# Upstream coupling to ALCHEMI molecular results (fermentai.fermentation.kinetics.
+# apply_molecular_descriptors). Not model parameters: these define how *relative* lactic-vs-acetic
+# signals from acid-water cluster calculations nudge the acid-strength parameters above, always
+# inside their configured [min, max]. Cluster-phase 0 K energetics are NOT solution pKa values;
+# see docs/scientific_assumptions.md section 9.
+molecular_coupling:
+  descriptors_path: "data/alchemi/analysis/molecular_descriptors.json"
+  assoc_scale_kcal: 2.0      # kcal/mol per water: lactic-minus-acetic difference that moves potency ~76% of the way to a bound (tanh)
+  hbond_scale_A: 0.50        # Angstrom; deliberately loose: hbond_min_A is a single shortest contact (noisy extreme value)
+  dpka_shrinkage: 0.10       # fraction of the cluster-implied pKa-difference discrepancy that is applied
+  dpka_cap: 0.025            # max |shift| per acid (pKa units); the lactic-acetic difference moves by <= 0.05
+  rt_ln10_kcal: 1.364        # RT ln 10 at 298.15 K, kcal/mol
+  reference: "assumption (mapping designed for this project; heavily shrunk, bounded)"

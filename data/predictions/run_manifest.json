@@ -1,15 +1,18 @@
 {
   "provenance": "simulated",
-  "generated_utc": "2026-10-31T03:54:04+00:00",
+  "generated_utc": "2026-10-31T04:02:47+00:00",
   "generator": "scripts/simulate_loaves.py",
   "model": "fermentai.fermentation (SciPy LSODA ODE), configs/kinetics.yaml",
   "n_uncertainty_samples": 128,
   "seed": 0,
-  "runtime_s": 6.02,
+  "alchemi_descriptors_status": "partial",
+  "runtime_s": 5.71,
   "note": "All values are simulated. Model CO2 is modelled production; the BME680 does not measure CO2.",
   "files": [
     "data/predictions/chamber_A_prediction.csv",
     "data/predictions/chamber_A_uncertainty.csv",
+    "data/predictions/chamber_A_morphology.json",
+    "data/predictions/chamber_A_prediction_alchemi_informed.csv",
     "data/predictions/chamber_A_summary.json",
     "data/predictions/charts/chamber_A_temperature_c.png",
     "data/predictions/charts/chamber_A_ph.png",
@@ -21,6 +24,8 @@
     "data/predictions/sensitivity_global_A.csv",
     "data/predictions/chamber_B_prediction.csv",
     "data/predictions/chamber_B_uncertainty.csv",
+    "data/predictions/chamber_B_morphology.json",
+    "data/predictions/chamber_B_prediction_alchemi_informed.csv",
     "data/predictions/chamber_B_summary.json",
     "data/predictions/charts/chamber_B_temperature_c.png",
     "data/predictions/charts/chamber_B_ph.png",
@@ -38,6 +43,7 @@
     "data/predictions/charts/compare_expansion_ratio.png",
     "data/predictions/charts/dashboard_A_vs_B.png",
     "data/predictions/dashboard_A_vs_B.html",
-    "data/predictions/sensitivity.md"
+    "data/predictions/sensitivity.md",
+    "data/predictions/molecular_coupling_report.json"
   ]
 }

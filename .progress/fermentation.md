@@ -18,6 +18,14 @@ tests/test_fermentation_*.py
 - tests: 28 passing (tests/test_fermentation_{model,schedule,calibration}.py).
 - Paired MC comparison -> data/predictions/comparison_summary.json.
 
+- SCOPE ADD (coordinator): upstream ALCHEMI hook kinetics.apply_molecular_descriptors (+ new
+  param undissociated_lactic_rel_potency, explicit `source:` on pKa/hac params, molecular_coupling
+  config block) and downstream co2_retained / gluten_weakening_index columns +
+  simulation.summarize_for_morphology; script writes chamber_{A,B}_morphology.json and
+  molecular_coupling_report.json (+ *_alchemi_informed.csv when descriptors exist). Real descriptor
+  file present -> status partial (potency 0.10->0.124; no deprot data -> pKa literature).
+  tests: 40 passing (added tests/test_fermentation_coupling.py). Docs §9-§10 added.
+
 ## Next
 - DONE. docs/scientific_assumptions.md written. Remaining optional work: calibrate against real
   pH/rise data once available (calibrate(observations, schedule=None, free_params=[...])).

@@ -15,8 +15,9 @@ Stable public API
     (``fermentai.fermentation.kinetics.STATE_NAMES``). Columns:
     time_h, temperature_c, substrate [g/kg], yeast [rel], lab [rel], lactic_acid [g/kg],
     acetic_acid [g/kg], co2_cumulative [g CO2/kg dough, MODELLED], ph, expansion_ratio [V/V0],
-    plus extras: gas_retained, gluten_integrity, expansion_capacity, tta_ml_per_10g,
-    fermentation_quotient [mol/mol], overproof_risk [0-1], provenance ("simulated").
+    plus extras: gas_retained, co2_retained (= gas_retained; gas held in dough, saturating),
+    gluten_weakening_index [0-1], gluten_integrity, expansion_capacity, tta_ml_per_10g,
+    fermentation_quotient, overproof_risk, provenance ("simulated").
     ``df.attrs`` holds provenance, schedule, params and units.
 
 ``simulate_with_uncertainty(schedule, n_samples=64, seed=0, params=None, t_end_h=16.0,
@@ -28,6 +29,10 @@ dt_h=0.1, initial=None, quantiles=(0.05, 0.5, 0.95), sample_names=None) -> dict`
 
 ``summarize_prediction(df) -> dict``
     Key numbers (final pH, pH at 12 h, peak expansion & time, time to 2x, overproof onset...).
+
+``summarize_for_morphology(df, t_end_h=None) -> dict``
+    Scalars for the crumb-morphology mapper (co2_cumulative/retained, expansion final/peak,
+    peak time, max expansion rate, overproof flag/onset, final pH, gluten_weakening_index ...).
 
 ``load_scenario(chamber_id) / load_scenarios() / load_experiments()`` (from ``scenarios``)
     Chamber A/B schedules and metadata from configs/experiments.yaml.
@@ -65,6 +70,8 @@ OUTPUT_COLUMNS: tuple[str, ...] = (
 )
 EXTRA_COLUMNS: tuple[str, ...] = (
     "gas_retained",
+    "co2_retained",
+    "gluten_weakening_index",
     "gluten_integrity",
     "expansion_capacity",
     "tta_ml_per_10g",
@@ -100,6 +107,8 @@ UNITS: dict[str, str] = {
     "tta_ml_per_10g": "mL 0.1 N NaOH per 10 g dough to pH 8.5",
     "fermentation_quotient": "mol lactic / mol acetic",
     "overproof_risk": "0-1 heuristic",
+    "co2_retained": "g CO2 / kg dough held as gas in dough cells (= gas_retained; saturates at capacity)",
+    "gluten_weakening_index": "0-1, cumulative temperature-weighted acid exposure (phenomenological)",
 }
 
 Mode = Literal["piecewise_constant", "piecewise_linear"]
@@ -258,8 +267,28 @@ def _postprocess(
     df["overproof_risk"] = overproof_risk(
         df.expansion_ratio.to_numpy(), df.expansion_capacity.to_numpy(), e_ref
     )
+    df["co2_retained"] = df["gas_retained"]
+    df["gluten_weakening_index"] = gluten_weakening_index(df.time_h.to_numpy(), ph, T, p)
     df["provenance"] = PROVENANCE
     return df[[*OUTPUT_COLUMNS, *EXTRA_COLUMNS, "provenance"]]
+
+
+def gluten_weakening_index(
+    t_h: np.ndarray, ph: np.ndarray, temperature_c: np.ndarray, p: Mapping[str, float]
+) -> np.ndarray:
+    """Phenomenological 0-1 index of acid-driven gluten weakening (assumption; downstream use).
+
+    ``GWI(t) = 1 - exp(-D(t) / gwi_dose_ref)``, with acid dose
+    ``D(t) = integral_0^t max(0, gluten_ph_onset - pH) * q10_gluten**((T - 25)/10) dt``
+    (pH-unit x hours). Monotone non-decreasing; 0 for dough that never acidifies below the
+    onset pH. It is an exposure measure, not a rheological measurement.
+    """
+    t = np.asarray(t_h, float)
+    drive = np.maximum(0.0, p["gluten_ph_onset"] - np.asarray(ph, float)) * p["q10_gluten"] ** (
+        (np.asarray(temperature_c, float) - 25.0) / 10.0
+    )
+    dose = np.concatenate([[0.0], np.cumsum(0.5 * (drive[1:] + drive[:-1]) * np.diff(t))])
+    return 1.0 - np.exp(-dose / p["gwi_dose_ref"])
 
 
 def overproof_risk(
@@ -461,6 +490,57 @@ def summarize_prediction(
     return out
 
 
+def summarize_for_morphology(df: pd.DataFrame, t_end_h: float | None = None) -> dict[str, Any]:
+    """Scalars a crumb-morphology mapper needs, from a ``simulate`` DataFrame.
+
+    ``t_end_h`` truncates the trajectory at the (planned or actual) end of fermentation / bake
+    time; default is the last simulated time. All values are simulated.
+
+    Keys: provenance, t_end_h, co2_cumulative_g_per_kg, co2_retained_g_per_kg,
+    co2_retained_peak_g_per_kg, expansion_ratio_final, expansion_ratio_peak,
+    peak_expansion_time_h, max_expansion_rate_per_h, max_expansion_rate_time_h,
+    overproof_flag, overproof_onset_h, overproof_risk_final, final_ph,
+    gluten_weakening_index, final_tta_ml_per_10g, final_fermentation_quotient,
+    expansion_fall_from_peak_fraction, units.
+    """
+    d = df if t_end_h is None else df[df.time_h <= t_end_h + 1e-9]
+    if len(d) < 2:
+        raise ValueError("need at least two time points up to t_end_h")
+    t = d.time_h.to_numpy(float)
+    e = d.expansion_ratio.to_numpy(float)
+    rate = np.gradient(e, t)
+    i_pk, i_rate = int(np.argmax(e)), int(np.argmax(rate))
+    risk = d.overproof_risk.to_numpy(float)
+    risky = np.nonzero(risk >= 0.5)[0]
+    last = d.iloc[-1]
+    return {
+        "provenance": PROVENANCE,
+        "t_end_h": float(t[-1]),
+        "co2_cumulative_g_per_kg": float(last.co2_cumulative),
+        "co2_retained_g_per_kg": float(last.co2_retained),
+        "co2_retained_peak_g_per_kg": float(d.co2_retained.max()),
+        "expansion_ratio_final": float(e[-1]),
+        "expansion_ratio_peak": float(e[i_pk]),
+        "peak_expansion_time_h": float(t[i_pk]),
+        "max_expansion_rate_per_h": float(rate[i_rate]),
+        "max_expansion_rate_time_h": float(t[i_rate]),
+        "overproof_flag": bool(len(risky) > 0),
+        "overproof_onset_h": float(t[risky[0]]) if len(risky) else None,
+        "overproof_risk_final": float(risk[-1]),
+        "expansion_fall_from_peak_fraction": float((e[i_pk] - e[-1]) / max(e[i_pk] - 1.0, 1e-9)),
+        "final_ph": float(last.ph),
+        "gluten_weakening_index": float(last.gluten_weakening_index),
+        "final_tta_ml_per_10g": float(last.tta_ml_per_10g),
+        "final_fermentation_quotient": float(last.fermentation_quotient),
+        "units": {
+            "co2": "g CO2 / kg dough (modelled; not a sensor value)",
+            "expansion_ratio": "V/V0 (= relative height)",
+            "max_expansion_rate_per_h": "(V/V0) per h",
+            "gluten_weakening_index": "0-1 (phenomenological)",
+        },
+    }
+
+
 # Scenario helpers re-exported for convenience.
 from .scenarios import Scenario, load_experiments, load_scenario, load_scenarios
 
@@ -480,4 +560,6 @@ __all__ = [
     "simulate",
     "simulate_with_uncertainty",
     "summarize_prediction",
+    "summarize_for_morphology",
+    "gluten_weakening_index",
 ]

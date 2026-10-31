@@ -33,11 +33,12 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from fermentai.fermentation import plotting, sensitivity
-from fermentai.fermentation.kinetics import PROVENANCE
+from fermentai.fermentation.kinetics import PROVENANCE, apply_molecular_descriptors
 from fermentai.fermentation.simulation import (
     load_scenarios,
     simulate,
     simulate_with_uncertainty,
+    summarize_for_morphology,
     summarize_prediction,
 )
 
@@ -65,6 +66,7 @@ def main() -> int:
     scenarios = load_scenarios()
     runs, summaries, files = [], {}, []
     mc: dict[str, dict] = {}
+    mol_status: dict[str, dict] = {}
     sens_oat, sens_glob = {}, {}
     for cid, sc in scenarios.items():
         horizon = args.horizon or sc.horizon_h
@@ -119,6 +121,41 @@ def main() -> int:
             "peak_t": pk_t,
         }
         summaries[cid] = summ
+
+        # downstream hand-off for the crumb-morphology mapper
+        morph = {
+            "provenance": PROVENANCE,
+            "chamber_id": cid,
+            "schedule": sc.schedule.to_dict(),
+            "note": "Baseline schedule held for the whole run (no agent intervention). Simulated.",
+            "at_window_end": summarize_for_morphology(nominal, t_end_h=sc.window_h[1]),
+            "at_window_start": summarize_for_morphology(nominal, t_end_h=sc.window_h[0]),
+            "at_horizon": summarize_for_morphology(nominal),
+        }
+        p = out / f"chamber_{cid}_morphology.json"
+        p.write_text(json.dumps(morph, indent=2))
+        files.append(p)
+
+        # upstream: ALCHEMI-informed variant (only if descriptors exist; baseline CSVs stay
+        # literature-based for reproducibility)
+        mol_params, mol_report = apply_molecular_descriptors(None, return_report=True)
+        mol_status[cid] = mol_report
+        if mol_report["status"] in ("applied", "partial"):
+            changed = {
+                k: v["value"]
+                for k, v in mol_report["parameters"].items()
+                if v["source"] == "alchemi-informed"
+            }
+            alt = simulate(sc.schedule, params=changed, t_end_h=horizon, dt_h=args.dt)
+            alt["provenance"] = PROVENANCE
+            p = out / f"chamber_{cid}_prediction_alchemi_informed.csv"
+            alt.to_csv(p, index=False, float_format="%.5g")
+            files.append(p)
+            alt_s = summarize_prediction(alt, sc.window_h)
+            mol_report["effect_on_chamber"] = {
+                k: {"literature": summ.get(k), "alchemi_informed": alt_s.get(k)}
+                for k in ("ph_at_12h", "ph_at_16h", "peak_expansion_time_h", "overproof_onset_h")
+            }
         p = out / f"chamber_{cid}_summary.json"
         p.write_text(json.dumps(summ, indent=2))
         files.append(p)
@@ -241,6 +278,13 @@ def main() -> int:
     p.write_text("\n".join(lines))
     files.append(p)
 
+    mol_any = next(iter(mol_status.values()), {"status": "absent"})
+    p = out / "molecular_coupling_report.json"
+    p.write_text(
+        json.dumps({"provenance": PROVENANCE, "per_chamber": mol_status}, indent=2, default=str)
+    )
+    files.append(p)
+    print(f"[ALCHEMI coupling] descriptors: {mol_any['status']} ({mol_any.get('path')})")
     manifest = {
         "provenance": PROVENANCE,
         "generated_utc": datetime.now(UTC).isoformat(timespec="seconds"),
@@ -248,6 +292,7 @@ def main() -> int:
         "model": "fermentai.fermentation (SciPy LSODA ODE), configs/kinetics.yaml",
         "n_uncertainty_samples": args.samples,
         "seed": args.seed,
+        "alchemi_descriptors_status": mol_any["status"],
         "runtime_s": round(time.time() - t0, 2),
         "note": "All values are simulated. Model CO2 is modelled production; the BME680 does not measure CO2.",
         "files": [str(f.relative_to(ROOT)) if f.is_relative_to(ROOT) else str(f) for f in files],

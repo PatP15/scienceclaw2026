@@ -1,25 +1,25 @@
 {
   "provenance": "simulated",
   "t_end_h": 24.0,
-  "final_ph": 3.901992804715452,
-  "final_lactic_g_per_kg": 6.51777211169475,
-  "final_acetic_g_per_kg": 1.066025607392381,
-  "final_fermentation_quotient": 4.0758310054520255,
-  "final_tta_ml_per_10g": 10.807508753699343,
-  "final_co2_g_per_kg": 10.052965006307323,
-  "final_expansion_ratio": 1.5912741349912154,
-  "peak_expansion_ratio": 2.0871066484208587,
+  "final_ph": 3.8906032792908314,
+  "final_lactic_g_per_kg": 6.628619048017131,
+  "final_acetic_g_per_kg": 1.0834232605416854,
+  "final_fermentation_quotient": 4.078585202941456,
+  "final_tta_ml_per_10g": 10.959390904377463,
+  "final_co2_g_per_kg": 10.007422302811676,
+  "final_expansion_ratio": 1.5902163216749114,
+  "peak_expansion_ratio": 2.086022004866437,
   "peak_expansion_time_h": 7.2,
-  "time_to_double_h": 5.6,
+  "time_to_double_h": 5.65,
   "overproof_onset_h": 9.5,
-  "ph_at_12h": 4.016361573110096,
-  "expansion_at_12h": 1.9451023920817567,
-  "lactic_at_12h": 5.525524116252223,
-  "acetic_at_12h": 0.9102902570476832,
-  "ph_at_16h": 3.9073680284416916,
-  "expansion_at_16h": 1.8111951049869843,
-  "lactic_at_16h": 6.466282063715576,
-  "acetic_at_16h": 1.0579441391524518,
+  "ph_at_12h": 4.015833883337738,
+  "expansion_at_12h": 1.9450879121104803,
+  "lactic_at_12h": 5.529648652497038,
+  "acetic_at_12h": 0.9109376114389693,
+  "ph_at_16h": 3.9008120235229193,
+  "expansion_at_16h": 1.811079191658673,
+  "lactic_at_16h": 6.529152481531567,
+  "acetic_at_16h": 1.0678117796917743,
   "chamber_id": "B",
   "name": "Chamber B - more-acidic hypothesis",
   "hypothesis": "Warmer fermentation (27 degC start) gives faster acidification and a detectably more acidic loaf.",
@@ -37,19 +37,19 @@
   "n_failed_samples": 0,
   "seed": 0,
   "ph_at_12h_p05_p95": [
-    3.832150056034369,
-    4.327037595910562
+    3.85771389119223,
+    4.320703882510646
   ],
   "ph_at_16h_p05_p95": [
-    3.722842953255258,
-    4.246237687031502
+    3.773061243576521,
+    4.280924648953351
   ],
   "peak_expansion_time_h_p05_p95": [
-    5.5,
-    9.365
+    5.7,
+    8.9
   ],
   "peak_expansion_ratio_p05_p95": [
-    1.8031110613838282,
-    2.499865387494964
+    1.8470584477630905,
+    2.4715869151123244
   ]
 }

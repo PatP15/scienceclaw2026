@@ -7,40 +7,40 @@ experimental findings.
 
 ## Chamber A (Chamber A - mild hypothesis)
 
-Baseline: pH@12h 4.31, peak expansion 2.11x at 9.4 h.
+Baseline: pH@12h 4.31, peak expansion 2.11x at 9.5 h.
 
 ### pH at 12 h
 
 | parameter | range | value at min | value at max | swing | Spearman (global) |
 |---|---|---|---|---|---|
-| `mu_max_lab` | 0.3–0.8 1/h | 4.520 | 4.127 | -0.393 | -0.35 |
-| `buffer_b1` | 25–60 mmol/kg dough | 4.119 | 4.497 | +0.378 | 0.43 |
-| `t_opt_lab` | 30–34 degC | 4.145 | 4.483 | +0.339 | 0.43 |
-| `xmax_lab` | 4–15 relative to inoculum | 4.491 | 4.190 | -0.301 | -0.37 |
-| `beta_lactic` | 0.05–0.16 g lactic / kg dough / h per unit relative LAB biomass | 4.453 | 4.175 | -0.278 | -0.40 |
-| `alpha_lactic` | 0.15–0.6 g lactic / kg dough per unit relative LAB growth | 4.412 | 4.158 | -0.254 | -0.29 |
+| `mu_max_lab` | 0.3–0.8 1/h | 4.520 | 4.127 | -0.393 | -0.44 |
+| `buffer_b1` | 25–60 mmol/kg dough | 4.119 | 4.497 | +0.378 | 0.47 |
+| `t_opt_lab` | 30–34 degC | 4.145 | 4.483 | +0.339 | 0.30 |
+| `xmax_lab` | 4–15 relative to inoculum | 4.491 | 4.190 | -0.301 | -0.29 |
+| `beta_lactic` | 0.05–0.16 g lactic / kg dough / h per unit relative LAB biomass | 4.453 | 4.175 | -0.278 | -0.27 |
+| `alpha_lactic` | 0.15–0.6 g lactic / kg dough per unit relative LAB growth | 4.412 | 4.158 | -0.254 | -0.31 |
 
 ### peak expansion (V/V0)
 
 | parameter | range | value at min | value at max | swing | Spearman (global) |
 |---|---|---|---|---|---|
-| `expansion_max` | 1.9–3 V/V0 | 1.784 | 2.636 | +0.852 | 0.91 |
-| `k_gluten_decay` | 0.004–0.03 1/h at 25 degC | 2.217 | 1.997 | -0.221 | -0.36 |
-| `qs_yeast` | 0.35–0.95 g hexose / kg dough / h per unit relative yeast biomass | 2.038 | 2.154 | +0.116 | 0.11 |
-| `t_opt_yeast` | 25–30 degC | 2.129 | 2.040 | -0.089 | -0.03 |
-| `rupture_exponent` | 3–10 dimensionless | 2.046 | 2.135 | +0.088 | 0.13 |
-| `mu_max_yeast` | 0.1–0.4 1/h | 2.060 | 2.145 | +0.085 | 0.08 |
+| `expansion_max` | 1.9–3 V/V0 | 1.784 | 2.634 | +0.851 | 0.92 |
+| `k_gluten_decay` | 0.004–0.03 1/h at 25 degC | 2.217 | 1.996 | -0.221 | -0.22 |
+| `qs_yeast` | 0.35–0.95 g hexose / kg dough / h per unit relative yeast biomass | 2.037 | 2.154 | +0.117 | 0.20 |
+| `t_opt_yeast` | 25–30 degC | 2.129 | 2.038 | -0.090 | -0.05 |
+| `rupture_exponent` | 3–10 dimensionless | 2.045 | 2.134 | +0.089 | 0.02 |
+| `mu_max_yeast` | 0.1–0.4 1/h | 2.059 | 2.144 | +0.086 | 0.23 |
 
 ### peak expansion time (h)
 
 | parameter | range | value at min | value at max | swing | Spearman (global) |
 |---|---|---|---|---|---|
-| `qs_yeast` | 0.35–0.95 g hexose / kg dough / h per unit relative yeast biomass | 12.10 | 7.45 | -4.65 | -0.53 |
-| `t_opt_yeast` | 25–30 degC | 8.55 | 11.95 | +3.40 | 0.29 |
-| `mu_max_yeast` | 0.1–0.4 1/h | 11.10 | 7.95 | -3.15 | -0.34 |
-| `rupture_exponent` | 3–10 dimensionless | 11.40 | 8.50 | -2.90 | -0.20 |
-| `expansion_max` | 1.9–3 V/V0 | 8.35 | 11.15 | +2.80 | 0.36 |
-| `k_gluten_decay` | 0.004–0.03 1/h at 25 degC | 11.10 | 8.50 | -2.60 | -0.35 |
+| `qs_yeast` | 0.35–0.95 g hexose / kg dough / h per unit relative yeast biomass | 12.15 | 7.50 | -4.65 | -0.44 |
+| `t_opt_yeast` | 25–30 degC | 8.55 | 12.00 | +3.45 | 0.39 |
+| `mu_max_yeast` | 0.1–0.4 1/h | 11.10 | 7.95 | -3.15 | -0.31 |
+| `rupture_exponent` | 3–10 dimensionless | 11.45 | 8.55 | -2.90 | -0.36 |
+| `expansion_max` | 1.9–3 V/V0 | 8.35 | 11.20 | +2.85 | 0.30 |
+| `k_gluten_decay` | 0.004–0.03 1/h at 25 degC | 11.15 | 8.50 | -2.65 | -0.15 |
 
 ## Chamber B (Chamber B - more-acidic hypothesis)
 
@@ -50,31 +50,31 @@ Baseline: pH@12h 4.02, peak expansion 2.09x at 7.2 h.
 
 | parameter | range | value at min | value at max | swing | Spearman (global) |
 |---|---|---|---|---|---|
-| `xmax_lab` | 4–15 relative to inoculum | 4.244 | 3.905 | -0.339 | -0.48 |
-| `mu_max_lab` | 0.3–0.8 1/h | 4.204 | 3.904 | -0.300 | -0.31 |
-| `buffer_b1` | 25–60 mmol/kg dough | 3.888 | 4.187 | +0.300 | 0.47 |
-| `beta_lactic` | 0.05–0.16 g lactic / kg dough / h per unit relative LAB biomass | 4.191 | 3.898 | -0.293 | -0.50 |
-| `t_opt_lab` | 30–34 degC | 3.949 | 4.127 | +0.178 | 0.31 |
-| `alpha_lactic` | 0.15–0.6 g lactic / kg dough per unit relative LAB growth | 4.084 | 3.936 | -0.148 | -0.20 |
+| `xmax_lab` | 4–15 relative to inoculum | 4.244 | 3.904 | -0.340 | -0.42 |
+| `mu_max_lab` | 0.3–0.8 1/h | 4.204 | 3.903 | -0.300 | -0.40 |
+| `buffer_b1` | 25–60 mmol/kg dough | 3.887 | 4.187 | +0.299 | 0.51 |
+| `beta_lactic` | 0.05–0.16 g lactic / kg dough / h per unit relative LAB biomass | 4.190 | 3.897 | -0.294 | -0.35 |
+| `t_opt_lab` | 30–34 degC | 3.949 | 4.127 | +0.178 | 0.20 |
+| `alpha_lactic` | 0.15–0.6 g lactic / kg dough per unit relative LAB growth | 4.083 | 3.935 | -0.148 | -0.26 |
 
 ### peak expansion (V/V0)
 
 | parameter | range | value at min | value at max | swing | Spearman (global) |
 |---|---|---|---|---|---|
-| `expansion_max` | 1.9–3 V/V0 | 1.773 | 2.598 | +0.824 | 0.90 |
-| `k_gluten_decay` | 0.004–0.03 1/h at 25 degC | 2.211 | 1.968 | -0.243 | -0.39 |
-| `qs_yeast` | 0.35–0.95 g hexose / kg dough / h per unit relative yeast biomass | 2.016 | 2.139 | +0.122 | 0.12 |
-| `rupture_exponent` | 3–10 dimensionless | 2.024 | 2.117 | +0.093 | 0.14 |
-| `mu_max_yeast` | 0.1–0.4 1/h | 2.044 | 2.127 | +0.083 | 0.08 |
-| `gluten_ph_onset` | 4.6–5.4 pH | 2.115 | 2.040 | -0.075 | -0.17 |
+| `expansion_max` | 1.9–3 V/V0 | 1.773 | 2.595 | +0.822 | 0.92 |
+| `k_gluten_decay` | 0.004–0.03 1/h at 25 degC | 2.210 | 1.967 | -0.243 | -0.22 |
+| `qs_yeast` | 0.35–0.95 g hexose / kg dough / h per unit relative yeast biomass | 2.014 | 2.138 | +0.124 | 0.22 |
+| `rupture_exponent` | 3–10 dimensionless | 2.022 | 2.116 | +0.094 | 0.04 |
+| `mu_max_yeast` | 0.1–0.4 1/h | 2.042 | 2.126 | +0.084 | 0.22 |
+| `gluten_ph_onset` | 4.6–5.4 pH | 2.114 | 2.039 | -0.075 | -0.18 |
 
 ### peak expansion time (h)
 
 | parameter | range | value at min | value at max | swing | Spearman (global) |
 |---|---|---|---|---|---|
-| `qs_yeast` | 0.35–0.95 g hexose / kg dough / h per unit relative yeast biomass | 9.05 | 5.75 | -3.30 | -0.55 |
-| `expansion_max` | 1.9–3 V/V0 | 6.35 | 8.50 | +2.15 | 0.39 |
-| `rupture_exponent` | 3–10 dimensionless | 8.65 | 6.50 | -2.15 | -0.20 |
-| `mu_max_yeast` | 0.1–0.4 1/h | 8.25 | 6.15 | -2.10 | -0.35 |
-| `k_gluten_decay` | 0.004–0.03 1/h at 25 degC | 8.50 | 6.40 | -2.10 | -0.37 |
-| `gas_volume_factor` | 0.8–1.3 dimensionless | 8.00 | 6.35 | -1.65 | -0.36 |
+| `qs_yeast` | 0.35–0.95 g hexose / kg dough / h per unit relative yeast biomass | 9.10 | 5.75 | -3.35 | -0.48 |
+| `expansion_max` | 1.9–3 V/V0 | 6.35 | 8.55 | +2.20 | 0.34 |
+| `mu_max_yeast` | 0.1–0.4 1/h | 8.30 | 6.15 | -2.15 | -0.29 |
+| `k_gluten_decay` | 0.004–0.03 1/h at 25 degC | 8.55 | 6.40 | -2.15 | -0.24 |
+| `rupture_exponent` | 3–10 dimensionless | 8.65 | 6.50 | -2.15 | -0.42 |
+| `gas_volume_factor` | 0.8–1.3 dimensionless | 8.05 | 6.35 | -1.70 | -0.23 |

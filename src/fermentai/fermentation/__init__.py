@@ -13,12 +13,14 @@ See docs/scientific_assumptions.md.
 """
 
 from .calibration import CalibrationResult, calibrate
+from .kinetics import apply_molecular_descriptors
 from .simulation import (
     TemperatureSchedule,
     load_scenario,
     load_scenarios,
     simulate,
     simulate_with_uncertainty,
+    summarize_for_morphology,
     summarize_prediction,
 )
 
@@ -31,4 +33,6 @@ __all__ = [
     "simulate",
     "simulate_with_uncertainty",
     "summarize_prediction",
+    "summarize_for_morphology",
+    "apply_molecular_descriptors",
 ]

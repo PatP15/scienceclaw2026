@@ -58,9 +58,12 @@ The **pH / acid inhibition factors** use the form of Presser, Ratkowsky & Ross (
 - LAB growth: pH_min = 3.9. Gänzle et al. (1998) give a growth range of pH 3.9–6.7.
 - LAB acid production when not growing: pH_min = 3.45 (assumption). This term bounds the final pH.
 - Yeast: pH_min = 2.8, so yeast is essentially insensitive to pH, consistent with "unaffected by pH
-  3.5–7" (Gänzle et al. 1998). Yeast is instead inhibited linearly by undissociated acetic acid in
-  the aqueous phase: `f_HAc = max(0, 1 − [HAc]/150 mmol L⁻¹)`. Complete inhibition at 150 mmol/L is
-  from Gänzle et al. (1998).
+  3.5–7" (Gänzle et al. 1998). Yeast is instead inhibited linearly by undissociated acid, expressed
+  in acetic-acid equivalents in the aqueous phase: `f_HAc = max(0, 1 − ([HAc] + r·[HLa])/150 mmol L⁻¹)`.
+  Complete inhibition at 150 mmol/L of undissociated acetic acid is from Gänzle et al. (1998)
+  (`source: literature`). r = `undissociated_lactic_rel_potency` = 0.10 (range 0–0.3) is the
+  relative potency of undissociated lactic vs acetic acid. It is an assumption (`source:
+  assumption`), and it is the parameter the ALCHEMI hook may adjust (§9).
 
 **Growth** is Monod in substrate, with a logistic cap:
 
@@ -204,24 +207,25 @@ With the nominal parameters (128-sample Monte Carlo, seed 0; see `data/predictio
 
 | Simulated | Chamber A, 22 °C | Chamber B, 27 °C |
 |---|---|---|
-| pH at 12 h (5–95 %) | 4.31 (3.99–4.62) | 4.02 (3.83–4.33) |
-| pH at 16 h (5–95 %) | 4.13 (3.86–4.48) | 3.91 (3.72–4.25) |
-| Final pH at 24 h | 4.03 | 3.90 |
-| Lactic / acetic at 16 h (g/kg) | 4.7 / 0.88 | 6.5 / 1.06 |
-| TTA at 24 h (mL 0.1 N / 10 g) | 9.4 | 10.8 |
-| Peak rise, V/V₀ (5–95 %) | 2.11 at 9.4 h (peak 7.0–12.6 h) | 2.09 at 7.2 h (peak 5.5–9.4 h) |
-| Time to 2× rise | 7.2 h | 5.6 h |
-| Overproof onset (≥ 5 % of rise lost) | 12.8 h | 9.5 h |
+| pH at 12 h (5–95 %) | 4.31 (4.03–4.65) | 4.02 (3.86–4.32) |
+| pH at 16 h (5–95 %) | 4.13 (3.92–4.50) | 3.90 (3.77–4.28) |
+| Final pH at 24 h | 4.02 | 3.89 |
+| Lactic / acetic at 16 h (g/kg) | 4.7 / 0.88 | 6.5 / 1.07 |
+| TTA at 24 h (mL 0.1 N / 10 g) | 9.5 | 11.0 |
+| Peak rise, V/V₀ (5–95 %) | 2.11 (1.88–2.49) at 9.5 h (peak 7.2–12.4 h) | 2.09 (1.85–2.47) at 7.2 h (peak 5.7–8.9 h) |
+| Time to 2× rise | 7.2 h | 5.7 h |
+| Overproof onset (≥ 5 % of rise lost) | 12.9 h | 9.5 h |
+| Gluten-weakening index at 16 h | 0.49 | 0.77 |
 
 **Paired comparison** (`comparison_summary.json`). This uses the same 128 parameter draws for both
 chambers. In **all** draws B is more acidic at 12 h: the median ΔpH(B − A) is −0.25, with a 5–95 %
-range of −0.40 to −0.14. In all draws B also peaks earlier, by a median of 2.3 h. The *direction* is
+range of −0.41 to −0.15. In all draws B also peaks earlier, by a median of 2.4 h. The *direction* is
 therefore robust within this model. The *magnitude* is not: the absolute pH bands of A and B overlap
 heavily, mostly because flour buffering and LAB vigour are uncertain.
 
 ### Overproofing risk at 27 °C
 
-At 27 °C the modelled dough peaks at about 7 h, with a 5–95 % range of 5.5–9.4 h. Rise is lost from
+At 27 °C the modelled dough peaks at about 7 h, with a 5–95 % range of 5.7–8.9 h. Rise is lost from
 about 9.5 h, and by 16 h the dough is down to 1.81× from 2.09×. **Holding 27 °C for the full 12–16 h
 window is therefore predicted to overproof the B dough.**
 
@@ -323,7 +327,145 @@ predict absolute rise height without calibration.
 A single early rise curve from each chamber is the most informative measurement for predicting when to
 end fermentation. A few pH readings constrain the buffer/LAB parameters that control acidity.
 
-## 9. References (verified to exist; values taken from them are flagged in `configs/kinetics.yaml`)
+## 9. Upstream coupling: ALCHEMI molecular descriptors → relative acid terms
+
+`kinetics.apply_molecular_descriptors(params, path="data/alchemi/analysis/molecular_descriptors.json", return_report=False)`
+reads per-acid descriptors from the ALCHEMI/AIMNet2 acid–water cluster calculations. The fields are
+`assoc_energy_per_water_kcal`, `deprot_energy_n6_kcal` and `hbond_min_A`. The hook uses only
+**lactic-minus-acetic differences** to nudge three acid-strength parameters, always inside their
+configured `[min, max]`.
+
+| Parameter | Default (`source`) | ALCHEMI signal used | Mapping |
+|---|---|---|---|
+| `undissociated_lactic_rel_potency` | 0.10 (assumption) | Δ association energy per water; Δ shortest H-bond | See note 1 below |
+| `pka_lactic`, `pka_acetic` | 3.86 / 4.76 (literature) | Δ deprotonation energy in the n = 6 cluster | See note 2 below |
+
+1. **Potency mapping.** A hydrophilicity score is computed as
+   `h = mean(−ΔE_assoc/2 kcal, −Δd_HB/0.50 Å)`. h > 0 means lactic acid is more strongly hydrated.
+   In that case the potency moves toward its minimum by `tanh(h)` of the gap; otherwise it moves
+   toward its maximum.
+2. **pKa mapping.** The cluster-implied gap is `ΔE_deprot / (RT ln 10)`. 10 % of its discrepancy
+   from the literature gap (−0.90) is applied, capped at ±0.025 per acid. The lactic–acetic gap
+   therefore moves by at most 0.05.
+
+**What happens with each kind of input:**
+
+- Every adjusted parameter is reported with `source: "alchemi-informed"` alongside its
+  `literature_value`, the input differences and the mapping applied (`return_report=True`).
+- If the file is **absent, unreadable, partial or non-numeric**, the affected parameters are returned
+  unchanged and labelled `literature` or `assumption`. Values are never NaN and never out of range.
+- `scripts/simulate_loaves.py` writes `data/predictions/molecular_coupling_report.json`. The baseline
+  chamber CSVs stay literature-based for reproducibility. When descriptors exist, the script also
+  writes `chamber_{A,B}_prediction_alchemi_informed.csv` and records the effect on pH and peak timing.
+
+**Rationale.** The direction of the potency mapping follows standard weak-acid preservative
+reasoning: undissociated acids act after crossing membranes, so a more strongly hydrated, more
+hydrophilic undissociated acid is expected to be a weaker inhibitor. Lactic acid carries an extra
+hydroxyl group and is the more hydrophilic of the two. The cluster energetics test that relative
+ordering. They are not used as an absolute potency.
+
+**Limits, stated honestly:**
+
+- **Cluster-phase energetics are not solution pKa.** The descriptors are 0 K electronic energies of
+  small microsolvated clusters (≤ 6 waters) from a machine-learned potential. They contain no
+  zero-point, thermal or entropic terms, no bulk dielectric, no conformational averaging, and no ions
+  or flour matrix. Solution pKa is a free-energy property of fully solvated species. Errors of several
+  kcal/mol, i.e. several pKa units, are normal for this kind of estimate. That is why the pKa
+  correction is shrunk to 10 % and capped at a few hundredths of a unit. It works as a consistency
+  check on the *relative* ordering, and the report flags whether the cluster reproduces "lactic is
+  the stronger acid". It is not a pKa prediction.
+- **Hydration energy is not inhibitory potency.** Microbial inhibition also depends on membrane
+  transport, intracellular pH buffering and anion accumulation. The hook only moves the potency within
+  an already-assumed plausible range.
+- **The H-bond signal is deliberately down-weighted.** `hbond_min_A` is the single shortest
+  acid–water contact across the optimised structures. It is an extreme value and therefore noisy, so
+  its scale is loose (0.50 Å).
+- **The scales are assumptions.** The 2 kcal/mol and 0.50 Å scales, the 10 % shrinkage and the ±0.025
+  cap (`molecular_coupling` in `configs/kinetics.yaml`) are design choices, not fitted values.
+- **The effect is small by design.** With a synthetic test descriptor set that maximally pushes both
+  mappings, pH at 12 h changes by about 0.01 and peak timing by ≤ 0.05 h. The molecular evidence
+  informs the model; it does not drive it.
+
+### Result with the real descriptor file
+
+This is the file present on 2026-10-31. Its provenance is "real: ALCHEMI/AIMNet2 on NVIDIA RTX
+A6000", checkpoint `aimnet2_wb97m_d3_3`. The hook returns `status: partial`.
+
+| Input (lactic − acetic) | Value | What it means |
+|---|---|---|
+| ΔE_assoc per water | −0.115 kcal/mol | Lactic acid is marginally more strongly hydrated |
+| Δ shortest H-bond | +0.148 Å | Lactic acid's shortest acid→water contact is longer |
+
+The combined score is h = −0.12. `undissociated_lactic_rel_potency` therefore moves from 0.10 to
+0.124 and is labelled `alchemi-informed`. No deprotonation energies are present, because no ion
+pair survived optimisation, so `pka_lactic` and `pka_acetic` stay at their literature values.
+
+The effect on the chamber predictions is negligible:
+
+- pH changes by ≤ 0.002 at 12 h and 16 h.
+- Peak time is unchanged.
+- B's overproof onset shifts by 0.05 h.
+
+The details are in `data/predictions/molecular_coupling_report.json`. The two signals point in
+mildly opposite directions, and both differences are small relative to the method's error. This is
+the expected outcome for cluster energetics of two similar carboxylic acids. The coupling is
+transparent and traceable, but it is not decisive for the fermentation forecast.
+
+## 10. Downstream hand-off: crumb morphology
+
+`simulation.summarize_for_morphology(df, t_end_h=None) -> dict` returns the following scalars with
+`provenance: "simulated"`. `t_end_h` is the actual or planned end of fermentation.
+
+| Key | Meaning |
+|---|---|
+| `co2_cumulative_g_per_kg` | Total modelled CO₂ production |
+| `co2_retained_g_per_kg` | Gas held in the dough cells at `t_end_h` (= column `co2_retained`). It saturates at the gas-holding capacity |
+| `co2_retained_peak_g_per_kg` | Peak retained gas |
+| `expansion_ratio_final` | Rise at `t_end_h` |
+| `expansion_ratio_peak` | Peak rise |
+| `peak_expansion_time_h` | Time of peak rise |
+| `max_expansion_rate_per_h` | Maximum rate of rise, (V/V₀)/h |
+| `max_expansion_rate_time_h` | Time of maximum rate of rise |
+| `overproof_flag` | Whether overproof onset (≥ 5 % of the rise lost) occurs before `t_end_h` |
+| `overproof_onset_h` | Time of overproof onset |
+| `overproof_risk_final` | Overproof signal at `t_end_h` |
+| `expansion_fall_from_peak_fraction` | Fraction of the peak rise lost by `t_end_h` |
+| `final_ph` | pH at `t_end_h` |
+| `final_tta_ml_per_10g` | Titratable acidity at `t_end_h` |
+| `final_fermentation_quotient` | Molar lactic:acetic ratio at `t_end_h` |
+| `gluten_weakening_index` | See below |
+
+**Gluten-weakening index** (column `gluten_weakening_index`). This is a **phenomenological
+assumption**:
+
+```
+GWI(t) = 1 − exp(−D(t)/D_ref)
+D(t)   = ∫ max(0, pH_onset − pH) · Q10^((T − 25)/10) dt
+```
+
+pH_onset = 5.0, Q10 = 2 and D_ref = 8 pH·h (`gwi_dose_ref`, range 4–16). It measures cumulative
+temperature-weighted acid exposure, motivated by acid-activated cereal proteolysis and the
+weakening of gluten (Gänzle, Loponen & Gobbetti 2008). It is in [0, 1], it never decreases, and it
+does not feed back into the ODE. The ODE's own `gluten_integrity` state, which also decays with time
+at neutral pH, sets the expansion capacity.
+
+The index is not a rheological measurement. Any mapping from it to crumb openness, wall thickness or
+cell size, which is done by the morphology agent, is a further assumption.
+
+`scripts/simulate_loaves.py` writes `data/predictions/chamber_{A,B}_morphology.json` with these
+scalars at the window start (12 h), the window end (16 h) and the horizon (24 h), for the baseline
+schedules held throughout. At 16 h:
+
+| | A | B |
+|---|---|---|
+| Peak rise | 2.11 at 9.5 h | 2.09 at 7.2 h |
+| Maximum rate of rise | 0.21 /h | 0.26 /h |
+| Retained CO₂ | 1.54 g/kg | 1.26 g/kg |
+| Overproof flag | True (12.9 h) | True (9.5 h) |
+| pH | 4.13 | 3.90 |
+| GWI | 0.49 | 0.77 |
+
+## 11. References (verified to exist; values taken from them are flagged in `configs/kinetics.yaml`)
 
 - Gänzle MG, Ehmann M, Hammes WP (1998). Modeling of growth of *Lactobacillus sanfranciscensis* and
   *Candida milleri* in response to process parameters of sourdough fermentation. *Appl Environ
