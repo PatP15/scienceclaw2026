@@ -104,7 +104,8 @@ def config_from_args(args: argparse.Namespace) -> BridgeConfig:
         status_path=args.status_file or data_dir / "telemetry" / "bridge_status.json",
         operator_token=(args.token or os.environ.get("FERMENTAI_API_TOKEN") or "change-me-local-device-token").strip(),
         device_tokens=tokens,
-        chambers={c: (cfg.device_id or f"fermentai-esp32-{c.lower()}") for c, cfg in hw.chambers.items()},
+        chambers={c: (cfg.device_id or f"fermentai-esp32-{c.lower()}") for c, cfg in hw.chambers.items()
+                  if cfg.kind != "demo"},   # demo labs are simulated, never on USB
         record_path=args.record,
         parse_status_log=args.parse_status_log,
         legacy_console=args.legacy_console,

@@ -125,6 +125,11 @@ class ControlService:
     def chamber_ids(self) -> list[str]:
         return list(self.hw.chambers)
 
+    @property
+    def lab_ids(self) -> list[str]:
+        """Chambers that are our own labs (kind != "demo"); the sous-chef agents only see these."""
+        return [c for c, cfg in self.hw.chambers.items() if cfg.kind != "demo"]
+
     def require_chamber(self, chamber_id: str) -> str:
         if chamber_id not in self.hw.chambers:
             raise UnknownChamber(
@@ -899,6 +904,8 @@ class ControlService:
         return {
             "chamber_id": chamber_id,
             "label": cfg.label,
+            "location": cfg.location,
+            "kind": cfg.kind,
             "device_id": cfg.device_id,
             "devices": [d for d in devs if d["active"]],
             "inactive_devices": [{"device_id": d["device_id"], "reason": d["inactive_reason"],

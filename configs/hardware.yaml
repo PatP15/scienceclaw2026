@@ -19,11 +19,44 @@ chambers:
     device_id: "fermentai-esp32-a"
     device_ids: ["simulated-esp32-a", "virtual-esp32-a", "fermentai-virtual-a"]
     initial_setpoint_c: 22.0     # PLAN.md section 5, Chamber A starting target
+    location: "Our lab"
+    kind: lab
   B:
     label: "Chamber B - more-acidic hypothesis"
     device_id: "fermentai-esp32-b"
     device_ids: ["simulated-esp32-b", "virtual-esp32-b", "fermentai-virtual-b"]
     initial_setpoint_c: 27.0     # PLAN.md section 5, Chamber B starting target
+    location: "Our lab"
+    kind: lab
+
+  # ---- DEMO NETWORK LABS (kind: demo) ------------------------------------------------------
+  # SIMULATED example labs at FICTIONAL restaurants, shown on the dashboard only to illustrate a
+  # multi-site network. Fed by `python -m simulated_devices --profile demo-restaurants`
+  # (source="simulated"). Never real measurements. Not part of the sous-chef chat / taste cycle.
+  C:
+    label: "Crumb & Copper"
+    location: "Boston"
+    kind: demo
+    device_id: "fermentai-sim-c"
+    initial_setpoint_c: 21.0     # assumption (demo preset)
+  D:
+    label: "Levain Lane"
+    location: "Lisbon"
+    kind: demo
+    device_id: "fermentai-sim-d"
+    initial_setpoint_c: 24.0     # assumption (demo preset)
+  E:
+    label: "Hoshi Bakehouse"
+    location: "Tokyo"
+    kind: demo
+    device_id: "fermentai-sim-e"
+    initial_setpoint_c: 26.0     # assumption (demo preset)
+  F:
+    label: "Casa Fermento"
+    location: "São Paulo"
+    kind: demo
+    device_id: "fermentai-sim-f"
+    initial_setpoint_c: 28.0     # assumption (demo preset)
 
 temperature:
   # Server-side bounds for any commanded setpoint (assumption: sourdough fermentation

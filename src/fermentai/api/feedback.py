@@ -92,7 +92,7 @@ def build_context(svc: ControlService, settings: Settings, fb: TasteFeedbackIn |
             "starter_height_mm", "door_open", "peltier_mode", "temperature_setpoint_c",
             "quality_flags", "experiment_id")
     chambers, recent, setpoints, raw = {}, {}, {}, {}
-    for cid in svc.chamber_ids:
+    for cid in svc.lab_ids:   # demo labs (kind=demo) are not part of the sous-chef contexts
         ctl = svc.current_control(cid)
         history = svc.telemetry_history(cid, limit=50)
         recent[cid] = [{k: r.get(k) for k in keep} for r in history]   # v1.0-era compact view
@@ -354,7 +354,7 @@ def run_feedback(svc: ControlService, settings: Settings, fb: TasteFeedbackIn) -
 
     fid, now = insert_feedback(svc, fb)
     context = build_context(svc, settings, fb, fid)
-    with ThinkingPulses(svc, svc.chamber_ids, "taste cycle") as tp:   # both stations' hats nod
+    with ThinkingPulses(svc, svc.lab_ids, "taste cycle") as tp:   # both stations' hats nod
         result, available = call_pipeline(fb, context)
     pulse_ids = tp.finish(clear_for_final_wiggle=fb.trigger_motors)
     response = persist_cycle(svc, settings, fb, fid, now, result, available)
@@ -400,7 +400,7 @@ def persist_cycle(svc: ControlService, settings: Settings, fb: TasteFeedbackIn, 
     if fb.trigger_motors:
         tf = settings.hardware.taste_feedback
         dur = min(tf.motor_duration_s, settings.hardware.motor.max_duration_s)
-        for cid in svc.chamber_ids:
+        for cid in svc.lab_ids:
             motors.append(svc.issue_motor_command(
                 cid, dur, tf.motor_pattern, f"new experiment proposed ({experiment['experiment_id']})",
                 "taste_feedback", experiment_id=experiment["experiment_id"]))

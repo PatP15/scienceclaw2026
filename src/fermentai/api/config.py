@@ -48,6 +48,10 @@ class ChamberCfg(_Cfg):
     # Every device id allowed to write this chamber (real + simulated stand-ins).
     device_ids: list[str] = Field(default_factory=list)
     initial_setpoint_c: float = 22.0
+    # Dashboard metadata. kind: "lab" (our own chambers) | "demo" (SIMULATED example lab at a
+    # fictional restaurant, shown only to illustrate the network; never real data).
+    location: str = ""
+    kind: str = "lab"
 
     def all_device_ids(self) -> list[str]:
         return list(dict.fromkeys([d for d in [self.device_id, *self.device_ids] if d]))

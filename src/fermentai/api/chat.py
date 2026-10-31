@@ -20,12 +20,13 @@ from typing import Any
 from .config import Settings
 from .db import dumps, iso, loads_cols
 from .devices import CommandError, ControlService
-from .feedback import build_context, insert_feedback, normalize_cycle_result, persist_cycle
+from .feedback import (build_context, insert_feedback, normalize_cycle_result, normalize_steps, persist_cycle,
+                       store_experiment)
 from .jsonutil import jsonable
 from .schemas import TasteFeedbackIn
 from .thinking import ThinkingPulses
 
-STAGES = ("greeting", "collecting", "confirming", "handoff", "done")
+STAGES = ("greeting", "collecting", "confirming", "handoff", "choosing", "done")
 UNAVAILABLE_LABEL = "chat unavailable: fermentai.agents.chat is not installed (use the taste-feedback form)"
 
 
@@ -66,8 +67,57 @@ def _guest_text(transcript: list, fallback: str) -> str:
     return ("\n".join(x for x in lines if x).strip() or fallback)[:4000]
 
 
+def persist_chosen(svc: ControlService, chosen: dict, *, session_id: str, feedback_id: int | None) -> dict:
+    """The guest picked one of the Head Chef's suggestions: put that schedule into the station's experiment
+    proposal (status stays "proposed"; it is NEVER applied to hardware here -- the operator applies it via
+    POST /experiments/{id}/apply)."""
+    station = str(chosen.get("station") or "A")
+    sched = {"schedule_id": chosen.get("schedule_id"), "name": chosen.get("title"),
+             "points": chosen.get("points"), "source": "chat_chosen_suggestion",
+             "provenance": chosen.get("provenance"), "predicted": chosen.get("predicted"),
+             "target": chosen.get("target"), "risk": chosen.get("risk"), "rank": chosen.get("rank")}
+    label = f"Station {station}: {chosen.get('title')}"
+    row = None
+    if feedback_id is not None:
+        row = svc.db.query_one("SELECT * FROM experiments WHERE feedback_id=? AND status='proposed' "
+                               "ORDER BY id DESC LIMIT 1", (feedback_id,))
+    if row is None:
+        exp = {"title": f"Chosen at chat: {label}", "status": "proposed", "requires_human_confirmation": True,
+               "hypothesis": chosen.get("why"), "schedules": {station: sched}, "chosen_suggestion": chosen}
+        rec = store_experiment(svc, exp, proposed_by="chat_chosen_suggestion",
+                               provenance=str(chosen.get("provenance") or "simulated"), feedback_id=feedback_id)
+        return {**rec, "chosen_suggestion": chosen, "created": True, "requires_operator_apply": True}
+    row = loads_cols(row, "schedules_json", "payload_json")
+    schedules = dict(row.get("schedules") or {})
+    schedules[station] = sched
+    payload = dict(row.get("payload") or {})
+    payload.update(schedules=schedules, chosen_suggestion=chosen, status="proposed",
+                   title=f"{str(payload.get('title') or row['title']).split(' — chosen:')[0]} — chosen: {label}"[:200])
+    now = iso(svc.clock())
+    with svc.db.tx() as conn:
+        conn.execute("UPDATE experiments SET title=?, schedules_json=?, payload_json=?, status='proposed'"
+                     " WHERE experiment_id=?",
+                     (payload["title"], dumps(jsonable(schedules)), dumps(jsonable(payload)), row["experiment_id"]))
+        conn.execute("DELETE FROM temperature_schedules WHERE experiment_id=? AND chamber_id=?",
+                     (row["experiment_id"], station))
+        conn.execute("INSERT INTO temperature_schedules(experiment_id, chamber_id, created_at_utc, source, steps_json)"
+                     " VALUES (?,?,?,?,?)",
+                     (row["experiment_id"], station, now, "chat_chosen_suggestion",
+                      dumps(normalize_steps(sched["points"]))))
+        rec = {"experiment_id": row["experiment_id"], "created_at_utc": row["created_at_utc"],
+               "title": payload["title"], "status": "proposed", "proposed_by": row.get("proposed_by"),
+               "provenance": row.get("provenance"), "feedback_id": feedback_id,
+               "schedules": jsonable(schedules), "chosen_suggestion": jsonable(chosen), "chat_session_id": session_id}
+        svc.db.emit("experiment", rec, None, conn=conn)
+    return {**rec, "created": False, "requires_operator_apply": True}
+
+
 def chat_turn(svc: ControlService, settings: Settings, *, text: str, session_id: str | None,
               mode: str = "offline", sous_chef: str | None = None, judge_name: str | None = None) -> dict:
+    if sous_chef is not None and sous_chef not in svc.lab_ids:
+        raise CommandError(
+            f"chat is not supported for station {sous_chef!r} (demo labs only report simulated "
+            f"readings); supported: {', '.join(svc.lab_ids)}", 400)
     mod = _chat_module()
     session_id = session_id or f"chat_{uuid.uuid4().hex[:12]}"
     prev = _session_row(svc, session_id)
@@ -115,6 +165,16 @@ def chat_turn(svc: ControlService, settings: Settings, *, text: str, session_id:
         persisted = persist_cycle(svc, settings, fb, feedback_id, received, cycle, True,
                                   chat_session_id=session_id)
 
+    chosen = result.get("chosen_suggestion")
+    if isinstance(chosen, dict) and chosen.get("schedule_id"):
+        rec = persist_chosen(svc, chosen, session_id=session_id, feedback_id=feedback_id)
+        persisted = {**(persisted or {}), "chosen": rec}
+        svc.db.emit("chat", {"session_id": session_id, "role": "system",
+                             "text": f"Chosen for Station {chosen.get('station')}: {chosen.get('title')} "
+                                     f"(experiment {rec['experiment_id']}, proposed; operator applies)",
+                             "ts": now, "stage": stage, "reasoning_mode_label": result.get("reasoning_mode_label"),
+                             "experiment_id": rec["experiment_id"]})
+
     with svc.db.tx() as conn:
         conn.execute(
             "INSERT INTO chat_sessions(session_id, created_at_utc, updated_at_utc, stage, mode, sous_chef,"
@@ -129,7 +189,7 @@ def chat_turn(svc: ControlService, settings: Settings, *, text: str, session_id:
             (session_id, now, now, stage, mode, sous_chef, judge_name, len(transcript), handoff_key,
              feedback_id, dumps(result)))
     return {**result, "session_id": session_id, "stage": stage, "feedback_id": feedback_id,
-            "handoff_persisted": persisted is not None, "persisted": persisted,
+            "handoff_persisted": new_handoff, "persisted": persisted,
             "thinking_pulse_ids": pulse_ids}
 
 

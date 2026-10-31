@@ -431,7 +431,7 @@ class ChatIn(_Strict):
     session_id: Annotated[str, StringConstraints(pattern=r"^[A-Za-z0-9_.:-]{1,64}$")] | None = None
     text: Annotated[str, StringConstraints(min_length=1, max_length=4000)]
     mode: Literal["live", "offline"] = "offline"
-    sous_chef: Literal["A", "B"] | None = None
+    sous_chef: str | None = Field(default=None, max_length=32)
     judge_name: Annotated[str, StringConstraints(max_length=100)] | None = None
 
 

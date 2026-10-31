@@ -76,6 +76,7 @@ class ChamberConfig:
     use_fermentation_model: bool = True
     save_frames_dir: Path | None = None
     limits: LocalLimits = LIMITS
+    room_rh_percent: float = 45.0               # assumed room humidity (demo profiles vary it)
 
     def __post_init__(self) -> None:
         self.device_id = self.device_id or DEVICE_IDS.get(self.chamber_id,
@@ -97,7 +98,7 @@ class VirtualChamber:
         self._last_tick = self.boot_at
         # hardware
         self.thermal = ThermalChamber(config.plant, config.controller, seed=config.seed, limits=self.limits)
-        self.bme = Bme680Like(self.rng)
+        self.bme = Bme680Like(self.rng, room_rh_percent=config.room_rh_percent)
         self.starter = StarterModel(initial_height_mm=config.initial_starter_height_mm,
                                     time_scale=config.ferment_time_scale,
                                     use_fermentation_model=config.use_fermentation_model, rng=self.rng)

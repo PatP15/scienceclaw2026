@@ -12,6 +12,8 @@ Run:  uv run python -m simulated_devices --chambers A B --base-url http://127.0.
 """
 
 FIRMWARE_VERSION = "virtual-0.1"
-DEVICE_IDS = {"A": "fermentai-esp32-a", "B": "fermentai-esp32-b"}
+DEVICE_IDS = {"A": "fermentai-esp32-a", "B": "fermentai-esp32-b",
+              "C": "fermentai-sim-c", "D": "fermentai-sim-d", "E": "fermentai-sim-e",
+              "F": "fermentai-sim-f"}
 
 __all__ = ["DEVICE_IDS", "FIRMWARE_VERSION"]

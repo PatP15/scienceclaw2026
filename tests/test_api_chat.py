@@ -145,7 +145,7 @@ def test_chat_auth_and_validation(client, fake):
     assert client.post("/api/v1/chat", headers={"Authorization": "Bearer dev-a"}, json={"text": "hi"}).status_code == 403
     assert chat(client, text="").status_code == 422
     assert chat(client, text="hi", session_id="../../etc").status_code == 422
-    assert chat(client, text="hi", sous_chef="C").status_code == 422
+    assert chat(client, text="hi", sous_chef="C").status_code == 400   # demo lab: no chat station
     assert chat(client, text="hi", temperature_setpoint_c=90).status_code == 422
     assert client.get("/api/v1/chat/nope").status_code == 404
     assert client.delete("/api/v1/chat/x").status_code == 401
@@ -176,3 +176,24 @@ def test_real_chat_module_end_to_end(client, tmp_path):
     assert {"guest", "sous_chef", "head_chef"} <= roles
     assert (tmp_path / "chat_sessions.jsonl").exists()                   # module store kept out of the repo
     assert client.delete(f"/api/v1/chat/{sid}", headers=auth()).json()["module_reset"] is True
+
+
+def test_real_chat_chosen_suggestion_persists_proposal_not_applied(client):
+    pytest.importorskip("fermentai.agents.chat")
+    sid, j = None, None
+    for t in ["", "It was pretty mild and a bit dense.", "no", "no, only this one", "more tang and a lighter crumb", "yes"]:
+        j = chat(client, text=t or "hi", session_id=sid, sous_chef="A").json()
+        sid = j["session_id"]
+    assert j["handoff_persisted"] and [s["rank"] for s in j["handoff_result"]["suggestions"]] == [1, 2, 3]
+    assert chat(client, text="what?", session_id=sid, sous_chef="A").json()["stage"] == "choosing"
+    r = chat(client, text="2", session_id=sid, sous_chef="A").json()
+    assert r["stage"] == "done" and r["handoff_persisted"] is False
+    ch = r["persisted"]["chosen"]
+    sg = j["handoff_result"]["suggestions"][1]
+    assert ch["status"] == "proposed" and ch["requires_operator_apply"] and ch["schedules"]["A"]["schedule_id"] == sg["schedule_id"]
+    assert ch["experiment_id"] == j["persisted"]["experiment"]["experiment_id"]
+    exps = {e["experiment_id"]: e for e in client.get("/api/v1/experiments").json()}
+    assert exps[ch["experiment_id"]]["status"] == "proposed"
+    ev = client.get("/api/v1/events?types=experiment,chat&limit=200").json()
+    assert any(e["type"] == "experiment" and e["data"].get("chosen_suggestion") for e in ev)
+    assert any(e["type"] == "chat" and "Chosen for Station A" in (e["data"].get("text") or "") for e in ev)

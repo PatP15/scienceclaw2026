@@ -32,6 +32,22 @@ Examples:
 """
 
 
+# --profile demo-restaurants: SIMULATED example labs at fictional restaurants (hardware.yaml C-F).
+# setpoint_c is only a documentation of the server-side initial setpoint; the device obeys the
+# server's desired-control. ambient_c / rh = assumed room conditions; doors = (start_s, dur_s).
+DEMO_RESTAURANTS: dict[str, dict] = {
+    "C": dict(setpoint_c=21.0, ambient_c=19.0, rh=40.0, seed=303, doors=[(240, 25), (900, 20)]),
+    "D": dict(setpoint_c=24.0, ambient_c=23.0, rh=60.0, seed=404, doors=[(420, 30), (1200, 15)]),
+    "E": dict(setpoint_c=26.0, ambient_c=25.0, rh=72.0, seed=505, doors=[(120, 20), (780, 25)]),
+    "F": dict(setpoint_c=28.0, ambient_c=27.0, rh=80.0, seed=606, doors=[(600, 20), (1500, 30)]),
+}
+
+
+def apply_profile(args: argparse.Namespace) -> None:
+    if args.profile == "demo-restaurants":
+        args.chambers = list(DEMO_RESTAURANTS)
+
+
 def parse_door_events(spec: list[str] | None, chambers: list[str]) -> dict[str, list[tuple[float, float]]]:
     """'A:60:30' = chamber A door opens 60 s after boot for 30 s. 'B:120' -> 20 s default.
     Without a chamber prefix ('60:30') the event applies to every chamber."""
@@ -57,6 +73,9 @@ def build_parser() -> argparse.ArgumentParser:
                                  description="Virtual FermentAI ESP32 chamber devices (SIMULATED).",
                                  epilog=EPILOG, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--chambers", nargs="+", default=["A", "B"])
+    ap.add_argument("--profile", choices=["demo-restaurants"], default=None,
+                    help="demo-restaurants: start simulated demo labs C-F (fictional restaurants) "
+                         "with distinct presets (overrides --chambers)")
     ap.add_argument("--base-url", default=os.environ.get(
         "FERMENTAI_BASE_URL", f"http://127.0.0.1:{os.environ.get('FERMENTAI_PORT', '8000')}"))
     ap.add_argument("--token", default=None,
@@ -98,6 +117,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def make_configs(args: argparse.Namespace):
+    apply_profile(args)
     from . import chamber_A, chamber_B
     from .device import ChamberConfig
     from .virtual_thermal_plant import PlantParams
@@ -122,8 +142,17 @@ def make_configs(args: argparse.Namespace):
                 log.info("[B] --ph ignored: chamber B has no pH probe")
             cfg = chamber_B.config(**common)
         else:
-            cfg = ChamberConfig(chamber_id=cid, **common)
-        if args.ambient is not None:
+            preset = DEMO_RESTAURANTS.get(cid) if args.profile == "demo-restaurants" else None
+            if preset:   # SIMULATED demo lab (fictional restaurant)
+                common["door_events"] = common["door_events"] or list(preset["doors"])
+                cfg = ChamberConfig(chamber_id=cid, seed=preset["seed"],
+                                    plant=PlantParams(ambient_c=preset["ambient_c"]),
+                                    room_rh_percent=preset["rh"], **common)
+            else:
+                cfg = ChamberConfig(chamber_id=cid, **common)
+        if args.profile == "demo-restaurants" and cid in DEMO_RESTAURANTS:
+            pass  # the profile's ambient wins over the global --ambient default
+        elif args.ambient is not None:
             cfg.plant = PlantParams(**{**cfg.plant.__dict__, "ambient_c": args.ambient})
         if args.seed is not None:
             cfg.seed = args.seed + ord(cid[0])
@@ -215,6 +244,7 @@ async def run_async(args: argparse.Namespace) -> int:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    apply_profile(args)
     logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO,
                         format="%(asctime)s %(name)s %(levelname)s %(message)s")
     logging.getLogger("httpx").setLevel(logging.DEBUG if args.verbose else logging.WARNING)
