@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>FermentAI Node hero</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#8A6338}a:hover{color:#5B3720}
+</style>
+</helmet>
+<div style="width: 1560px; height: 1724px; box-sizing: border-box; padding: 40px; background: #F7F3EC; font-family: 'Figtree', 'Avenir Next', 'Helvetica Neue', Arial, sans-serif; color: #1F1B16; display: flex; flex-direction: column; gap: 24px">
+  <div style="display: flex; justify-content: space-between; align-items: flex-end; height: 120px">
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <h1 style="margin: 0; font-size: 60px; line-height: 68px; font-weight: 600; letter-spacing: -0.5px">FermentAI Node</h1>
+      <p style="margin: 0; font-size: 25px; line-height: 32px; color: #5B5248">A retrofit sensor + climate module for any proofing box, restaurant cabinet or bakery retarder</p>
+    </div>
+    <div style="display: flex; align-items: center; height: 48px; padding: 0 28px; border: 2px solid #B08A5E; border-radius: 24px; font-size: 18px; font-weight: 700; letter-spacing: 2.4px; color: #7A5530">CONCEPT MOCKUP</div>
+  </div>
+  <div style="position: relative; width: 1480px; height: 1500px; border-radius: 36px; overflow: hidden">
+    <img src="{{heroSrc}}" alt="FermentAI Node mounted on a chamber wall: matte cream body, walnut top cap with a chef-hat automaton, camera eye with a glowing status ring, e-ink strip, air vent grille, probe, pH and power cables" style="display: block; width: 1480px; height: 1500px">
+    <p style="position: absolute; left: 48px; top: 44px; margin: 0; font-size: 22px; line-height: 30px; font-weight: 600; color: #5B5248; letter-spacing: 0.3px">Mounted on the inner wall · chamber {{chamber}}</p>
+    <div style="position: absolute; right: 48px; top: 44px; display: flex; gap: 36px; align-items: center; font-size: 20px; line-height: 30px; font-weight: 500; color: #5B5248">
+      <div style="display: flex; gap: 10px; align-items: center"><span style="width: 30px; height: 30px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #FCF8F1, #D9CBB2); box-shadow: 0 2px 5px rgba(0,0,0,0.15)"></span>Matte cream PC</div>
+      <div style="display: flex; gap: 10px; align-items: center"><span style="width: 30px; height: 30px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #A06C43, #5B3720); box-shadow: 0 2px 5px rgba(0,0,0,0.15)"></span>Oiled walnut</div>
+      <div style="display: flex; gap: 10px; align-items: center"><span style="width: 30px; height: 30px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #5A544D, #1F1D1A); box-shadow: 0 2px 5px rgba(0,0,0,0.15)"></span>Charcoal + smoked glass</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"chamber":{"editor":"enum","options":["A","B"],"default":"B","section":"Variant"},"$preview":{"width":1560,"height":1724}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const ch = this.props.chamber === 'A' ? 'A' : 'B';
+    const src = { A: '/_blob/6bbf9de9fa163d2b66c8e1fa88563a0c', B: '/_blob/d9ede08c421af9aa4cc400567eeb5afb' };
+    return { chamber: ch, heroSrc: src[ch] };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>FermentAI Node in context</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#8A6338}a:hover{color:#5B3720}
+</style>
+</helmet>
+<div style="position: relative; width: 1640px; height: 1040px; overflow: hidden; border-radius: 36px; background: linear-gradient(180deg, #F4EEE4 0%, #E8DFD0 100%); font-family: 'Figtree', 'Avenir Next', 'Helvetica Neue', Arial, sans-serif; color: #1F1B16">
+  <img src="/_blob/0b0594fb09ca4ac50599c4a886bb519a" alt="A countertop proofing box with a glass door; the module is mounted on the back wall, its probe cable runs into a glass jar of risen dough on a wire shelf, a Peltier heatsink sits on the right wall" style="position: absolute; left: 0px; top: 0px; width: 1100px; height: 1040px">
+  <h2 style="position: absolute; left: 70px; top: 50px; margin: 0; font-size: 30px; line-height: 38px; font-weight: 600">In context · drops into the box you already have</h2>
+
+  <div style="position: absolute; left: 1150px; top: 170px; width: 400px; height: 800px; box-sizing: border-box; padding: 14px; border-radius: 58px; background: #1F1D1B; box-shadow: 0 26px 48px rgba(42, 28, 16, 0.30)">
+    <div style="position: relative; width: 372px; height: 772px; box-sizing: border-box; border-radius: 46px; background: #FCFAF6; padding: 64px 30px 28px; display: flex; flex-direction: column">
+      <div style="position: absolute; left: 136px; top: 16px; width: 100px; height: 26px; border-radius: 13px; background: #1F1D1B"></div>
+      <div style="display: flex; align-items: center; gap: 12px; height: 36px">
+        <span style="width: 18px; height: 18px; border-radius: 50%; background: {{accent}}"></span>
+        <span style="font-size: 26px; font-weight: 600; flex-grow: 1">Chamber B</span>
+        <span style="font-size: 17px; font-weight: 600; letter-spacing: 1.2px; color: #6E6458">LIVE</span>
+      </div>
+      <div style="display: flex; align-items: flex-start; margin-top: 14px; height: 104px">
+        <span style="font-size: 100px; line-height: 104px; font-weight: 500; letter-spacing: -2px">27</span>
+        <span style="font-size: 32px; line-height: 50px; font-weight: 500; color: #5B5248; margin-left: 6px">°C</span>
+      </div>
+      <p style="margin: 6px 0 0; font-size: 20px; line-height: 26px; color: #6E6458">holding setpoint</p>
+      <div style="height: 2px; background: #E6DDCF; margin: 24px 0 22px"></div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+        <div><div style="font-size: 50px; line-height: 56px; font-weight: 500">3.9</div><div style="font-size: 17px; font-weight: 700; letter-spacing: 1.6px; color: #6E6458">pH</div></div>
+        <div><div style="font-size: 50px; line-height: 56px; font-weight: 500">1.8×</div><div style="font-size: 17px; font-weight: 700; letter-spacing: 1.6px; color: #6E6458">RISE</div></div>
+      </div>
+      <div style="margin-top: 28px; border-radius: 20px; background: #F3EDE3; padding: 16px 14px 10px">
+        <svg width="284" height="200" viewBox="0 0 284 200" aria-hidden="true" style="display: block">
+          <line x1="0" y1="1" x2="284" y2="1" stroke="#E2D8C8" stroke-width="1.5"></line>
+          <line x1="0" y1="67" x2="284" y2="67" stroke="#E2D8C8" stroke-width="1.5"></line>
+          <line x1="0" y1="133" x2="284" y2="133" stroke="#E2D8C8" stroke-width="1.5"></line>
+          <line x1="0" y1="199" x2="284" y2="199" stroke="#E2D8C8" stroke-width="1.5"></line>
+          <path d="M0,194 C 70,190 95,172 130,112 S 205,34 276,30 L276,199 L0,199 Z" fill="{{accent}}" opacity="0.14"></path>
+          <path d="M0,194 C 70,190 95,172 130,112 S 205,34 276,30" fill="none" stroke="{{accent}}" stroke-width="4.5" stroke-linecap="round"></path>
+          <circle cx="276" cy="30" r="7" fill="{{accent}}" stroke="#FFFFFF" stroke-width="3"></circle>
+        </svg>
+        <div style="display: flex; justify-content: space-between; font-size: 15px; line-height: 22px; color: #6E6458; margin-top: 4px"><span>0 h</span><span>now</span></div>
+      </div>
+      <p style="margin: auto 0 0; font-size: 18px; line-height: 24px; font-weight: 600; color: #5B5248">Chamber B · 27 °C · pH 3.9 · rise 1.8×</p>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#ff7f0e","options":["#ff7f0e","#1f77b4"],"section":"Variant"},"$preview":{"width":1640,"height":1040}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { accent: this.props.accent ?? '#ff7f0e' };
+  }
+}
+</script>
+</body>
+</html>

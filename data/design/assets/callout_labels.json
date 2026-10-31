@@ -1,0 +1,85 @@
+{
+ "left": [
+  [
+   "Walnut cap · Wi-Fi window",
+   [
+    "ESP32-S3 and its 2.4 GHz antenna",
+    "sit behind wood, not metal"
+   ],
+   297,
+   236
+  ],
+  [
+   "Status ring",
+   [
+    "chamber colour; breathes while heating,",
+    "pulses when the door opens"
+   ],
+   459,
+   400
+  ],
+  [
+   "Camera · OV2640",
+   [
+    "watches the jar through its wall",
+    "and tracks the rise"
+   ],
+   513,
+   520
+  ],
+  [
+   "Diffused ring light",
+   [
+    "fixed white light, so exposure",
+    "never drifts between frames"
+   ],
+   552,
+   650
+  ]
+ ],
+ "right": [
+  [
+   "Chef-hat automaton",
+   [
+    "N20 gear motor; bobs when its agent",
+    "starts a new experiment"
+   ],
+   140
+  ],
+  [
+   "E-ink strip",
+   [
+    "temperature, pH and rise,",
+    "readable with the light off"
+   ],
+   360
+  ],
+  [
+   "Air vent · BME680",
+   [
+    "air temperature, humidity,",
+    "pressure, VOC gas resistance"
+   ],
+   560
+  ]
+ ],
+ "side": [
+  [
+   "pH port · BNC",
+   [
+    "any lab electrode, isolated",
+    "interface board inside"
+   ],
+   975
+  ],
+  [
+   "Shorting cap",
+   [
+    "tethered BNC cap: 0 mV",
+    "check before calibration"
+   ],
+   1085
+  ]
+ ],
+ "back_label_y": 1442.0
+}
