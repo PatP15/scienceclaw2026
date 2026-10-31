@@ -14,7 +14,7 @@ benchmark_results.csv; and the fermentation simulator (fermentai.fermentation.si
 "B cooled at 6 h" intervention curve.
 
 Every number on a figure is read from those files at build time (none is typed in by hand), except
-the Brev run cost/MD count in ALCHEMI_RUN_NOTE, which comes from data/alchemi/environment/report.md.
+none: GPU hours, cost and run counts are parsed from data/alchemi/environment/report.md.
 """
 
 from __future__ import annotations
@@ -47,7 +47,6 @@ OUT = ROOT / "data" / "figures"
 ALCH = ROOT / "data" / "alchemi" / "analysis"
 BENCH = ROOT / "data" / "benchmarks"
 # From data/alchemi/environment/report.md ("Runtime and cost"); Brev's invoice is authoritative.
-ALCHEMI_RUN_NOTE = "72 MD runs, ~1.1 GPU-hours (~$0.68)"
 
 
 def alchemi_numbers() -> dict:
@@ -71,10 +70,13 @@ def alchemi_numbers() -> dict:
         "deprot_n6": (dep[("lactic_acid", 6)], dep[("acetic_acid", 6)]),
         "ion_pair_n6": d["dE_deprot_ion_pair_kcal_mol"].dropna().to_dict(),
         "potency": (pot["literature_value"], pot["value"]),
+        "pka_shift": max(abs(v["value"] - v["literature_value"]) for k, v in rep["A"]["parameters"].items()
+                         if k.startswith("pka_") and v.get("source") == "alchemi-informed") if any(
+            k.startswith("pka_") and v.get("source") == "alchemi-informed" for k, v in rep["A"]["parameters"].items())
+        else 0.0,
         "max_dph": dph,
         "provenance": (f"real: AIMNet2 ({summ['model'][0]}) via NVIDIA ALCHEMI toolkit {v['nvalchemi-toolkit']} "
-                       f"on an {v['gpu'].replace('NVIDIA ', '')} — {summ['n_converged']} optimisations, "
-                       f"{ALCHEMI_RUN_NOTE}"),
+                       f"on an {v['gpu'].replace('NVIDIA ', '')}"),
     }
 
 
@@ -517,19 +519,19 @@ def fig_evidence_pipeline():
     bx1 = x0 + bw / 2
     bx2 = x0 + bw + gap + bw / 2
     yb = y0 + bh + 2.0
-    p0, p1 = al["potency"]
+    _p0, _p1 = al["potency"]
     ax.plot([bx1, bx1, bx2, bx2], [yb - 0.8, yb + 0.8, yb + 0.8, yb - 0.8], color=GREEN, lw=2)
     ax.text(bx2 + 1.5, yb + 0.8,
-            f"constrains the acid chemistry (potency {p0:.2f} → {p1:.3f}, pH Δ < {max(0.01, al['max_dph']):.2f})"
-            " — does not drive the bread",
+            f"constrains the acid chemistry ({coupling_phrase(al)}) — does not drive the bread",
             fontsize=12, color=GREEN, fontweight="bold", va="center", ha="left",
             bbox={"boxstyle": "round,pad=0.3", "fc": "white", "ec": "none"})
-    ax.text(3, 7.6, "ALCHEMI provenance — " + al["provenance"], fontsize=10.3, color=MUTED, va="center")
-    l6, a6 = al["deprot_n6"]
-    ip = ", ".join(f"{k[0].split('_')[0]} n={k[1]} ({v:+.1f})" for k, v in al["ion_pair_n6"].items())
-    ax.text(3, 4.7, f"Deprotonation order flips at n=6 ({l6:.1f} vs {a6:.1f}), within the conformer spread.  "
-                    f"Contact ion pair survives only for {ip} kcal/mol.  0 K cluster energetics, not solution pKa.",
-            fontsize=10.3, color=MUTED, va="center")
+    c2 = alchemi_c2()
+    ax.text(3, 7.6, f"ALCHEMI provenance — {al['provenance']}, two campaigns: {c2['n_opt']:,} optimisations, "
+                    f"{c2['n_vib']} vibrational analyses, {c2['n_md']} MD runs, ~{c2['gpu_h']:.0f} GPU-hours "
+                    f"(~${c2['cost_usd']:.0f})", fontsize=10.3, color=MUTED, va="center")
+    ax.text(3, 4.7, f"Relative pKa (lactic − acetic, thermodynamic cycle): {_m(c2['dpka'], 1)} ± {c2['dpka_unc']:.1f} vs "
+                    f"experiment {_m(c2['dpka_exp'], 1)}: right sign, converging with cluster size. Cluster-phase "
+                    "estimate, not a solution pKa.", fontsize=10.3, color=MUTED, va="center")
     ax.text(3, 1.8, "Crumb mapping is a stated hypothesis (kinetics do not uniquely determine crumb).  Baseline presets, "
                     f"not simulation-derived: mild {100 * base['mild']['cut_face_pore_area_fraction']:.1f} % / "
                     f"{base['mild']['cut_face_pore_count']} pores, sour "
@@ -968,6 +970,37 @@ def preform_numbers() -> dict | None:
     }
 
 
+def coupling_phrase(al: dict) -> str:
+    """Short, data-driven description of how much ALCHEMI moved the kinetics (never rounds toward zero)."""
+    p0, p1 = al["potency"]
+    parts = [f"potency {p0:.2f} → {p1:.3f}"]
+    if al["pka_shift"] > 0:
+        parts.append(f"pKa ±{al['pka_shift']:.3f}")
+    return ", ".join(parts) + f"; pH Δ ≤ {al['max_dph']:.3f}"
+
+
+def alchemi_c2() -> dict:
+    """Campaign-2 headline numbers (data/alchemi/analysis/c2_summary.json + environment/report.md)."""
+    import re
+
+    c2 = json.loads((ALCH / "c2_summary.json").read_text())
+    rp = c2["relative_pka_estimate"]
+    per6 = rp["per_n"]["6"]
+    to_pka = per6["dpKa"] / per6["ddG_qh_kcal"]  # 1/(RT ln 10), as used by the analysis
+    by_n = [(tc["n_water"], tc["dd_boltzmann_kcal"] * to_pka) for tc in c2["thermo_cycles"]]
+    rep = (ROOT / "data" / "alchemi" / "environment" / "report.md").read_text()
+    tot = re.search(r"Total across sessions: ([\d.]+) h ≈ \$([\d.]+)", rep)
+    c1 = re.search(r"Calculations: (\d+) optimisations.*?(\d+) MD runs", rep)
+    cc = re.search(r"Campaign 2: (\d+) optimisations.*?(\d+) vibrational analyses, (\d+) long-MD runs", rep)
+    return {
+        "dpka": rp["value"], "dpka_unc": rp["uncertainty"], "dpka_exp": rp["experiment"], "by_n": by_n,
+        "dimer": c2["acid_pairs"]["acetic_dimer_kcal"], "dimer_lit": c2["acid_pairs"]["acetic_dimer_literature_kcal"],
+        "gpu_h": float(tot.group(1)), "cost_usd": float(tot.group(2)),
+        "n_opt": int(c1.group(1)) + int(cc.group(1)), "n_vib": int(cc.group(2)),
+        "n_md": int(c1.group(2)) + int(cc.group(3)),
+    }
+
+
 def _placeholder(ax, x, y, text, size=11.0, ha="center"):
     ax.text(x, y, text, ha=ha, va="center", fontsize=size, fontweight="bold", color="#8a6d00",
             bbox={"boxstyle": "round,pad=0.3", "fc": "#fff6cc", "ec": "#e0c25a", "lw": 1})
@@ -999,44 +1032,53 @@ def fig_tech_highlights():
     px, pw, py, ph = (3.0, 81.5), 75.5, 4.0, 72.0
     # ---------------- NVIDIA panel
     x = px[0]
+    c2 = alchemi_c2()
     rbox(ax, x, py, pw, ph, fc="white", ec=GREEN, lw=2.6, r=2.0)
     ax.text(x + 3, py + ph - 5.0, "NVIDIA ALCHEMI", fontsize=24, fontweight="bold", color=INK, va="center")
     ax.text(x + 3, py + ph - 10.0, f"AIMNet2 ({summ['model'][0]}) on a Brev {summ['versions']['gpu'].replace('NVIDIA ', '')}",
             fontsize=13, color=MUTED, va="center")
     badge(ax, x + pw - 3, py + ph - 5.0, "real_gpu", size=12, ha="right")
-    ax.text(x + 3, py + ph - 14.5, "Lactic vs acetic acid in clusters of 0–6 waters:", fontsize=12.5, color=INK,
-            va="top")
-    ax.text(x + 3, py + ph - 18.3, f"{summ['n_converged']} geometry optimisations + 72 molecular-dynamics runs",
-            fontsize=12.5, color=INK, va="top", fontweight="bold")
-    # mini bars: deprotonation at n = 3 (lower = ionises more easily)
-    dl, da = al["deprot_n3"]
-    bx0, bx1, by = x + 21, x + pw - 14, py + 42.0
-    ax.text(x + 3, by + 6.2, "Energy to give up a proton (n = 3 cluster, kcal/mol, lower = easier)", fontsize=12,
-            color=MUTED, va="center")
-    vmax = max(dl, da)
-    for k, (lab, v) in enumerate((("lactic", dl), ("acetic", da))):
-        yy = by - k * 5.2
-        ax.text(x + 3, yy, lab, fontsize=13.5, fontweight="bold", color=INK, va="center")
-        ax.add_patch(Rectangle((bx0, yy - 1.5), (bx1 - bx0) * v / vmax, 3.0, fc=GREEN if k == 0 else "#9fd39f",
-                               ec="none", zorder=2))
-        ax.text(bx0 + (bx1 - bx0) * v / vmax + 1.0, yy, f"{v:.1f}", fontsize=13.5, fontweight="bold", color=INK,
-                va="center")
-    lw_, la_ = al["per_water"]
-    ax.text(x + 3, by - 10.5, f"→ lactic gives up its proton ~{da - dl:.1f} kcal/mol more easily", fontsize=13,
-            fontweight="bold", color=INK, va="center")
-    ax.text(x + 3, by - 14.8, f"Hydration per water: lactic {_m(lw_, 2)} vs acetic {_m(la_, 2)} kcal/mol",
-            fontsize=12.5, color=INK, va="center")
+    ax.text(x + 3, py + ph - 14.5, "Lactic vs acetic acid in water clusters, two GPU campaigns:", fontsize=12.5,
+            color=INK, va="top")
+    ax.text(x + 3, py + ph - 18.3, f"{c2['n_opt']:,} optimisations · {c2['n_vib']} vibrational analyses · "
+                                   f"{c2['n_md']} MD runs", fontsize=12.5, color=INK, va="top", fontweight="bold")
+    # inset: relative pKa (lactic − acetic) vs cluster size, with the experimental value
+    est, unc, exp_ = c2["dpka"], c2["dpka_unc"], c2["dpka_exp"]
+    iax = fig.add_axes(((x + 9.5) / W, (py + 27.5) / H, (pw - 13.0) / W, 17.0 / H))
+    ns = [n for n, _ in c2["by_n"]]
+    iax.axhline(exp_, color=MUTED, lw=1.6, ls=(0, (4, 3)))
+    iax.axhspan(est - unc, est + unc, xmin=0.0, xmax=1.0, color=GREEN, alpha=0.10, lw=0)
+    iax.plot(ns, [v for _, v in c2["by_n"]], "-o", color=GREEN, lw=2.6, ms=8, mec="white", mew=1.8, zorder=3)
+    iax.text(10.3, exp_ + 0.3, f"experiment {_m(exp_, 1)}", fontsize=11, color=MUTED, va="bottom", ha="right")
+    iax.text(-0.4, est, f"estimate {_m(est, 1)} ± {unc:.1f}", fontsize=11, color=GREEN, va="center", ha="left",
+             fontweight="bold")
+    iax.set_xlim(-0.6, 10.5)
+    iax.set_ylim(min(v for _, v in c2["by_n"]) - 1.0, 1.0)
+    iax.set_xticks(ns)
+    iax.tick_params(labelsize=10.5, colors=MUTED, length=0)
+    iax.grid(axis="y", color="#e6e6e1", lw=1)
+    for sp in ("top", "right", "left"):
+        iax.spines[sp].set_visible(False)
+    iax.spines["bottom"].set_color(FAINT)
+    iax.set_xlabel("waters in the cluster (n)", fontsize=11, color=MUTED, labelpad=2)
+    iax.set_facecolor("white")
+    ax.text(x + 3, py + 48.4, "Relative pKa, lactic − acetic: right sign, converging with n",
+            fontsize=11.8, color=INK, fontweight="bold", va="center")
+    ax.text(x + 3, py + 20.6, f"Acetic acid dimer {_m(c2['dimer'], 1)} kcal/mol, inside the literature range "
+                              f"({_m(c2['dimer_lit'][0], 0)} to {_m(c2['dimer_lit'][1], 0)})",
+            fontsize=12, color=INK, va="center")
     # stat tiles
-    tiles = [("~$0.68", "of GPU time"), ("~1.1 h", "on Brev, then deleted"), ("offline", "cached on the Mac")]
+    tiles = [(f"~{c2['gpu_h']:.0f} h", "GPU, both campaigns"), (f"~${c2['cost_usd']:.0f}", "total GPU cost"),
+             ("offline", "cached on the Mac")]
     tw = (pw - 6 - 2 * 2.0) / 3
     for k, (big, small) in enumerate(tiles):
         tx = x + 3 + k * (tw + 2.0)
-        rbox(ax, tx, py + 8.0, tw, 10.5, fc=PANEL, ec="none", r=1.4)
-        ax.text(tx + 1.8, py + 15.2, big, fontsize=20, fontweight="bold", color=INK, va="center")
-        ax.text(tx + 1.8, py + 10.4, small, fontsize=11.5, color=MUTED, va="center")
-    p0, p1 = al["potency"]
-    ax.text(x + 3, py + 4.0, f"Constrains one acid term in the model ({p0:.2f} → {p1:.3f}); pH moves < 0.01.",
-            fontsize=11.5, color=GREEN, fontweight="bold", va="center")
+        rbox(ax, tx, py + 7.6, tw, 10.0, fc=PANEL, ec="none", r=1.4)
+        ax.text(tx + 1.8, py + 14.4, big, fontsize=20, fontweight="bold", color=INK, va="center")
+        ax.text(tx + 1.8, py + 9.9, small, fontsize=11.5, color=MUTED, va="center")
+    _p0, _p1 = al["potency"]
+    ax.text(x + 3, py + 3.8, f"Model nudge only: {coupling_phrase(al)}",
+            fontsize=10.8, color=GREEN, fontweight="bold", va="center")
 
     # ---------------- Formlabs panel
     x = px[1]
