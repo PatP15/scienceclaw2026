@@ -335,7 +335,7 @@ void handleLine(char* line) {
         "status | scan | assign <rom16hex> <starter|internal_heatsink|external_heatsink> |\n"
         "unassign <role> | phcal 4|7|clear | arm peltier <CHAMBER_ID> | disarm peltier |\n"
         "arm motor | disarm motor | motor test <ms> | setpoint <C> (local, clamped) |\n"
-        "wifi <ssid> <pass> | backend <url> | token <token> | reboot");
+        "wifi <ssid> <pass> | backend <url> | token <token> | pin <gpio> | i2cscan | reboot");
   } else if (!strcmp(cmd, "status")) {
     printStatus(now);
   } else if (!strcmp(cmd, "scan")) {
@@ -429,6 +429,28 @@ void handleLine(char* line) {
   } else if (!strcmp(cmd, "token") && argc == 2) {
     nvs.putString("api_token", argv[1]);
     Serial.println("OK saved; reboot to apply");
+  } else if (!strcmp(cmd, "pin") && argc == 2) {
+    // Read-only diagnostic: digital level of a GPIO (does not change the pin mode).
+    const int p = atoi(argv[1]);
+    if (p < 0 || p > 48) {
+      Serial.println("ERR gpio 0-48");
+    } else {
+      Serial.printf("GPIO%d level=%d\n", p, (int)digitalRead(p));
+    }
+  } else if (!strcmp(cmd, "i2cscan")) {
+#if FERMENTAI_NOIO
+    Serial.println("ERR no I2C in NOIO build");
+#else
+    int found = 0;
+    for (uint8_t a = 0x08; a < 0x78; ++a) {
+      Wire.beginTransmission(a);
+      if (Wire.endTransmission() == 0) {
+        Serial.printf("  i2c 0x%02x ack\n", a);
+        ++found;
+      }
+    }
+    Serial.printf("i2cscan: %d device(s) on SDA=%d SCL=%d\n", found, pins::kI2cSda, pins::kI2cScl);
+#endif
   } else if (!strcmp(cmd, "reboot")) {
     ESP.restart();
   } else {
