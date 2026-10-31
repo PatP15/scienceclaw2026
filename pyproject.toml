@@ -23,6 +23,7 @@ dependencies = [
     "rdkit>=2024.3",
     "ase>=3.23",
     "anthropic>=0.40",
+    "formlabs-sdk",
 ]
 
 [project.optional-dependencies]
@@ -30,7 +31,12 @@ dependencies = [
 remote = ["torch", "nvalchemi-toolkit"]
 
 [dependency-groups]
-dev = ["pytest>=8.2", "pytest-asyncio>=0.23", "ruff>=0.4"]
+dev = [
+    "jsonschema>=4.26.0",
+    "pytest>=8.2",
+ "pytest-asyncio>=0.23",
+ "ruff>=0.4",
+]
 
 [build-system]
 requires = ["hatchling"]
@@ -42,7 +48,11 @@ packages = ["src/fermentai"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
 
 [tool.ruff]
 line-length = 100
 target-version = "py312"
+
+[tool.uv.sources]
+formlabs-sdk = { git = "https://github.com/Formlabs/formlabs-api-python", rev = "v1.0.0-alpha.post2" }

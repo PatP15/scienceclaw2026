@@ -17,6 +17,7 @@ from .config import Settings
 from .db import dumps, iso, loads_cols, parse_iso
 from .devices import ControlService, agent_key
 from .events import EVENT_TYPES, event_stream
+from .jsonutil import load_json_file
 from .feedback import apply_schedules, jsonable, pipeline_available, run_feedback, store_experiment
 from .schemas import (
     SCHEMA_VERSION,
@@ -423,7 +424,8 @@ def agent_state(agent_id: str, request: Request):
         get_agent_state, why = None, f"fermentai.agents.state not importable ({e})"
     if get_agent_state is not None:
         try:
-            state = jsonable(get_agent_state(agent_id))
+            fp = settings(request).findings_path
+            state = jsonable(get_agent_state(agent_id, log_path=str(fp) if fp else None))
             if isinstance(state, dict):
                 state.setdefault("available", True)
                 state.setdefault("agent_id", agent_id)
@@ -525,13 +527,45 @@ def prediction_file(path: str, request: Request):
 
 @router.get("/molecular/summary", tags=["data"])
 def molecular_summary(request: Request):
-    return datafiles.molecular_summary(settings(request).data_dir / "alchemi",
-                                       "/api/v1/molecular/files")
+    return jsonable(datafiles.molecular_summary(settings(request).data_dir / "alchemi",
+                                                "/api/v1/molecular/files"))  # NaN -> null
 
 
 @router.get("/molecular/files/{path:path}", tags=["data"])
 def molecular_file(path: str, request: Request):
     return datafiles.serve(settings(request).data_dir / "alchemi" / "analysis", path)
+
+
+@router.get("/molecular/environment", tags=["data"])
+def molecular_environment(request: Request):
+    """Brev GPU environment for the ALCHEMI runs: report.md, remote_environment.json, parsed cost."""
+    return datafiles.environment_report(settings(request).data_dir / "alchemi" / "environment",
+                                        "/api/v1/molecular/environment/files")
+
+
+@router.get("/molecular/environment/files/{path:path}", tags=["data"])
+def molecular_environment_file(path: str, request: Request):
+    return datafiles.serve(settings(request).data_dir / "alchemi" / "environment", path)
+
+
+@router.get("/benchmarks", tags=["data"])
+def benchmarks(request: Request):
+    """Agent-collaboration benchmark outputs (in-silico; data/benchmarks/)."""
+    root = settings(request).data_dir / "benchmarks"
+    files = datafiles.list_files(root, "/api/v1/benchmarks")
+    summary = None
+    if (root / "summary.json").is_file():
+        try:
+            summary = load_json_file(root / "summary.json")
+        except (OSError, ValueError) as e:
+            summary = {"error": f"unreadable: {e}"}
+    return {"root": "data/benchmarks", "available": bool(files), "provenance": "simulated (in-silico benchmark)",
+            "summary": summary, "files": files}
+
+
+@router.get("/benchmarks/{path:path}", tags=["data"])
+def benchmark_file(path: str, request: Request):
+    return datafiles.serve(settings(request).data_dir / "benchmarks", path)
 
 
 @router.get("/stl", tags=["data"])

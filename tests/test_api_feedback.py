@@ -169,3 +169,70 @@ def test_real_pipeline_messages_and_provenance(client, tmp_path):
     assert all(m["duration_s"] == 3.0 and m["experiment_id"] == exp_id for m in j["motor_commands"])
     st = client.get("/api/v1/agents/scientist_A/state").json()
     assert st["agent_id"] == "scientist_A"
+
+
+def _sim_module():
+    import importlib.util
+    from pathlib import Path
+    spec = importlib.util.spec_from_file_location(
+        "simulate_device", Path(__file__).resolve().parents[1] / "scripts" / "simulate_device.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def _run_sim_devices(client, clock, seconds=60):
+    from fermentai.api.testing import TEST_TOKEN
+    sim = _sim_module()
+
+    class Mono:
+        t = 0.0
+
+        def __call__(self):
+            return self.t
+    mono = Mono()
+    devs = [sim.SimulatedDevice(c, client, TEST_TOKEN, clock=mono, telemetry_interval_s=10) for c in "AB"]
+    for _ in range(seconds):
+        mono.t += 1
+        clock.advance(1)
+        for d in devs:
+            d.step()
+
+
+def test_context_carries_full_telemetry_limits_and_experiment(client, clock, fake_pipeline):
+    client.post("/api/v1/experiments", headers=auth(), json={"experiment_id": "exp_run_7", "title": "run",
+                                                              "status": "running"})
+    _run_sim_devices(client, clock, 25)
+    assert client.post("/api/v1/taste-feedback", headers=auth(), json={"text": JUDGE}).status_code == 200
+    ctx = fake_pipeline["context"]
+    assert set(ctx["telemetry"]) == {"A", "B"} and len(ctx["telemetry"]["A"]) >= 2
+    rec = ctx["telemetry"]["A"][-1]
+    for k in ("received_at_utc", "boot_id", "sequence_number", "device_uptime_ms", "timestamp_quality",
+              "field_provenance", "diagnostics", "source", "quality_flags", "internal_heatsink_temperature_c"):
+        assert k in rec, k
+    assert rec["timestamp_utc"] is None and rec["source"] == "simulated"
+    assert ctx["telemetry"]["A"][0]["telemetry_id"] < rec["telemetry_id"]          # oldest -> newest
+    assert ctx["recent_telemetry"]["A"]                                             # kept for compatibility
+    lim = ctx["hardware_limits"]
+    assert lim["setpoint_min_c"] == 4.0 and lim["setpoint_max_c"] == 35.0 and lim["stale_after_s"] == 60.0
+    assert lim["heat_cool_dead_time_s"] == 60
+    assert ctx["experiment_id"] == "exp_run_7"
+    assert ctx["now_utc"] == "2026-10-31T12:00:25Z"
+
+
+def test_real_pipeline_sees_live_telemetry(client, clock):
+    """Integration: simulated devices post telemetry through the API; the real agents pipeline must
+    report usable observations for both chambers (not 'no telemetry this cycle')."""
+    pytest.importorskip("fermentai.agents.pipeline")
+    _run_sim_devices(client, clock, 60)
+    r = client.post("/api/v1/taste-feedback", headers=auth(),
+                    json={"text": "Loaf A was mild and fluffy. Loaf B was more sour but a little dense."})
+    assert r.status_code == 200, r.text
+    obs = r.json()["result"]["observations"]
+    for c in ("A", "B"):
+        q = obs[c]["quality"]
+        assert q.get("n", 0) >= 3 and q.get("note") != "no telemetry", q
+        assert not q["latest_stale"] and "simulated" in q["sources"]
+        assert "chamber_temperature" in q["latest_usable"] and "starter_temperature" in q["latest_usable"]
+        assert obs[c]["latest"]["fields"]["chamber_temperature"]["quality"] == "ok"
+        assert obs[c]["ph_status"]["reason"] != "no telemetry this cycle"

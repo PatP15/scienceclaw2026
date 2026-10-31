@@ -50,3 +50,10 @@ Done:
   (other agent made the script launch simulated_devices by default; `--legacy` = my reference client)
 
 Resume: read contracts/README.md (semantics + deviations), run the tests above.
+
+# PHASE 3 (dashboard live-run bugs) — COMPLETE: tests/test_api_*.py 102 passed, 1 skipped
+- api/jsonutil.py: jsonable / load_json_file / SafeJSONResponse (app default_response_class) -> NaN->null
+- datafiles.serve re-encodes .json (NaN->null); molecular_summary, findings NaN-safe
+- feedback.build_context: + telemetry (full stored records per chamber), hardware_limits, experiment_id,
+  experiment_ids, now_utc (server clock); recent_telemetry kept
+- routes: GET /benchmarks, /benchmarks/{path}, /molecular/environment (+ /files/{path}, parsed cost)

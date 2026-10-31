@@ -20,6 +20,7 @@ from .config import Settings
 from .db import Database
 from .devices import CommandError, ControlService, UnknownChamber, set_default_service
 from .feedback import jsonable
+from .jsonutil import SafeJSONResponse
 from .routes import router
 
 log = logging.getLogger("fermentai.api")
@@ -102,7 +103,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     service = ControlService(db, settings.hardware)
     set_default_service(service)
 
-    app = FastAPI(title="FermentAI local API", version="1.0.0",
+    app = FastAPI(title="FermentAI local API", version="1.1.0", default_response_class=SafeJSONResponse,
                   description="Local LAN backend for FermentAI chambers, dashboard and agents.")
     app.state.settings = settings
     app.state.service = service

@@ -8,7 +8,6 @@ schedule application is enabled. The motor animation goes through the separate m
 
 from __future__ import annotations
 
-import dataclasses
 import json
 import logging
 import math
@@ -19,6 +18,7 @@ from typing import Any
 from .config import Settings
 from .db import dumps, iso, loads_cols
 from .devices import ControlService, agent_key
+from .jsonutil import jsonable  # re-exported (routes/app import it from here)
 from .schemas import TasteFeedbackIn
 
 log = logging.getLogger("fermentai.api.feedback")
@@ -39,30 +39,6 @@ def pipeline_available() -> bool:
     return True
 
 
-def jsonable(obj: Any) -> Any:
-    """Best-effort conversion of pipeline/simulation outputs into JSON-safe structures."""
-    if obj is None or isinstance(obj, (bool, int, str)):
-        return obj
-    if isinstance(obj, float):
-        return obj if math.isfinite(obj) else None
-    if isinstance(obj, dict):
-        return {str(k): jsonable(v) for k, v in obj.items()}
-    if isinstance(obj, (list, tuple, set)):
-        return [jsonable(v) for v in obj]
-    if dataclasses.is_dataclass(obj) and not isinstance(obj, type):
-        return jsonable(dataclasses.asdict(obj))
-    if hasattr(obj, "model_dump"):
-        return jsonable(obj.model_dump(mode="json"))
-    if hasattr(obj, "to_dict") and hasattr(obj, "columns"):  # pandas DataFrame
-        return {"columns": [str(c) for c in obj.columns],
-                "data": jsonable(obj.to_dict(orient="list"))}
-    if hasattr(obj, "tolist"):  # numpy
-        return jsonable(obj.tolist())
-    if hasattr(obj, "isoformat"):
-        return obj.isoformat()
-    if hasattr(obj, "to_dict"):
-        return jsonable(obj.to_dict())
-    return str(obj)
 
 
 def first_setpoint(steps: Any) -> float | None:
@@ -90,16 +66,34 @@ def first_setpoint(steps: Any) -> float | None:
     return f if math.isfinite(f) else None
 
 
+def telemetry_record(row: dict) -> dict:
+    """Full telemetry record as stored: the device payload (all v1.1 fields, field_provenance,
+    diagnostics, canonical source) plus server fields (receipt time, server quality flags)."""
+    rec = dict(row.get("payload") or {})
+    rec.update({
+        "telemetry_id": row["id"],
+        "chamber_id": row["chamber_id"],
+        "timestamp_utc": row.get("timestamp_utc"),   # NULL stays null (never invented)
+        "received_at_utc": row["received_at_utc"],
+        "time_basis": row.get("time_basis"),
+        "source": row["source"],
+        "quality_flags": row.get("quality_flags") or [],
+        "field_provenance": rec.get("field_provenance") or {},
+    })
+    return rec
+
+
 def build_context(svc: ControlService, settings: Settings, fb: TasteFeedbackIn, feedback_id: int) -> dict:
     keep = ("id", "timestamp_utc", "source", "chamber_temperature_c", "starter_temperature_c",
             "relative_humidity_percent", "gas_resistance_ohms", "ph", "ph_method",
             "starter_height_mm", "door_open", "peltier_mode", "temperature_setpoint_c",
             "quality_flags", "experiment_id")
-    chambers, recent, setpoints = {}, {}, {}
+    chambers, recent, setpoints, raw = {}, {}, {}, {}
     for cid in svc.chamber_ids:
         ctl = svc.current_control(cid)
-        rows = [{k: r.get(k) for k in keep} for r in svc.telemetry_history(cid, limit=50)]
-        recent[cid] = rows
+        history = svc.telemetry_history(cid, limit=50)
+        recent[cid] = [{k: r.get(k) for k in keep} for r in history]   # v1.0-era compact view
+        raw[cid] = [telemetry_record(r) for r in history]
         setpoints[cid] = ctl["setpoint_c"]
         chambers[cid] = {"label": svc.hw.chambers[cid].label, "current_setpoint_c": ctl["setpoint_c"],
                          "setpoint_source": ctl["source"], "experiment_id": ctl.get("experiment_id")}
@@ -108,12 +102,34 @@ def build_context(svc: ControlService, settings: Settings, fb: TasteFeedbackIn, 
     prior = [loads_cols(r, "result_json") for r in svc.db.query(
         "SELECT * FROM taste_feedback WHERE id<? ORDER BY id DESC LIMIT 10", (feedback_id,))]
     t = svc.hw.temperature
+    hw_limits = {
+        **svc.hw.firmware_local_limits,
+        "setpoint_min_c": t.min_setpoint_c,
+        "setpoint_max_c": t.max_setpoint_c,
+        "max_step_c_per_update": t.max_step_c_per_update,
+        "min_update_interval_s": t.min_update_interval_s,
+        "stale_after_s": float(svc.hw.telemetry.stale_after_s),
+        "motor_max_duration_s": svc.hw.motor.max_duration_s,
+    }
+    running = svc.db.query_one(
+        "SELECT experiment_id FROM experiments WHERE status='running' ORDER BY id DESC LIMIT 1")
+    exp_ids = {cid: chambers[cid]["experiment_id"] for cid in chambers}
+    latest_tel_exp = next((r.get("experiment_id") for cid in raw for r in reversed(raw[cid])
+                           if r.get("experiment_id")), None)
+    current_exp = ((running or {}).get("experiment_id")
+                   or next((e for e in exp_ids.values() if e), None) or latest_tel_exp)
     return {
         "feedback_id": feedback_id,
+        "now_utc": iso(svc.clock()),          # server clock: staleness judged consistently
+        "experiment_id": current_exp,         # current run (None if nothing is running)
+        "experiment_ids": exp_ids,
+        "telemetry": raw,                     # full stored records per chamber (oldest -> newest)
+        "hardware_limits": hw_limits,
         "judge_name": fb.judge_name,
         "loaf_notes": {"A": fb.loaf_a_notes, "B": fb.loaf_b_notes},
         "chambers": chambers,
         "current_setpoints": setpoints,
+        "setpoints": setpoints,               # key the agents' offline policy reads
         "recent_telemetry": recent,
         "experiments": experiments,
         "prior_feedback": prior,

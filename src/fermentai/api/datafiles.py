@@ -4,10 +4,13 @@ from __future__ import annotations
 
 import json
 import mimetypes
+import re
 from pathlib import Path
 
 from fastapi import HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse, Response
+
+from .jsonutil import jsonable, load_json_file
 
 SERVABLE = {".csv", ".json", ".jsonl", ".png", ".jpg", ".jpeg", ".svg", ".html", ".txt", ".md",
             ".stl", ".xyz", ".pdb", ".sdf", ".mol", ".log", ".yaml", ".yml", ".webp"}
@@ -41,8 +44,15 @@ def safe_file(root: Path, rel: str) -> Path:
     return p
 
 
-def serve(root: Path, rel: str) -> FileResponse:
+def serve(root: Path, rel: str) -> Response:
+    """Serve a data file. .json files are re-encoded so NaN/Infinity (which Python's json writes
+    but browsers' JSON.parse rejects) become null; unparseable JSON is served as-is."""
     p = safe_file(root, rel)
+    if p.suffix.lower() == ".json":
+        try:
+            return JSONResponse(load_json_file(p))
+        except (ValueError, OSError):
+            pass
     media, _ = mimetypes.guess_type(p.name)
     return FileResponse(p, media_type=media or "application/octet-stream")
 
@@ -57,8 +67,8 @@ def molecular_summary(alchemi_dir: Path, url_prefix: str) -> dict:
     for f in files:
         if f["suffix"] == ".json" and f["bytes"] < 5_000_000:
             try:
-                summaries[f["path"]] = json.loads((analysis / f["path"]).read_text())
-            except (OSError, json.JSONDecodeError) as e:
+                summaries[f["path"]] = load_json_file(analysis / f["path"])  # NaN -> null
+            except (OSError, ValueError) as e:
                 summaries[f["path"]] = {"error": f"unreadable: {e}"}
     return {"available": True, "files": files, "summaries": summaries,
             "provenance": "ALCHEMI outputs as cached on the Mac (see files for run metadata)"}
@@ -83,11 +93,41 @@ def read_findings(path: Path, limit: int) -> list:
             line = line.strip()
             if line:
                 try:
-                    items.append(json.loads(line))
+                    items.append(jsonable(json.loads(line)))
                 except json.JSONDecodeError:
                     items.append({"unparsed": line})
     else:
-        data = json.loads(text)
+        data = jsonable(json.loads(text))
         items = data.get("findings", data) if isinstance(data, dict) else data
         items = items if isinstance(items, list) else [items]
     return items[-limit:]
+
+
+_COST_RE = re.compile(r"([\d.]+)\s*h\s*[×x*]\s*\$\s*([\d.]+)\s*/\s*h\s*≈?\s*\**\s*\$\s*([\d.]+)")
+
+
+def environment_report(env_dir: Path, url_prefix: str) -> dict:
+    """data/alchemi/environment: report.md + remote_environment.json (+ parsed cost line)."""
+    report = env_dir / "report.md"
+    remote = env_dir / "remote_environment.json"
+    if not report.is_file() and not remote.is_file():
+        return {"available": False, "reason": f"no environment report under {env_dir}",
+                "report_md": None, "remote_environment": None, "cost": None, "files": []}
+    text = report.read_text(encoding="utf-8") if report.is_file() else None
+    cost = None
+    for line in (text or "").splitlines():
+        m = _COST_RE.search(line)
+        if m:
+            cost = {"line": line.strip().lstrip("-* ").strip(), "hours": float(m.group(1)),
+                    "rate_usd_per_h": float(m.group(2)), "estimate_usd": float(m.group(3)),
+                    "note": "estimate from report.md; the Brev invoice is authoritative"}
+            break
+        if cost is None and "$" in line and "cost" in line.lower():
+            cost = {"line": line.strip().lstrip("-* ").strip()}
+    try:
+        remote_env = load_json_file(remote) if remote.is_file() else None
+    except (OSError, ValueError) as e:
+        remote_env = {"error": f"unreadable: {e}"}
+    return {"available": True, "report_md": text, "remote_environment": remote_env, "cost": cost,
+            "files": list_files(env_dir, url_prefix),
+            "provenance": "recorded on the remote NVIDIA Brev GPU instance; cached on the Mac"}

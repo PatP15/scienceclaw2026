@@ -252,7 +252,7 @@ def test_agent_state_stub_and_module(client, monkeypatch):
     st = client.get("/api/v1/agents/scientist_A/state").json()
     assert st["available"] is False and st["stub"] is True and st["chamber_id"] == "A"
     mod = types.ModuleType("fermentai.agents.state")
-    mod.get_agent_state = lambda agent_id: {"agent_id": agent_id, "hypotheses": ["h1"], "mode": "offline"}
+    mod.get_agent_state = lambda agent_id, **kw: {"agent_id": agent_id, "hypotheses": ["h1"], "mode": "offline"}
     monkeypatch.setitem(sys.modules, "fermentai.agents.state", mod)
     st = client.get("/api/v1/agents/scientist_B/state").json()
     assert st["available"] is True and st["hypotheses"] == ["h1"]
