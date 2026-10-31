@@ -1,0 +1,115 @@
+{
+ "id": "lactic_acid__n6__c0__T278.15K__s20261102",
+ "start_structure": "lactic_acid__n6__c0",
+ "temperature_k": 278.15,
+ "n_steps": 4000,
+ "timestep_fs": 0.5,
+ "friction_per_fs": 0.01,
+ "seed": 20261102,
+ "integrator": "nvalchemi.dynamics.NVTLangevin (BAOAB)",
+ "checkpoint": "aimnet2_wb97m_d3_3",
+ "versions": {
+  "python": "3.12.16",
+  "platform": "Linux-6.8.0-90-generic-x86_64-with-glibc2.35",
+  "nvalchemi-toolkit": "0.2.0",
+  "nvalchemi-toolkit-ops": "0.5.0",
+  "aimnet": "0.2.5",
+  "torch": "2.10.0",
+  "warp-lang": "1.18.0+cu12",
+  "ase": "3.29.0",
+  "nvidia-physicsnemo": "2.2.2",
+  "numpy": "2.2.6",
+  "torch_cuda": "12.8",
+  "cudnn": 91002,
+  "gpu": "NVIDIA RTX A6000",
+  "gpu_capability": "8.6",
+  "gpu_memory_gb": 50.91
+ },
+ "provenance": "real: ALCHEMI/AIMNet2 on NVIDIA RTX A6000",
+ "started_at_utc": "2026-10-31T04:35:07Z",
+ "status": "completed",
+ "wall_seconds": 127.02972650527954,
+ "n_frames": 200,
+ "frame_every_steps": 20,
+ "ns_per_day": 1.3603115172637814,
+ "mean_temperature_second_half_k": 267.9305618286133,
+ "std_temperature_second_half_k": 39.7800960480005,
+ "n_logged_rows": 400,
+ "finished_at_utc": "2026-10-31T04:37:14Z",
+ "symbols": [
+  "C",
+  "C",
+  "C",
+  "O",
+  "O",
+  "O",
+  "H",
+  "H",
+  "H",
+  "H",
+  "H",
+  "H",
+  "O",
+  "H",
+  "H",
+  "O",
+  "H",
+  "H",
+  "O",
+  "H",
+  "H",
+  "O",
+  "H",
+  "H",
+  "O",
+  "H",
+  "H",
+  "O",
+  "H",
+  "H"
+ ],
+ "fragments": [
+  {
+   "name": "lactic_acid",
+   "smiles": "C[C@H](O)C(=O)O",
+   "start": 0,
+   "stop": 12
+  },
+  {
+   "name": "water",
+   "smiles": "O",
+   "start": 12,
+   "stop": 15
+  },
+  {
+   "name": "water",
+   "smiles": "O",
+   "start": 15,
+   "stop": 18
+  },
+  {
+   "name": "water",
+   "smiles": "O",
+   "start": 18,
+   "stop": 21
+  },
+  {
+   "name": "water",
+   "smiles": "O",
+   "start": 21,
+   "stop": 24
+  },
+  {
+   "name": "water",
+   "smiles": "O",
+   "start": 24,
+   "stop": 27
+  },
+  {
+   "name": "water",
+   "smiles": "O",
+   "start": 27,
+   "stop": 30
+  }
+ ]
+}

@@ -1,0 +1,78 @@
+[2026-10-31T03:53:19Z] mode=optimize device=cuda:0 versions={"python": "3.12.16", "platform": "Linux-6.8.0-90-generic-x86_64-with-glibc2.35", "nvalchemi-toolkit": "0.2.0", "nvalchemi-toolkit-ops": "0.5.0", "aimnet": "0.2.5", "torch": "2.10.0", "warp-lang": "1.18.0+cu12", "ase": "3.29.0", "nvidia-physicsnemo": "2.2.2", "numpy": "2.2.6", "torch_cuda": "12.8", "cudnn": 91002, "gpu": "NVIDIA RTX A6000", "gpu_capability": "8.6", "gpu_memory_gb": 50.91}
+Warp 1.18.0 initialized:
+   CUDA Toolkit 12.9, Driver 12.8
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA RTX A6000" (47 GiB, sm_86, mempool enabled)
+   Kernel cache:
+     /home/shadeform/.cache/warp/1.18.0
+/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemi/models/aimnet2.py:353: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  values = [float(v) for v in (rc_s, rc_v) if v is not None]
+[2026-10-31T03:53:28Z] AIMNet2 'aimnet2_wb97m_d3_3' loaded on cuda:0 in 6.7s; D3(BJ) params used: {'s6': 1.0, 'a1': 0.566, 's8': 0.3908, 'a2': 3.128}
+[2026-10-31T03:53:28Z] optimising 57 structures with FIRE2 (fmax<0.01 eV/A, max 4000 steps)
+[2026-10-31T03:53:33Z] [1/57] water__n1__c0: E=-2081.045206 eV fmax=0.0089 steps=40 converged (3.2s)
+[2026-10-31T03:53:39Z] [2/57] water_cluster__n3__c0: E=-6243.632890 eV fmax=0.0083 steps=184 converged (5.5s)
+[2026-10-31T03:53:49Z] [3/57] water_cluster__n3__c1: E=-6243.912961 eV fmax=0.0098 steps=468 converged (10.5s)
+[2026-10-31T03:53:54Z] [4/57] water_cluster__n3__c2: E=-6243.676640 eV fmax=0.0097 steps=186 converged (4.1s)
+[2026-10-31T03:53:58Z] [5/57] water_cluster__n3__c3: E=-6243.657090 eV fmax=0.0090 steps=198 converged (4.6s)
+W1031 03:53:58.947000 19296 torch/_dynamo/convert_frame.py:1676] [5/8] torch._dynamo hit config.recompile_limit (8)
+W1031 03:53:58.947000 19296 torch/_dynamo/convert_frame.py:1676] [5/8]    function: 'neighbor_list' (/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemiops/torch/neighbors/__init__.py:102)
+W1031 03:53:58.947000 19296 torch/_dynamo/convert_frame.py:1676] [5/8]    last reason: 5/5: ___as_tensor(cutoff).item() == 15.0  # (unknown source ___as_tensor(cutoff).item(), please file a bug)
+W1031 03:53:58.947000 19296 torch/_dynamo/convert_frame.py:1676] [5/8] To log all recompilation reasons, use TORCH_LOGS="recompiles".
+W1031 03:53:58.947000 19296 torch/_dynamo/convert_frame.py:1676] [5/8] To diagnose recompilation issues, see https://pytorch.org/docs/main/compile/programming_model.recompilation.html
+[2026-10-31T03:54:07Z] [6/57] water_cluster__n6__c0: E=-12488.010557 eV fmax=0.0096 steps=342 converged (8.3s)
+[2026-10-31T03:54:14Z] [7/57] water_cluster__n6__c1: E=-12487.928278 eV fmax=0.0098 steps=312 converged (7.0s)
+[2026-10-31T03:54:31Z] [8/57] water_cluster__n6__c2: E=-12488.245012 eV fmax=0.0100 steps=734 converged (16.9s)
+[2026-10-31T03:54:41Z] [9/57] water_cluster__n6__c3: E=-12487.965665 eV fmax=0.0082 steps=492 converged (10.9s)
+[2026-10-31T03:54:47Z] [10/57] lactic_acid__n0__c0: E=-9356.625187 eV fmax=0.0092 steps=257 converged (5.7s)
+[2026-10-31T03:54:53Z] [11/57] lactic_acid__n0__c1: E=-9356.631945 eV fmax=0.0096 steps=252 converged (5.6s)
+[2026-10-31T03:54:57Z] [12/57] lactic_acid__n0__c2: E=-9356.625021 eV fmax=0.0094 steps=210 converged (4.5s)
+[2026-10-31T03:55:02Z] [13/57] lactic_acid__n0__c3: E=-9356.730808 eV fmax=0.0089 steps=205 converged (4.5s)
+[2026-10-31T03:55:06Z] [14/57] lactic_acid__n0__c4: E=-9356.624828 eV fmax=0.0094 steps=203 converged (4.3s)
+[2026-10-31T03:55:10Z] [15/57] lactic_acid__n0__c5: E=-9356.624388 eV fmax=0.0097 steps=195 converged (4.2s)
+[2026-10-31T03:55:20Z] [16/57] lactic_acid__n1__c0: E=-11438.170993 eV fmax=0.0100 steps=446 converged (9.7s)
+[2026-10-31T03:55:27Z] [17/57] lactic_acid__n1__c1: E=-11437.894981 eV fmax=0.0099 steps=285 converged (6.4s)
+[2026-10-31T03:55:35Z] [18/57] lactic_acid__n1__c2: E=-11438.188382 eV fmax=0.0089 steps=372 converged (8.0s)
+[2026-10-31T03:55:41Z] [19/57] lactic_acid__n1__c3: E=-11438.188625 eV fmax=0.0097 steps=263 converged (5.8s)
+[2026-10-31T03:55:46Z] [20/57] lactic_acid__n1__c4: E=-11437.842393 eV fmax=0.0096 steps=231 converged (4.9s)
+[2026-10-31T03:55:54Z] [21/57] lactic_acid__n1__c5: E=-11438.123118 eV fmax=0.0092 steps=371 converged (8.1s)
+[2026-10-31T03:56:04Z] [22/57] lactic_acid__n3__c0: E=-15601.063485 eV fmax=0.0097 steps=431 converged (9.8s)
+[2026-10-31T03:56:13Z] [23/57] lactic_acid__n3__c1: E=-15600.886094 eV fmax=0.0100 steps=411 converged (9.2s)
+[2026-10-31T03:56:27Z] [24/57] lactic_acid__n3__c2: E=-15600.942558 eV fmax=0.0089 steps=603 converged (13.6s)
+[2026-10-31T03:56:35Z] [25/57] lactic_acid__n3__c3: E=-15600.929630 eV fmax=0.0099 steps=390 converged (8.7s)
+[2026-10-31T03:56:46Z] [26/57] lactic_acid__n3__c4: E=-15601.049571 eV fmax=0.0086 steps=459 converged (10.1s)
+[2026-10-31T03:56:57Z] [27/57] lactic_acid__n3__c5: E=-15600.647977 eV fmax=0.0094 steps=496 converged (11.0s)
+[2026-10-31T03:57:15Z] [28/57] lactic_acid__n6__c0: E=-21845.668887 eV fmax=0.0097 steps=818 converged (17.9s)
+[2026-10-31T03:57:24Z] [29/57] lactic_acid__n6__c1: E=-21845.481049 eV fmax=0.0088 steps=400 converged (8.9s)
+[2026-10-31T03:57:39Z] [30/57] lactic_acid__n6__c2: E=-21845.154208 eV fmax=0.0100 steps=647 converged (15.8s)
+[2026-10-31T03:57:49Z] [31/57] lactic_acid__n6__c3: E=-21844.915558 eV fmax=0.0092 steps=411 converged (9.7s)
+[2026-10-31T03:57:57Z] [32/57] lactic_acid__n6__c4: E=-21845.153944 eV fmax=0.0092 steps=345 converged (8.0s)
+[2026-10-31T03:58:06Z] [33/57] lactic_acid__n6__c5: E=-21845.411145 eV fmax=0.0100 steps=363 converged (8.4s)
+[2026-10-31T03:58:11Z] [34/57] acetic_acid__n0__c0: E=-6238.043687 eV fmax=0.0098 steps=226 converged (5.2s)
+[2026-10-31T03:58:14Z] [35/57] acetic_acid__n0__c1: E=-6238.029895 eV fmax=0.0087 steps=138 converged (3.1s)
+[2026-10-31T03:58:18Z] [36/57] acetic_acid__n0__c2: E=-6238.044538 eV fmax=0.0098 steps=184 converged (4.1s)
+[2026-10-31T03:58:22Z] [37/57] acetic_acid__n0__c3: E=-6238.046120 eV fmax=0.0098 steps=142 converged (3.2s)
+[2026-10-31T03:58:25Z] [38/57] acetic_acid__n0__c4: E=-6238.047587 eV fmax=0.0096 steps=140 converged (3.3s)
+[2026-10-31T03:58:28Z] [39/57] acetic_acid__n0__c5: E=-6238.030761 eV fmax=0.0099 steps=122 converged (2.8s)
+[2026-10-31T03:58:37Z] [40/57] acetic_acid__n1__c0: E=-8319.295497 eV fmax=0.0097 steps=413 converged (9.5s)
+[2026-10-31T03:58:46Z] [41/57] acetic_acid__n1__c1: E=-8319.530971 eV fmax=0.0097 steps=370 converged (8.5s)
+[2026-10-31T03:58:52Z] [42/57] acetic_acid__n1__c2: E=-8319.372452 eV fmax=0.0099 steps=280 converged (6.3s)
+[2026-10-31T03:58:58Z] [43/57] acetic_acid__n1__c3: E=-8319.539259 eV fmax=0.0083 steps=231 converged (5.4s)
+[2026-10-31T03:59:03Z] [44/57] acetic_acid__n1__c4: E=-8319.537030 eV fmax=0.0098 steps=222 converged (5.0s)
+[2026-10-31T03:59:10Z] [45/57] acetic_acid__n1__c5: E=-8319.538457 eV fmax=0.0094 steps=308 converged (7.1s)
+[2026-10-31T03:59:17Z] [46/57] acetic_acid__n3__c0: E=-12482.108104 eV fmax=0.0100 steps=328 converged (7.6s)
+[2026-10-31T03:59:27Z] [47/57] acetic_acid__n3__c1: E=-12482.107281 eV fmax=0.0095 steps=419 converged (9.5s)
+[2026-10-31T03:59:42Z] [48/57] acetic_acid__n3__c2: E=-12481.961832 eV fmax=0.0099 steps=660 converged (15.2s)
+[2026-10-31T03:59:51Z] [49/57] acetic_acid__n3__c3: E=-12482.176665 eV fmax=0.0097 steps=391 converged (8.7s)
+[2026-10-31T04:00:04Z] [50/57] acetic_acid__n3__c4: E=-12482.313037 eV fmax=0.0099 steps=565 converged (13.1s)
+[2026-10-31T04:00:14Z] [51/57] acetic_acid__n3__c5: E=-12482.141922 eV fmax=0.0094 steps=404 converged (9.5s)
+[2026-10-31T04:00:24Z] [52/57] acetic_acid__n6__c0: E=-18726.497586 eV fmax=0.0096 steps=442 converged (10.3s)
+[2026-10-31T04:00:40Z] [53/57] acetic_acid__n6__c1: E=-18726.568100 eV fmax=0.0098 steps=684 converged (15.4s)
+[2026-10-31T04:00:48Z] [54/57] acetic_acid__n6__c2: E=-18726.421558 eV fmax=0.0090 steps=352 converged (8.2s)
+[2026-10-31T04:01:00Z] [55/57] acetic_acid__n6__c3: E=-18726.532015 eV fmax=0.0099 steps=545 converged (12.4s)
+[2026-10-31T04:01:10Z] [56/57] acetic_acid__n6__c4: E=-18726.826958 eV fmax=0.0096 steps=425 converged (9.7s)
+[2026-10-31T04:01:19Z] [57/57] acetic_acid__n6__c5: E=-18726.282195 eV fmax=0.0096 steps=383 converged (8.4s)
+[2026-10-31T04:01:19Z] optimize done: 57 ok, 0 failed
+[2026-10-31T04:01:19Z] total wall time 479.8s
+exit_code=0

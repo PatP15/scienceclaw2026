@@ -1,0 +1,28 @@
+uv 0.13.6 (x86_64-unknown-linux-gnu)
+Checked 3 packages in 12ms
+driver 570 < 580: installing Warp 1.18.0+cu12 from https://github.com/NVIDIA/warp/releases/download/v1.18.0/warp_lang-1.18.0%2Bcu12-py3-none-manylinux_2_28_x86_64.whl
+Resolved 1 package in 1.61s
+Downloading warp-lang (157.0MiB)
+ Downloaded warp-lang
+Prepared 1 package in 1.22s
+Uninstalled 1 package in 11ms
+Installed 1 package in 17ms
+ - warp-lang==1.18.0
+ + warp-lang==1.18.0+cu12 (from https://github.com/NVIDIA/warp/releases/download/v1.18.0/warp_lang-1.18.0%2Bcu12-py3-none-manylinux_2_28_x86_64.whl)
+Warp 1.18.0 initialized:
+   CUDA Toolkit 12.9, Driver 12.8
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA RTX A6000" (47 GiB, sm_86, mempool enabled)
+   Kernel cache:
+     /home/shadeform/.cache/warp/1.18.0
+warp 1.18.0 cuda devices 1
+torch 2.10.0+cu128 cuda 12.8 available True
+device NVIDIA RTX A6000
+nvalchemi-toolkit 0.2.0
+nvalchemi-toolkit-ops 0.5.0
+aimnet 0.2.5
+ase 3.29.0
+warp-lang 1.18.0+cu12
+nvidia-physicsnemo 2.2.2
+setup_env.sh: OK

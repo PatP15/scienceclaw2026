@@ -1,0 +1,31 @@
+Pseudo-terminal will not be allocated because stdin is not a terminal.
+Warning: Permanently added '[global.prd.ga.run.brev.nvidia.com]:13623' (ED25519) to the list of known hosts.
+Sat Oct 31 03:46:15 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 570.195.03             Driver Version: 570.195.03     CUDA Version: 12.8     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA RTX A6000               On  |   00000000:00:06.0 Off |                  Off |
+| 30%   25C    P8             12W /  300W |       1MiB /  49140MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+name, driver_version, memory.total [MiB], compute_cap
+NVIDIA RTX A6000, 570.195.03, 49140 MiB, 8.6
+28
+               total        used        free      shared  buff/cache   available
+Mem:              56           1          49           0           5          55
+/dev/vda1        97G   20G   78G  20% /
+PRETTY_NAME="Ubuntu 22.04.5 LTS"
+NAME="Ubuntu"
+Python 3.10.12

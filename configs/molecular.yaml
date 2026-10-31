@@ -1,0 +1,67 @@
+# FermentAI molecular (NVIDIA ALCHEMI / AIMNet2) configuration.
+# Read by src/fermentai/molecular/structures.py (Mac) and remote/run_alchemi.py (Brev GPU).
+# Units are given next to each parameter. "assumption" marks a modelling choice, not a literature value.
+
+provenance_label: "real: ALCHEMI/AIMNet2 on Brev GPU"
+
+structures:
+  output_dir: data/alchemi/inputs          # XYZ files + manifest.json
+  base_seed: 20261031                      # assumption; every RDKit/numpy seed is derived from this
+  n_conformers_acid: 6                     # isolated-acid ETKDG conformers (seeds base_seed + i)
+  n_conformers_cluster: 6                  # independent seeded starts per (acid, n_water)
+  n_conformers_water_cluster: 4            # pure (H2O)n reference clusters for n > 1
+  water_counts: [1, 3, 6]                  # waters around each acid (PLAN.md §4)
+  acids:
+    lactic_acid:
+      # L-(+)-lactic acid, (S)-2-hydroxypropanoic acid (PubChem CID 107689), the main LAB product.
+      smiles: "C[C@@H](C(=O)O)O"
+      formula: C3H6O3
+    acetic_acid:
+      # Acetic acid (PubChem CID 176); heterofermentative LAB / acetic flavour.
+      smiles: "CC(=O)O"
+      formula: C2H4O2
+  water_smiles: "O"
+  placement:
+    # Waters are placed at hydrogen-bonding positions on polar atoms (acid O/H, then previously
+    # placed waters) with seeded random orientation. Distances are starting guesses only; the
+    # AIMNet2 optimisation determines the final geometry.
+    donor_h_to_acceptor_o_angstrom: 1.85   # typical O-H...O H-bond length (Jeffrey 1997), +-0.3
+    acceptor_o_to_water_o_angstrom: 2.85   # typical O...O distance in water H-bonds, +-0.2
+    jitter_angstrom: 0.25                  # assumption: random displacement of the placement site
+    min_heavy_heavy_angstrom: 2.45         # assumption: clash rejection between molecules
+    min_any_h_angstrom: 1.45               # assumption: clash rejection involving H between molecules
+    max_attempts_per_water: 400
+
+model:
+  # AIMNet2 wB97M-D3 checkpoint used in the official ALCHEMI example 08_aimnet2_ewald_pipeline.
+  checkpoint: aimnet2_wb97m_d3_3
+  # AIMNet2Wrapper disables AIMNet2's internal Coulomb and D3 terms; the toolkit composes them
+  # back in with PipelineModelWrapper: [AIMNet2 + Ewald] (shared autograd) + [DFT-D3(BJ)].
+  electrostatics: ewald                    # EwaldModelWrapper, AIMNet2 charges, accuracy below
+  ewald_accuracy: 1.0e-6
+  box_size_angstrom: 60.0                  # large periodic box (as in official example) ~ gas phase
+  dispersion: dftd3_bj
+  # wB97M-D3(BJ) damping parameters (Najibi & Goerigk, JCTC 2018, 14, 5725): s6=1, a1, s8, a2 (Bohr).
+  # remote/run_alchemi.py reads the actual values used by the aimnet package if exposed and logs both.
+  d3_bj: {s6: 1.0, a1: 0.5660, s8: 0.3908, a2: 3.1280}
+  charge: 0                                # all species neutral
+  multiplicity: 1                          # closed-shell singlets
+
+optimization:
+  method: FIRE2                            # nvalchemi.dynamics.optimizers.fire2.FIRE2 (official example 08)
+  fallback_method: LBFGS                   # nvalchemi.dynamics.optimizers.LBFGS, used only if FIRE2 does not converge
+  fmax_ev_per_angstrom: 0.01               # convergence threshold on max per-atom |F|
+  max_steps: 4000
+  fire2_dt: 0.01                           # as in official example 08
+  log_frequency: 1
+
+md:
+  # Optional NVT Langevin (official example basic/05_nvt_langevin).
+  enabled: true
+  temperatures_k: [278.15, 295.15, 300.15, 310.15]   # 5, 22, 27, 37 degC (chamber A/B setpoints included)
+  timestep_fs: 0.5
+  friction_per_fs: 0.01
+  n_steps: 4000                            # 2 ps per trajectory
+  log_frequency: 10                        # energy/temperature rows every N steps
+  frame_every_steps: 20                    # coordinates saved every N steps (10 fs)
+  seed: 20261031

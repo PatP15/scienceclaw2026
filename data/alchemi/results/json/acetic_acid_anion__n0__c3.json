@@ -1,0 +1,217 @@
+{
+ "id": "acetic_acid_anion__n0__c3",
+ "kind": "anion_monomer",
+ "acid": "acetic_acid",
+ "n_water": 0,
+ "conformer_index": 3,
+ "seeds": {
+  "base_seed": 20261031,
+  "etkdg_seed": 53863089
+ },
+ "charge": -1,
+ "multiplicity": 1,
+ "formula": "C2H3O2",
+ "fragments": [
+  {
+   "name": "acetate",
+   "smiles": "CC(=O)[O-]",
+   "start": 0,
+   "stop": 7
+  }
+ ],
+ "n_atoms": 7,
+ "input_sha256": "9b9b2b476e8069318d1be08ddbfe95edb0dfed34f38588365aa789b8aa93786e",
+ "input_meta": {
+  "derived_from": "acetic_acid__n0__c3",
+  "species": "acetate(-).0H2O",
+  "derivation": "removed carboxylic H (atom 7) from optimised acetic_acid__n0__c3"
+ },
+ "provenance": "real: ALCHEMI/AIMNet2 on NVIDIA RTX A6000",
+ "method": {
+  "engine": "nvalchemi-toolkit",
+  "optimizer": "FIRE2",
+  "model": "PipelineModelWrapper[[AIMNet2Wrapper+EwaldModelWrapper](autograd)+[DFTD3ModelWrapper]]",
+  "checkpoint": "aimnet2_wb97m_d3_3",
+  "d3_bj": {
+   "s6": 1.0,
+   "a1": 0.566,
+   "s8": 0.3908,
+   "a2": 3.128
+  },
+  "box_size_angstrom": 60.0,
+  "ewald_accuracy": 1e-06,
+  "fmax_threshold_ev_per_angstrom": 0.01,
+  "max_steps": 4000,
+  "fire2_dt": 0.01
+ },
+ "versions": {
+  "python": "3.12.16",
+  "platform": "Linux-6.8.0-90-generic-x86_64-with-glibc2.35",
+  "nvalchemi-toolkit": "0.2.0",
+  "nvalchemi-toolkit-ops": "0.5.0",
+  "aimnet": "0.2.5",
+  "torch": "2.10.0",
+  "warp-lang": "1.18.0+cu12",
+  "ase": "3.29.0",
+  "nvidia-physicsnemo": "2.2.2",
+  "numpy": "2.2.6",
+  "torch_cuda": "12.8",
+  "cudnn": 91002,
+  "gpu": "NVIDIA RTX A6000",
+  "gpu_capability": "8.6",
+  "gpu_memory_gb": 50.91
+ },
+ "started_at_utc": "2026-10-31T04:02:29Z",
+ "energy_periodic_raw_ev": -6222.9039570043315,
+ "makov_payne_monopole_ev": -0.3404672463297083,
+ "energy_definition": "gas-phase total energy = periodic Ewald energy minus Makov-Payne monopole term -q^2*alpha/(2L) (zero for neutral species); validated in chargetest.json",
+ "crosscheck_upstream_aimnet_gas_phase_energy_ev": -6222.564296170008,
+ "crosscheck_delta_ev": 0.0008064120056587853,
+ "status": "converged",
+ "converged": true,
+ "iterations": 130,
+ "attempts": [
+  {
+   "optimizer": "FIRE2",
+   "steps": 130,
+   "final_fmax": 0.009335924888810269
+  }
+ ],
+ "wall_seconds": 3.05198335647583,
+ "energy_ev": -6222.563489758002,
+ "energy_hartree": -228.67499044358485,
+ "max_force_ev_per_angstrom": 0.009335924888810269,
+ "optimizer_final_energy_ev": -6222.90380859375,
+ "initial_energy_ev": -6222.48388671875,
+ "initial_fmax_ev_per_angstrom": 7.1367926597595215,
+ "charges_e": [
+  -0.31062477827072144,
+  0.5129078030586243,
+  -0.6794155836105347,
+  -0.6818342804908752,
+  0.05393671989440918,
+  0.053191326558589935,
+  0.05183867737650871
+ ],
+ "forces_ev_per_angstrom": [
+  [
+   -2.3179687559604645e-05,
+   0.003943140152841806,
+   0.0013852561824023724
+  ],
+  [
+   -0.004127868451178074,
+   0.001094255712814629,
+   -5.792966112494469e-05
+  ],
+  [
+   -0.006032971665263176,
+   -0.0004009511321783066,
+   -0.003415589453652501
+  ],
+  [
+   -0.0034019537270069122,
+   -0.0050071473233401775,
+   0.0007377243600785732
+  ],
+  [
+   0.002137165516614914,
+   0.007357309572398663,
+   0.000999713665805757
+  ],
+  [
+   0.005374938249588013,
+   -0.005993352271616459,
+   -0.00472750049084425
+  ],
+  [
+   0.006073587574064732,
+   -0.0009930026717483997,
+   0.005078440997749567
+  ]
+ ],
+ "symbols": [
+  "C",
+  "C",
+  "O",
+  "O",
+  "H",
+  "H",
+  "H"
+ ],
+ "initial_positions_angstrom": [
+  [
+   29.352134704589844,
+   29.895328521728516,
+   29.923643112182617
+  ],
+  [
+   30.80237579345703,
+   30.232099533081055,
+   30.102277755737305
+  ],
+  [
+   31.252944946289062,
+   31.320070266723633,
+   30.3358211517334
+  ],
+  [
+   31.58731460571289,
+   29.139400482177734,
+   29.975875854492188
+  ],
+  [
+   28.775489807128906,
+   30.81136131286621,
+   29.87773895263672
+  ],
+  [
+   29.017423629760742,
+   29.292341232299805,
+   30.766223907470703
+  ],
+  [
+   29.212310791015625,
+   29.30939292907715,
+   29.018421173095703
+  ]
+ ],
+ "optimized_positions_angstrom": [
+  [
+   29.35295867919922,
+   29.89295768737793,
+   29.922943115234375
+  ],
+  [
+   30.877351760864258,
+   30.164321899414062,
+   30.096158981323242
+  ],
+  [
+   31.196613311767578,
+   31.348447799682617,
+   30.334304809570312
+  ],
+  [
+   31.607402801513672,
+   29.15671157836914,
+   29.983642578125
+  ],
+  [
+   28.796375274658203,
+   30.82822608947754,
+   29.883813858032227
+  ],
+  [
+   28.993642807006836,
+   29.295621871948242,
+   30.765474319458008
+  ],
+  [
+   29.17563819885254,
+   29.31371307373047,
+   29.013669967651367
+  ]
+ ],
+ "finished_at_utc": "2026-10-31T04:02:36Z"
+}

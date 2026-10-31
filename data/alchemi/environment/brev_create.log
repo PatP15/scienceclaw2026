@@ -1,0 +1,11 @@
+Attempting to create 1 instance(s) with 1 parallel attempts
+Instance types to try: hyperstack_A6000
+
+Trying hyperstack_A6000 for 1 instance(s)...
+[Worker 1] Trying hyperstack_A6000 for instance 'fermentai-gpu'...
+[Worker 1] hyperstack_A6000 Success! Created instance 'fermentai-gpu'
+
+Waiting for instance(s) to be ready...
+You can safely ctrl+c to exit
+  og64kprp7: Ready
+fermentai-gpu

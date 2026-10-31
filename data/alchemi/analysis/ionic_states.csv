@@ -1,0 +1,102 @@
+id,kind,acid,n_water,conformer_index,charge,converged,energy_ev,min_interatomic_distance_angstrom,starting_species,final_state,d_hydronium_carboxylate_O_angstrom,derived_from
+acetic_acid_anion__n0__c0,anion_monomer,acetic_acid,0,0,-1,True,-6222.56333032872,1.0894111623565765,acetate(-).0H2O,anion,,acetic_acid__n0__c0
+acetic_acid_anion__n0__c1,anion_monomer,acetic_acid,0,1,-1,True,-6222.564649345324,1.0892185183716236,acetate(-).0H2O,anion,,acetic_acid__n0__c1
+acetic_acid_anion__n0__c2,anion_monomer,acetic_acid,0,2,-1,True,-6222.563322056939,1.0893935489486213,acetate(-).0H2O,anion,,acetic_acid__n0__c2
+acetic_acid_anion__n0__c3,anion_monomer,acetic_acid,0,3,-1,True,-6222.563489758002,1.0890560908170048,acetate(-).0H2O,anion,,acetic_acid__n0__c3
+acetic_acid_anion__n0__c4,anion_monomer,acetic_acid,0,4,-1,True,-6222.563794742472,1.088943686560774,acetate(-).0H2O,anion,,acetic_acid__n0__c4
+acetic_acid_anion__n0__c5,anion_monomer,acetic_acid,0,5,-1,True,-6222.564165760515,1.0894149943388491,acetate(-).0H2O,anion,,acetic_acid__n0__c5
+acetic_acid_anion__n1__c0,anion_water_cluster,acetic_acid,1,0,-1,True,-8304.413360486771,0.9564100618446881,acetate(-).1H2O,anion,,acetic_acid__n1__c0
+acetic_acid_anion__n1__c1,anion_water_cluster,acetic_acid,1,1,-1,True,-8304.34531937798,0.9566790940056309,acetate(-).1H2O,anion,,acetic_acid__n1__c1
+acetic_acid_anion__n1__c2,anion_water_cluster,acetic_acid,1,2,-1,True,-8304.411879750274,0.9564718220597981,acetate(-).1H2O,anion,,acetic_acid__n1__c2
+acetic_acid_anion__n1__c3,anion_water_cluster,acetic_acid,1,3,-1,True,-8304.498842636296,0.9650501797725292,acetate(-).1H2O,anion,,acetic_acid__n1__c3
+acetic_acid_anion__n1__c4,anion_water_cluster,acetic_acid,1,4,-1,True,-8304.494950316173,0.9651424061803422,acetate(-).1H2O,anion,,acetic_acid__n1__c4
+acetic_acid_anion__n1__c5,anion_water_cluster,acetic_acid,1,5,-1,True,-8304.495948586482,0.9652327789664973,acetate(-).1H2O,anion,,acetic_acid__n1__c5
+acetic_acid_anion__n3__c0,anion_water_cluster,acetic_acid,3,0,-1,True,-12467.913918135584,0.9569543136738833,acetate(-).3H2O,anion,,acetic_acid__n3__c0
+acetic_acid_anion__n3__c1,anion_water_cluster,acetic_acid,3,1,-1,True,-12467.839942841327,0.9564529738197173,acetate(-).3H2O,anion,,acetic_acid__n3__c1
+acetic_acid_anion__n3__c2,anion_water_cluster,acetic_acid,3,2,-1,True,-12467.534683585422,0.9570613711171618,acetate(-).3H2O,anion,,acetic_acid__n3__c2
+acetic_acid_anion__n3__c3,anion_water_cluster,acetic_acid,3,3,-1,True,-12467.81869051461,0.9563559542561814,acetate(-).3H2O,anion,,acetic_acid__n3__c3
+acetic_acid_anion__n3__c4,anion_water_cluster,acetic_acid,3,4,-1,True,-12467.784517734925,0.9559485116488656,acetate(-).3H2O,anion,,acetic_acid__n3__c4
+acetic_acid_anion__n3__c5,anion_water_cluster,acetic_acid,3,5,-1,True,-12467.783796486176,0.9561783099213647,acetate(-).3H2O,anion,,acetic_acid__n3__c5
+acetic_acid_anion__n6__c0,anion_water_cluster,acetic_acid,6,0,-1,True,-18712.76349024563,0.9579580654228574,acetate(-).6H2O,anion,,acetic_acid__n6__c0
+acetic_acid_anion__n6__c1,anion_water_cluster,acetic_acid,6,1,-1,True,-18712.43009665612,0.9575680106049423,acetate(-).6H2O,anion,,acetic_acid__n6__c1
+acetic_acid_anion__n6__c2,anion_water_cluster,acetic_acid,6,2,-1,True,-18712.39536954235,0.9567323171717638,acetate(-).6H2O,anion,,acetic_acid__n6__c2
+acetic_acid_anion__n6__c3,anion_water_cluster,acetic_acid,6,3,-1,True,-18712.70928434245,0.9563079899442339,acetate(-).6H2O,anion,,acetic_acid__n6__c3
+acetic_acid_anion__n6__c4,anion_water_cluster,acetic_acid,6,4,-1,True,-18712.954754830876,0.9588170581438682,acetate(-).6H2O,anion,,acetic_acid__n6__c4
+acetic_acid_anion__n6__c5,anion_water_cluster,acetic_acid,6,5,-1,True,-18712.480306494366,0.9570493006954031,acetate(-).6H2O,anion,,acetic_acid__n6__c5
+acetic_acid_ionpairSS__n3__c0,ion_pair_cluster,acetic_acid,3,0,0,True,-12482.110828463028,0.9586326194233076,acetate(-).H3O(+).2H2O (solvent-separated),neutral_acid,,acetic_acid__n3__c0
+acetic_acid_ionpairSS__n3__c1,ion_pair_cluster,acetic_acid,3,1,0,True,-12482.171853175603,0.9573358578193087,acetate(-).H3O(+).2H2O (solvent-separated),neutral_acid,,acetic_acid__n3__c1
+acetic_acid_ionpairSS__n3__c3,ion_pair_cluster,acetic_acid,3,3,0,True,-12482.162762889315,0.9573998617579792,acetate(-).H3O(+).2H2O (solvent-separated),neutral_acid,,acetic_acid__n3__c3
+acetic_acid_ionpairSS__n6__c0,ion_pair_cluster,acetic_acid,6,0,0,True,-18726.50100261597,0.9574903186641022,acetate(-).H3O(+).5H2O (solvent-separated),neutral_acid,,acetic_acid__n6__c0
+acetic_acid_ionpairSS__n6__c1,ion_pair_cluster,acetic_acid,6,1,0,True,-18726.566614138246,0.9575905542998135,acetate(-).H3O(+).5H2O (solvent-separated),neutral_acid,,acetic_acid__n6__c1
+acetic_acid_ionpairSS__n6__c2,ion_pair_cluster,acetic_acid,6,2,0,True,-18726.71013036388,0.9566612286034404,acetate(-).H3O(+).5H2O (solvent-separated),neutral_acid,,acetic_acid__n6__c2
+acetic_acid_ionpairSS__n6__c3,ion_pair_cluster,acetic_acid,6,3,0,True,-18726.422993547803,0.9574198194973598,acetate(-).H3O(+).5H2O (solvent-separated),neutral_acid,,acetic_acid__n6__c3
+acetic_acid_ionpairSS__n6__c4,ion_pair_cluster,acetic_acid,6,4,0,True,-18726.833497521748,0.9572075243275577,acetate(-).H3O(+).5H2O (solvent-separated),neutral_acid,,acetic_acid__n6__c4
+acetic_acid_ionpairSS__n6__c5,ion_pair_cluster,acetic_acid,6,5,0,True,-18726.288746996306,0.9570964858984992,acetate(-).H3O(+).5H2O (solvent-separated),neutral_acid,,acetic_acid__n6__c5
+acetic_acid_ionpair__n1__c0,ion_pair_cluster,acetic_acid,1,0,0,True,-8319.226232932253,0.960208533280544,acetate(-).H3O(+).0H2O (contact),neutral_acid,,acetic_acid__n1__c0
+acetic_acid_ionpair__n1__c1,ion_pair_cluster,acetic_acid,1,1,0,True,-8319.538327569488,0.9590533295772043,acetate(-).H3O(+).0H2O (contact),neutral_acid,,acetic_acid__n1__c1
+acetic_acid_ionpair__n1__c2,ion_pair_cluster,acetic_acid,1,2,0,True,-8319.252218834385,0.9610713823769512,acetate(-).H3O(+).0H2O (contact),neutral_acid,,acetic_acid__n1__c2
+acetic_acid_ionpair__n1__c3,ion_pair_cluster,acetic_acid,1,3,0,True,-8319.538094394786,0.9593692566491361,acetate(-).H3O(+).0H2O (contact),neutral_acid,,acetic_acid__n1__c3
+acetic_acid_ionpair__n1__c4,ion_pair_cluster,acetic_acid,1,4,0,True,-8319.538903020893,0.9597486178075182,acetate(-).H3O(+).0H2O (contact),neutral_acid,,acetic_acid__n1__c4
+acetic_acid_ionpair__n1__c5,ion_pair_cluster,acetic_acid,1,5,0,True,-8319.539833697385,0.9593680833114634,acetate(-).H3O(+).0H2O (contact),neutral_acid,,acetic_acid__n1__c5
+acetic_acid_ionpair__n3__c0,ion_pair_cluster,acetic_acid,3,0,0,True,-12482.112990364829,0.9587918612870893,acetate(-).H3O(+).2H2O (contact),neutral_acid,,acetic_acid__n3__c0
+acetic_acid_ionpair__n3__c1,ion_pair_cluster,acetic_acid,3,1,0,True,-12482.109469486653,0.9573530628073857,acetate(-).H3O(+).2H2O (contact),neutral_acid,,acetic_acid__n3__c1
+acetic_acid_ionpair__n3__c2,ion_pair_cluster,acetic_acid,3,2,0,True,-12482.11146366442,0.9565698710547608,acetate(-).H3O(+).2H2O (contact),neutral_acid,,acetic_acid__n3__c2
+acetic_acid_ionpair__n3__c3,ion_pair_cluster,acetic_acid,3,3,0,True,-12482.180159439804,0.9576792131801188,acetate(-).H3O(+).2H2O (contact),neutral_acid,,acetic_acid__n3__c3
+acetic_acid_ionpair__n3__c4,ion_pair_cluster,acetic_acid,3,4,0,True,-12482.317536886067,0.9572623307645276,acetate(-).H3O(+).2H2O (contact),neutral_acid,,acetic_acid__n3__c4
+acetic_acid_ionpair__n3__c5,ion_pair_cluster,acetic_acid,3,5,0,True,-12482.197225737806,0.9576255696802068,acetate(-).H3O(+).2H2O (contact),neutral_acid,,acetic_acid__n3__c5
+acetic_acid_ionpair__n6__c0,ion_pair_cluster,acetic_acid,6,0,0,True,-18726.49744389207,0.957388332362456,acetate(-).H3O(+).5H2O (contact),neutral_acid,,acetic_acid__n6__c0
+acetic_acid_ionpair__n6__c1,ion_pair_cluster,acetic_acid,6,1,0,True,-18726.57000581866,0.957521079886689,acetate(-).H3O(+).5H2O (contact),neutral_acid,,acetic_acid__n6__c1
+acetic_acid_ionpair__n6__c2,ion_pair_cluster,acetic_acid,6,2,0,True,-18726.419093521115,0.9574861275412844,acetate(-).H3O(+).5H2O (contact),neutral_acid,,acetic_acid__n6__c2
+acetic_acid_ionpair__n6__c3,ion_pair_cluster,acetic_acid,6,3,0,True,-18726.536118690266,0.9571866394302531,acetate(-).H3O(+).5H2O (contact),neutral_acid,,acetic_acid__n6__c3
+acetic_acid_ionpair__n6__c4,ion_pair_cluster,acetic_acid,6,4,0,True,-18726.832517118335,0.9573005014543103,acetate(-).H3O(+).5H2O (contact),neutral_acid,,acetic_acid__n6__c4
+acetic_acid_ionpair__n6__c5,ion_pair_cluster,acetic_acid,6,5,0,True,-18726.28542293689,0.9570942116470542,acetate(-).H3O(+).5H2O (contact),neutral_acid,,acetic_acid__n6__c5
+lactic_acid_anion__n0__c0,anion_monomer,lactic_acid,0,0,-1,True,-9341.838753381317,0.9822528533156074,lactate(-).0H2O,anion,,lactic_acid__n0__c0
+lactic_acid_anion__n0__c1,anion_monomer,lactic_acid,0,1,-1,True,-9341.840085471655,0.982382480898317,lactate(-).0H2O,anion,,lactic_acid__n0__c1
+lactic_acid_anion__n0__c2,anion_monomer,lactic_acid,0,2,-1,True,-9341.83888355186,0.9823088075271154,lactate(-).0H2O,anion,,lactic_acid__n0__c2
+lactic_acid_anion__n0__c3,anion_monomer,lactic_acid,0,3,-1,True,-9341.838541907207,0.9822034359119471,lactate(-).0H2O,anion,,lactic_acid__n0__c3
+lactic_acid_anion__n0__c4,anion_monomer,lactic_acid,0,4,-1,True,-9341.83845349485,0.9821809495202828,lactate(-).0H2O,anion,,lactic_acid__n0__c4
+lactic_acid_anion__n0__c5,anion_monomer,lactic_acid,0,5,-1,True,-9341.83830748725,0.9821967333254829,lactate(-).0H2O,anion,,lactic_acid__n0__c5
+lactic_acid_anion__n1__c0,anion_water_cluster,lactic_acid,1,0,-1,True,-11423.424629928713,0.9578854928954273,lactate(-).1H2O,anion,,lactic_acid__n1__c0
+lactic_acid_anion__n1__c1,anion_water_cluster,lactic_acid,1,1,-1,True,-11423.375532947899,0.9570286855409346,lactate(-).1H2O,anion,,lactic_acid__n1__c1
+lactic_acid_anion__n1__c2,anion_water_cluster,lactic_acid,1,2,-1,True,-11423.640335376389,0.9629286248257296,lactate(-).1H2O,anion,,lactic_acid__n1__c2
+lactic_acid_anion__n1__c3,anion_water_cluster,lactic_acid,1,3,-1,True,-11423.639028858148,0.9630606263348975,lactate(-).1H2O,anion,,lactic_acid__n1__c3
+lactic_acid_anion__n1__c4,anion_water_cluster,lactic_acid,1,4,-1,True,-11423.37288098536,0.9568297550536432,lactate(-).1H2O,anion,,lactic_acid__n1__c4
+lactic_acid_anion__n1__c5,anion_water_cluster,lactic_acid,1,5,-1,True,-11423.427106605799,0.956611478975675,lactate(-).1H2O,anion,,lactic_acid__n1__c5
+lactic_acid_anion__n3__c0,anion_water_cluster,lactic_acid,3,0,-1,True,-15586.987444172895,0.962102558647937,lactate(-).3H2O,anion,,lactic_acid__n3__c0
+lactic_acid_anion__n3__c1,anion_water_cluster,lactic_acid,3,1,-1,True,-15586.617666565811,0.9571216696049929,lactate(-).3H2O,anion,,lactic_acid__n3__c1
+lactic_acid_anion__n3__c2,anion_water_cluster,lactic_acid,3,2,-1,True,-15586.638405370413,0.9582804410262471,lactate(-).3H2O,anion,,lactic_acid__n3__c2
+lactic_acid_anion__n3__c3,anion_water_cluster,lactic_acid,3,3,-1,True,-15586.724485382189,0.956919030653983,lactate(-).3H2O,anion,,lactic_acid__n3__c3
+lactic_acid_anion__n3__c4,anion_water_cluster,lactic_acid,3,4,-1,True,-15586.832518294364,0.9593422590077261,lactate(-).3H2O,anion,,lactic_acid__n3__c4
+lactic_acid_anion__n3__c5,anion_water_cluster,lactic_acid,3,5,-1,True,-15586.727157997093,0.9570166627277927,lactate(-).3H2O,anion,,lactic_acid__n3__c5
+lactic_acid_anion__n6__c0,anion_water_cluster,lactic_acid,6,0,-1,True,-21831.610583530444,0.9584176764114193,lactate(-).6H2O,anion,,lactic_acid__n6__c0
+lactic_acid_anion__n6__c1,anion_water_cluster,lactic_acid,6,1,-1,True,-21831.578980159356,0.95876836543459,lactate(-).6H2O,anion,,lactic_acid__n6__c1
+lactic_acid_anion__n6__c2,anion_water_cluster,lactic_acid,6,2,-1,True,-21831.235385778553,0.9571026422140189,lactate(-).6H2O,anion,,lactic_acid__n6__c2
+lactic_acid_anion__n6__c3,anion_water_cluster,lactic_acid,6,3,-1,True,-21831.379539945043,0.9563793141400394,lactate(-).6H2O,anion,,lactic_acid__n6__c3
+lactic_acid_anion__n6__c4,anion_water_cluster,lactic_acid,6,4,-1,True,-21831.406284807344,0.9582632876006022,lactate(-).6H2O,anion,,lactic_acid__n6__c4
+lactic_acid_anion__n6__c5,anion_water_cluster,lactic_acid,6,5,-1,True,-21831.192305147197,0.9572963100571956,lactate(-).6H2O,anion,,lactic_acid__n6__c5
+lactic_acid_ionpairSS__n3__c0,ion_pair_cluster,lactic_acid,3,0,0,True,-15601.266835736156,0.958361241281954,lactate(-).H3O(+).2H2O (solvent-separated),neutral_acid,,lactic_acid__n3__c0
+lactic_acid_ionpairSS__n3__c1,ion_pair_cluster,lactic_acid,3,1,0,True,-15600.8896035496,0.9592662614351268,lactate(-).H3O(+).2H2O (solvent-separated),neutral_acid,,lactic_acid__n3__c1
+lactic_acid_ionpairSS__n3__c2,ion_pair_cluster,lactic_acid,3,2,0,True,-15600.893886452226,0.9571437948560184,lactate(-).H3O(+).2H2O (solvent-separated),neutral_acid,,lactic_acid__n3__c2
+lactic_acid_ionpairSS__n6__c0,ion_pair_cluster,lactic_acid,6,0,0,True,-21845.70295502154,0.9574595680800454,lactate(-).H3O(+).5H2O (solvent-separated),neutral_acid,,lactic_acid__n6__c0
+lactic_acid_ionpairSS__n6__c1,ion_pair_cluster,lactic_acid,6,1,0,True,-21845.18103482294,0.9588877242025549,lactate(-).H3O(+).5H2O (solvent-separated),contact_ion_pair,2.673390124540259,lactic_acid__n6__c1
+lactic_acid_ionpairSS__n6__c2,ion_pair_cluster,lactic_acid,6,2,0,True,-21844.17432895871,0.9561865713077381,lactate(-).H3O(+).5H2O (solvent-separated),contact_ion_pair,2.854705856294553,lactic_acid__n6__c2
+lactic_acid_ionpairSS__n6__c4,ion_pair_cluster,lactic_acid,6,4,0,True,-21845.27213957605,0.9565156062364124,lactate(-).H3O(+).5H2O (solvent-separated),neutral_acid,,lactic_acid__n6__c4
+lactic_acid_ionpairSS__n6__c5,ion_pair_cluster,lactic_acid,6,5,0,True,-21845.49386838223,0.9564753822179337,lactate(-).H3O(+).5H2O (solvent-separated),neutral_acid,,lactic_acid__n6__c5
+lactic_acid_ionpair__n1__c0,ion_pair_cluster,lactic_acid,1,0,0,True,-11438.1154285323,0.9584811090938707,lactate(-).H3O(+).0H2O (contact),neutral_acid,,lactic_acid__n1__c0
+lactic_acid_ionpair__n1__c1,ion_pair_cluster,lactic_acid,1,1,0,True,-11438.032899867521,0.9594333928452726,lactate(-).H3O(+).0H2O (contact),neutral_acid,,lactic_acid__n1__c1
+lactic_acid_ionpair__n1__c2,ion_pair_cluster,lactic_acid,1,2,0,True,-11438.192259449112,0.9606691285127335,lactate(-).H3O(+).0H2O (contact),neutral_acid,,lactic_acid__n1__c2
+lactic_acid_ionpair__n1__c3,ion_pair_cluster,lactic_acid,1,3,0,True,-11438.191942284984,0.9607161304348419,lactate(-).H3O(+).0H2O (contact),neutral_acid,,lactic_acid__n1__c3
+lactic_acid_ionpair__n1__c4,ion_pair_cluster,lactic_acid,1,4,0,True,-11438.025609256165,0.9593666732282075,lactate(-).H3O(+).0H2O (contact),neutral_acid,,lactic_acid__n1__c4
+lactic_acid_ionpair__n1__c5,ion_pair_cluster,lactic_acid,1,5,0,True,-11438.058897299754,0.9592777395534606,lactate(-).H3O(+).0H2O (contact),neutral_acid,,lactic_acid__n1__c5
+lactic_acid_ionpair__n3__c0,ion_pair_cluster,lactic_acid,3,0,0,True,-15601.065016027169,0.9587382296677415,lactate(-).H3O(+).2H2O (contact),neutral_acid,,lactic_acid__n3__c0
+lactic_acid_ionpair__n3__c1,ion_pair_cluster,lactic_acid,3,1,0,True,-15600.890579390552,0.9593153003513765,lactate(-).H3O(+).2H2O (contact),neutral_acid,,lactic_acid__n3__c1
+lactic_acid_ionpair__n3__c2,ion_pair_cluster,lactic_acid,3,2,0,True,-15601.161898162849,0.9562886267991659,lactate(-).H3O(+).2H2O (contact),neutral_acid,,lactic_acid__n3__c2
+lactic_acid_ionpair__n3__c3,ion_pair_cluster,lactic_acid,3,3,0,True,-15600.907134280955,0.9598351183508596,lactate(-).H3O(+).2H2O (contact),neutral_acid,,lactic_acid__n3__c3
+lactic_acid_ionpair__n3__c4,ion_pair_cluster,lactic_acid,3,4,0,True,-15601.0429129105,0.9583993365793744,lactate(-).H3O(+).2H2O (contact),neutral_acid,,lactic_acid__n3__c4
+lactic_acid_ionpair__n3__c5,ion_pair_cluster,lactic_acid,3,5,0,True,-15600.657570385141,0.9581469274554076,lactate(-).H3O(+).2H2O (contact),neutral_acid,,lactic_acid__n3__c5
+lactic_acid_ionpair__n6__c0,ion_pair_cluster,lactic_acid,6,0,0,True,-21845.68384510838,0.9571389268285143,lactate(-).H3O(+).5H2O (contact),neutral_acid,,lactic_acid__n6__c0
+lactic_acid_ionpair__n6__c1,ion_pair_cluster,lactic_acid,6,1,0,True,-21845.48509980823,0.9578069367744786,lactate(-).H3O(+).5H2O (contact),neutral_acid,,lactic_acid__n6__c1
+lactic_acid_ionpair__n6__c2,ion_pair_cluster,lactic_acid,6,2,0,True,-21845.150483825906,0.9570142697747132,lactate(-).H3O(+).5H2O (contact),neutral_acid,,lactic_acid__n6__c2
+lactic_acid_ionpair__n6__c3,ion_pair_cluster,lactic_acid,6,3,0,True,-21844.92385135793,0.9565518940551306,lactate(-).H3O(+).5H2O (contact),neutral_acid,,lactic_acid__n6__c3
+lactic_acid_ionpair__n6__c4,ion_pair_cluster,lactic_acid,6,4,0,True,-21845.156085822236,0.9568487375758001,lactate(-).H3O(+).5H2O (contact),neutral_acid,,lactic_acid__n6__c4
+lactic_acid_ionpair__n6__c5,ion_pair_cluster,lactic_acid,6,5,0,True,-21845.419245931917,0.9558671646245666,lactate(-).H3O(+).5H2O (contact),neutral_acid,,lactic_acid__n6__c5

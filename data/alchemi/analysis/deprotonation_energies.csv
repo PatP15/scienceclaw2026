@@ -1,0 +1,9 @@
+acid,n_water,E_neutral_min_ev,neutral_id,n_neutral_starts,neutral_gap_to_2nd_kcal_mol,E_anion_min_ev,anion_id,n_anion_starts,anion_gap_to_2nd_kcal_mol,dE_deprot_separated_ions_kcal_mol,n_ion_pair_starts,n_ion_pairs_surviving,n_ion_pairs_collapsed_to_neutral,E_ion_pair_min_ev,ion_pair_id,ion_pair_type,dE_deprot_ion_pair_kcal_mol
+lactic_acid,0,-9356.730808259217,lactic_acid__n0__c3,6,2.279839708516227,-9341.840085471655,lactic_acid_anion__n0__c1,6,0.027716928915782528,171.44988758134423,,,,,,,
+lactic_acid,1,-11438.188624619013,lactic_acid__n1__c3,6,0.00559551243097962,-11423.640335376389,lactic_acid_anion__n1__c2,6,0.03012902639065367,163.5531824395326,6.0,0.0,6.0,,,,
+lactic_acid,3,-15601.06348532849,lactic_acid__n3__c0,6,0.3208777225386855,-15586.987444172895,lactic_acid_anion__n3__c0,6,3.5726756320596214,152.66288284062662,9.0,0.0,9.0,,,,
+lactic_acid,6,-21845.668887326887,lactic_acid__n6__c0,6,4.331662591713807,-21831.610583530444,lactic_acid_anion__n6__c0,6,0.7287910505799373,152.25384962154794,11.0,2.0,9.0,-21845.18103482294,lactic_acid_ionpairSS__n6__c1,contact_ion_pair,11.250146001528442
+acetic_acid,0,-6238.0475869185975,acetic_acid__n0__c4,6,0.03381667547819929,-6222.564649345324,acetic_acid_anion__n0__c1,6,0.011151730628354221,185.10668497327202,,,,,,,
+acetic_acid,1,-8319.539258696963,acetic_acid__n1__c3,6,0.018495452210738422,-8304.498842636296,acetic_acid_anion__n1__c3,6,0.06673837416296183,174.9018964656873,6.0,0.0,6.0,,,,
+acetic_acid,3,-12482.313036628395,acetic_acid__n3__c4,6,3.1448150882013244,-12467.913918135584,acetic_acid_anion__n3__c0,6,1.7059108115034805,160.1132232284873,9.0,0.0,9.0,,,,
+acetic_acid,6,-18726.826958170328,acetic_acid__n6__c4,6,5.969420623434056,-18712.954754830876,acetic_acid_anion__n6__c4,6,4.41066611637453,147.9622711318076,12.0,0.0,12.0,,,,

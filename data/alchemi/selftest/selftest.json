@@ -1,0 +1,79 @@
+{
+  "generated_at_utc": "2026-10-31T03:51:20Z",
+  "device": "cuda:0",
+  "versions": {
+    "python": "3.12.16",
+    "platform": "Linux-6.8.0-90-generic-x86_64-with-glibc2.35",
+    "nvalchemi-toolkit": "0.2.0",
+    "nvalchemi-toolkit-ops": "0.5.0",
+    "aimnet": "0.2.5",
+    "torch": "2.10.0",
+    "warp-lang": "1.18.0+cu12",
+    "ase": "3.29.0",
+    "nvidia-physicsnemo": "2.2.2",
+    "numpy": "2.2.6",
+    "torch_cuda": "12.8",
+    "cudnn": 91002,
+    "gpu": "NVIDIA RTX A6000",
+    "gpu_capability": "8.6",
+    "gpu_memory_gb": 50.91
+  },
+  "checkpoint": "aimnet2_wb97m_d3_3",
+  "d3_params_used": {
+    "s6": 1.0,
+    "a1": 0.566,
+    "s8": 0.3908,
+    "a2": 3.128
+  },
+  "all_finite": true,
+  "rows": [
+    {
+      "id": "water__n1__c0",
+      "n_atoms": 3,
+      "energy_ev": -2081.045407635982,
+      "fmax_ev_per_angstrom": 0.0664082218789311,
+      "finite": true,
+      "seconds": 26.01307201385498,
+      "charges_sum_e": 5.960464477539063e-08,
+      "upstream_aimnet_energy_ev": -2081.045201670687,
+      "delta_energy_ev_alchemi_minus_upstream": -0.00020596529475369607,
+      "max_abs_force_diff_ev_per_angstrom": 0.00010109320282936096
+    },
+    {
+      "id": "acetic_acid__n0__c0",
+      "n_atoms": 8,
+      "energy_ev": -6237.488392472954,
+      "fmax_ev_per_angstrom": 5.494459773951727,
+      "finite": true,
+      "seconds": 3.853905439376831,
+      "charges_sum_e": 5.21540641784668e-08,
+      "upstream_aimnet_energy_ev": -6237.487868939986,
+      "delta_energy_ev_alchemi_minus_upstream": -0.0005235329681454459,
+      "max_abs_force_diff_ev_per_angstrom": 0.0002796649932861328
+    },
+    {
+      "id": "lactic_acid__n0__c0",
+      "n_atoms": 12,
+      "energy_ev": -9355.81353172352,
+      "fmax_ev_per_angstrom": 6.194516497122846,
+      "finite": true,
+      "seconds": 0.6321263313293457,
+      "charges_sum_e": 8.940696716308594e-08,
+      "upstream_aimnet_energy_ev": -9355.813138386213,
+      "delta_energy_ev_alchemi_minus_upstream": -0.00039333730637736153,
+      "max_abs_force_diff_ev_per_angstrom": 0.00016450881958007812
+    },
+    {
+      "id": "acetic_acid__n1__c0",
+      "n_atoms": 11,
+      "energy_ev": -8318.477789750696,
+      "fmax_ev_per_angstrom": 5.196541453505518,
+      "finite": true,
+      "seconds": 0.031659603118896484,
+      "charges_sum_e": 2.2351741790771484e-08,
+      "upstream_aimnet_energy_ev": -8318.47880811519,
+      "delta_energy_ev_alchemi_minus_upstream": 0.0010183644935750635,
+      "max_abs_force_diff_ev_per_angstrom": 0.0001010894775390625
+    }
+  ]
+}

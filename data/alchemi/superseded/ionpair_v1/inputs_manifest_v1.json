@@ -1,0 +1,7380 @@
+{
+  "schema_version": "1.0",
+  "provenance": "simulated: RDKit ETKDGv3 + seeded H-bond placement (starting geometries, not ALCHEMI output)",
+  "generator": "fermentai.molecular.structures",
+  "rdkit_version": "2026.09.1",
+  "numpy_version": "2.5.4",
+  "config": {
+    "output_dir": "data/alchemi/inputs",
+    "base_seed": 20261031,
+    "n_conformers_acid": 6,
+    "n_conformers_cluster": 6,
+    "n_conformers_water_cluster": 4,
+    "water_counts": [
+      1,
+      3,
+      6
+    ],
+    "acids": {
+      "lactic_acid": {
+        "smiles": "C[C@@H](C(=O)O)O",
+        "formula": "C3H6O3"
+      },
+      "acetic_acid": {
+        "smiles": "CC(=O)O",
+        "formula": "C2H4O2"
+      }
+    },
+    "water_smiles": "O",
+    "placement": {
+      "donor_h_to_acceptor_o_angstrom": 1.85,
+      "acceptor_o_to_water_o_angstrom": 2.85,
+      "jitter_angstrom": 0.25,
+      "min_heavy_heavy_angstrom": 2.45,
+      "min_any_h_angstrom": 1.45,
+      "max_attempts_per_water": 400
+    }
+  },
+  "lactic_acid_cip": "S",
+  "units": {
+    "coordinates": "angstrom"
+  },
+  "structures": [
+    {
+      "id": "water__n1__c0",
+      "kind": "water_monomer",
+      "acid": null,
+      "n_water": 1,
+      "conformer_index": 0,
+      "seeds": {
+        "base_seed": 20261031
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 3,
+      "formula": "H2O",
+      "fragments": [
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 0,
+          "stop": 3
+        }
+      ],
+      "xyz": "xyz/water__n1__c0.xyz",
+      "sha256": "23ca8f136ecb8e9fb9f02bf0997a263c8125053d312a4c6071fe1e163c4bda33"
+    },
+    {
+      "id": "water_cluster__n3__c0",
+      "kind": "water_cluster",
+      "acid": null,
+      "n_water": 3,
+      "conformer_index": 0,
+      "seeds": {
+        "base_seed": 20261031,
+        "placement_seed": 449159536
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 9,
+      "formula": "H6O3",
+      "fragments": [
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 0,
+          "stop": 3
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 3,
+          "stop": 6
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 6,
+          "stop": 9
+        }
+      ],
+      "xyz": "xyz/water_cluster__n3__c0.xyz",
+      "sha256": "d8431ba37b36136efd7a4b05f1f5116f3815621f27fe1a795c980b98efbd7c6a"
+    },
+    {
+      "id": "water_cluster__n3__c1",
+      "kind": "water_cluster",
+      "acid": null,
+      "n_water": 3,
+      "conformer_index": 1,
+      "seeds": {
+        "base_seed": 20261031,
+        "placement_seed": 893713357
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 9,
+      "formula": "H6O3",
+      "fragments": [
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 0,
+          "stop": 3
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 3,
+          "stop": 6
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 6,
+          "stop": 9
+        }
+      ],
+      "xyz": "xyz/water_cluster__n3__c1.xyz",
+      "sha256": "ef34364e4fc357a8599287deba406168ac4d3e13b03902e82e67fb340a5a5526"
+    },
+    {
+      "id": "water_cluster__n3__c2",
+      "kind": "water_cluster",
+      "acid": null,
+      "n_water": 3,
+      "conformer_index": 2,
+      "seeds": {
+        "base_seed": 20261031,
+        "placement_seed": 199462090
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 9,
+      "formula": "H6O3",
+      "fragments": [
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 0,
+          "stop": 3
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 3,
+          "stop": 6
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 6,
+          "stop": 9
+        }
+      ],
+      "xyz": "xyz/water_cluster__n3__c2.xyz",
+      "sha256": "6b72fcdf231f66c7ff8c2742403eecef6e8fce8e153301b0adb4e54aabe5fc6b"
+    },
+    {
+      "id": "water_cluster__n3__c3",
+      "kind": "water_cluster",
+      "acid": null,
+      "n_water": 3,
+      "conformer_index": 3,
+      "seeds": {
+        "base_seed": 20261031,
+        "placement_seed": 216063198
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 9,
+      "formula": "H6O3",
+      "fragments": [
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 0,
+          "stop": 3
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 3,
+          "stop": 6
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 6,
+          "stop": 9
+        }
+      ],
+      "xyz": "xyz/water_cluster__n3__c3.xyz",
+      "sha256": "a113f901f7a2cbae99918dee766517505269b2650b3df7d28c82521b45598de0"
+    },
+    {
+      "id": "water_cluster__n6__c0",
+      "kind": "water_cluster",
+      "acid": null,
+      "n_water": 6,
+      "conformer_index": 0,
+      "seeds": {
+        "base_seed": 20261031,
+        "placement_seed": 1746065806
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 18,
+      "formula": "H12O6",
+      "fragments": [
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 0,
+          "stop": 3
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 3,
+          "stop": 6
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 6,
+          "stop": 9
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 9,
+          "stop": 12
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 12,
+          "stop": 15
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 15,
+          "stop": 18
+        }
+      ],
+      "xyz": "xyz/water_cluster__n6__c0.xyz",
+      "sha256": "f97f2b7c3d07e08387ca50a745a3e25984255f03faa2fc8264bada96306f32d7"
+    },
+    {
+      "id": "water_cluster__n6__c1",
+      "kind": "water_cluster",
+      "acid": null,
+      "n_water": 6,
+      "conformer_index": 1,
+      "seeds": {
+        "base_seed": 20261031,
+        "placement_seed": 1148178907
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 18,
+      "formula": "H12O6",
+      "fragments": [
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 0,
+          "stop": 3
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 3,
+          "stop": 6
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 6,
+          "stop": 9
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 9,
+          "stop": 12
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 12,
+          "stop": 15
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 15,
+          "stop": 18
+        }
+      ],
+      "xyz": "xyz/water_cluster__n6__c1.xyz",
+      "sha256": "30bd996b66f7c69020b4004fe496557af6ca19831d10d1430e4e0f2f0959f947"
+    },
+    {
+      "id": "water_cluster__n6__c2",
+      "kind": "water_cluster",
+      "acid": null,
+      "n_water": 6,
+      "conformer_index": 2,
+      "seeds": {
+        "base_seed": 20261031,
+        "placement_seed": 1363735511
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 18,
+      "formula": "H12O6",
+      "fragments": [
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 0,
+          "stop": 3
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 3,
+          "stop": 6
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 6,
+          "stop": 9
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 9,
+          "stop": 12
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 12,
+          "stop": 15
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 15,
+          "stop": 18
+        }
+      ],
+      "xyz": "xyz/water_cluster__n6__c2.xyz",
+      "sha256": "dd75a3c5591fadcd154e72806ebf453587ba45aaf89e68c3fa090a9b757e951f"
+    },
+    {
+      "id": "water_cluster__n6__c3",
+      "kind": "water_cluster",
+      "acid": null,
+      "n_water": 6,
+      "conformer_index": 3,
+      "seeds": {
+        "base_seed": 20261031,
+        "placement_seed": 499531131
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 18,
+      "formula": "H12O6",
+      "fragments": [
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 0,
+          "stop": 3
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 3,
+          "stop": 6
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 6,
+          "stop": 9
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 9,
+          "stop": 12
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 12,
+          "stop": 15
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 15,
+          "stop": 18
+        }
+      ],
+      "xyz": "xyz/water_cluster__n6__c3.xyz",
+      "sha256": "21844e25c31711eab8d7f0bf55b78f255d29bb1d1680fcaf4f76b21fc7f0b057"
+    },
+    {
+      "id": "lactic_acid__n0__c0",
+      "kind": "acid_monomer",
+      "acid": "lactic_acid",
+      "n_water": 0,
+      "conformer_index": 0,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1701083493
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 12,
+      "formula": "C3H6O3",
+      "fragments": [
+        {
+          "name": "lactic_acid",
+          "smiles": "C[C@H](O)C(=O)O",
+          "start": 0,
+          "stop": 12
+        }
+      ],
+      "xyz": "xyz/lactic_acid__n0__c0.xyz",
+      "sha256": "5f6f488c4c77d580cee934a08d6c2816456dddaf80bccb2a1af0364af1765d12"
+    },
+    {
+      "id": "lactic_acid__n0__c1",
+      "kind": "acid_monomer",
+      "acid": "lactic_acid",
+      "n_water": 0,
+      "conformer_index": 1,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 635370021
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 12,
+      "formula": "C3H6O3",
+      "fragments": [
+        {
+          "name": "lactic_acid",
+          "smiles": "C[C@H](O)C(=O)O",
+          "start": 0,
+          "stop": 12
+        }
+      ],
+      "xyz": "xyz/lactic_acid__n0__c1.xyz",
+      "sha256": "31462e754fc738b96089bd47fda4dd7fe2d7ef304b0c173d426e10cd7a8d4ae5"
+    },
+    {
+      "id": "lactic_acid__n0__c2",
+      "kind": "acid_monomer",
+      "acid": "lactic_acid",
+      "n_water": 0,
+      "conformer_index": 2,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 363209691
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 12,
+      "formula": "C3H6O3",
+      "fragments": [
+        {
+          "name": "lactic_acid",
+          "smiles": "C[C@H](O)C(=O)O",
+          "start": 0,
+          "stop": 12
+        }
+      ],
+      "xyz": "xyz/lactic_acid__n0__c2.xyz",
+      "sha256": "ac0b039bc5457a5dc4fbb4658c5cacd9c3c4eca30a9ed5751e04b75997e46f7e"
+    },
+    {
+      "id": "lactic_acid__n0__c3",
+      "kind": "acid_monomer",
+      "acid": "lactic_acid",
+      "n_water": 0,
+      "conformer_index": 3,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1104364854
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 12,
+      "formula": "C3H6O3",
+      "fragments": [
+        {
+          "name": "lactic_acid",
+          "smiles": "C[C@H](O)C(=O)O",
+          "start": 0,
+          "stop": 12
+        }
+      ],
+      "xyz": "xyz/lactic_acid__n0__c3.xyz",
+      "sha256": "3cc096b2c54bdaa28a70942bfd8ab6d856feede23f16a3851b20da2289133ffb"
+    },
+    {
+      "id": "lactic_acid__n0__c4",
+      "kind": "acid_monomer",
+      "acid": "lactic_acid",
+      "n_water": 0,
+      "conformer_index": 4,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 2068390574
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 12,
+      "formula": "C3H6O3",
+      "fragments": [
+        {
+          "name": "lactic_acid",
+          "smiles": "C[C@H](O)C(=O)O",
+          "start": 0,
+          "stop": 12
+        }
+      ],
+      "xyz": "xyz/lactic_acid__n0__c4.xyz",
+      "sha256": "a14843bf21cad2ebc53ef5f1f3535a863700610ee9a2f3d48edb313bff989b43"
+    },
+    {
+      "id": "lactic_acid__n0__c5",
+      "kind": "acid_monomer",
+      "acid": "lactic_acid",
+      "n_water": 0,
+      "conformer_index": 5,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 266019600
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 12,
+      "formula": "C3H6O3",
+      "fragments": [
+        {
+          "name": "lactic_acid",
+          "smiles": "C[C@H](O)C(=O)O",
+          "start": 0,
+          "stop": 12
+        }
+      ],
+      "xyz": "xyz/lactic_acid__n0__c5.xyz",
+      "sha256": "f39a84a8a86baf06233e8fe562d6ce919fbe16caffc8ba637a297aca03dc2d1c"
+    },
+    {
+      "id": "lactic_acid__n1__c0",
+      "kind": "acid_water_cluster",
+      "acid": "lactic_acid",
+      "n_water": 1,
+      "conformer_index": 0,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1133866898,
+        "placement_seed": 882648900
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 15,
+      "formula": "C3H8O4",
+      "fragments": [
+        {
+          "name": "lactic_acid",
+          "smiles": "C[C@H](O)C(=O)O",
+          "start": 0,
+          "stop": 12
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 12,
+          "stop": 15
+        }
+      ],
+      "xyz": "xyz/lactic_acid__n1__c0.xyz",
+      "sha256": "461e58b71ac27bbdbd08ce7062bb32d3fce7da9c3b12947f34f19b62b648b8f0"
+    },
+    {
+      "id": "lactic_acid__n1__c1",
+      "kind": "acid_water_cluster",
+      "acid": "lactic_acid",
+      "n_water": 1,
+      "conformer_index": 1,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1074380438,
+        "placement_seed": 31865928
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 15,
+      "formula": "C3H8O4",
+      "fragments": [
+        {
+          "name": "lactic_acid",
+          "smiles": "C[C@H](O)C(=O)O",
+          "start": 0,
+          "stop": 12
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 12,
+          "stop": 15
+        }
+      ],
+      "xyz": "xyz/lactic_acid__n1__c1.xyz",
+      "sha256": "103d56c03daf1bc7b730846c65b5be8aacb1434e0ae95c3196784c0b708c3377"
+    },
+    {
+      "id": "lactic_acid__n1__c2",
+      "kind": "acid_water_cluster",
+      "acid": "lactic_acid",
+      "n_water": 1,
+      "conformer_index": 2,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1129352620,
+        "placement_seed": 1003970075
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 15,
+      "formula": "C3H8O4",
+      "fragments": [
+        {
+          "name": "lactic_acid",
+          "smiles": "C[C@H](O)C(=O)O",
+          "start": 0,
+          "stop": 12
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 12,
+          "stop": 15
+        }
+      ],
+      "xyz": "xyz/lactic_acid__n1__c2.xyz",
+      "sha256": "055afe1ed41b9053ed91df1ac169a80c69701e607a14070ab22d69f2e7f36104"
+    },
+    {
+      "id": "lactic_acid__n1__c3",
+      "kind": "acid_water_cluster",
+      "acid": "lactic_acid",
+      "n_water": 1,
+      "conformer_index": 3,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 184029028,
+        "placement_seed": 2131766322
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 15,
+      "formula": "C3H8O4",
+      "fragments": [
+        {
+          "name": "lactic_acid",
+          "smiles": "C[C@H](O)C(=O)O",
+          "start": 0,
+          "stop": 12
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 12,
+          "stop": 15
+        }
+      ],
+      "xyz": "xyz/lactic_acid__n1__c3.xyz",
+      "sha256": "3bf03ad420989a79a408aec26b87d0a0161c2c785c994c2cc089db074c8a18cc"
+    },
+    {
+      "id": "lactic_acid__n1__c4",
+      "kind": "acid_water_cluster",
+      "acid": "lactic_acid",
+      "n_water": 1,
+      "conformer_index": 4,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 983565860,
+        "placement_seed": 678549980
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 15,
+      "formula": "C3H8O4",
+      "fragments": [
+        {
+          "name": "lactic_acid",
+          "smiles": "C[C@H](O)C(=O)O",
+          "start": 0,
+          "stop": 12
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 12,
+          "stop": 15
+        }
+      ],
+      "xyz": "xyz/lactic_acid__n1__c4.xyz",
+      "sha256": "e472d49c12a2b7f874a8a2dfc823b810b040ea814d4d943eabd9c04920813419"
+    },
+    {
+      "id": "lactic_acid__n1__c5",
+      "kind": "acid_water_cluster",
+      "acid": "lactic_acid",
+      "n_water": 1,
+      "conformer_index": 5,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1378562906,
+        "placement_seed": 258655116
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 15,
+      "formula": "C3H8O4",
+      "fragments": [
+        {
+          "name": "lactic_acid",
+          "smiles": "C[C@H](O)C(=O)O",
+          "start": 0,
+          "stop": 12
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 12,
+          "stop": 15
+        }
+      ],
+      "xyz": "xyz/lactic_acid__n1__c5.xyz",
+      "sha256": "7dd55eebfaa9f6e939c81751492a1e928e4e95d6c98440a5de75810a8d14cd46"
+    },
+    {
+      "id": "lactic_acid__n3__c0",
+      "kind": "acid_water_cluster",
+      "acid": "lactic_acid",
+      "n_water": 3,
+      "conformer_index": 0,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 360200526,
+        "placement_seed": 646972009
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 21,
+      "formula": "C3H12O6",
+      "fragments": [
+        {
+          "name": "lactic_acid",
+          "smiles": "C[C@H](O)C(=O)O",
+          "start": 0,
+          "stop": 12
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 12,
+          "stop": 15
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 15,
+          "stop": 18
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 18,
+          "stop": 21
+        }
+      ],
+      "xyz": "xyz/lactic_acid__n3__c0.xyz",
+      "sha256": "87f745d26a58e8623cb53e4e7380618c4a972f8c773e1dde9d3bf2480f45de57"
+    },
+    {
+      "id": "lactic_acid__n3__c1",
+      "kind": "acid_water_cluster",
+      "acid": "lactic_acid",
+      "n_water": 3,
+      "conformer_index": 1,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1374415276,
+        "placement_seed": 93379047
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 21,
+      "formula": "C3H12O6",
+      "fragments": [
+        {
+          "name": "lactic_acid",
+          "smiles": "C[C@H](O)C(=O)O",
+          "start": 0,
+          "stop": 12
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 12,
+          "stop": 15
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 15,
+          "stop": 18
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 18,
+          "stop": 21
+        }
+      ],
+      "xyz": "xyz/lactic_acid__n3__c1.xyz",
+      "sha256": "0a74335b507b11f6f62da794e8dfdf8614767ec8ff75341b30a4dfcc0be51ed5"
+    },
+    {
+      "id": "lactic_acid__n3__c2",
+      "kind": "acid_water_cluster",
+      "acid": "lactic_acid",
+      "n_water": 3,
+      "conformer_index": 2,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 545252448,
+        "placement_seed": 625709192
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 21,
+      "formula": "C3H12O6",
+      "fragments": [
+        {
+          "name": "lactic_acid",
+          "smiles": "C[C@H](O)C(=O)O",
+          "start": 0,
+          "stop": 12
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 12,
+          "stop": 15
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 15,
+          "stop": 18
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 18,
+          "stop": 21
+        }
+      ],
+      "xyz": "xyz/lactic_acid__n3__c2.xyz",
+      "sha256": "ee880fae59f22545bdc4eb2656e2730631585622b1ed8f660f099b4ab916857d"
+    },
+    {
+      "id": "lactic_acid__n3__c3",
+      "kind": "acid_water_cluster",
+      "acid": "lactic_acid",
+      "n_water": 3,
+      "conformer_index": 3,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 332614080,
+        "placement_seed": 1069325478
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 21,
+      "formula": "C3H12O6",
+      "fragments": [
+        {
+          "name": "lactic_acid",
+          "smiles": "C[C@H](O)C(=O)O",
+          "start": 0,
+          "stop": 12
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 12,
+          "stop": 15
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 15,
+          "stop": 18
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 18,
+          "stop": 21
+        }
+      ],
+      "xyz": "xyz/lactic_acid__n3__c3.xyz",
+      "sha256": "35d81fbddb6368714562cfeb04c42c1ea07d70106714807f867930369076c06e"
+    },
+    {
+      "id": "lactic_acid__n3__c4",
+      "kind": "acid_water_cluster",
+      "acid": "lactic_acid",
+      "n_water": 3,
+      "conformer_index": 4,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 829400067,
+        "placement_seed": 529202121
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 21,
+      "formula": "C3H12O6",
+      "fragments": [
+        {
+          "name": "lactic_acid",
+          "smiles": "C[C@H](O)C(=O)O",
+          "start": 0,
+          "stop": 12
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 12,
+          "stop": 15
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 15,
+          "stop": 18
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 18,
+          "stop": 21
+        }
+      ],
+      "xyz": "xyz/lactic_acid__n3__c4.xyz",
+      "sha256": "41fe4c35f14375e4d1a6eefc3242f2ba678b78b0f76cf1e1a34ca0bf0f6e4d02"
+    },
+    {
+      "id": "lactic_acid__n3__c5",
+      "kind": "acid_water_cluster",
+      "acid": "lactic_acid",
+      "n_water": 3,
+      "conformer_index": 5,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 2110668736,
+        "placement_seed": 710267726
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 21,
+      "formula": "C3H12O6",
+      "fragments": [
+        {
+          "name": "lactic_acid",
+          "smiles": "C[C@H](O)C(=O)O",
+          "start": 0,
+          "stop": 12
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 12,
+          "stop": 15
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 15,
+          "stop": 18
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 18,
+          "stop": 21
+        }
+      ],
+      "xyz": "xyz/lactic_acid__n3__c5.xyz",
+      "sha256": "4976355ec167cda81898911fe4e8661a54af92df8635e595cbcd17707da90872"
+    },
+    {
+      "id": "lactic_acid__n6__c0",
+      "kind": "acid_water_cluster",
+      "acid": "lactic_acid",
+      "n_water": 6,
+      "conformer_index": 0,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 86164480,
+        "placement_seed": 1710886896
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 30,
+      "formula": "C3H18O9",
+      "fragments": [
+        {
+          "name": "lactic_acid",
+          "smiles": "C[C@H](O)C(=O)O",
+          "start": 0,
+          "stop": 12
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 12,
+          "stop": 15
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 15,
+          "stop": 18
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 18,
+          "stop": 21
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 21,
+          "stop": 24
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 24,
+          "stop": 27
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 27,
+          "stop": 30
+        }
+      ],
+      "xyz": "xyz/lactic_acid__n6__c0.xyz",
+      "sha256": "a7506a5e6ae2dd5c78b3ad04354d0452f44833e8392e6a4e5f3d634377a7ca8b"
+    },
+    {
+      "id": "lactic_acid__n6__c1",
+      "kind": "acid_water_cluster",
+      "acid": "lactic_acid",
+      "n_water": 6,
+      "conformer_index": 1,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 380582539,
+        "placement_seed": 190742038
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 30,
+      "formula": "C3H18O9",
+      "fragments": [
+        {
+          "name": "lactic_acid",
+          "smiles": "C[C@H](O)C(=O)O",
+          "start": 0,
+          "stop": 12
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 12,
+          "stop": 15
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 15,
+          "stop": 18
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 18,
+          "stop": 21
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 21,
+          "stop": 24
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 24,
+          "stop": 27
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 27,
+          "stop": 30
+        }
+      ],
+      "xyz": "xyz/lactic_acid__n6__c1.xyz",
+      "sha256": "826df0af0b80373427f3c5789bff6d41d8f1264189b37c24bbbccc61d682024f"
+    },
+    {
+      "id": "lactic_acid__n6__c2",
+      "kind": "acid_water_cluster",
+      "acid": "lactic_acid",
+      "n_water": 6,
+      "conformer_index": 2,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 747551818,
+        "placement_seed": 579425472
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 30,
+      "formula": "C3H18O9",
+      "fragments": [
+        {
+          "name": "lactic_acid",
+          "smiles": "C[C@H](O)C(=O)O",
+          "start": 0,
+          "stop": 12
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 12,
+          "stop": 15
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 15,
+          "stop": 18
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 18,
+          "stop": 21
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 21,
+          "stop": 24
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 24,
+          "stop": 27
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 27,
+          "stop": 30
+        }
+      ],
+      "xyz": "xyz/lactic_acid__n6__c2.xyz",
+      "sha256": "3b1550ef5aeb42bb030a10bf5af34ad7293d8dea5776cf2dc689a376462f50bb"
+    },
+    {
+      "id": "lactic_acid__n6__c3",
+      "kind": "acid_water_cluster",
+      "acid": "lactic_acid",
+      "n_water": 6,
+      "conformer_index": 3,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 2067487448,
+        "placement_seed": 651036595
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 30,
+      "formula": "C3H18O9",
+      "fragments": [
+        {
+          "name": "lactic_acid",
+          "smiles": "C[C@H](O)C(=O)O",
+          "start": 0,
+          "stop": 12
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 12,
+          "stop": 15
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 15,
+          "stop": 18
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 18,
+          "stop": 21
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 21,
+          "stop": 24
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 24,
+          "stop": 27
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 27,
+          "stop": 30
+        }
+      ],
+      "xyz": "xyz/lactic_acid__n6__c3.xyz",
+      "sha256": "0a6ae15c9e21eb4a0e9277a145a3701c2a8d2d2014f926cc02fd841c83c6f210"
+    },
+    {
+      "id": "lactic_acid__n6__c4",
+      "kind": "acid_water_cluster",
+      "acid": "lactic_acid",
+      "n_water": 6,
+      "conformer_index": 4,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1723133795,
+        "placement_seed": 1482550605
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 30,
+      "formula": "C3H18O9",
+      "fragments": [
+        {
+          "name": "lactic_acid",
+          "smiles": "C[C@H](O)C(=O)O",
+          "start": 0,
+          "stop": 12
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 12,
+          "stop": 15
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 15,
+          "stop": 18
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 18,
+          "stop": 21
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 21,
+          "stop": 24
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 24,
+          "stop": 27
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 27,
+          "stop": 30
+        }
+      ],
+      "xyz": "xyz/lactic_acid__n6__c4.xyz",
+      "sha256": "e3ed8dfc7646effa4f4c8e462c65c013caeeaf90a953a46c8882a85666430af6"
+    },
+    {
+      "id": "lactic_acid__n6__c5",
+      "kind": "acid_water_cluster",
+      "acid": "lactic_acid",
+      "n_water": 6,
+      "conformer_index": 5,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1536544806,
+        "placement_seed": 619090912
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 30,
+      "formula": "C3H18O9",
+      "fragments": [
+        {
+          "name": "lactic_acid",
+          "smiles": "C[C@H](O)C(=O)O",
+          "start": 0,
+          "stop": 12
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 12,
+          "stop": 15
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 15,
+          "stop": 18
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 18,
+          "stop": 21
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 21,
+          "stop": 24
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 24,
+          "stop": 27
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 27,
+          "stop": 30
+        }
+      ],
+      "xyz": "xyz/lactic_acid__n6__c5.xyz",
+      "sha256": "bed81aba865eb449606b22d0ff27b2a3dafdcc8f1bec172efdb6c4fb05e31876"
+    },
+    {
+      "id": "acetic_acid__n0__c0",
+      "kind": "acid_monomer",
+      "acid": "acetic_acid",
+      "n_water": 0,
+      "conformer_index": 0,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1199095090
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 8,
+      "formula": "C2H4O2",
+      "fragments": [
+        {
+          "name": "acetic_acid",
+          "smiles": "CC(=O)O",
+          "start": 0,
+          "stop": 8
+        }
+      ],
+      "xyz": "xyz/acetic_acid__n0__c0.xyz",
+      "sha256": "038afad9203d39b924aa6639aeffd8275d20d147db5a600315a8daa841073bf2"
+    },
+    {
+      "id": "acetic_acid__n0__c1",
+      "kind": "acid_monomer",
+      "acid": "acetic_acid",
+      "n_water": 0,
+      "conformer_index": 1,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1617547545
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 8,
+      "formula": "C2H4O2",
+      "fragments": [
+        {
+          "name": "acetic_acid",
+          "smiles": "CC(=O)O",
+          "start": 0,
+          "stop": 8
+        }
+      ],
+      "xyz": "xyz/acetic_acid__n0__c1.xyz",
+      "sha256": "008a0e59b3891ba76b08f66fdc56c84cc6f1b15d9ef5501096e53546cf403d17"
+    },
+    {
+      "id": "acetic_acid__n0__c2",
+      "kind": "acid_monomer",
+      "acid": "acetic_acid",
+      "n_water": 0,
+      "conformer_index": 2,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1949694751
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 8,
+      "formula": "C2H4O2",
+      "fragments": [
+        {
+          "name": "acetic_acid",
+          "smiles": "CC(=O)O",
+          "start": 0,
+          "stop": 8
+        }
+      ],
+      "xyz": "xyz/acetic_acid__n0__c2.xyz",
+      "sha256": "4c90ec0a6af2acaeaa2cffba291d659038f4958f1568aab49ca1dc7433dab9d7"
+    },
+    {
+      "id": "acetic_acid__n0__c3",
+      "kind": "acid_monomer",
+      "acid": "acetic_acid",
+      "n_water": 0,
+      "conformer_index": 3,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 53863089
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 8,
+      "formula": "C2H4O2",
+      "fragments": [
+        {
+          "name": "acetic_acid",
+          "smiles": "CC(=O)O",
+          "start": 0,
+          "stop": 8
+        }
+      ],
+      "xyz": "xyz/acetic_acid__n0__c3.xyz",
+      "sha256": "86e8ea410048d7896878b63fa44509ac8fcedbed80ca8e00ab5305c11a758d66"
+    },
+    {
+      "id": "acetic_acid__n0__c4",
+      "kind": "acid_monomer",
+      "acid": "acetic_acid",
+      "n_water": 0,
+      "conformer_index": 4,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 282991168
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 8,
+      "formula": "C2H4O2",
+      "fragments": [
+        {
+          "name": "acetic_acid",
+          "smiles": "CC(=O)O",
+          "start": 0,
+          "stop": 8
+        }
+      ],
+      "xyz": "xyz/acetic_acid__n0__c4.xyz",
+      "sha256": "11ead84df5603eaafde165353ae5540e769d9e0aa7d92f614e52ba2c7fac12f3"
+    },
+    {
+      "id": "acetic_acid__n0__c5",
+      "kind": "acid_monomer",
+      "acid": "acetic_acid",
+      "n_water": 0,
+      "conformer_index": 5,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1852317886
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 8,
+      "formula": "C2H4O2",
+      "fragments": [
+        {
+          "name": "acetic_acid",
+          "smiles": "CC(=O)O",
+          "start": 0,
+          "stop": 8
+        }
+      ],
+      "xyz": "xyz/acetic_acid__n0__c5.xyz",
+      "sha256": "997d8b7abac106b04d754b716beea0259c45d4a3a8212f50b7ca920f1a6a583f"
+    },
+    {
+      "id": "acetic_acid__n1__c0",
+      "kind": "acid_water_cluster",
+      "acid": "acetic_acid",
+      "n_water": 1,
+      "conformer_index": 0,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 834433977,
+        "placement_seed": 1430454621
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 11,
+      "formula": "C2H6O3",
+      "fragments": [
+        {
+          "name": "acetic_acid",
+          "smiles": "CC(=O)O",
+          "start": 0,
+          "stop": 8
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 8,
+          "stop": 11
+        }
+      ],
+      "xyz": "xyz/acetic_acid__n1__c0.xyz",
+      "sha256": "f9f790590c60c9523eb80c789917c4fe8f852176aaa1c21cebb16a8b1622cc58"
+    },
+    {
+      "id": "acetic_acid__n1__c1",
+      "kind": "acid_water_cluster",
+      "acid": "acetic_acid",
+      "n_water": 1,
+      "conformer_index": 1,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 197317888,
+        "placement_seed": 332467904
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 11,
+      "formula": "C2H6O3",
+      "fragments": [
+        {
+          "name": "acetic_acid",
+          "smiles": "CC(=O)O",
+          "start": 0,
+          "stop": 8
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 8,
+          "stop": 11
+        }
+      ],
+      "xyz": "xyz/acetic_acid__n1__c1.xyz",
+      "sha256": "3d997d1bf4d0e3e1e78bf8d7407c0c565119a12602737582bad2e75e4d5d85e9"
+    },
+    {
+      "id": "acetic_acid__n1__c2",
+      "kind": "acid_water_cluster",
+      "acid": "acetic_acid",
+      "n_water": 1,
+      "conformer_index": 2,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1148363858,
+        "placement_seed": 1547971706
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 11,
+      "formula": "C2H6O3",
+      "fragments": [
+        {
+          "name": "acetic_acid",
+          "smiles": "CC(=O)O",
+          "start": 0,
+          "stop": 8
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 8,
+          "stop": 11
+        }
+      ],
+      "xyz": "xyz/acetic_acid__n1__c2.xyz",
+      "sha256": "8c69d1483678df0ca61e24bc80750a7ccce9827d73e6fc6114e5ce26f61d3c9f"
+    },
+    {
+      "id": "acetic_acid__n1__c3",
+      "kind": "acid_water_cluster",
+      "acid": "acetic_acid",
+      "n_water": 1,
+      "conformer_index": 3,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 725848749,
+        "placement_seed": 963813619
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 11,
+      "formula": "C2H6O3",
+      "fragments": [
+        {
+          "name": "acetic_acid",
+          "smiles": "CC(=O)O",
+          "start": 0,
+          "stop": 8
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 8,
+          "stop": 11
+        }
+      ],
+      "xyz": "xyz/acetic_acid__n1__c3.xyz",
+      "sha256": "3f87700f15fc71bdf877adddd611d1e6bd0bdff2d3c06e15cbf01f486e7648c2"
+    },
+    {
+      "id": "acetic_acid__n1__c4",
+      "kind": "acid_water_cluster",
+      "acid": "acetic_acid",
+      "n_water": 1,
+      "conformer_index": 4,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1060948839,
+        "placement_seed": 27925137
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 11,
+      "formula": "C2H6O3",
+      "fragments": [
+        {
+          "name": "acetic_acid",
+          "smiles": "CC(=O)O",
+          "start": 0,
+          "stop": 8
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 8,
+          "stop": 11
+        }
+      ],
+      "xyz": "xyz/acetic_acid__n1__c4.xyz",
+      "sha256": "77275b5c139c826fc7944289674400320c0d10d928a46c268e14a2035c01db1a"
+    },
+    {
+      "id": "acetic_acid__n1__c5",
+      "kind": "acid_water_cluster",
+      "acid": "acetic_acid",
+      "n_water": 1,
+      "conformer_index": 5,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 226068308,
+        "placement_seed": 1233866753
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 11,
+      "formula": "C2H6O3",
+      "fragments": [
+        {
+          "name": "acetic_acid",
+          "smiles": "CC(=O)O",
+          "start": 0,
+          "stop": 8
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 8,
+          "stop": 11
+        }
+      ],
+      "xyz": "xyz/acetic_acid__n1__c5.xyz",
+      "sha256": "53cb5f93121e352a70d122be508b561c7b4c8abb5250a3d8cd8f90c6bcf6d92e"
+    },
+    {
+      "id": "acetic_acid__n3__c0",
+      "kind": "acid_water_cluster",
+      "acid": "acetic_acid",
+      "n_water": 3,
+      "conformer_index": 0,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 388441540,
+        "placement_seed": 5834340
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 17,
+      "formula": "C2H10O5",
+      "fragments": [
+        {
+          "name": "acetic_acid",
+          "smiles": "CC(=O)O",
+          "start": 0,
+          "stop": 8
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 8,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        }
+      ],
+      "xyz": "xyz/acetic_acid__n3__c0.xyz",
+      "sha256": "ec24702043b067226280515fa12ea2b81ef8b3bd45e794510cba81a8fe058b50"
+    },
+    {
+      "id": "acetic_acid__n3__c1",
+      "kind": "acid_water_cluster",
+      "acid": "acetic_acid",
+      "n_water": 3,
+      "conformer_index": 1,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 69200921,
+        "placement_seed": 184191181
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 17,
+      "formula": "C2H10O5",
+      "fragments": [
+        {
+          "name": "acetic_acid",
+          "smiles": "CC(=O)O",
+          "start": 0,
+          "stop": 8
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 8,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        }
+      ],
+      "xyz": "xyz/acetic_acid__n3__c1.xyz",
+      "sha256": "68853e8cdec28fadfaefc02ec6b011e1b8d7e969200d81e1ed11ada64b427994"
+    },
+    {
+      "id": "acetic_acid__n3__c2",
+      "kind": "acid_water_cluster",
+      "acid": "acetic_acid",
+      "n_water": 3,
+      "conformer_index": 2,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1803124682,
+        "placement_seed": 1410095130
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 17,
+      "formula": "C2H10O5",
+      "fragments": [
+        {
+          "name": "acetic_acid",
+          "smiles": "CC(=O)O",
+          "start": 0,
+          "stop": 8
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 8,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        }
+      ],
+      "xyz": "xyz/acetic_acid__n3__c2.xyz",
+      "sha256": "4ed6e6ee5398574c5cf5853310fd4bdd456dd46996b5a05a70deb98a0d72717a"
+    },
+    {
+      "id": "acetic_acid__n3__c3",
+      "kind": "acid_water_cluster",
+      "acid": "acetic_acid",
+      "n_water": 3,
+      "conformer_index": 3,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 812698612,
+        "placement_seed": 1246174331
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 17,
+      "formula": "C2H10O5",
+      "fragments": [
+        {
+          "name": "acetic_acid",
+          "smiles": "CC(=O)O",
+          "start": 0,
+          "stop": 8
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 8,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        }
+      ],
+      "xyz": "xyz/acetic_acid__n3__c3.xyz",
+      "sha256": "3ceb5c4da8228e61cc8d348ba7f6c6a72b8de6975b6a428aa401f422a4a243ba"
+    },
+    {
+      "id": "acetic_acid__n3__c4",
+      "kind": "acid_water_cluster",
+      "acid": "acetic_acid",
+      "n_water": 3,
+      "conformer_index": 4,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1769978763,
+        "placement_seed": 797966537
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 17,
+      "formula": "C2H10O5",
+      "fragments": [
+        {
+          "name": "acetic_acid",
+          "smiles": "CC(=O)O",
+          "start": 0,
+          "stop": 8
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 8,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        }
+      ],
+      "xyz": "xyz/acetic_acid__n3__c4.xyz",
+      "sha256": "f2cca019d23874adf1f0fbe50dd1dcedcf572e085f1bc023cc6b00bd940aee41"
+    },
+    {
+      "id": "acetic_acid__n3__c5",
+      "kind": "acid_water_cluster",
+      "acid": "acetic_acid",
+      "n_water": 3,
+      "conformer_index": 5,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 390339530,
+        "placement_seed": 1150419258
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 17,
+      "formula": "C2H10O5",
+      "fragments": [
+        {
+          "name": "acetic_acid",
+          "smiles": "CC(=O)O",
+          "start": 0,
+          "stop": 8
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 8,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        }
+      ],
+      "xyz": "xyz/acetic_acid__n3__c5.xyz",
+      "sha256": "4670b85328d18bc894ac3736a2a562e0a56186e343192ac1c756c0d3b9d87b4e"
+    },
+    {
+      "id": "acetic_acid__n6__c0",
+      "kind": "acid_water_cluster",
+      "acid": "acetic_acid",
+      "n_water": 6,
+      "conformer_index": 0,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1386078134,
+        "placement_seed": 145696388
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 26,
+      "formula": "C2H16O8",
+      "fragments": [
+        {
+          "name": "acetic_acid",
+          "smiles": "CC(=O)O",
+          "start": 0,
+          "stop": 8
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 8,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 17,
+          "stop": 20
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 20,
+          "stop": 23
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 23,
+          "stop": 26
+        }
+      ],
+      "xyz": "xyz/acetic_acid__n6__c0.xyz",
+      "sha256": "e2cd9b1eb2b76f1935faef41ece7db5cde7b5acb03480bbd3df02896cb4cb3c6"
+    },
+    {
+      "id": "acetic_acid__n6__c1",
+      "kind": "acid_water_cluster",
+      "acid": "acetic_acid",
+      "n_water": 6,
+      "conformer_index": 1,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1250065811,
+        "placement_seed": 656801615
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 26,
+      "formula": "C2H16O8",
+      "fragments": [
+        {
+          "name": "acetic_acid",
+          "smiles": "CC(=O)O",
+          "start": 0,
+          "stop": 8
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 8,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 17,
+          "stop": 20
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 20,
+          "stop": 23
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 23,
+          "stop": 26
+        }
+      ],
+      "xyz": "xyz/acetic_acid__n6__c1.xyz",
+      "sha256": "7f2eb028637be37aae110d3d5d632456b06c9503b858ddcae38ced4ec091fc94"
+    },
+    {
+      "id": "acetic_acid__n6__c2",
+      "kind": "acid_water_cluster",
+      "acid": "acetic_acid",
+      "n_water": 6,
+      "conformer_index": 2,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1496841323,
+        "placement_seed": 523216735
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 26,
+      "formula": "C2H16O8",
+      "fragments": [
+        {
+          "name": "acetic_acid",
+          "smiles": "CC(=O)O",
+          "start": 0,
+          "stop": 8
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 8,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 17,
+          "stop": 20
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 20,
+          "stop": 23
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 23,
+          "stop": 26
+        }
+      ],
+      "xyz": "xyz/acetic_acid__n6__c2.xyz",
+      "sha256": "76e50e09b76b02a711c08b7919d6502d6fe747807ca4fb8528ef5ae621c0c605"
+    },
+    {
+      "id": "acetic_acid__n6__c3",
+      "kind": "acid_water_cluster",
+      "acid": "acetic_acid",
+      "n_water": 6,
+      "conformer_index": 3,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1023124976,
+        "placement_seed": 147439449
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 26,
+      "formula": "C2H16O8",
+      "fragments": [
+        {
+          "name": "acetic_acid",
+          "smiles": "CC(=O)O",
+          "start": 0,
+          "stop": 8
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 8,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 17,
+          "stop": 20
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 20,
+          "stop": 23
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 23,
+          "stop": 26
+        }
+      ],
+      "xyz": "xyz/acetic_acid__n6__c3.xyz",
+      "sha256": "77ee4c185cdd6fd7e5dd8c5d5fe736f6768aed2bbd3b77e6e7fb6632450f2ded"
+    },
+    {
+      "id": "acetic_acid__n6__c4",
+      "kind": "acid_water_cluster",
+      "acid": "acetic_acid",
+      "n_water": 6,
+      "conformer_index": 4,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1156395828,
+        "placement_seed": 263275129
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 26,
+      "formula": "C2H16O8",
+      "fragments": [
+        {
+          "name": "acetic_acid",
+          "smiles": "CC(=O)O",
+          "start": 0,
+          "stop": 8
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 8,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 17,
+          "stop": 20
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 20,
+          "stop": 23
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 23,
+          "stop": 26
+        }
+      ],
+      "xyz": "xyz/acetic_acid__n6__c4.xyz",
+      "sha256": "2d1915356df918a1dfe5aef6f02ee151ad117d2aae8894cd17c0d7c534000880"
+    },
+    {
+      "id": "acetic_acid__n6__c5",
+      "kind": "acid_water_cluster",
+      "acid": "acetic_acid",
+      "n_water": 6,
+      "conformer_index": 5,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 350781717,
+        "placement_seed": 414101913
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 26,
+      "formula": "C2H16O8",
+      "fragments": [
+        {
+          "name": "acetic_acid",
+          "smiles": "CC(=O)O",
+          "start": 0,
+          "stop": 8
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 8,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 17,
+          "stop": 20
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 20,
+          "stop": 23
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 23,
+          "stop": 26
+        }
+      ],
+      "xyz": "xyz/acetic_acid__n6__c5.xyz",
+      "sha256": "c56a4c12ce95a1b9dc77ae340029487b716ce2a570ae274a44bd5c949d32fc90"
+    },
+    {
+      "id": "acetic_acid_anion__n0__c0",
+      "kind": "anion_monomer",
+      "acid": "acetic_acid",
+      "n_water": 0,
+      "conformer_index": 0,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1199095090
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 7,
+      "formula": "C2H3O2",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        }
+      ],
+      "xyz": "xyz/acetic_acid_anion__n0__c0.xyz",
+      "sha256": "ed7007dd247147c2e7d3b738ec4baeebec15622596a8b70225763cb0bc29a946",
+      "derived_from": "acetic_acid__n0__c0",
+      "derived_from_positions_sha256_16": "77f63ddf23c90f28",
+      "species": "acetate(-).0H2O",
+      "derivation": "removed carboxylic H (atom 7) from optimised acetic_acid__n0__c0"
+    },
+    {
+      "id": "acetic_acid_anion__n0__c1",
+      "kind": "anion_monomer",
+      "acid": "acetic_acid",
+      "n_water": 0,
+      "conformer_index": 1,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1617547545
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 7,
+      "formula": "C2H3O2",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        }
+      ],
+      "xyz": "xyz/acetic_acid_anion__n0__c1.xyz",
+      "sha256": "5021b35beb099f9ca665f13ea23187832e78b0354df418f5f10f568b0740b119",
+      "derived_from": "acetic_acid__n0__c1",
+      "derived_from_positions_sha256_16": "0966fe6cc2f95d2d",
+      "species": "acetate(-).0H2O",
+      "derivation": "removed carboxylic H (atom 7) from optimised acetic_acid__n0__c1"
+    },
+    {
+      "id": "acetic_acid_anion__n0__c2",
+      "kind": "anion_monomer",
+      "acid": "acetic_acid",
+      "n_water": 0,
+      "conformer_index": 2,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1949694751
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 7,
+      "formula": "C2H3O2",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        }
+      ],
+      "xyz": "xyz/acetic_acid_anion__n0__c2.xyz",
+      "sha256": "37199cd5b294dae12fc74e178bf531222781212413592d8f32519d70faf6f249",
+      "derived_from": "acetic_acid__n0__c2",
+      "derived_from_positions_sha256_16": "1e25aae2ccc4548f",
+      "species": "acetate(-).0H2O",
+      "derivation": "removed carboxylic H (atom 7) from optimised acetic_acid__n0__c2"
+    },
+    {
+      "id": "acetic_acid_anion__n0__c3",
+      "kind": "anion_monomer",
+      "acid": "acetic_acid",
+      "n_water": 0,
+      "conformer_index": 3,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 53863089
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 7,
+      "formula": "C2H3O2",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        }
+      ],
+      "xyz": "xyz/acetic_acid_anion__n0__c3.xyz",
+      "sha256": "9b9b2b476e8069318d1be08ddbfe95edb0dfed34f38588365aa789b8aa93786e",
+      "derived_from": "acetic_acid__n0__c3",
+      "derived_from_positions_sha256_16": "529f45adc61bb874",
+      "species": "acetate(-).0H2O",
+      "derivation": "removed carboxylic H (atom 7) from optimised acetic_acid__n0__c3"
+    },
+    {
+      "id": "acetic_acid_anion__n0__c4",
+      "kind": "anion_monomer",
+      "acid": "acetic_acid",
+      "n_water": 0,
+      "conformer_index": 4,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 282991168
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 7,
+      "formula": "C2H3O2",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        }
+      ],
+      "xyz": "xyz/acetic_acid_anion__n0__c4.xyz",
+      "sha256": "8ef7311bd5641525f3863c70bc9954addc0bf2270535eab4b2506c9fed2cf0ab",
+      "derived_from": "acetic_acid__n0__c4",
+      "derived_from_positions_sha256_16": "e16184060f0df425",
+      "species": "acetate(-).0H2O",
+      "derivation": "removed carboxylic H (atom 7) from optimised acetic_acid__n0__c4"
+    },
+    {
+      "id": "acetic_acid_anion__n0__c5",
+      "kind": "anion_monomer",
+      "acid": "acetic_acid",
+      "n_water": 0,
+      "conformer_index": 5,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1852317886
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 7,
+      "formula": "C2H3O2",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        }
+      ],
+      "xyz": "xyz/acetic_acid_anion__n0__c5.xyz",
+      "sha256": "73bc12ae2d263c0e6e6c65a956f5d563df2ddb8da21edcc390152f8dcc9345f3",
+      "derived_from": "acetic_acid__n0__c5",
+      "derived_from_positions_sha256_16": "83222bf07c5114ca",
+      "species": "acetate(-).0H2O",
+      "derivation": "removed carboxylic H (atom 7) from optimised acetic_acid__n0__c5"
+    },
+    {
+      "id": "acetic_acid_anion__n1__c0",
+      "kind": "anion_water_cluster",
+      "acid": "acetic_acid",
+      "n_water": 1,
+      "conformer_index": 0,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 834433977,
+        "placement_seed": 1430454621
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 10,
+      "formula": "C2H5O3",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 7,
+          "stop": 10
+        }
+      ],
+      "xyz": "xyz/acetic_acid_anion__n1__c0.xyz",
+      "sha256": "046c2ffab1d4c506953b63348a6d82f3fa9b0465dc2aa934029eea11bc726f3e",
+      "derived_from": "acetic_acid__n1__c0",
+      "derived_from_positions_sha256_16": "0e7133717b1773f0",
+      "species": "acetate(-).1H2O",
+      "derivation": "removed carboxylic H (atom 7) from optimised acetic_acid__n1__c0"
+    },
+    {
+      "id": "acetic_acid_ionpair__n1__c0",
+      "kind": "ion_pair_cluster",
+      "acid": "acetic_acid",
+      "n_water": 1,
+      "conformer_index": 0,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 834433977,
+        "placement_seed": 1430454621
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 11,
+      "formula": "C2H6O3",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 7,
+          "stop": 11
+        }
+      ],
+      "xyz": "xyz/acetic_acid_ionpair__n1__c0.xyz",
+      "sha256": "579999dfbdb9080dcba0526a216f1a787bfec53e3002c696bbcf4a705bd4c757",
+      "derived_from": "acetic_acid__n1__c0",
+      "derived_from_positions_sha256_16": "0e7133717b1773f0",
+      "species": "acetate(-).H3O(+).0H2O (contact)",
+      "derivation": "moved carboxylic H (atom 7) to water O (atom 8) of optimised acetic_acid__n1__c0"
+    },
+    {
+      "id": "acetic_acid_anion__n1__c1",
+      "kind": "anion_water_cluster",
+      "acid": "acetic_acid",
+      "n_water": 1,
+      "conformer_index": 1,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 197317888,
+        "placement_seed": 332467904
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 10,
+      "formula": "C2H5O3",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 7,
+          "stop": 10
+        }
+      ],
+      "xyz": "xyz/acetic_acid_anion__n1__c1.xyz",
+      "sha256": "60dcfd22f2bf5e73626b0fdc522268d0d5acc0de630c3943560a051f3653e781",
+      "derived_from": "acetic_acid__n1__c1",
+      "derived_from_positions_sha256_16": "9200c5a56f27ee55",
+      "species": "acetate(-).1H2O",
+      "derivation": "removed carboxylic H (atom 7) from optimised acetic_acid__n1__c1"
+    },
+    {
+      "id": "acetic_acid_ionpair__n1__c1",
+      "kind": "ion_pair_cluster",
+      "acid": "acetic_acid",
+      "n_water": 1,
+      "conformer_index": 1,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 197317888,
+        "placement_seed": 332467904
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 11,
+      "formula": "C2H6O3",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 7,
+          "stop": 11
+        }
+      ],
+      "xyz": "xyz/acetic_acid_ionpair__n1__c1.xyz",
+      "sha256": "b08380af440e1569f8c7980ce520babf681e299ad384899370c0ede4c1eda0c3",
+      "derived_from": "acetic_acid__n1__c1",
+      "derived_from_positions_sha256_16": "9200c5a56f27ee55",
+      "species": "acetate(-).H3O(+).0H2O (contact)",
+      "derivation": "moved carboxylic H (atom 7) to water O (atom 8) of optimised acetic_acid__n1__c1"
+    },
+    {
+      "id": "acetic_acid_anion__n1__c2",
+      "kind": "anion_water_cluster",
+      "acid": "acetic_acid",
+      "n_water": 1,
+      "conformer_index": 2,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1148363858,
+        "placement_seed": 1547971706
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 10,
+      "formula": "C2H5O3",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 7,
+          "stop": 10
+        }
+      ],
+      "xyz": "xyz/acetic_acid_anion__n1__c2.xyz",
+      "sha256": "57c4cda5ac4b72a134f5c45748115cfd58a1689c44412eb85a5cddec50eb6435",
+      "derived_from": "acetic_acid__n1__c2",
+      "derived_from_positions_sha256_16": "aaa0e6663da92030",
+      "species": "acetate(-).1H2O",
+      "derivation": "removed carboxylic H (atom 7) from optimised acetic_acid__n1__c2"
+    },
+    {
+      "id": "acetic_acid_ionpair__n1__c2",
+      "kind": "ion_pair_cluster",
+      "acid": "acetic_acid",
+      "n_water": 1,
+      "conformer_index": 2,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1148363858,
+        "placement_seed": 1547971706
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 11,
+      "formula": "C2H6O3",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 7,
+          "stop": 11
+        }
+      ],
+      "xyz": "xyz/acetic_acid_ionpair__n1__c2.xyz",
+      "sha256": "e83a031b3ef78a2678da658fbd92fb62c95ba1c6177a5931632bbeb34b47d935",
+      "derived_from": "acetic_acid__n1__c2",
+      "derived_from_positions_sha256_16": "aaa0e6663da92030",
+      "species": "acetate(-).H3O(+).0H2O (contact)",
+      "derivation": "moved carboxylic H (atom 7) to water O (atom 8) of optimised acetic_acid__n1__c2"
+    },
+    {
+      "id": "acetic_acid_anion__n1__c3",
+      "kind": "anion_water_cluster",
+      "acid": "acetic_acid",
+      "n_water": 1,
+      "conformer_index": 3,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 725848749,
+        "placement_seed": 963813619
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 10,
+      "formula": "C2H5O3",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 7,
+          "stop": 10
+        }
+      ],
+      "xyz": "xyz/acetic_acid_anion__n1__c3.xyz",
+      "sha256": "05e74360701ddaa6d8f1cc10f117ef2e76fcf2809ecefa35fa512b95f076e4fd",
+      "derived_from": "acetic_acid__n1__c3",
+      "derived_from_positions_sha256_16": "8c6628cb505c8c70",
+      "species": "acetate(-).1H2O",
+      "derivation": "removed carboxylic H (atom 7) from optimised acetic_acid__n1__c3"
+    },
+    {
+      "id": "acetic_acid_ionpair__n1__c3",
+      "kind": "ion_pair_cluster",
+      "acid": "acetic_acid",
+      "n_water": 1,
+      "conformer_index": 3,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 725848749,
+        "placement_seed": 963813619
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 11,
+      "formula": "C2H6O3",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 7,
+          "stop": 11
+        }
+      ],
+      "xyz": "xyz/acetic_acid_ionpair__n1__c3.xyz",
+      "sha256": "dbd1e58d83a0e4953d198384b9025634b063e0fb569fc8e93a086423b678b17a",
+      "derived_from": "acetic_acid__n1__c3",
+      "derived_from_positions_sha256_16": "8c6628cb505c8c70",
+      "species": "acetate(-).H3O(+).0H2O (contact)",
+      "derivation": "moved carboxylic H (atom 7) to water O (atom 8) of optimised acetic_acid__n1__c3"
+    },
+    {
+      "id": "acetic_acid_anion__n1__c4",
+      "kind": "anion_water_cluster",
+      "acid": "acetic_acid",
+      "n_water": 1,
+      "conformer_index": 4,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1060948839,
+        "placement_seed": 27925137
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 10,
+      "formula": "C2H5O3",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 7,
+          "stop": 10
+        }
+      ],
+      "xyz": "xyz/acetic_acid_anion__n1__c4.xyz",
+      "sha256": "96b6abac9a4b7ac4a1c612ce9a1125cc3fe06f95c5e33227603042aad7b5f0b8",
+      "derived_from": "acetic_acid__n1__c4",
+      "derived_from_positions_sha256_16": "7c640c23790ad89f",
+      "species": "acetate(-).1H2O",
+      "derivation": "removed carboxylic H (atom 7) from optimised acetic_acid__n1__c4"
+    },
+    {
+      "id": "acetic_acid_ionpair__n1__c4",
+      "kind": "ion_pair_cluster",
+      "acid": "acetic_acid",
+      "n_water": 1,
+      "conformer_index": 4,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1060948839,
+        "placement_seed": 27925137
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 11,
+      "formula": "C2H6O3",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 7,
+          "stop": 11
+        }
+      ],
+      "xyz": "xyz/acetic_acid_ionpair__n1__c4.xyz",
+      "sha256": "44ebe124de5491eea79767d403c92f892ccfa24bc920f74ccd8a2bc9b5e7e3e6",
+      "derived_from": "acetic_acid__n1__c4",
+      "derived_from_positions_sha256_16": "7c640c23790ad89f",
+      "species": "acetate(-).H3O(+).0H2O (contact)",
+      "derivation": "moved carboxylic H (atom 7) to water O (atom 8) of optimised acetic_acid__n1__c4"
+    },
+    {
+      "id": "acetic_acid_anion__n1__c5",
+      "kind": "anion_water_cluster",
+      "acid": "acetic_acid",
+      "n_water": 1,
+      "conformer_index": 5,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 226068308,
+        "placement_seed": 1233866753
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 10,
+      "formula": "C2H5O3",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 7,
+          "stop": 10
+        }
+      ],
+      "xyz": "xyz/acetic_acid_anion__n1__c5.xyz",
+      "sha256": "311de383085fb445fff9ea11063505f6b7e638f65d42e8436992646c051e7f54",
+      "derived_from": "acetic_acid__n1__c5",
+      "derived_from_positions_sha256_16": "1ada11bf79104748",
+      "species": "acetate(-).1H2O",
+      "derivation": "removed carboxylic H (atom 7) from optimised acetic_acid__n1__c5"
+    },
+    {
+      "id": "acetic_acid_ionpair__n1__c5",
+      "kind": "ion_pair_cluster",
+      "acid": "acetic_acid",
+      "n_water": 1,
+      "conformer_index": 5,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 226068308,
+        "placement_seed": 1233866753
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 11,
+      "formula": "C2H6O3",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 7,
+          "stop": 11
+        }
+      ],
+      "xyz": "xyz/acetic_acid_ionpair__n1__c5.xyz",
+      "sha256": "8d27ae6efce6a7a823a6780500a08a9354801555edd3adef77b984c9a2ecba27",
+      "derived_from": "acetic_acid__n1__c5",
+      "derived_from_positions_sha256_16": "1ada11bf79104748",
+      "species": "acetate(-).H3O(+).0H2O (contact)",
+      "derivation": "moved carboxylic H (atom 7) to water O (atom 8) of optimised acetic_acid__n1__c5"
+    },
+    {
+      "id": "acetic_acid_anion__n3__c0",
+      "kind": "anion_water_cluster",
+      "acid": "acetic_acid",
+      "n_water": 3,
+      "conformer_index": 0,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 388441540,
+        "placement_seed": 5834340
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 16,
+      "formula": "C2H9O5",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 7,
+          "stop": 10
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 10,
+          "stop": 13
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 13,
+          "stop": 16
+        }
+      ],
+      "xyz": "xyz/acetic_acid_anion__n3__c0.xyz",
+      "sha256": "319a368e126236188c3cfe72d3c817d8e7b48baaf938e563a8296ea0ccc42f31",
+      "derived_from": "acetic_acid__n3__c0",
+      "derived_from_positions_sha256_16": "33a99aa307188fa3",
+      "species": "acetate(-).3H2O",
+      "derivation": "removed carboxylic H (atom 7) from optimised acetic_acid__n3__c0"
+    },
+    {
+      "id": "acetic_acid_ionpair__n3__c0",
+      "kind": "ion_pair_cluster",
+      "acid": "acetic_acid",
+      "n_water": 3,
+      "conformer_index": 0,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 388441540,
+        "placement_seed": 5834340
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 17,
+      "formula": "C2H10O5",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 7,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        }
+      ],
+      "xyz": "xyz/acetic_acid_ionpair__n3__c0.xyz",
+      "sha256": "d8269ada05dd2505853d008513fb3fd041c42ed70b4dbeb5aafa1bef11406334",
+      "derived_from": "acetic_acid__n3__c0",
+      "derived_from_positions_sha256_16": "33a99aa307188fa3",
+      "species": "acetate(-).H3O(+).2H2O (contact)",
+      "derivation": "moved carboxylic H (atom 7) to water O (atom 11) of optimised acetic_acid__n3__c0"
+    },
+    {
+      "id": "acetic_acid_ionpairSS__n3__c0",
+      "kind": "ion_pair_cluster",
+      "acid": "acetic_acid",
+      "n_water": 3,
+      "conformer_index": 0,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 388441540,
+        "placement_seed": 5834340
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 17,
+      "formula": "C2H10O5",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 7,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        }
+      ],
+      "xyz": "xyz/acetic_acid_ionpairSS__n3__c0.xyz",
+      "sha256": "7f07a5ee725aceda85d031315d7682905f0b172f98f008a99df71b73d8ad36ae",
+      "derived_from": "acetic_acid__n3__c0",
+      "derived_from_positions_sha256_16": "33a99aa307188fa3",
+      "species": "acetate(-).H3O(+).2H2O (solvent-separated)",
+      "derivation": "Grotthuss relay in optimised acetic_acid__n3__c0: acid H 7 -> water O 11, water H 13 -> water O 14"
+    },
+    {
+      "id": "acetic_acid_anion__n3__c1",
+      "kind": "anion_water_cluster",
+      "acid": "acetic_acid",
+      "n_water": 3,
+      "conformer_index": 1,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 69200921,
+        "placement_seed": 184191181
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 16,
+      "formula": "C2H9O5",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 7,
+          "stop": 10
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 10,
+          "stop": 13
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 13,
+          "stop": 16
+        }
+      ],
+      "xyz": "xyz/acetic_acid_anion__n3__c1.xyz",
+      "sha256": "d37698060e58cd214f8bfd74f458ae0353bfc9e937c10f9b90ca7413278e942f",
+      "derived_from": "acetic_acid__n3__c1",
+      "derived_from_positions_sha256_16": "1b8fb8e20f720511",
+      "species": "acetate(-).3H2O",
+      "derivation": "removed carboxylic H (atom 7) from optimised acetic_acid__n3__c1"
+    },
+    {
+      "id": "acetic_acid_ionpair__n3__c1",
+      "kind": "ion_pair_cluster",
+      "acid": "acetic_acid",
+      "n_water": 3,
+      "conformer_index": 1,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 69200921,
+        "placement_seed": 184191181
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 17,
+      "formula": "C2H10O5",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 7,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        }
+      ],
+      "xyz": "xyz/acetic_acid_ionpair__n3__c1.xyz",
+      "sha256": "6471b146bacc03cd9c05bebbc7b69337d142e19949e36dffbd552d6e91d2e99b",
+      "derived_from": "acetic_acid__n3__c1",
+      "derived_from_positions_sha256_16": "1b8fb8e20f720511",
+      "species": "acetate(-).H3O(+).2H2O (contact)",
+      "derivation": "moved carboxylic H (atom 7) to water O (atom 8) of optimised acetic_acid__n3__c1"
+    },
+    {
+      "id": "acetic_acid_ionpairSS__n3__c1",
+      "kind": "ion_pair_cluster",
+      "acid": "acetic_acid",
+      "n_water": 3,
+      "conformer_index": 1,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 69200921,
+        "placement_seed": 184191181
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 17,
+      "formula": "C2H10O5",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 7,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        }
+      ],
+      "xyz": "xyz/acetic_acid_ionpairSS__n3__c1.xyz",
+      "sha256": "d705a31fabe6d29375920d50fb05bd0d6cc34561dbaad612215e1260ceadbc46",
+      "derived_from": "acetic_acid__n3__c1",
+      "derived_from_positions_sha256_16": "1b8fb8e20f720511",
+      "species": "acetate(-).H3O(+).2H2O (solvent-separated)",
+      "derivation": "Grotthuss relay in optimised acetic_acid__n3__c1: acid H 7 -> water O 8, water H 10 -> water O 14"
+    },
+    {
+      "id": "acetic_acid_anion__n3__c2",
+      "kind": "anion_water_cluster",
+      "acid": "acetic_acid",
+      "n_water": 3,
+      "conformer_index": 2,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1803124682,
+        "placement_seed": 1410095130
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 16,
+      "formula": "C2H9O5",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 7,
+          "stop": 10
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 10,
+          "stop": 13
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 13,
+          "stop": 16
+        }
+      ],
+      "xyz": "xyz/acetic_acid_anion__n3__c2.xyz",
+      "sha256": "68988e4ba346336c51612d0753438d03c74dbd166a18d5128c7848dcba7f7f41",
+      "derived_from": "acetic_acid__n3__c2",
+      "derived_from_positions_sha256_16": "971582d961f731dd",
+      "species": "acetate(-).3H2O",
+      "derivation": "removed carboxylic H (atom 7) from optimised acetic_acid__n3__c2"
+    },
+    {
+      "id": "acetic_acid_ionpair__n3__c2",
+      "kind": "ion_pair_cluster",
+      "acid": "acetic_acid",
+      "n_water": 3,
+      "conformer_index": 2,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1803124682,
+        "placement_seed": 1410095130
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 17,
+      "formula": "C2H10O5",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 7,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        }
+      ],
+      "xyz": "xyz/acetic_acid_ionpair__n3__c2.xyz",
+      "sha256": "5701f76c5da7fc0e25f0fb27e941756f211eda501405258010914899a994914b",
+      "derived_from": "acetic_acid__n3__c2",
+      "derived_from_positions_sha256_16": "971582d961f731dd",
+      "species": "acetate(-).H3O(+).2H2O (contact)",
+      "derivation": "moved carboxylic H (atom 7) to water O (atom 8) of optimised acetic_acid__n3__c2"
+    },
+    {
+      "id": "acetic_acid_anion__n3__c3",
+      "kind": "anion_water_cluster",
+      "acid": "acetic_acid",
+      "n_water": 3,
+      "conformer_index": 3,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 812698612,
+        "placement_seed": 1246174331
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 16,
+      "formula": "C2H9O5",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 7,
+          "stop": 10
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 10,
+          "stop": 13
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 13,
+          "stop": 16
+        }
+      ],
+      "xyz": "xyz/acetic_acid_anion__n3__c3.xyz",
+      "sha256": "690e5dc5f23b18678b9cea1b80925e27ede32a9747d400f0df7776fcf7a39f96",
+      "derived_from": "acetic_acid__n3__c3",
+      "derived_from_positions_sha256_16": "eb7a3a55ab397577",
+      "species": "acetate(-).3H2O",
+      "derivation": "removed carboxylic H (atom 7) from optimised acetic_acid__n3__c3"
+    },
+    {
+      "id": "acetic_acid_ionpair__n3__c3",
+      "kind": "ion_pair_cluster",
+      "acid": "acetic_acid",
+      "n_water": 3,
+      "conformer_index": 3,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 812698612,
+        "placement_seed": 1246174331
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 17,
+      "formula": "C2H10O5",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 7,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        }
+      ],
+      "xyz": "xyz/acetic_acid_ionpair__n3__c3.xyz",
+      "sha256": "8d97e2f4c8e3fd91012cf7fce49e95c357661a9cae42e4b9b8b07de56bdf3a61",
+      "derived_from": "acetic_acid__n3__c3",
+      "derived_from_positions_sha256_16": "eb7a3a55ab397577",
+      "species": "acetate(-).H3O(+).2H2O (contact)",
+      "derivation": "moved carboxylic H (atom 7) to water O (atom 8) of optimised acetic_acid__n3__c3"
+    },
+    {
+      "id": "acetic_acid_ionpairSS__n3__c3",
+      "kind": "ion_pair_cluster",
+      "acid": "acetic_acid",
+      "n_water": 3,
+      "conformer_index": 3,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 812698612,
+        "placement_seed": 1246174331
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 17,
+      "formula": "C2H10O5",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 7,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        }
+      ],
+      "xyz": "xyz/acetic_acid_ionpairSS__n3__c3.xyz",
+      "sha256": "5efc3d144b8d8213ed5705e61473a705bc5b1789dc0913064fcd055bf12860d1",
+      "derived_from": "acetic_acid__n3__c3",
+      "derived_from_positions_sha256_16": "eb7a3a55ab397577",
+      "species": "acetate(-).H3O(+).2H2O (solvent-separated)",
+      "derivation": "Grotthuss relay in optimised acetic_acid__n3__c3: acid H 7 -> water O 8, water H 10 -> water O 11"
+    },
+    {
+      "id": "acetic_acid_anion__n3__c4",
+      "kind": "anion_water_cluster",
+      "acid": "acetic_acid",
+      "n_water": 3,
+      "conformer_index": 4,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1769978763,
+        "placement_seed": 797966537
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 16,
+      "formula": "C2H9O5",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 7,
+          "stop": 10
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 10,
+          "stop": 13
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 13,
+          "stop": 16
+        }
+      ],
+      "xyz": "xyz/acetic_acid_anion__n3__c4.xyz",
+      "sha256": "e61ab4d4e195ad93413f3ae5aa5bf559efda2471af0ab6b75608ab5489aa522b",
+      "derived_from": "acetic_acid__n3__c4",
+      "derived_from_positions_sha256_16": "2ef2ed45b12a7565",
+      "species": "acetate(-).3H2O",
+      "derivation": "removed carboxylic H (atom 7) from optimised acetic_acid__n3__c4"
+    },
+    {
+      "id": "acetic_acid_ionpair__n3__c4",
+      "kind": "ion_pair_cluster",
+      "acid": "acetic_acid",
+      "n_water": 3,
+      "conformer_index": 4,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1769978763,
+        "placement_seed": 797966537
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 17,
+      "formula": "C2H10O5",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 7,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        }
+      ],
+      "xyz": "xyz/acetic_acid_ionpair__n3__c4.xyz",
+      "sha256": "67e2b58f8466909d62992116d0ac24eb14f76150b12f87ea7ee6c5338894cdf9",
+      "derived_from": "acetic_acid__n3__c4",
+      "derived_from_positions_sha256_16": "2ef2ed45b12a7565",
+      "species": "acetate(-).H3O(+).2H2O (contact)",
+      "derivation": "moved carboxylic H (atom 7) to water O (atom 8) of optimised acetic_acid__n3__c4"
+    },
+    {
+      "id": "acetic_acid_anion__n3__c5",
+      "kind": "anion_water_cluster",
+      "acid": "acetic_acid",
+      "n_water": 3,
+      "conformer_index": 5,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 390339530,
+        "placement_seed": 1150419258
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 16,
+      "formula": "C2H9O5",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 7,
+          "stop": 10
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 10,
+          "stop": 13
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 13,
+          "stop": 16
+        }
+      ],
+      "xyz": "xyz/acetic_acid_anion__n3__c5.xyz",
+      "sha256": "339d7f5db3ce30b511bae9a8d3c19966d096879b88a2c006555bae83524e1cf2",
+      "derived_from": "acetic_acid__n3__c5",
+      "derived_from_positions_sha256_16": "736ec29358d8ab2f",
+      "species": "acetate(-).3H2O",
+      "derivation": "removed carboxylic H (atom 7) from optimised acetic_acid__n3__c5"
+    },
+    {
+      "id": "acetic_acid_ionpair__n3__c5",
+      "kind": "ion_pair_cluster",
+      "acid": "acetic_acid",
+      "n_water": 3,
+      "conformer_index": 5,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 390339530,
+        "placement_seed": 1150419258
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 17,
+      "formula": "C2H10O5",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 7,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        }
+      ],
+      "xyz": "xyz/acetic_acid_ionpair__n3__c5.xyz",
+      "sha256": "b1e4ea7d53400f0a84c74fde7c66a602a07b209a154b5cdc0513d4a466f4c7ed",
+      "derived_from": "acetic_acid__n3__c5",
+      "derived_from_positions_sha256_16": "736ec29358d8ab2f",
+      "species": "acetate(-).H3O(+).2H2O (contact)",
+      "derivation": "moved carboxylic H (atom 7) to water O (atom 11) of optimised acetic_acid__n3__c5"
+    },
+    {
+      "id": "acetic_acid_anion__n6__c0",
+      "kind": "anion_water_cluster",
+      "acid": "acetic_acid",
+      "n_water": 6,
+      "conformer_index": 0,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1386078134,
+        "placement_seed": 145696388
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 25,
+      "formula": "C2H15O8",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 7,
+          "stop": 10
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 10,
+          "stop": 13
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 13,
+          "stop": 16
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 16,
+          "stop": 19
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 19,
+          "stop": 22
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 22,
+          "stop": 25
+        }
+      ],
+      "xyz": "xyz/acetic_acid_anion__n6__c0.xyz",
+      "sha256": "1a4977e2bd70c51e5a0e960f5bf43a9a32aff8277e10bfaa50b7d684ea0ed2bf",
+      "derived_from": "acetic_acid__n6__c0",
+      "derived_from_positions_sha256_16": "cc16682c918d8450",
+      "species": "acetate(-).6H2O",
+      "derivation": "removed carboxylic H (atom 7) from optimised acetic_acid__n6__c0"
+    },
+    {
+      "id": "acetic_acid_ionpair__n6__c0",
+      "kind": "ion_pair_cluster",
+      "acid": "acetic_acid",
+      "n_water": 6,
+      "conformer_index": 0,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1386078134,
+        "placement_seed": 145696388
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 26,
+      "formula": "C2H16O8",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 7,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 17,
+          "stop": 20
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 20,
+          "stop": 23
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 23,
+          "stop": 26
+        }
+      ],
+      "xyz": "xyz/acetic_acid_ionpair__n6__c0.xyz",
+      "sha256": "7687b763a2b4e94feec5e2ff52f83ac9b3216018bd17b792d9f8c789b4e62aa8",
+      "derived_from": "acetic_acid__n6__c0",
+      "derived_from_positions_sha256_16": "cc16682c918d8450",
+      "species": "acetate(-).H3O(+).5H2O (contact)",
+      "derivation": "moved carboxylic H (atom 7) to water O (atom 17) of optimised acetic_acid__n6__c0"
+    },
+    {
+      "id": "acetic_acid_ionpairSS__n6__c0",
+      "kind": "ion_pair_cluster",
+      "acid": "acetic_acid",
+      "n_water": 6,
+      "conformer_index": 0,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1386078134,
+        "placement_seed": 145696388
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 26,
+      "formula": "C2H16O8",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 7,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 17,
+          "stop": 20
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 20,
+          "stop": 23
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 23,
+          "stop": 26
+        }
+      ],
+      "xyz": "xyz/acetic_acid_ionpairSS__n6__c0.xyz",
+      "sha256": "5aeebda8acb88c4b74299bbaee43fac1519598f395749d96303677c6f80e288e",
+      "derived_from": "acetic_acid__n6__c0",
+      "derived_from_positions_sha256_16": "cc16682c918d8450",
+      "species": "acetate(-).H3O(+).5H2O (solvent-separated)",
+      "derivation": "Grotthuss relay in optimised acetic_acid__n6__c0: acid H 7 -> water O 17, water H 19 -> water O 23"
+    },
+    {
+      "id": "acetic_acid_anion__n6__c1",
+      "kind": "anion_water_cluster",
+      "acid": "acetic_acid",
+      "n_water": 6,
+      "conformer_index": 1,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1250065811,
+        "placement_seed": 656801615
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 25,
+      "formula": "C2H15O8",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 7,
+          "stop": 10
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 10,
+          "stop": 13
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 13,
+          "stop": 16
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 16,
+          "stop": 19
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 19,
+          "stop": 22
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 22,
+          "stop": 25
+        }
+      ],
+      "xyz": "xyz/acetic_acid_anion__n6__c1.xyz",
+      "sha256": "215e26dda3eaacd7c14c18c2e2ed6edf67cc31ade5a58dfaa1fd50d9789f816c",
+      "derived_from": "acetic_acid__n6__c1",
+      "derived_from_positions_sha256_16": "50af94554f14b97f",
+      "species": "acetate(-).6H2O",
+      "derivation": "removed carboxylic H (atom 7) from optimised acetic_acid__n6__c1"
+    },
+    {
+      "id": "acetic_acid_ionpair__n6__c1",
+      "kind": "ion_pair_cluster",
+      "acid": "acetic_acid",
+      "n_water": 6,
+      "conformer_index": 1,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1250065811,
+        "placement_seed": 656801615
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 26,
+      "formula": "C2H16O8",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 7,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 17,
+          "stop": 20
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 20,
+          "stop": 23
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 23,
+          "stop": 26
+        }
+      ],
+      "xyz": "xyz/acetic_acid_ionpair__n6__c1.xyz",
+      "sha256": "d4e0787cc1e20ba2722213833a74d51a682278fe6ab06825f396815eeccc4415",
+      "derived_from": "acetic_acid__n6__c1",
+      "derived_from_positions_sha256_16": "50af94554f14b97f",
+      "species": "acetate(-).H3O(+).5H2O (contact)",
+      "derivation": "moved carboxylic H (atom 7) to water O (atom 14) of optimised acetic_acid__n6__c1"
+    },
+    {
+      "id": "acetic_acid_ionpairSS__n6__c1",
+      "kind": "ion_pair_cluster",
+      "acid": "acetic_acid",
+      "n_water": 6,
+      "conformer_index": 1,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1250065811,
+        "placement_seed": 656801615
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 26,
+      "formula": "C2H16O8",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 7,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 17,
+          "stop": 20
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 20,
+          "stop": 23
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 23,
+          "stop": 26
+        }
+      ],
+      "xyz": "xyz/acetic_acid_ionpairSS__n6__c1.xyz",
+      "sha256": "cb606c7a1bac36a7cc98ff98571249cd993fcba58532be68217cca20ac11461f",
+      "derived_from": "acetic_acid__n6__c1",
+      "derived_from_positions_sha256_16": "50af94554f14b97f",
+      "species": "acetate(-).H3O(+).5H2O (solvent-separated)",
+      "derivation": "Grotthuss relay in optimised acetic_acid__n6__c1: acid H 7 -> water O 14, water H 15 -> water O 17"
+    },
+    {
+      "id": "acetic_acid_anion__n6__c2",
+      "kind": "anion_water_cluster",
+      "acid": "acetic_acid",
+      "n_water": 6,
+      "conformer_index": 2,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1496841323,
+        "placement_seed": 523216735
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 25,
+      "formula": "C2H15O8",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 7,
+          "stop": 10
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 10,
+          "stop": 13
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 13,
+          "stop": 16
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 16,
+          "stop": 19
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 19,
+          "stop": 22
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 22,
+          "stop": 25
+        }
+      ],
+      "xyz": "xyz/acetic_acid_anion__n6__c2.xyz",
+      "sha256": "3d8e6d61830d2498f57439a30e21c1c8f4458c2873a53af9033e22eb858ab331",
+      "derived_from": "acetic_acid__n6__c2",
+      "derived_from_positions_sha256_16": "6ac36b81d11379f1",
+      "species": "acetate(-).6H2O",
+      "derivation": "removed carboxylic H (atom 7) from optimised acetic_acid__n6__c2"
+    },
+    {
+      "id": "acetic_acid_ionpair__n6__c2",
+      "kind": "ion_pair_cluster",
+      "acid": "acetic_acid",
+      "n_water": 6,
+      "conformer_index": 2,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1496841323,
+        "placement_seed": 523216735
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 26,
+      "formula": "C2H16O8",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 7,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 17,
+          "stop": 20
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 20,
+          "stop": 23
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 23,
+          "stop": 26
+        }
+      ],
+      "xyz": "xyz/acetic_acid_ionpair__n6__c2.xyz",
+      "sha256": "c4c5f39910050d896f79a46ea0608bb3516d1b6e44f0769714fa286c317db79d",
+      "derived_from": "acetic_acid__n6__c2",
+      "derived_from_positions_sha256_16": "6ac36b81d11379f1",
+      "species": "acetate(-).H3O(+).5H2O (contact)",
+      "derivation": "moved carboxylic H (atom 7) to water O (atom 17) of optimised acetic_acid__n6__c2"
+    },
+    {
+      "id": "acetic_acid_ionpairSS__n6__c2",
+      "kind": "ion_pair_cluster",
+      "acid": "acetic_acid",
+      "n_water": 6,
+      "conformer_index": 2,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1496841323,
+        "placement_seed": 523216735
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 26,
+      "formula": "C2H16O8",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 7,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 17,
+          "stop": 20
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 20,
+          "stop": 23
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 23,
+          "stop": 26
+        }
+      ],
+      "xyz": "xyz/acetic_acid_ionpairSS__n6__c2.xyz",
+      "sha256": "f14bbf7ef03cbff87481442cb2c23bf9edb7748b4d85f216bf2f394d1ca638fd",
+      "derived_from": "acetic_acid__n6__c2",
+      "derived_from_positions_sha256_16": "6ac36b81d11379f1",
+      "species": "acetate(-).H3O(+).5H2O (solvent-separated)",
+      "derivation": "Grotthuss relay in optimised acetic_acid__n6__c2: acid H 7 -> water O 17, water H 19 -> water O 8"
+    },
+    {
+      "id": "acetic_acid_anion__n6__c3",
+      "kind": "anion_water_cluster",
+      "acid": "acetic_acid",
+      "n_water": 6,
+      "conformer_index": 3,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1023124976,
+        "placement_seed": 147439449
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 25,
+      "formula": "C2H15O8",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 7,
+          "stop": 10
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 10,
+          "stop": 13
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 13,
+          "stop": 16
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 16,
+          "stop": 19
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 19,
+          "stop": 22
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 22,
+          "stop": 25
+        }
+      ],
+      "xyz": "xyz/acetic_acid_anion__n6__c3.xyz",
+      "sha256": "709908e5bf7c52eee0c3a27e5116d597971e1e48d79daa43b138503a18d2f844",
+      "derived_from": "acetic_acid__n6__c3",
+      "derived_from_positions_sha256_16": "a455b3e0ba3445fc",
+      "species": "acetate(-).6H2O",
+      "derivation": "removed carboxylic H (atom 7) from optimised acetic_acid__n6__c3"
+    },
+    {
+      "id": "acetic_acid_ionpair__n6__c3",
+      "kind": "ion_pair_cluster",
+      "acid": "acetic_acid",
+      "n_water": 6,
+      "conformer_index": 3,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1023124976,
+        "placement_seed": 147439449
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 26,
+      "formula": "C2H16O8",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 7,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 17,
+          "stop": 20
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 20,
+          "stop": 23
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 23,
+          "stop": 26
+        }
+      ],
+      "xyz": "xyz/acetic_acid_ionpair__n6__c3.xyz",
+      "sha256": "6b47696e345fd1e1765b90dc53fd755dfa0bfded33ef2ec2dcb5607a3935e6d2",
+      "derived_from": "acetic_acid__n6__c3",
+      "derived_from_positions_sha256_16": "a455b3e0ba3445fc",
+      "species": "acetate(-).H3O(+).5H2O (contact)",
+      "derivation": "moved carboxylic H (atom 7) to water O (atom 8) of optimised acetic_acid__n6__c3"
+    },
+    {
+      "id": "acetic_acid_ionpairSS__n6__c3",
+      "kind": "ion_pair_cluster",
+      "acid": "acetic_acid",
+      "n_water": 6,
+      "conformer_index": 3,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1023124976,
+        "placement_seed": 147439449
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 26,
+      "formula": "C2H16O8",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 7,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 17,
+          "stop": 20
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 20,
+          "stop": 23
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 23,
+          "stop": 26
+        }
+      ],
+      "xyz": "xyz/acetic_acid_ionpairSS__n6__c3.xyz",
+      "sha256": "a437894e49d8c484c8873dcebf265aee21b51beac50803427715fbeafe1f52e1",
+      "derived_from": "acetic_acid__n6__c3",
+      "derived_from_positions_sha256_16": "a455b3e0ba3445fc",
+      "species": "acetate(-).H3O(+).5H2O (solvent-separated)",
+      "derivation": "Grotthuss relay in optimised acetic_acid__n6__c3: acid H 7 -> water O 8, water H 10 -> water O 11"
+    },
+    {
+      "id": "acetic_acid_anion__n6__c4",
+      "kind": "anion_water_cluster",
+      "acid": "acetic_acid",
+      "n_water": 6,
+      "conformer_index": 4,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1156395828,
+        "placement_seed": 263275129
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 25,
+      "formula": "C2H15O8",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 7,
+          "stop": 10
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 10,
+          "stop": 13
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 13,
+          "stop": 16
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 16,
+          "stop": 19
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 19,
+          "stop": 22
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 22,
+          "stop": 25
+        }
+      ],
+      "xyz": "xyz/acetic_acid_anion__n6__c4.xyz",
+      "sha256": "a2b51f44ff2b1aebca9cba427572d3f7377b7f9f560a6bfeb6e55951e6791e28",
+      "derived_from": "acetic_acid__n6__c4",
+      "derived_from_positions_sha256_16": "f59880ab00161468",
+      "species": "acetate(-).6H2O",
+      "derivation": "removed carboxylic H (atom 7) from optimised acetic_acid__n6__c4"
+    },
+    {
+      "id": "acetic_acid_ionpair__n6__c4",
+      "kind": "ion_pair_cluster",
+      "acid": "acetic_acid",
+      "n_water": 6,
+      "conformer_index": 4,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1156395828,
+        "placement_seed": 263275129
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 26,
+      "formula": "C2H16O8",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 7,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 17,
+          "stop": 20
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 20,
+          "stop": 23
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 23,
+          "stop": 26
+        }
+      ],
+      "xyz": "xyz/acetic_acid_ionpair__n6__c4.xyz",
+      "sha256": "eb43402d07445949df9030b38a10f58fa179439763eb3d8d2511f43d7c14f633",
+      "derived_from": "acetic_acid__n6__c4",
+      "derived_from_positions_sha256_16": "f59880ab00161468",
+      "species": "acetate(-).H3O(+).5H2O (contact)",
+      "derivation": "moved carboxylic H (atom 7) to water O (atom 8) of optimised acetic_acid__n6__c4"
+    },
+    {
+      "id": "acetic_acid_ionpairSS__n6__c4",
+      "kind": "ion_pair_cluster",
+      "acid": "acetic_acid",
+      "n_water": 6,
+      "conformer_index": 4,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1156395828,
+        "placement_seed": 263275129
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 26,
+      "formula": "C2H16O8",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 7,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 17,
+          "stop": 20
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 20,
+          "stop": 23
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 23,
+          "stop": 26
+        }
+      ],
+      "xyz": "xyz/acetic_acid_ionpairSS__n6__c4.xyz",
+      "sha256": "cbb87ee81093ce0bd10782b4d3c0fbf1ae81cdcdabb8546a5da1b3163eddb7cf",
+      "derived_from": "acetic_acid__n6__c4",
+      "derived_from_positions_sha256_16": "f59880ab00161468",
+      "species": "acetate(-).H3O(+).5H2O (solvent-separated)",
+      "derivation": "Grotthuss relay in optimised acetic_acid__n6__c4: acid H 7 -> water O 8, water H 9 -> water O 14"
+    },
+    {
+      "id": "acetic_acid_anion__n6__c5",
+      "kind": "anion_water_cluster",
+      "acid": "acetic_acid",
+      "n_water": 6,
+      "conformer_index": 5,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 350781717,
+        "placement_seed": 414101913
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 25,
+      "formula": "C2H15O8",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 7,
+          "stop": 10
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 10,
+          "stop": 13
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 13,
+          "stop": 16
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 16,
+          "stop": 19
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 19,
+          "stop": 22
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 22,
+          "stop": 25
+        }
+      ],
+      "xyz": "xyz/acetic_acid_anion__n6__c5.xyz",
+      "sha256": "31e65a33e88091d3ec456928c1d10320c988c7dc3f3c898f70a4894c8c0b6f5d",
+      "derived_from": "acetic_acid__n6__c5",
+      "derived_from_positions_sha256_16": "5ffb5f59e06ede54",
+      "species": "acetate(-).6H2O",
+      "derivation": "removed carboxylic H (atom 7) from optimised acetic_acid__n6__c5"
+    },
+    {
+      "id": "acetic_acid_ionpair__n6__c5",
+      "kind": "ion_pair_cluster",
+      "acid": "acetic_acid",
+      "n_water": 6,
+      "conformer_index": 5,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 350781717,
+        "placement_seed": 414101913
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 26,
+      "formula": "C2H16O8",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 7,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 17,
+          "stop": 20
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 20,
+          "stop": 23
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 23,
+          "stop": 26
+        }
+      ],
+      "xyz": "xyz/acetic_acid_ionpair__n6__c5.xyz",
+      "sha256": "38523571e13bc70e98c884e5e665cb62cfb56538557b099668844672f5fe996a",
+      "derived_from": "acetic_acid__n6__c5",
+      "derived_from_positions_sha256_16": "5ffb5f59e06ede54",
+      "species": "acetate(-).H3O(+).5H2O (contact)",
+      "derivation": "moved carboxylic H (atom 7) to water O (atom 8) of optimised acetic_acid__n6__c5"
+    },
+    {
+      "id": "acetic_acid_ionpairSS__n6__c5",
+      "kind": "ion_pair_cluster",
+      "acid": "acetic_acid",
+      "n_water": 6,
+      "conformer_index": 5,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 350781717,
+        "placement_seed": 414101913
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 26,
+      "formula": "C2H16O8",
+      "fragments": [
+        {
+          "name": "acetate",
+          "smiles": "CC(=O)[O-]",
+          "start": 0,
+          "stop": 7
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 7,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 17,
+          "stop": 20
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 20,
+          "stop": 23
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 23,
+          "stop": 26
+        }
+      ],
+      "xyz": "xyz/acetic_acid_ionpairSS__n6__c5.xyz",
+      "sha256": "434253f43a617779fc4b5190e1810bff51fcbe3d4a4ef1eb496d621c16be7ca5",
+      "derived_from": "acetic_acid__n6__c5",
+      "derived_from_positions_sha256_16": "5ffb5f59e06ede54",
+      "species": "acetate(-).H3O(+).5H2O (solvent-separated)",
+      "derivation": "Grotthuss relay in optimised acetic_acid__n6__c5: acid H 7 -> water O 8, water H 9 -> water O 11"
+    },
+    {
+      "id": "lactic_acid_anion__n0__c0",
+      "kind": "anion_monomer",
+      "acid": "lactic_acid",
+      "n_water": 0,
+      "conformer_index": 0,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1701083493
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 11,
+      "formula": "C3H5O3",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        }
+      ],
+      "xyz": "xyz/lactic_acid_anion__n0__c0.xyz",
+      "sha256": "e980ccd7e113ed81f92f19055cc3a0550e662e288cfb9cde098eb054732abb5e",
+      "derived_from": "lactic_acid__n0__c0",
+      "derived_from_positions_sha256_16": "bcde6f0a1d64d4e3",
+      "species": "lactate(-).0H2O",
+      "derivation": "removed carboxylic H (atom 10) from optimised lactic_acid__n0__c0"
+    },
+    {
+      "id": "lactic_acid_anion__n0__c1",
+      "kind": "anion_monomer",
+      "acid": "lactic_acid",
+      "n_water": 0,
+      "conformer_index": 1,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 635370021
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 11,
+      "formula": "C3H5O3",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        }
+      ],
+      "xyz": "xyz/lactic_acid_anion__n0__c1.xyz",
+      "sha256": "4d573766031cad39c225a4e4d052ac93ed7cecfb26e21b7e7f641713452b4b0f",
+      "derived_from": "lactic_acid__n0__c1",
+      "derived_from_positions_sha256_16": "24bb343c47f2ce98",
+      "species": "lactate(-).0H2O",
+      "derivation": "removed carboxylic H (atom 10) from optimised lactic_acid__n0__c1"
+    },
+    {
+      "id": "lactic_acid_anion__n0__c2",
+      "kind": "anion_monomer",
+      "acid": "lactic_acid",
+      "n_water": 0,
+      "conformer_index": 2,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 363209691
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 11,
+      "formula": "C3H5O3",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        }
+      ],
+      "xyz": "xyz/lactic_acid_anion__n0__c2.xyz",
+      "sha256": "e247c7104587f45762ef4c751843c4718597e089313c77780c599d6627ff5e15",
+      "derived_from": "lactic_acid__n0__c2",
+      "derived_from_positions_sha256_16": "6c444f79d6e31e50",
+      "species": "lactate(-).0H2O",
+      "derivation": "removed carboxylic H (atom 10) from optimised lactic_acid__n0__c2"
+    },
+    {
+      "id": "lactic_acid_anion__n0__c3",
+      "kind": "anion_monomer",
+      "acid": "lactic_acid",
+      "n_water": 0,
+      "conformer_index": 3,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1104364854
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 11,
+      "formula": "C3H5O3",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        }
+      ],
+      "xyz": "xyz/lactic_acid_anion__n0__c3.xyz",
+      "sha256": "b39ba5900317a5a5cb28e25ce26c4c1a1423ba944152b1f11ceb3e67539fdaec",
+      "derived_from": "lactic_acid__n0__c3",
+      "derived_from_positions_sha256_16": "29b71dd9f2cf9798",
+      "species": "lactate(-).0H2O",
+      "derivation": "removed carboxylic H (atom 10) from optimised lactic_acid__n0__c3"
+    },
+    {
+      "id": "lactic_acid_anion__n0__c4",
+      "kind": "anion_monomer",
+      "acid": "lactic_acid",
+      "n_water": 0,
+      "conformer_index": 4,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 2068390574
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 11,
+      "formula": "C3H5O3",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        }
+      ],
+      "xyz": "xyz/lactic_acid_anion__n0__c4.xyz",
+      "sha256": "cfc37c0e809f76e45326f89d7be592289b29d91edf9fd70c89087423f3ba0e3c",
+      "derived_from": "lactic_acid__n0__c4",
+      "derived_from_positions_sha256_16": "c284314a106df3f7",
+      "species": "lactate(-).0H2O",
+      "derivation": "removed carboxylic H (atom 10) from optimised lactic_acid__n0__c4"
+    },
+    {
+      "id": "lactic_acid_anion__n0__c5",
+      "kind": "anion_monomer",
+      "acid": "lactic_acid",
+      "n_water": 0,
+      "conformer_index": 5,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 266019600
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 11,
+      "formula": "C3H5O3",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        }
+      ],
+      "xyz": "xyz/lactic_acid_anion__n0__c5.xyz",
+      "sha256": "4a81633c514079082d37d5dd47179d381cbf089c2ab9bd001ea4a3f3c7ebc57e",
+      "derived_from": "lactic_acid__n0__c5",
+      "derived_from_positions_sha256_16": "8d011c925b57e27e",
+      "species": "lactate(-).0H2O",
+      "derivation": "removed carboxylic H (atom 10) from optimised lactic_acid__n0__c5"
+    },
+    {
+      "id": "lactic_acid_anion__n1__c0",
+      "kind": "anion_water_cluster",
+      "acid": "lactic_acid",
+      "n_water": 1,
+      "conformer_index": 0,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1133866898,
+        "placement_seed": 882648900
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 14,
+      "formula": "C3H7O4",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        }
+      ],
+      "xyz": "xyz/lactic_acid_anion__n1__c0.xyz",
+      "sha256": "b0954448ba901fdd36bc1052c2e2a4f85c03ba71648173b9512bdf3124ff97f6",
+      "derived_from": "lactic_acid__n1__c0",
+      "derived_from_positions_sha256_16": "bdbb1e1bd4aeb3a0",
+      "species": "lactate(-).1H2O",
+      "derivation": "removed carboxylic H (atom 10) from optimised lactic_acid__n1__c0"
+    },
+    {
+      "id": "lactic_acid_ionpair__n1__c0",
+      "kind": "ion_pair_cluster",
+      "acid": "lactic_acid",
+      "n_water": 1,
+      "conformer_index": 0,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1133866898,
+        "placement_seed": 882648900
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 15,
+      "formula": "C3H8O4",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 11,
+          "stop": 15
+        }
+      ],
+      "xyz": "xyz/lactic_acid_ionpair__n1__c0.xyz",
+      "sha256": "87396d9fce6d5e418d58cf7d51e1d0e8b25cfb09ae09587336807ff990b9833b",
+      "derived_from": "lactic_acid__n1__c0",
+      "derived_from_positions_sha256_16": "bdbb1e1bd4aeb3a0",
+      "species": "lactate(-).H3O(+).0H2O (contact)",
+      "derivation": "moved carboxylic H (atom 10) to water O (atom 12) of optimised lactic_acid__n1__c0"
+    },
+    {
+      "id": "lactic_acid_anion__n1__c1",
+      "kind": "anion_water_cluster",
+      "acid": "lactic_acid",
+      "n_water": 1,
+      "conformer_index": 1,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1074380438,
+        "placement_seed": 31865928
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 14,
+      "formula": "C3H7O4",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        }
+      ],
+      "xyz": "xyz/lactic_acid_anion__n1__c1.xyz",
+      "sha256": "8376d109658a59cd6bdefda58eeb093fbd166d638271fffd4d17dd5b31f9cf0e",
+      "derived_from": "lactic_acid__n1__c1",
+      "derived_from_positions_sha256_16": "835792916d71684c",
+      "species": "lactate(-).1H2O",
+      "derivation": "removed carboxylic H (atom 10) from optimised lactic_acid__n1__c1"
+    },
+    {
+      "id": "lactic_acid_ionpair__n1__c1",
+      "kind": "ion_pair_cluster",
+      "acid": "lactic_acid",
+      "n_water": 1,
+      "conformer_index": 1,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1074380438,
+        "placement_seed": 31865928
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 15,
+      "formula": "C3H8O4",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 11,
+          "stop": 15
+        }
+      ],
+      "xyz": "xyz/lactic_acid_ionpair__n1__c1.xyz",
+      "sha256": "b4fb273502b3069a6c86ccd5941f55c28e4763e71c7479aaaa432b82358a29c0",
+      "derived_from": "lactic_acid__n1__c1",
+      "derived_from_positions_sha256_16": "835792916d71684c",
+      "species": "lactate(-).H3O(+).0H2O (contact)",
+      "derivation": "moved carboxylic H (atom 10) to water O (atom 12) of optimised lactic_acid__n1__c1"
+    },
+    {
+      "id": "lactic_acid_anion__n1__c2",
+      "kind": "anion_water_cluster",
+      "acid": "lactic_acid",
+      "n_water": 1,
+      "conformer_index": 2,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1129352620,
+        "placement_seed": 1003970075
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 14,
+      "formula": "C3H7O4",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        }
+      ],
+      "xyz": "xyz/lactic_acid_anion__n1__c2.xyz",
+      "sha256": "4e40c7da4563f1401a8516d8de321d96f6786f0b800f2046db025cd9a0df16c4",
+      "derived_from": "lactic_acid__n1__c2",
+      "derived_from_positions_sha256_16": "54614e445028e806",
+      "species": "lactate(-).1H2O",
+      "derivation": "removed carboxylic H (atom 10) from optimised lactic_acid__n1__c2"
+    },
+    {
+      "id": "lactic_acid_ionpair__n1__c2",
+      "kind": "ion_pair_cluster",
+      "acid": "lactic_acid",
+      "n_water": 1,
+      "conformer_index": 2,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1129352620,
+        "placement_seed": 1003970075
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 15,
+      "formula": "C3H8O4",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 11,
+          "stop": 15
+        }
+      ],
+      "xyz": "xyz/lactic_acid_ionpair__n1__c2.xyz",
+      "sha256": "053418032d49b288bcfc009e680801e8e2690f830142ac786a5f17a0213114f3",
+      "derived_from": "lactic_acid__n1__c2",
+      "derived_from_positions_sha256_16": "54614e445028e806",
+      "species": "lactate(-).H3O(+).0H2O (contact)",
+      "derivation": "moved carboxylic H (atom 10) to water O (atom 12) of optimised lactic_acid__n1__c2"
+    },
+    {
+      "id": "lactic_acid_anion__n1__c3",
+      "kind": "anion_water_cluster",
+      "acid": "lactic_acid",
+      "n_water": 1,
+      "conformer_index": 3,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 184029028,
+        "placement_seed": 2131766322
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 14,
+      "formula": "C3H7O4",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        }
+      ],
+      "xyz": "xyz/lactic_acid_anion__n1__c3.xyz",
+      "sha256": "6934b6410470155b6e7d3a037953a52c72386a35399208e65946f031003cf935",
+      "derived_from": "lactic_acid__n1__c3",
+      "derived_from_positions_sha256_16": "66df8aa9d8aa3c37",
+      "species": "lactate(-).1H2O",
+      "derivation": "removed carboxylic H (atom 10) from optimised lactic_acid__n1__c3"
+    },
+    {
+      "id": "lactic_acid_ionpair__n1__c3",
+      "kind": "ion_pair_cluster",
+      "acid": "lactic_acid",
+      "n_water": 1,
+      "conformer_index": 3,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 184029028,
+        "placement_seed": 2131766322
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 15,
+      "formula": "C3H8O4",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 11,
+          "stop": 15
+        }
+      ],
+      "xyz": "xyz/lactic_acid_ionpair__n1__c3.xyz",
+      "sha256": "ea551854be72f39be1333c104af189cbb87ae67eaa844f20cea8f15a2ed81974",
+      "derived_from": "lactic_acid__n1__c3",
+      "derived_from_positions_sha256_16": "66df8aa9d8aa3c37",
+      "species": "lactate(-).H3O(+).0H2O (contact)",
+      "derivation": "moved carboxylic H (atom 10) to water O (atom 12) of optimised lactic_acid__n1__c3"
+    },
+    {
+      "id": "lactic_acid_anion__n1__c4",
+      "kind": "anion_water_cluster",
+      "acid": "lactic_acid",
+      "n_water": 1,
+      "conformer_index": 4,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 983565860,
+        "placement_seed": 678549980
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 14,
+      "formula": "C3H7O4",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        }
+      ],
+      "xyz": "xyz/lactic_acid_anion__n1__c4.xyz",
+      "sha256": "f0fcfc484a0aeeb685c904b480265d301af478c0918a94b4408d1e7c43001eda",
+      "derived_from": "lactic_acid__n1__c4",
+      "derived_from_positions_sha256_16": "c4e7a859168c2e6f",
+      "species": "lactate(-).1H2O",
+      "derivation": "removed carboxylic H (atom 10) from optimised lactic_acid__n1__c4"
+    },
+    {
+      "id": "lactic_acid_ionpair__n1__c4",
+      "kind": "ion_pair_cluster",
+      "acid": "lactic_acid",
+      "n_water": 1,
+      "conformer_index": 4,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 983565860,
+        "placement_seed": 678549980
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 15,
+      "formula": "C3H8O4",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 11,
+          "stop": 15
+        }
+      ],
+      "xyz": "xyz/lactic_acid_ionpair__n1__c4.xyz",
+      "sha256": "c6888d2f72b1123eabc3b329e93f35044416c87f284a159f039fe1042c23b715",
+      "derived_from": "lactic_acid__n1__c4",
+      "derived_from_positions_sha256_16": "c4e7a859168c2e6f",
+      "species": "lactate(-).H3O(+).0H2O (contact)",
+      "derivation": "moved carboxylic H (atom 10) to water O (atom 12) of optimised lactic_acid__n1__c4"
+    },
+    {
+      "id": "lactic_acid_anion__n1__c5",
+      "kind": "anion_water_cluster",
+      "acid": "lactic_acid",
+      "n_water": 1,
+      "conformer_index": 5,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1378562906,
+        "placement_seed": 258655116
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 14,
+      "formula": "C3H7O4",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        }
+      ],
+      "xyz": "xyz/lactic_acid_anion__n1__c5.xyz",
+      "sha256": "9ce504a6d4aeaee49abd14fbb0df51f0838ebfae5de8c7e6d86671c85a83b52a",
+      "derived_from": "lactic_acid__n1__c5",
+      "derived_from_positions_sha256_16": "fb9c4d3c146ac194",
+      "species": "lactate(-).1H2O",
+      "derivation": "removed carboxylic H (atom 10) from optimised lactic_acid__n1__c5"
+    },
+    {
+      "id": "lactic_acid_ionpair__n1__c5",
+      "kind": "ion_pair_cluster",
+      "acid": "lactic_acid",
+      "n_water": 1,
+      "conformer_index": 5,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1378562906,
+        "placement_seed": 258655116
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 15,
+      "formula": "C3H8O4",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 11,
+          "stop": 15
+        }
+      ],
+      "xyz": "xyz/lactic_acid_ionpair__n1__c5.xyz",
+      "sha256": "1fe1e3f3670da6a95156c2822d9bd80f34c7305d77f53b0fca8fee6c740ac9dc",
+      "derived_from": "lactic_acid__n1__c5",
+      "derived_from_positions_sha256_16": "fb9c4d3c146ac194",
+      "species": "lactate(-).H3O(+).0H2O (contact)",
+      "derivation": "moved carboxylic H (atom 10) to water O (atom 12) of optimised lactic_acid__n1__c5"
+    },
+    {
+      "id": "lactic_acid_anion__n3__c0",
+      "kind": "anion_water_cluster",
+      "acid": "lactic_acid",
+      "n_water": 3,
+      "conformer_index": 0,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 360200526,
+        "placement_seed": 646972009
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 20,
+      "formula": "C3H11O6",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 17,
+          "stop": 20
+        }
+      ],
+      "xyz": "xyz/lactic_acid_anion__n3__c0.xyz",
+      "sha256": "f86c8433f7cf780dbe58a081e658987bd260bc9e40dcef8e809d9a27d972735f",
+      "derived_from": "lactic_acid__n3__c0",
+      "derived_from_positions_sha256_16": "19de8a26dfb41c5b",
+      "species": "lactate(-).3H2O",
+      "derivation": "removed carboxylic H (atom 10) from optimised lactic_acid__n3__c0"
+    },
+    {
+      "id": "lactic_acid_ionpair__n3__c0",
+      "kind": "ion_pair_cluster",
+      "acid": "lactic_acid",
+      "n_water": 3,
+      "conformer_index": 0,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 360200526,
+        "placement_seed": 646972009
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 21,
+      "formula": "C3H12O6",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 11,
+          "stop": 15
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 15,
+          "stop": 18
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 18,
+          "stop": 21
+        }
+      ],
+      "xyz": "xyz/lactic_acid_ionpair__n3__c0.xyz",
+      "sha256": "d648bedf5177dbc4d5fa17903ee702912878510ba5c216de0a8eee812e59b6ca",
+      "derived_from": "lactic_acid__n3__c0",
+      "derived_from_positions_sha256_16": "19de8a26dfb41c5b",
+      "species": "lactate(-).H3O(+).2H2O (contact)",
+      "derivation": "moved carboxylic H (atom 10) to water O (atom 12) of optimised lactic_acid__n3__c0"
+    },
+    {
+      "id": "lactic_acid_ionpairSS__n3__c0",
+      "kind": "ion_pair_cluster",
+      "acid": "lactic_acid",
+      "n_water": 3,
+      "conformer_index": 0,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 360200526,
+        "placement_seed": 646972009
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 21,
+      "formula": "C3H12O6",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 11,
+          "stop": 15
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 15,
+          "stop": 18
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 18,
+          "stop": 21
+        }
+      ],
+      "xyz": "xyz/lactic_acid_ionpairSS__n3__c0.xyz",
+      "sha256": "d31ba9fe7d07a6fff8b586d74aa94dd8f1b46c45740683d0bbbe88b364e877c1",
+      "derived_from": "lactic_acid__n3__c0",
+      "derived_from_positions_sha256_16": "19de8a26dfb41c5b",
+      "species": "lactate(-).H3O(+).2H2O (solvent-separated)",
+      "derivation": "Grotthuss relay in optimised lactic_acid__n3__c0: acid H 10 -> water O 12, water H 13 -> water O 15"
+    },
+    {
+      "id": "lactic_acid_anion__n3__c1",
+      "kind": "anion_water_cluster",
+      "acid": "lactic_acid",
+      "n_water": 3,
+      "conformer_index": 1,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1374415276,
+        "placement_seed": 93379047
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 20,
+      "formula": "C3H11O6",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 17,
+          "stop": 20
+        }
+      ],
+      "xyz": "xyz/lactic_acid_anion__n3__c1.xyz",
+      "sha256": "3223a666d40e84abcfc5ac962a412ff9418d664429328c1cbe8a27623e3a46ac",
+      "derived_from": "lactic_acid__n3__c1",
+      "derived_from_positions_sha256_16": "0ec6fcc74c4cd385",
+      "species": "lactate(-).3H2O",
+      "derivation": "removed carboxylic H (atom 10) from optimised lactic_acid__n3__c1"
+    },
+    {
+      "id": "lactic_acid_ionpair__n3__c1",
+      "kind": "ion_pair_cluster",
+      "acid": "lactic_acid",
+      "n_water": 3,
+      "conformer_index": 1,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1374415276,
+        "placement_seed": 93379047
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 21,
+      "formula": "C3H12O6",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 11,
+          "stop": 15
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 15,
+          "stop": 18
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 18,
+          "stop": 21
+        }
+      ],
+      "xyz": "xyz/lactic_acid_ionpair__n3__c1.xyz",
+      "sha256": "0b979288bc3a93c8122ef9cbcaf07b42b78d974630263a3e3153e9b360855566",
+      "derived_from": "lactic_acid__n3__c1",
+      "derived_from_positions_sha256_16": "0ec6fcc74c4cd385",
+      "species": "lactate(-).H3O(+).2H2O (contact)",
+      "derivation": "moved carboxylic H (atom 10) to water O (atom 12) of optimised lactic_acid__n3__c1"
+    },
+    {
+      "id": "lactic_acid_ionpairSS__n3__c1",
+      "kind": "ion_pair_cluster",
+      "acid": "lactic_acid",
+      "n_water": 3,
+      "conformer_index": 1,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1374415276,
+        "placement_seed": 93379047
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 21,
+      "formula": "C3H12O6",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 11,
+          "stop": 15
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 15,
+          "stop": 18
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 18,
+          "stop": 21
+        }
+      ],
+      "xyz": "xyz/lactic_acid_ionpairSS__n3__c1.xyz",
+      "sha256": "33fe20ebd468990204d5b828d0fc75c241acb1bbe082a489f2f2ecf87c295973",
+      "derived_from": "lactic_acid__n3__c1",
+      "derived_from_positions_sha256_16": "0ec6fcc74c4cd385",
+      "species": "lactate(-).H3O(+).2H2O (solvent-separated)",
+      "derivation": "Grotthuss relay in optimised lactic_acid__n3__c1: acid H 10 -> water O 12, water H 14 -> water O 15"
+    },
+    {
+      "id": "lactic_acid_anion__n3__c2",
+      "kind": "anion_water_cluster",
+      "acid": "lactic_acid",
+      "n_water": 3,
+      "conformer_index": 2,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 545252448,
+        "placement_seed": 625709192
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 20,
+      "formula": "C3H11O6",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 17,
+          "stop": 20
+        }
+      ],
+      "xyz": "xyz/lactic_acid_anion__n3__c2.xyz",
+      "sha256": "6a6a231c5943960cc975c1b9a284f9513afbb5be26bf65872965d4b50f2daaea",
+      "derived_from": "lactic_acid__n3__c2",
+      "derived_from_positions_sha256_16": "cf67d9113956aced",
+      "species": "lactate(-).3H2O",
+      "derivation": "removed carboxylic H (atom 10) from optimised lactic_acid__n3__c2"
+    },
+    {
+      "id": "lactic_acid_ionpair__n3__c2",
+      "kind": "ion_pair_cluster",
+      "acid": "lactic_acid",
+      "n_water": 3,
+      "conformer_index": 2,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 545252448,
+        "placement_seed": 625709192
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 21,
+      "formula": "C3H12O6",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 11,
+          "stop": 15
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 15,
+          "stop": 18
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 18,
+          "stop": 21
+        }
+      ],
+      "xyz": "xyz/lactic_acid_ionpair__n3__c2.xyz",
+      "sha256": "d8681e72907488aaf5231bf1f94a4b27e1474e5f4810c527e626313dccdb69e6",
+      "derived_from": "lactic_acid__n3__c2",
+      "derived_from_positions_sha256_16": "cf67d9113956aced",
+      "species": "lactate(-).H3O(+).2H2O (contact)",
+      "derivation": "moved carboxylic H (atom 10) to water O (atom 12) of optimised lactic_acid__n3__c2"
+    },
+    {
+      "id": "lactic_acid_ionpairSS__n3__c2",
+      "kind": "ion_pair_cluster",
+      "acid": "lactic_acid",
+      "n_water": 3,
+      "conformer_index": 2,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 545252448,
+        "placement_seed": 625709192
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 21,
+      "formula": "C3H12O6",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 11,
+          "stop": 15
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 15,
+          "stop": 18
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 18,
+          "stop": 21
+        }
+      ],
+      "xyz": "xyz/lactic_acid_ionpairSS__n3__c2.xyz",
+      "sha256": "222b3e662a7c0a5032171ea37e71b450efb56664b0be478ea4c05893f888c3e0",
+      "derived_from": "lactic_acid__n3__c2",
+      "derived_from_positions_sha256_16": "cf67d9113956aced",
+      "species": "lactate(-).H3O(+).2H2O (solvent-separated)",
+      "derivation": "Grotthuss relay in optimised lactic_acid__n3__c2: acid H 10 -> water O 12, water H 14 -> water O 18"
+    },
+    {
+      "id": "lactic_acid_anion__n3__c3",
+      "kind": "anion_water_cluster",
+      "acid": "lactic_acid",
+      "n_water": 3,
+      "conformer_index": 3,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 332614080,
+        "placement_seed": 1069325478
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 20,
+      "formula": "C3H11O6",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 17,
+          "stop": 20
+        }
+      ],
+      "xyz": "xyz/lactic_acid_anion__n3__c3.xyz",
+      "sha256": "225d569ddc7c644ffe13f7627d520449bdc8210d11ffec57fd25dd97ae081e68",
+      "derived_from": "lactic_acid__n3__c3",
+      "derived_from_positions_sha256_16": "af39781a23421e0e",
+      "species": "lactate(-).3H2O",
+      "derivation": "removed carboxylic H (atom 10) from optimised lactic_acid__n3__c3"
+    },
+    {
+      "id": "lactic_acid_ionpair__n3__c3",
+      "kind": "ion_pair_cluster",
+      "acid": "lactic_acid",
+      "n_water": 3,
+      "conformer_index": 3,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 332614080,
+        "placement_seed": 1069325478
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 21,
+      "formula": "C3H12O6",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 11,
+          "stop": 15
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 15,
+          "stop": 18
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 18,
+          "stop": 21
+        }
+      ],
+      "xyz": "xyz/lactic_acid_ionpair__n3__c3.xyz",
+      "sha256": "0772b4ccee71a83979bab32cf9eaac081ee190fd2f5b5ca951f68eaa2325d40a",
+      "derived_from": "lactic_acid__n3__c3",
+      "derived_from_positions_sha256_16": "af39781a23421e0e",
+      "species": "lactate(-).H3O(+).2H2O (contact)",
+      "derivation": "moved carboxylic H (atom 10) to water O (atom 12) of optimised lactic_acid__n3__c3"
+    },
+    {
+      "id": "lactic_acid_anion__n3__c4",
+      "kind": "anion_water_cluster",
+      "acid": "lactic_acid",
+      "n_water": 3,
+      "conformer_index": 4,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 829400067,
+        "placement_seed": 529202121
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 20,
+      "formula": "C3H11O6",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 17,
+          "stop": 20
+        }
+      ],
+      "xyz": "xyz/lactic_acid_anion__n3__c4.xyz",
+      "sha256": "ce005907082eb52397cfe6d772fb3a99875fb70145dac98b2bb275ec741ccbbb",
+      "derived_from": "lactic_acid__n3__c4",
+      "derived_from_positions_sha256_16": "68cc762a3dbe475a",
+      "species": "lactate(-).3H2O",
+      "derivation": "removed carboxylic H (atom 10) from optimised lactic_acid__n3__c4"
+    },
+    {
+      "id": "lactic_acid_ionpair__n3__c4",
+      "kind": "ion_pair_cluster",
+      "acid": "lactic_acid",
+      "n_water": 3,
+      "conformer_index": 4,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 829400067,
+        "placement_seed": 529202121
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 21,
+      "formula": "C3H12O6",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 11,
+          "stop": 15
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 15,
+          "stop": 18
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 18,
+          "stop": 21
+        }
+      ],
+      "xyz": "xyz/lactic_acid_ionpair__n3__c4.xyz",
+      "sha256": "9aafc695160ed31a81d3d08cf3249656efcd9c9594fb38174553a2f59afa42a0",
+      "derived_from": "lactic_acid__n3__c4",
+      "derived_from_positions_sha256_16": "68cc762a3dbe475a",
+      "species": "lactate(-).H3O(+).2H2O (contact)",
+      "derivation": "moved carboxylic H (atom 10) to water O (atom 18) of optimised lactic_acid__n3__c4"
+    },
+    {
+      "id": "lactic_acid_anion__n3__c5",
+      "kind": "anion_water_cluster",
+      "acid": "lactic_acid",
+      "n_water": 3,
+      "conformer_index": 5,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 2110668736,
+        "placement_seed": 710267726
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 20,
+      "formula": "C3H11O6",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 17,
+          "stop": 20
+        }
+      ],
+      "xyz": "xyz/lactic_acid_anion__n3__c5.xyz",
+      "sha256": "a80bc53ad93311f233c4bb8b9dc79bb5e798c325942ba6e653782b53b185142d",
+      "derived_from": "lactic_acid__n3__c5",
+      "derived_from_positions_sha256_16": "1488cf95c41fe279",
+      "species": "lactate(-).3H2O",
+      "derivation": "removed carboxylic H (atom 10) from optimised lactic_acid__n3__c5"
+    },
+    {
+      "id": "lactic_acid_ionpair__n3__c5",
+      "kind": "ion_pair_cluster",
+      "acid": "lactic_acid",
+      "n_water": 3,
+      "conformer_index": 5,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 2110668736,
+        "placement_seed": 710267726
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 21,
+      "formula": "C3H12O6",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 11,
+          "stop": 15
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 15,
+          "stop": 18
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 18,
+          "stop": 21
+        }
+      ],
+      "xyz": "xyz/lactic_acid_ionpair__n3__c5.xyz",
+      "sha256": "2896705bf304096e33b1c45c096e3d20b354b31fac3fc5ea81361a5a6997bf36",
+      "derived_from": "lactic_acid__n3__c5",
+      "derived_from_positions_sha256_16": "1488cf95c41fe279",
+      "species": "lactate(-).H3O(+).2H2O (contact)",
+      "derivation": "moved carboxylic H (atom 10) to water O (atom 12) of optimised lactic_acid__n3__c5"
+    },
+    {
+      "id": "lactic_acid_anion__n6__c0",
+      "kind": "anion_water_cluster",
+      "acid": "lactic_acid",
+      "n_water": 6,
+      "conformer_index": 0,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 86164480,
+        "placement_seed": 1710886896
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 29,
+      "formula": "C3H17O9",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 17,
+          "stop": 20
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 20,
+          "stop": 23
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 23,
+          "stop": 26
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 26,
+          "stop": 29
+        }
+      ],
+      "xyz": "xyz/lactic_acid_anion__n6__c0.xyz",
+      "sha256": "c54ec8b2d2b8aeb4352a728ecbce3e1585fb721daa96582d2fad2203bdc07da4",
+      "derived_from": "lactic_acid__n6__c0",
+      "derived_from_positions_sha256_16": "bbacb558b5e7c5c0",
+      "species": "lactate(-).6H2O",
+      "derivation": "removed carboxylic H (atom 10) from optimised lactic_acid__n6__c0"
+    },
+    {
+      "id": "lactic_acid_ionpair__n6__c0",
+      "kind": "ion_pair_cluster",
+      "acid": "lactic_acid",
+      "n_water": 6,
+      "conformer_index": 0,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 86164480,
+        "placement_seed": 1710886896
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 30,
+      "formula": "C3H18O9",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 11,
+          "stop": 15
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 15,
+          "stop": 18
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 18,
+          "stop": 21
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 21,
+          "stop": 24
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 24,
+          "stop": 27
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 27,
+          "stop": 30
+        }
+      ],
+      "xyz": "xyz/lactic_acid_ionpair__n6__c0.xyz",
+      "sha256": "445a938617de6f3afde211cba9a5cc2c037086d75894ebd5b871d80889e6dea1",
+      "derived_from": "lactic_acid__n6__c0",
+      "derived_from_positions_sha256_16": "bbacb558b5e7c5c0",
+      "species": "lactate(-).H3O(+).5H2O (contact)",
+      "derivation": "moved carboxylic H (atom 10) to water O (atom 21) of optimised lactic_acid__n6__c0"
+    },
+    {
+      "id": "lactic_acid_ionpairSS__n6__c0",
+      "kind": "ion_pair_cluster",
+      "acid": "lactic_acid",
+      "n_water": 6,
+      "conformer_index": 0,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 86164480,
+        "placement_seed": 1710886896
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 30,
+      "formula": "C3H18O9",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 11,
+          "stop": 15
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 15,
+          "stop": 18
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 18,
+          "stop": 21
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 21,
+          "stop": 24
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 24,
+          "stop": 27
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 27,
+          "stop": 30
+        }
+      ],
+      "xyz": "xyz/lactic_acid_ionpairSS__n6__c0.xyz",
+      "sha256": "40a1147e04abb5a5c6841f3481b67dd0f739edbaaa7a1402625486ca93fefb76",
+      "derived_from": "lactic_acid__n6__c0",
+      "derived_from_positions_sha256_16": "bbacb558b5e7c5c0",
+      "species": "lactate(-).H3O(+).5H2O (solvent-separated)",
+      "derivation": "Grotthuss relay in optimised lactic_acid__n6__c0: acid H 10 -> water O 21, water H 22 -> water O 24"
+    },
+    {
+      "id": "lactic_acid_anion__n6__c1",
+      "kind": "anion_water_cluster",
+      "acid": "lactic_acid",
+      "n_water": 6,
+      "conformer_index": 1,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 380582539,
+        "placement_seed": 190742038
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 29,
+      "formula": "C3H17O9",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 17,
+          "stop": 20
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 20,
+          "stop": 23
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 23,
+          "stop": 26
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 26,
+          "stop": 29
+        }
+      ],
+      "xyz": "xyz/lactic_acid_anion__n6__c1.xyz",
+      "sha256": "df5080551ec3369d11e92c973dca407cb6e1bbd10314a86ccd7e85481c5164ff",
+      "derived_from": "lactic_acid__n6__c1",
+      "derived_from_positions_sha256_16": "a22be09c9dee1ecf",
+      "species": "lactate(-).6H2O",
+      "derivation": "removed carboxylic H (atom 10) from optimised lactic_acid__n6__c1"
+    },
+    {
+      "id": "lactic_acid_ionpair__n6__c1",
+      "kind": "ion_pair_cluster",
+      "acid": "lactic_acid",
+      "n_water": 6,
+      "conformer_index": 1,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 380582539,
+        "placement_seed": 190742038
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 30,
+      "formula": "C3H18O9",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 11,
+          "stop": 15
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 15,
+          "stop": 18
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 18,
+          "stop": 21
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 21,
+          "stop": 24
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 24,
+          "stop": 27
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 27,
+          "stop": 30
+        }
+      ],
+      "xyz": "xyz/lactic_acid_ionpair__n6__c1.xyz",
+      "sha256": "2d7d73ecfc21f1fafea05fd5b4bb100efd956d310f475b944c87d9b53df20a87",
+      "derived_from": "lactic_acid__n6__c1",
+      "derived_from_positions_sha256_16": "a22be09c9dee1ecf",
+      "species": "lactate(-).H3O(+).5H2O (contact)",
+      "derivation": "moved carboxylic H (atom 10) to water O (atom 27) of optimised lactic_acid__n6__c1"
+    },
+    {
+      "id": "lactic_acid_ionpairSS__n6__c1",
+      "kind": "ion_pair_cluster",
+      "acid": "lactic_acid",
+      "n_water": 6,
+      "conformer_index": 1,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 380582539,
+        "placement_seed": 190742038
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 30,
+      "formula": "C3H18O9",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 11,
+          "stop": 15
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 15,
+          "stop": 18
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 18,
+          "stop": 21
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 21,
+          "stop": 24
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 24,
+          "stop": 27
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 27,
+          "stop": 30
+        }
+      ],
+      "xyz": "xyz/lactic_acid_ionpairSS__n6__c1.xyz",
+      "sha256": "422e02a6acb960d930ea4aed8acaec1920fde138d4544bd04a6afc75a82b9f64",
+      "derived_from": "lactic_acid__n6__c1",
+      "derived_from_positions_sha256_16": "a22be09c9dee1ecf",
+      "species": "lactate(-).H3O(+).5H2O (solvent-separated)",
+      "derivation": "Grotthuss relay in optimised lactic_acid__n6__c1: acid H 10 -> water O 27, water H 29 -> water O 12"
+    },
+    {
+      "id": "lactic_acid_anion__n6__c2",
+      "kind": "anion_water_cluster",
+      "acid": "lactic_acid",
+      "n_water": 6,
+      "conformer_index": 2,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 747551818,
+        "placement_seed": 579425472
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 29,
+      "formula": "C3H17O9",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 17,
+          "stop": 20
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 20,
+          "stop": 23
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 23,
+          "stop": 26
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 26,
+          "stop": 29
+        }
+      ],
+      "xyz": "xyz/lactic_acid_anion__n6__c2.xyz",
+      "sha256": "bd698e92b72ea75b4fdbf2ac379a20d4c9f26ff945c3c95294d67769698dcc45",
+      "derived_from": "lactic_acid__n6__c2",
+      "derived_from_positions_sha256_16": "bae99e3f4a83ddd1",
+      "species": "lactate(-).6H2O",
+      "derivation": "removed carboxylic H (atom 10) from optimised lactic_acid__n6__c2"
+    },
+    {
+      "id": "lactic_acid_ionpair__n6__c2",
+      "kind": "ion_pair_cluster",
+      "acid": "lactic_acid",
+      "n_water": 6,
+      "conformer_index": 2,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 747551818,
+        "placement_seed": 579425472
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 30,
+      "formula": "C3H18O9",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 11,
+          "stop": 15
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 15,
+          "stop": 18
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 18,
+          "stop": 21
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 21,
+          "stop": 24
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 24,
+          "stop": 27
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 27,
+          "stop": 30
+        }
+      ],
+      "xyz": "xyz/lactic_acid_ionpair__n6__c2.xyz",
+      "sha256": "7c596802dc046a18dc22fe6ab2541a2b42aa0abdefc99a0648d8b56f81c36971",
+      "derived_from": "lactic_acid__n6__c2",
+      "derived_from_positions_sha256_16": "bae99e3f4a83ddd1",
+      "species": "lactate(-).H3O(+).5H2O (contact)",
+      "derivation": "moved carboxylic H (atom 10) to water O (atom 21) of optimised lactic_acid__n6__c2"
+    },
+    {
+      "id": "lactic_acid_ionpairSS__n6__c2",
+      "kind": "ion_pair_cluster",
+      "acid": "lactic_acid",
+      "n_water": 6,
+      "conformer_index": 2,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 747551818,
+        "placement_seed": 579425472
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 30,
+      "formula": "C3H18O9",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 11,
+          "stop": 15
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 15,
+          "stop": 18
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 18,
+          "stop": 21
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 21,
+          "stop": 24
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 24,
+          "stop": 27
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 27,
+          "stop": 30
+        }
+      ],
+      "xyz": "xyz/lactic_acid_ionpairSS__n6__c2.xyz",
+      "sha256": "d1f9178ab2572527e31b966a51923a540d92ea0f3c8545e018d785677ca5efd8",
+      "derived_from": "lactic_acid__n6__c2",
+      "derived_from_positions_sha256_16": "bae99e3f4a83ddd1",
+      "species": "lactate(-).H3O(+).5H2O (solvent-separated)",
+      "derivation": "Grotthuss relay in optimised lactic_acid__n6__c2: acid H 10 -> water O 21, water H 22 -> water O 12"
+    },
+    {
+      "id": "lactic_acid_anion__n6__c3",
+      "kind": "anion_water_cluster",
+      "acid": "lactic_acid",
+      "n_water": 6,
+      "conformer_index": 3,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 2067487448,
+        "placement_seed": 651036595
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 29,
+      "formula": "C3H17O9",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 17,
+          "stop": 20
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 20,
+          "stop": 23
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 23,
+          "stop": 26
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 26,
+          "stop": 29
+        }
+      ],
+      "xyz": "xyz/lactic_acid_anion__n6__c3.xyz",
+      "sha256": "ec24fdd28ac063339213b2ba08a17b6ebbf1baf14fbe5fad627868a2eff26e8f",
+      "derived_from": "lactic_acid__n6__c3",
+      "derived_from_positions_sha256_16": "8feccc36a08274e2",
+      "species": "lactate(-).6H2O",
+      "derivation": "removed carboxylic H (atom 10) from optimised lactic_acid__n6__c3"
+    },
+    {
+      "id": "lactic_acid_ionpair__n6__c3",
+      "kind": "ion_pair_cluster",
+      "acid": "lactic_acid",
+      "n_water": 6,
+      "conformer_index": 3,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 2067487448,
+        "placement_seed": 651036595
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 30,
+      "formula": "C3H18O9",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 11,
+          "stop": 15
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 15,
+          "stop": 18
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 18,
+          "stop": 21
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 21,
+          "stop": 24
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 24,
+          "stop": 27
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 27,
+          "stop": 30
+        }
+      ],
+      "xyz": "xyz/lactic_acid_ionpair__n6__c3.xyz",
+      "sha256": "c6d4298bc1a37b3e2a959ab6d38f521c034763f77bf2bb806560aa22966cdf46",
+      "derived_from": "lactic_acid__n6__c3",
+      "derived_from_positions_sha256_16": "8feccc36a08274e2",
+      "species": "lactate(-).H3O(+).5H2O (contact)",
+      "derivation": "moved carboxylic H (atom 10) to water O (atom 15) of optimised lactic_acid__n6__c3"
+    },
+    {
+      "id": "lactic_acid_anion__n6__c4",
+      "kind": "anion_water_cluster",
+      "acid": "lactic_acid",
+      "n_water": 6,
+      "conformer_index": 4,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1723133795,
+        "placement_seed": 1482550605
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 29,
+      "formula": "C3H17O9",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 17,
+          "stop": 20
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 20,
+          "stop": 23
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 23,
+          "stop": 26
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 26,
+          "stop": 29
+        }
+      ],
+      "xyz": "xyz/lactic_acid_anion__n6__c4.xyz",
+      "sha256": "e4fc1f7b8655ccaa21076c29a4b34548a8f01da01bf9f3581449b7904ecacaf8",
+      "derived_from": "lactic_acid__n6__c4",
+      "derived_from_positions_sha256_16": "3bbd399269d104e4",
+      "species": "lactate(-).6H2O",
+      "derivation": "removed carboxylic H (atom 10) from optimised lactic_acid__n6__c4"
+    },
+    {
+      "id": "lactic_acid_ionpair__n6__c4",
+      "kind": "ion_pair_cluster",
+      "acid": "lactic_acid",
+      "n_water": 6,
+      "conformer_index": 4,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1723133795,
+        "placement_seed": 1482550605
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 30,
+      "formula": "C3H18O9",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 11,
+          "stop": 15
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 15,
+          "stop": 18
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 18,
+          "stop": 21
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 21,
+          "stop": 24
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 24,
+          "stop": 27
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 27,
+          "stop": 30
+        }
+      ],
+      "xyz": "xyz/lactic_acid_ionpair__n6__c4.xyz",
+      "sha256": "624d9a5ba9c933adb22c1a4529ae67318a275a39d43b1536cbb389fe298a184d",
+      "derived_from": "lactic_acid__n6__c4",
+      "derived_from_positions_sha256_16": "3bbd399269d104e4",
+      "species": "lactate(-).H3O(+).5H2O (contact)",
+      "derivation": "moved carboxylic H (atom 10) to water O (atom 18) of optimised lactic_acid__n6__c4"
+    },
+    {
+      "id": "lactic_acid_ionpairSS__n6__c4",
+      "kind": "ion_pair_cluster",
+      "acid": "lactic_acid",
+      "n_water": 6,
+      "conformer_index": 4,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1723133795,
+        "placement_seed": 1482550605
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 30,
+      "formula": "C3H18O9",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 11,
+          "stop": 15
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 15,
+          "stop": 18
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 18,
+          "stop": 21
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 21,
+          "stop": 24
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 24,
+          "stop": 27
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 27,
+          "stop": 30
+        }
+      ],
+      "xyz": "xyz/lactic_acid_ionpairSS__n6__c4.xyz",
+      "sha256": "89eac6a8247806927679059f0c72c0b21b689ec2ff91dc1c961283fa9b4d005a",
+      "derived_from": "lactic_acid__n6__c4",
+      "derived_from_positions_sha256_16": "3bbd399269d104e4",
+      "species": "lactate(-).H3O(+).5H2O (solvent-separated)",
+      "derivation": "Grotthuss relay in optimised lactic_acid__n6__c4: acid H 10 -> water O 18, water H 20 -> water O 24"
+    },
+    {
+      "id": "lactic_acid_anion__n6__c5",
+      "kind": "anion_water_cluster",
+      "acid": "lactic_acid",
+      "n_water": 6,
+      "conformer_index": 5,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1536544806,
+        "placement_seed": 619090912
+      },
+      "charge": -1,
+      "multiplicity": 1,
+      "n_atoms": 29,
+      "formula": "C3H17O9",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 11,
+          "stop": 14
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 14,
+          "stop": 17
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 17,
+          "stop": 20
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 20,
+          "stop": 23
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 23,
+          "stop": 26
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 26,
+          "stop": 29
+        }
+      ],
+      "xyz": "xyz/lactic_acid_anion__n6__c5.xyz",
+      "sha256": "f72cd16ee52eb0d79d2778e8ae9a67ed8212d517cbfd8ea707cf873469d110f4",
+      "derived_from": "lactic_acid__n6__c5",
+      "derived_from_positions_sha256_16": "fd8eba8b19953423",
+      "species": "lactate(-).6H2O",
+      "derivation": "removed carboxylic H (atom 10) from optimised lactic_acid__n6__c5"
+    },
+    {
+      "id": "lactic_acid_ionpair__n6__c5",
+      "kind": "ion_pair_cluster",
+      "acid": "lactic_acid",
+      "n_water": 6,
+      "conformer_index": 5,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1536544806,
+        "placement_seed": 619090912
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 30,
+      "formula": "C3H18O9",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 11,
+          "stop": 15
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 15,
+          "stop": 18
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 18,
+          "stop": 21
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 21,
+          "stop": 24
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 24,
+          "stop": 27
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 27,
+          "stop": 30
+        }
+      ],
+      "xyz": "xyz/lactic_acid_ionpair__n6__c5.xyz",
+      "sha256": "34aed35808fe8fd84411e8d0b1e60618a3ec97ef314a177fa9f47022e5814851",
+      "derived_from": "lactic_acid__n6__c5",
+      "derived_from_positions_sha256_16": "fd8eba8b19953423",
+      "species": "lactate(-).H3O(+).5H2O (contact)",
+      "derivation": "moved carboxylic H (atom 10) to water O (atom 15) of optimised lactic_acid__n6__c5"
+    },
+    {
+      "id": "lactic_acid_ionpairSS__n6__c5",
+      "kind": "ion_pair_cluster",
+      "acid": "lactic_acid",
+      "n_water": 6,
+      "conformer_index": 5,
+      "seeds": {
+        "base_seed": 20261031,
+        "etkdg_seed": 1536544806,
+        "placement_seed": 619090912
+      },
+      "charge": 0,
+      "multiplicity": 1,
+      "n_atoms": 30,
+      "formula": "C3H18O9",
+      "fragments": [
+        {
+          "name": "lactate",
+          "smiles": "C[C@@H](C(=O)[O-])O",
+          "start": 0,
+          "stop": 11
+        },
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 11,
+          "stop": 15
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 15,
+          "stop": 18
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 18,
+          "stop": 21
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 21,
+          "stop": 24
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 24,
+          "stop": 27
+        },
+        {
+          "name": "water",
+          "smiles": "O",
+          "start": 27,
+          "stop": 30
+        }
+      ],
+      "xyz": "xyz/lactic_acid_ionpairSS__n6__c5.xyz",
+      "sha256": "9bc0fa429fb152066bf65b209df837a00db4715574ba18823789f45431d10cff",
+      "derived_from": "lactic_acid__n6__c5",
+      "derived_from_positions_sha256_16": "fd8eba8b19953423",
+      "species": "lactate(-).H3O(+).5H2O (solvent-separated)",
+      "derivation": "Grotthuss relay in optimised lactic_acid__n6__c5: acid H 10 -> water O 15, water H 16 -> water O 24"
+    },
+    {
+      "id": "hydronium__n0__c0",
+      "kind": "hydronium",
+      "acid": null,
+      "n_water": 0,
+      "conformer_index": 0,
+      "seeds": {
+        "base_seed": 20261031
+      },
+      "charge": 1,
+      "multiplicity": 1,
+      "n_atoms": 4,
+      "formula": "H3O",
+      "fragments": [
+        {
+          "name": "hydronium",
+          "smiles": "[OH3+]",
+          "start": 0,
+          "stop": 4
+        }
+      ],
+      "xyz": "xyz/hydronium__n0__c0.xyz",
+      "sha256": "bc8bb61eeaebecc0f2b7fc2df00b3d72e5ed0b99e05cd9be31ab0eb3dd02721a",
+      "species": "H3O(+)",
+      "derivation": "idealised pyramidal geometry (r(OH)=0.98 A)"
+    }
+  ]
+}

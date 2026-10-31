@@ -1,0 +1,46 @@
+{
+  "generated_at_utc": "2026-10-31T04:23:08Z",
+  "versions": {
+    "python": "3.12.16",
+    "platform": "Linux-6.8.0-90-generic-x86_64-with-glibc2.35",
+    "nvalchemi-toolkit": "0.2.0",
+    "nvalchemi-toolkit-ops": "0.5.0",
+    "aimnet": "0.2.5",
+    "torch": "2.10.0",
+    "warp-lang": "1.18.0+cu12",
+    "ase": "3.29.0",
+    "nvidia-physicsnemo": "2.2.2",
+    "numpy": "2.2.6",
+    "torch_cuda": "12.8",
+    "cudnn": 91002,
+    "gpu": "NVIDIA RTX A6000",
+    "gpu_capability": "8.6",
+    "gpu_memory_gb": 50.91
+  },
+  "device": "cuda:0",
+  "checkpoint": {
+    "name": "aimnet2_wb97m_d3_3",
+    "registry_functions": [
+      "get_model_path",
+      "load_model_registry"
+    ],
+    "path": "/home/shadeform/.cache/aimnet/aimnet2_wb97m_d3_3.pt",
+    "sha256": "0c5f26b9de15c72a9ccb1d411b3b7814816bb06cca46f784dccd1f5efb2c334b",
+    "size_bytes": 8836941,
+    "cutoff_angstrom": 5.0,
+    "n_parameters": 2205593
+  },
+  "d3_params_used": {
+    "s6": 1.0,
+    "a1": 0.566,
+    "s8": 0.3908,
+    "a2": 3.128
+  },
+  "d3_params_config": {
+    "s6": 1.0,
+    "a1": 0.566,
+    "s8": 0.3908,
+    "a2": 3.128
+  },
+  "aimnet2_load_seconds": 31.801539421081543
+}

@@ -1,0 +1,110 @@
+{
+ "id": "acetic_acid_anion__n6__c4__T278.15K",
+ "start_structure": "acetic_acid_anion__n6__c4",
+ "temperature_k": 278.15,
+ "n_steps": 4000,
+ "timestep_fs": 0.5,
+ "friction_per_fs": 0.01,
+ "seed": 20261031,
+ "integrator": "nvalchemi.dynamics.NVTLangevin (BAOAB)",
+ "checkpoint": "aimnet2_wb97m_d3_3",
+ "versions": {
+  "python": "3.12.16",
+  "platform": "Linux-6.8.0-90-generic-x86_64-with-glibc2.35",
+  "nvalchemi-toolkit": "0.2.0",
+  "nvalchemi-toolkit-ops": "0.5.0",
+  "aimnet": "0.2.5",
+  "torch": "2.10.0",
+  "warp-lang": "1.18.0+cu12",
+  "ase": "3.29.0",
+  "nvidia-physicsnemo": "2.2.2",
+  "numpy": "2.2.6",
+  "torch_cuda": "12.8",
+  "cudnn": 91002,
+  "gpu": "NVIDIA RTX A6000",
+  "gpu_capability": "8.6",
+  "gpu_memory_gb": 50.91
+ },
+ "provenance": "real: ALCHEMI/AIMNet2 on NVIDIA RTX A6000",
+ "started_at_utc": "2026-10-31T04:22:12Z",
+ "status": "completed",
+ "wall_seconds": 170.19400668144226,
+ "n_frames": 200,
+ "frame_every_steps": 20,
+ "ns_per_day": 1.015311898282267,
+ "mean_temperature_second_half_k": 279.18501708984377,
+ "std_temperature_second_half_k": 36.96458353487317,
+ "n_logged_rows": 400,
+ "finished_at_utc": "2026-10-31T04:25:03Z",
+ "symbols": [
+  "C",
+  "C",
+  "O",
+  "O",
+  "H",
+  "H",
+  "H",
+  "O",
+  "H",
+  "H",
+  "O",
+  "H",
+  "H",
+  "O",
+  "H",
+  "H",
+  "O",
+  "H",
+  "H",
+  "O",
+  "H",
+  "H",
+  "O",
+  "H",
+  "H"
+ ],
+ "fragments": [
+  {
+   "name": "acetate",
+   "smiles": "CC(=O)[O-]",
+   "start": 0,
+   "stop": 7
+  },
+  {
+   "name": "water",
+   "smiles": "O",
+   "start": 7,
+   "stop": 10
+  },
+  {
+   "name": "water",
+   "smiles": "O",
+   "start": 10,
+   "stop": 13
+  },
+  {
+   "name": "water",
+   "smiles": "O",
+   "start": 13,
+   "stop": 16
+  },
+  {
+   "name": "water",
+   "smiles": "O",
+   "start": 16,
+   "stop": 19
+  },
+  {
+   "name": "water",
+   "smiles": "O",
+   "start": 19,
+   "stop": 22
+  },
+  {
+   "name": "water",
+   "smiles": "O",
+   "start": 22,
+   "stop": 25
+  }
+ ]
+}

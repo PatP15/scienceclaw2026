@@ -1,0 +1,1 @@
+Sequential MD run started 04:02:09Z, stopped at ~04:03:30Z by operator before any trajectory finished; replaced by 4 parallel md runs (one cluster each) to use idle CPU cores. No results were written by this run.

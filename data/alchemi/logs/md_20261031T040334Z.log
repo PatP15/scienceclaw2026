@@ -1,0 +1,18 @@
+[2026-10-31T04:03:37Z] mode=md device=cuda:0 versions={"python": "3.12.16", "platform": "Linux-6.8.0-90-generic-x86_64-with-glibc2.35", "nvalchemi-toolkit": "0.2.0", "nvalchemi-toolkit-ops": "0.5.0", "aimnet": "0.2.5", "torch": "2.10.0", "warp-lang": "1.18.0+cu12", "ase": "3.29.0", "nvidia-physicsnemo": "2.2.2", "numpy": "2.2.6", "torch_cuda": "12.8", "cudnn": 91002, "gpu": "NVIDIA RTX A6000", "gpu_capability": "8.6", "gpu_memory_gb": 50.91}
+Warp 1.18.0 initialized:
+   CUDA Toolkit 12.9, Driver 12.8
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA RTX A6000" (47 GiB, sm_86, mempool enabled)
+   Kernel cache:
+     /home/shadeform/.cache/warp/1.18.0
+/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemi/models/aimnet2.py:353: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  values = [float(v) for v in (rc_s, rc_v) if v is not None]
+[2026-10-31T04:04:05Z] AIMNet2 'aimnet2_wb97m_d3_3' loaded on cuda:0 in 22.2s; D3(BJ) params used: {'s6': 1.0, 'a1': 0.566, 's8': 0.3908, 'a2': 3.128}
+[2026-10-31T04:06:04Z] MD acetic_acid__n3__c4__T278.15K: completed <T>=270.28888465881346 K, 118.0s
+[2026-10-31T04:08:04Z] MD acetic_acid__n3__c4__T295.15K: completed <T>=302.77806144714356 K, 120.6s
+[2026-10-31T04:10:03Z] MD acetic_acid__n3__c4__T300.15K: completed <T>=311.01659439086916 K, 118.3s
+[2026-10-31T04:12:11Z] MD acetic_acid__n3__c4__T310.15K: completed <T>=312.5853046417236 K, 128.9s
+[2026-10-31T04:12:11Z] total wall time 514.8s
+exit_code=0

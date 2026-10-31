@@ -1,0 +1,100 @@
+Sat Oct 31 03:47:20 AM UTC 2026
+NVIDIA RTX A6000
+Warp UserWarning: 
+   Insufficient CUDA driver version.
+   The minimum required CUDA driver version is 13.0, but the installed CUDA driver version is 12.8.
+   Visit https://nvidia.github.io/warp/stable/user_guide/installation.html for guidance.
+
+Batch: 10 clusters, 150 atoms, box=60.0 Å, device=cuda:0
+Downloading https://storage.googleapis.com/aimnetcentral/aimnet2v2/AIMNet2/aimnet2_wb97m_d3_3.pt -> /home/shadeform/.cache/aimnet/aimnet2_wb97m_d3_3.pt
+Loaded AIMNet2 on cuda:0
+
+Pipeline: ['AIMNet2Wrapper', 'EwaldModelWrapper']
+  Output Capabilities: ['charges', 'energy', 'forces', 'stress']
+  Active Outputs: ['charges', 'energy', 'forces', 'stress']
+Traceback (most recent call last):
+  File "/home/shadeform/fermentai/results/official_example/08_aimnet2_ewald_pipeline.py", line 237, in <module>
+    batch = optimizer.run(batch)
+            ^^^^^^^^^^^^^^^^^^^^
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemi/dynamics/base.py", line 1994, in run
+    batch, _converged = self.step(batch)
+                        ^^^^^^^^^^^^^^^^
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemi/dynamics/base.py", line 1926, in step
+    self.pre_update(batch)
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemi/dynamics/optimizers/fire2.py", line 207, in pre_update
+    fire2_step_coord(
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemi/dynamics/_ops/fire.py", line 536, in fire2_step_coord
+    _fire2_coord(
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemiops/torch/fire2.py", line 558, in fire2_step_coord
+    _fire2_step_coord_op(
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_library/custom_ops.py", line 698, in __call__
+    return self._opoverload(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_ops.py", line 819, in __call__
+    return self._op(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_library/autograd.py", line 112, in autograd_impl
+    result = forward_no_grad(*args, Metadata(keyset, keyword_only_args))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_library/autograd.py", line 41, in forward_no_grad
+    result = op.redispatch(keyset & _C._after_autograd_keyset, *args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_ops.py", line 826, in redispatch
+    return self._handle.redispatch_boxed(keyset, *args, **kwargs)  # type: ignore[return-value]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_library/custom_ops.py", line 662, in adinplaceorview_impl
+    return original_kernel.call_boxed(keyset, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_library/custom_ops.py", line 347, in backend_impl
+    result = self._backend_fns[device_type](*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_compile.py", line 54, in inner
+    return disable_fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 1181, in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/torch/_library/custom_ops.py", line 382, in wrapped_fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemiops/torch/_warp_op_helpers.py", line 118, in wrapped
+    with scoped_warp_stream(device):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemiops/torch/_warp_op_helpers.py", line 97, in scoped_warp_stream
+    warp_stream = wp.get_stream(str(torch_device))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/warp/_src/context.py", line 9696, in get_stream
+    return get_device(device).stream
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/warp/_src/context.py", line 9103, in get_device
+    return runtime.get_device(ident)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/warp/_src/context.py", line 8840, in get_device
+    raise ValueError(f"Invalid device identifier: {ident}")
+ValueError: Invalid device identifier: cuda:0
+Command exited with non-zero status 1
+	Command being timed: "python -u 08_aimnet2_ewald_pipeline.py"
+	User time (seconds): 29.11
+	System time (seconds): 2.82
+	Percent of CPU this job got: 132%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:24.12
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 1909440
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 25
+	Minor (reclaiming a frame) page faults: 775825
+	Voluntary context switches: 728
+	Involuntary context switches: 719
+	Swaps: 0
+	File system inputs: 8512
+	File system outputs: 178488
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 1
+exit_code=1
+Sat Oct 31 03:47:44 AM UTC 2026

@@ -1,0 +1,16 @@
+1 error occurred:
+	* instance "fermentai-gpu" does not support stop.
+
+
+You have 1 instances in Org ppuma-f24f6a-4ukc
+ NAME           STATUS   BUILD      SHELL  ID         MACHINE           GPU   
+ fermentai-gpu  RUNNING  COMPLETED  READY  og64kprp7  hyperstack_A6000  A6000 
+
+fermentai-gpu
+You have 1 instances in Org ppuma-f24f6a-4ukc
+ NAME           STATUS    BUILD      SHELL      ID         MACHINE           GPU   
+ fermentai-gpu  DELETING  COMPLETED  NOT READY  og64kprp7  hyperstack_A6000  A6000 
+
+No instances in org ppuma-f24f6a-4ukc
+
+Create a new instance:

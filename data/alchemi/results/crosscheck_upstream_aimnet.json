@@ -1,0 +1,1457 @@
+{
+ "generated_at_utc": "2026-10-31T04:35:55Z",
+ "versions": {
+  "python": "3.12.16",
+  "platform": "Linux-6.8.0-90-generic-x86_64-with-glibc2.35",
+  "nvalchemi-toolkit": "0.2.0",
+  "nvalchemi-toolkit-ops": "0.5.0",
+  "aimnet": "0.2.5",
+  "torch": "2.10.0",
+  "warp-lang": "1.18.0+cu12",
+  "ase": "3.29.0",
+  "nvidia-physicsnemo": "2.2.2",
+  "numpy": "2.2.6",
+  "torch_cuda": "12.8",
+  "cudnn": 91002,
+  "gpu": "NVIDIA RTX A6000",
+  "gpu_capability": "8.6",
+  "gpu_memory_gb": 50.91
+ },
+ "n": 159,
+ "max_abs_delta_energy_ev": 0.005875076116353739,
+ "mean_abs_delta_energy_ev": 0.0010959692859935058,
+ "max_abs_force_diff_ev_per_angstrom": 0.0014574527740478516,
+ "rows": [
+  {
+   "id": "acetic_acid__n0__c0",
+   "charge": 0,
+   "alchemi_energy_ev": -6238.043686691672,
+   "upstream_energy_ev": -6238.044154474501,
+   "delta_energy_ev": 0.0004677828292187769,
+   "max_abs_force_diff_ev_per_angstrom": 0.00015360326506197453,
+   "upstream_fmax_ev_per_angstrom": 0.009779925127892605
+  },
+  {
+   "id": "acetic_acid__n0__c1",
+   "charge": 0,
+   "alchemi_energy_ev": -6238.02989493725,
+   "upstream_energy_ev": -6238.0298118575465,
+   "delta_energy_ev": -8.307970347232185e-05,
+   "max_abs_force_diff_ev_per_angstrom": 0.00016015325672924519,
+   "upstream_fmax_ev_per_angstrom": 0.008702031509694785
+  },
+  {
+   "id": "acetic_acid__n0__c2",
+   "charge": 0,
+   "alchemi_energy_ev": -6238.044537886976,
+   "upstream_energy_ev": -6238.044166135987,
+   "delta_energy_ev": -0.00037175098896113923,
+   "max_abs_force_diff_ev_per_angstrom": 0.00016015814617276192,
+   "upstream_fmax_ev_per_angstrom": 0.009774821622217152
+  },
+  {
+   "id": "acetic_acid__n0__c3",
+   "charge": 0,
+   "alchemi_energy_ev": -6238.046120488757,
+   "upstream_energy_ev": -6238.0461208014585,
+   "delta_energy_ev": 3.127015588688664e-07,
+   "max_abs_force_diff_ev_per_angstrom": 0.00016659637913107872,
+   "upstream_fmax_ev_per_angstrom": 0.009755977081649504
+  },
+  {
+   "id": "acetic_acid__n0__c4",
+   "charge": 0,
+   "alchemi_energy_ev": -6238.0475869185975,
+   "upstream_energy_ev": -6238.046816788903,
+   "delta_energy_ev": -0.0007701296945015201,
+   "max_abs_force_diff_ev_per_angstrom": 0.00014079047832638025,
+   "upstream_fmax_ev_per_angstrom": 0.00963684471853703
+  },
+  {
+   "id": "acetic_acid__n0__c5",
+   "charge": 0,
+   "alchemi_energy_ev": -6238.0307610890495,
+   "upstream_energy_ev": -6238.030118810102,
+   "delta_energy_ev": -0.0006422789474527235,
+   "max_abs_force_diff_ev_per_angstrom": 0.00016206270083785057,
+   "upstream_fmax_ev_per_angstrom": 0.009900186284022042
+  },
+  {
+   "id": "acetic_acid__n1__c0",
+   "charge": 0,
+   "alchemi_energy_ev": -8319.295496656245,
+   "upstream_energy_ev": -8319.295898496746,
+   "delta_energy_ev": 0.0004018405015813187,
+   "max_abs_force_diff_ev_per_angstrom": 0.00020056241191923618,
+   "upstream_fmax_ev_per_angstrom": 0.00971303077097137
+  },
+  {
+   "id": "acetic_acid__n1__c1",
+   "charge": 0,
+   "alchemi_energy_ev": -8319.530971321003,
+   "upstream_energy_ev": -8319.529856461642,
+   "delta_energy_ev": -0.001114859360313858,
+   "max_abs_force_diff_ev_per_angstrom": 3.903987817466259e-05,
+   "upstream_fmax_ev_per_angstrom": 0.009698458299678263
+  },
+  {
+   "id": "acetic_acid__n1__c2",
+   "charge": 0,
+   "alchemi_energy_ev": -8319.372451877569,
+   "upstream_energy_ev": -8319.372264943297,
+   "delta_energy_ev": -0.0001869342722784495,
+   "max_abs_force_diff_ev_per_angstrom": 0.0002216072753071785,
+   "upstream_fmax_ev_per_angstrom": 0.009839500001959257
+  },
+  {
+   "id": "acetic_acid__n1__c3",
+   "charge": 0,
+   "alchemi_energy_ev": -8319.539258696963,
+   "upstream_energy_ev": -8319.538355457846,
+   "delta_energy_ev": -0.0009032391171786003,
+   "max_abs_force_diff_ev_per_angstrom": 5.519471596926451e-05,
+   "upstream_fmax_ev_per_angstrom": 0.008299689480404484
+  },
+  {
+   "id": "acetic_acid__n1__c4",
+   "charge": 0,
+   "alchemi_energy_ev": -8319.537030342723,
+   "upstream_energy_ev": -8319.53861086575,
+   "delta_energy_ev": 0.001580523026859737,
+   "max_abs_force_diff_ev_per_angstrom": 5.173496901988983e-05,
+   "upstream_fmax_ev_per_angstrom": 0.009816170619253141
+  },
+  {
+   "id": "acetic_acid__n1__c5",
+   "charge": 0,
+   "alchemi_energy_ev": -8319.538456658245,
+   "upstream_energy_ev": -8319.538575549856,
+   "delta_energy_ev": 0.00011889161032740958,
+   "max_abs_force_diff_ev_per_angstrom": 4.672445356845856e-05,
+   "upstream_fmax_ev_per_angstrom": 0.009464693735110826
+  },
+  {
+   "id": "acetic_acid__n3__c0",
+   "charge": 0,
+   "alchemi_energy_ev": -12482.108103999373,
+   "upstream_energy_ev": -12482.109660782819,
+   "delta_energy_ev": 0.001556783445266774,
+   "max_abs_force_diff_ev_per_angstrom": 0.00018924567848443985,
+   "upstream_fmax_ev_per_angstrom": 0.009985690093786354
+  },
+  {
+   "id": "acetic_acid__n3__c1",
+   "charge": 0,
+   "alchemi_energy_ev": -12482.10728093642,
+   "upstream_energy_ev": -12482.108223418349,
+   "delta_energy_ev": 0.0009424819290870801,
+   "max_abs_force_diff_ev_per_angstrom": 0.0001497352495789528,
+   "upstream_fmax_ev_per_angstrom": 0.009547379972001365
+  },
+  {
+   "id": "acetic_acid__n3__c2",
+   "charge": 0,
+   "alchemi_energy_ev": -12481.961832285317,
+   "upstream_energy_ev": -12481.961313973636,
+   "delta_energy_ev": -0.0005183116809348576,
+   "max_abs_force_diff_ev_per_angstrom": 0.00024419277906417847,
+   "upstream_fmax_ev_per_angstrom": 0.009822491969321152
+  },
+  {
+   "id": "acetic_acid__n3__c3",
+   "charge": 0,
+   "alchemi_energy_ev": -12482.176664539089,
+   "upstream_energy_ev": -12482.176777534954,
+   "delta_energy_ev": 0.00011299586549284868,
+   "max_abs_force_diff_ev_per_angstrom": 0.0003025475889444351,
+   "upstream_fmax_ev_per_angstrom": 0.009681507187035676
+  },
+  {
+   "id": "acetic_acid__n3__c4",
+   "charge": 0,
+   "alchemi_energy_ev": -12482.313036628395,
+   "upstream_energy_ev": -12482.311825845494,
+   "delta_energy_ev": -0.0012107829006708926,
+   "max_abs_force_diff_ev_per_angstrom": 0.00021403934806585312,
+   "upstream_fmax_ev_per_angstrom": 0.009919045258996537
+  },
+  {
+   "id": "acetic_acid__n3__c5",
+   "charge": 0,
+   "alchemi_energy_ev": -12482.141921676712,
+   "upstream_energy_ev": -12482.14081035447,
+   "delta_energy_ev": -0.001111322240831214,
+   "max_abs_force_diff_ev_per_angstrom": 0.00011422461830079556,
+   "upstream_fmax_ev_per_angstrom": 0.00926086384296672
+  },
+  {
+   "id": "acetic_acid__n6__c0",
+   "charge": 0,
+   "alchemi_energy_ev": -18726.497586275615,
+   "upstream_energy_ev": -18726.497986995222,
+   "delta_energy_ev": 0.00040071960756904446,
+   "max_abs_force_diff_ev_per_angstrom": 0.0012001637369394302,
+   "upstream_fmax_ev_per_angstrom": 0.009752869375083104
+  },
+  {
+   "id": "acetic_acid__n6__c1",
+   "charge": 0,
+   "alchemi_energy_ev": -18726.56809959215,
+   "upstream_energy_ev": -18726.569257034585,
+   "delta_energy_ev": 0.0011574424352147616,
+   "max_abs_force_diff_ev_per_angstrom": 0.0005039292154833674,
+   "upstream_fmax_ev_per_angstrom": 0.009438865433001584
+  },
+  {
+   "id": "acetic_acid__n6__c2",
+   "charge": 0,
+   "alchemi_energy_ev": -18726.42155758308,
+   "upstream_energy_ev": -18726.42203581936,
+   "delta_energy_ev": 0.0004782362811965868,
+   "max_abs_force_diff_ev_per_angstrom": 0.0006360521074384451,
+   "upstream_fmax_ev_per_angstrom": 0.009175852182981264
+  },
+  {
+   "id": "acetic_acid__n6__c3",
+   "charge": 0,
+   "alchemi_energy_ev": -18726.53201545072,
+   "upstream_energy_ev": -18726.5345697655,
+   "delta_energy_ev": 0.002554314778535627,
+   "max_abs_force_diff_ev_per_angstrom": 0.0008445405401289463,
+   "upstream_fmax_ev_per_angstrom": 0.009933648394060156
+  },
+  {
+   "id": "acetic_acid__n6__c4",
+   "charge": 0,
+   "alchemi_energy_ev": -18726.826958170328,
+   "upstream_energy_ev": -18726.826986757427,
+   "delta_energy_ev": 2.858709922293201e-05,
+   "max_abs_force_diff_ev_per_angstrom": 0.000781746581196785,
+   "upstream_fmax_ev_per_angstrom": 0.009530724524203093
+  },
+  {
+   "id": "acetic_acid__n6__c5",
+   "charge": 0,
+   "alchemi_energy_ev": -18726.282194708925,
+   "upstream_energy_ev": -18726.285369112946,
+   "delta_energy_ev": 0.0031744040206831414,
+   "max_abs_force_diff_ev_per_angstrom": 0.0008158134296536446,
+   "upstream_fmax_ev_per_angstrom": 0.010207985395024193
+  },
+  {
+   "id": "acetic_acid_anion__n0__c0",
+   "charge": -1,
+   "alchemi_energy_ev": -6222.56333032872,
+   "upstream_energy_ev": -6222.563571964214,
+   "delta_energy_ev": 0.0002416354936940479,
+   "max_abs_force_diff_ev_per_angstrom": 0.0003235330805182457,
+   "upstream_fmax_ev_per_angstrom": 0.009927519099170324
+  },
+  {
+   "id": "acetic_acid_anion__n0__c1",
+   "charge": -1,
+   "alchemi_energy_ev": -6222.564649345324,
+   "upstream_energy_ev": -6222.564162879543,
+   "delta_energy_ev": -0.0004864657812504447,
+   "max_abs_force_diff_ev_per_angstrom": 0.00032555684447288513,
+   "upstream_fmax_ev_per_angstrom": 0.00984919467169617
+  },
+  {
+   "id": "acetic_acid_anion__n0__c2",
+   "charge": -1,
+   "alchemi_energy_ev": -6222.563322056939,
+   "upstream_energy_ev": -6222.563583666451,
+   "delta_energy_ev": 0.00026160951256315457,
+   "max_abs_force_diff_ev_per_angstrom": 0.0003274669870734215,
+   "upstream_fmax_ev_per_angstrom": 0.00977629266470096
+  },
+  {
+   "id": "acetic_acid_anion__n0__c3",
+   "charge": -1,
+   "alchemi_energy_ev": -6222.563489758002,
+   "upstream_energy_ev": -6222.564296170008,
+   "delta_energy_ev": 0.0008064120056587853,
+   "max_abs_force_diff_ev_per_angstrom": 0.00032353494316339493,
+   "upstream_fmax_ev_per_angstrom": 0.00933112329353651
+  },
+  {
+   "id": "acetic_acid_anion__n0__c4",
+   "charge": -1,
+   "alchemi_energy_ev": -6222.563794742472,
+   "upstream_energy_ev": -6222.564576904937,
+   "delta_energy_ev": 0.00078216246492957,
+   "max_abs_force_diff_ev_per_angstrom": 0.0003225933760404587,
+   "upstream_fmax_ev_per_angstrom": 0.009871569320247742
+  },
+  {
+   "id": "acetic_acid_anion__n0__c5",
+   "charge": -1,
+   "alchemi_energy_ev": -6222.564165760515,
+   "upstream_energy_ev": -6222.564011086839,
+   "delta_energy_ev": -0.00015467367575183744,
+   "max_abs_force_diff_ev_per_angstrom": 0.0003175763413310051,
+   "upstream_fmax_ev_per_angstrom": 0.009894059940240533
+  },
+  {
+   "id": "acetic_acid_anion__n1__c0",
+   "charge": -1,
+   "alchemi_energy_ev": -8304.413360486771,
+   "upstream_energy_ev": -8304.412594835765,
+   "delta_energy_ev": -0.0007656510060769506,
+   "max_abs_force_diff_ev_per_angstrom": 0.0005208756774663925,
+   "upstream_fmax_ev_per_angstrom": 0.009251505362180612
+  },
+  {
+   "id": "acetic_acid_anion__n1__c1",
+   "charge": -1,
+   "alchemi_energy_ev": -8304.34531937798,
+   "upstream_energy_ev": -8304.344427147993,
+   "delta_energy_ev": -0.0008922299875848694,
+   "max_abs_force_diff_ev_per_angstrom": 0.0005180787993595004,
+   "upstream_fmax_ev_per_angstrom": 0.006059673387599298
+  },
+  {
+   "id": "acetic_acid_anion__n1__c2",
+   "charge": -1,
+   "alchemi_energy_ev": -8304.411879750274,
+   "upstream_energy_ev": -8304.411707965824,
+   "delta_energy_ev": -0.0001717844497761689,
+   "max_abs_force_diff_ev_per_angstrom": 0.0005082376301288605,
+   "upstream_fmax_ev_per_angstrom": 0.009258181496769078
+  },
+  {
+   "id": "acetic_acid_anion__n1__c3",
+   "charge": -1,
+   "alchemi_energy_ev": -8304.498842636296,
+   "upstream_energy_ev": -8304.498772529907,
+   "delta_energy_ev": -7.010638910287526e-05,
+   "max_abs_force_diff_ev_per_angstrom": 0.0005977218970656395,
+   "upstream_fmax_ev_per_angstrom": 0.009335924645954086
+  },
+  {
+   "id": "acetic_acid_anion__n1__c4",
+   "charge": -1,
+   "alchemi_energy_ev": -8304.494950316173,
+   "upstream_energy_ev": -8304.495967697376,
+   "delta_energy_ev": 0.0010173812024731888,
+   "max_abs_force_diff_ev_per_angstrom": 0.0006338451057672501,
+   "upstream_fmax_ev_per_angstrom": 0.00982225790116379
+  },
+  {
+   "id": "acetic_acid_anion__n1__c5",
+   "charge": -1,
+   "alchemi_energy_ev": -8304.495948586482,
+   "upstream_energy_ev": -8304.496121552245,
+   "delta_energy_ev": 0.0001729657633404713,
+   "max_abs_force_diff_ev_per_angstrom": 0.000660422258079052,
+   "upstream_fmax_ev_per_angstrom": 0.009643334833046333
+  },
+  {
+   "id": "acetic_acid_anion__n3__c0",
+   "charge": -1,
+   "alchemi_energy_ev": -12467.913918135584,
+   "upstream_energy_ev": -12467.916228177479,
+   "delta_energy_ev": 0.002310041894816095,
+   "max_abs_force_diff_ev_per_angstrom": 0.0011556223034858704,
+   "upstream_fmax_ev_per_angstrom": 0.007203344968188919
+  },
+  {
+   "id": "acetic_acid_anion__n3__c1",
+   "charge": -1,
+   "alchemi_energy_ev": -12467.839942841327,
+   "upstream_energy_ev": -12467.84132100999,
+   "delta_energy_ev": 0.0013781686629954493,
+   "max_abs_force_diff_ev_per_angstrom": 0.0006735334172844887,
+   "upstream_fmax_ev_per_angstrom": 0.010077513929844174
+  },
+  {
+   "id": "acetic_acid_anion__n3__c2",
+   "charge": -1,
+   "alchemi_energy_ev": -12467.534683585422,
+   "upstream_energy_ev": -12467.538301808961,
+   "delta_energy_ev": 0.0036182235398882767,
+   "max_abs_force_diff_ev_per_angstrom": 0.0009083789773285389,
+   "upstream_fmax_ev_per_angstrom": 0.009242111586725572
+  },
+  {
+   "id": "acetic_acid_anion__n3__c3",
+   "charge": -1,
+   "alchemi_energy_ev": -12467.81869051461,
+   "upstream_energy_ev": -12467.82005835783,
+   "delta_energy_ev": 0.0013678432187589351,
+   "max_abs_force_diff_ev_per_angstrom": 0.0005706008523702621,
+   "upstream_fmax_ev_per_angstrom": 0.009911246551212616
+  },
+  {
+   "id": "acetic_acid_anion__n3__c4",
+   "charge": -1,
+   "alchemi_energy_ev": -12467.784517734925,
+   "upstream_energy_ev": -12467.786280334336,
+   "delta_energy_ev": 0.001762599411449628,
+   "max_abs_force_diff_ev_per_angstrom": 0.0008582891896367073,
+   "upstream_fmax_ev_per_angstrom": 0.010082958884274712
+  },
+  {
+   "id": "acetic_acid_anion__n3__c5",
+   "charge": -1,
+   "alchemi_energy_ev": -12467.783796486176,
+   "upstream_energy_ev": -12467.78482354729,
+   "delta_energy_ev": 0.0010270611146552255,
+   "max_abs_force_diff_ev_per_angstrom": 0.0009587956592440605,
+   "upstream_fmax_ev_per_angstrom": 0.009892181744277553
+  },
+  {
+   "id": "acetic_acid_anion__n6__c0",
+   "charge": -1,
+   "alchemi_energy_ev": -18712.76349024563,
+   "upstream_energy_ev": -18712.763493737137,
+   "delta_energy_ev": 3.4915065043605864e-06,
+   "max_abs_force_diff_ev_per_angstrom": 0.0010926853865385056,
+   "upstream_fmax_ev_per_angstrom": 0.009675117315012074
+  },
+  {
+   "id": "acetic_acid_anion__n6__c1",
+   "charge": -1,
+   "alchemi_energy_ev": -18712.43009665612,
+   "upstream_energy_ev": -18712.434155560444,
+   "delta_energy_ev": 0.004058904323755996,
+   "max_abs_force_diff_ev_per_angstrom": 0.0009419303387403488,
+   "upstream_fmax_ev_per_angstrom": 0.008704549155633953
+  },
+  {
+   "id": "acetic_acid_anion__n6__c2",
+   "charge": -1,
+   "alchemi_energy_ev": -18712.39536954235,
+   "upstream_energy_ev": -18712.39773919126,
+   "delta_energy_ev": 0.002369648907915689,
+   "max_abs_force_diff_ev_per_angstrom": 0.0013154386542737484,
+   "upstream_fmax_ev_per_angstrom": 0.009233437580079303
+  },
+  {
+   "id": "acetic_acid_anion__n6__c3",
+   "charge": -1,
+   "alchemi_energy_ev": -18712.70928434245,
+   "upstream_energy_ev": -18712.711728685466,
+   "delta_energy_ev": 0.0024443430156679824,
+   "max_abs_force_diff_ev_per_angstrom": 0.0013178614899516106,
+   "upstream_fmax_ev_per_angstrom": 0.01016417773387118
+  },
+  {
+   "id": "acetic_acid_anion__n6__c4",
+   "charge": -1,
+   "alchemi_energy_ev": -18712.954754830876,
+   "upstream_energy_ev": -18712.95565270495,
+   "delta_energy_ev": 0.0008978740734164603,
+   "max_abs_force_diff_ev_per_angstrom": 0.0011034384369850159,
+   "upstream_fmax_ev_per_angstrom": 0.009243603541797417
+  },
+  {
+   "id": "acetic_acid_anion__n6__c5",
+   "charge": -1,
+   "alchemi_energy_ev": -18712.480306494366,
+   "upstream_energy_ev": -18712.481764696004,
+   "delta_energy_ev": 0.0014582016374333762,
+   "max_abs_force_diff_ev_per_angstrom": 0.0008323974907398224,
+   "upstream_fmax_ev_per_angstrom": 0.010156982834806854
+  },
+  {
+   "id": "acetic_acid_ionpairSS__n3__c0",
+   "charge": 0,
+   "alchemi_energy_ev": -12482.110828463028,
+   "upstream_energy_ev": -12482.11127711479,
+   "delta_energy_ev": 0.00044865176096209325,
+   "max_abs_force_diff_ev_per_angstrom": 0.00018166843801736832,
+   "upstream_fmax_ev_per_angstrom": 0.009550220005653446
+  },
+  {
+   "id": "acetic_acid_ionpairSS__n3__c1",
+   "charge": 0,
+   "alchemi_energy_ev": -12482.171853175603,
+   "upstream_energy_ev": -12482.171687397225,
+   "delta_energy_ev": -0.00016577837777731474,
+   "max_abs_force_diff_ev_per_angstrom": 0.0004727747291326523,
+   "upstream_fmax_ev_per_angstrom": 0.006708298617565952
+  },
+  {
+   "id": "acetic_acid_ionpairSS__n3__c3",
+   "charge": 0,
+   "alchemi_energy_ev": -12482.162762889315,
+   "upstream_energy_ev": -12482.161655750528,
+   "delta_energy_ev": -0.0011071387871197658,
+   "max_abs_force_diff_ev_per_angstrom": 0.00041194912046194077,
+   "upstream_fmax_ev_per_angstrom": 0.009035973477281637
+  },
+  {
+   "id": "acetic_acid_ionpairSS__n6__c0",
+   "charge": 0,
+   "alchemi_energy_ev": -18726.50100261597,
+   "upstream_energy_ev": -18726.500160056952,
+   "delta_energy_ev": -0.000842559016746236,
+   "max_abs_force_diff_ev_per_angstrom": 0.0011773090809583664,
+   "upstream_fmax_ev_per_angstrom": 0.00958899747636642
+  },
+  {
+   "id": "acetic_acid_ionpairSS__n6__c1",
+   "charge": 0,
+   "alchemi_energy_ev": -18726.566614138246,
+   "upstream_energy_ev": -18726.570340296108,
+   "delta_energy_ev": 0.0037261578618199565,
+   "max_abs_force_diff_ev_per_angstrom": 0.00044442061334848404,
+   "upstream_fmax_ev_per_angstrom": 0.009319015956844425
+  },
+  {
+   "id": "acetic_acid_ionpairSS__n6__c2",
+   "charge": 0,
+   "alchemi_energy_ev": -18726.71013036388,
+   "upstream_energy_ev": -18726.709958427353,
+   "delta_energy_ev": -0.00017193652820424177,
+   "max_abs_force_diff_ev_per_angstrom": 0.0002043209969997406,
+   "upstream_fmax_ev_per_angstrom": 0.009412425795156118
+  },
+  {
+   "id": "acetic_acid_ionpairSS__n6__c3",
+   "charge": 0,
+   "alchemi_energy_ev": -18726.422993547803,
+   "upstream_energy_ev": -18726.42218960273,
+   "delta_energy_ev": -0.0008039450731303077,
+   "max_abs_force_diff_ev_per_angstrom": 0.000769834965467453,
+   "upstream_fmax_ev_per_angstrom": 0.00833824157228915
+  },
+  {
+   "id": "acetic_acid_ionpairSS__n6__c4",
+   "charge": 0,
+   "alchemi_energy_ev": -18726.833497521748,
+   "upstream_energy_ev": -18726.83308494991,
+   "delta_energy_ev": -0.00041257183693232946,
+   "max_abs_force_diff_ev_per_angstrom": 0.0007805380737408996,
+   "upstream_fmax_ev_per_angstrom": 0.009087866278424773
+  },
+  {
+   "id": "acetic_acid_ionpairSS__n6__c5",
+   "charge": 0,
+   "alchemi_energy_ev": -18726.288746996306,
+   "upstream_energy_ev": -18726.288332677097,
+   "delta_energy_ev": -0.0004143192090850789,
+   "max_abs_force_diff_ev_per_angstrom": 0.0007804594933986664,
+   "upstream_fmax_ev_per_angstrom": 0.007405178822477031
+  },
+  {
+   "id": "acetic_acid_ionpair__n1__c0",
+   "charge": 0,
+   "alchemi_energy_ev": -8319.226232932253,
+   "upstream_energy_ev": -8319.225498920217,
+   "delta_energy_ev": -0.0007340120355365798,
+   "max_abs_force_diff_ev_per_angstrom": 0.0005721384659409523,
+   "upstream_fmax_ev_per_angstrom": 0.009998964881149538
+  },
+  {
+   "id": "acetic_acid_ionpair__n1__c1",
+   "charge": 0,
+   "alchemi_energy_ev": -8319.538327569488,
+   "upstream_energy_ev": -8319.538883048734,
+   "delta_energy_ev": 0.0005554792460316094,
+   "max_abs_force_diff_ev_per_angstrom": 0.00011550448834896088,
+   "upstream_fmax_ev_per_angstrom": 0.009076933498585684
+  },
+  {
+   "id": "acetic_acid_ionpair__n1__c2",
+   "charge": 0,
+   "alchemi_energy_ev": -8319.252218834385,
+   "upstream_energy_ev": -8319.251983693766,
+   "delta_energy_ev": -0.0002351406183151994,
+   "max_abs_force_diff_ev_per_angstrom": 0.0006832871586084366,
+   "upstream_fmax_ev_per_angstrom": 0.009806780980579504
+  },
+  {
+   "id": "acetic_acid_ionpair__n1__c3",
+   "charge": 0,
+   "alchemi_energy_ev": -8319.538094394786,
+   "upstream_energy_ev": -8319.538113899922,
+   "delta_energy_ev": 1.950513615156524e-05,
+   "max_abs_force_diff_ev_per_angstrom": 5.3767114877700806e-05,
+   "upstream_fmax_ev_per_angstrom": 0.009710177926836984
+  },
+  {
+   "id": "acetic_acid_ionpair__n1__c4",
+   "charge": 0,
+   "alchemi_energy_ev": -8319.538903020893,
+   "upstream_energy_ev": -8319.538440907556,
+   "delta_energy_ev": -0.00046211333756218664,
+   "max_abs_force_diff_ev_per_angstrom": 7.878988981246948e-05,
+   "upstream_fmax_ev_per_angstrom": 0.009283931852515418
+  },
+  {
+   "id": "acetic_acid_ionpair__n1__c5",
+   "charge": 0,
+   "alchemi_energy_ev": -8319.539833697385,
+   "upstream_energy_ev": -8319.539092382154,
+   "delta_energy_ev": -0.0007413152306980919,
+   "max_abs_force_diff_ev_per_angstrom": 6.627105176448822e-05,
+   "upstream_fmax_ev_per_angstrom": 0.010016882429952615
+  },
+  {
+   "id": "acetic_acid_ionpair__n3__c0",
+   "charge": 0,
+   "alchemi_energy_ev": -12482.112990364829,
+   "upstream_energy_ev": -12482.111313302925,
+   "delta_energy_ev": -0.0016770619040471502,
+   "max_abs_force_diff_ev_per_angstrom": 0.0002174321562051773,
+   "upstream_fmax_ev_per_angstrom": 0.0067532276986007065
+  },
+  {
+   "id": "acetic_acid_ionpair__n3__c1",
+   "charge": 0,
+   "alchemi_energy_ev": -12482.109469486653,
+   "upstream_energy_ev": -12482.11036384203,
+   "delta_energy_ev": 0.0008943553766584955,
+   "max_abs_force_diff_ev_per_angstrom": 0.00017662998288869858,
+   "upstream_fmax_ev_per_angstrom": 0.009583962350302056
+  },
+  {
+   "id": "acetic_acid_ionpair__n3__c2",
+   "charge": 0,
+   "alchemi_energy_ev": -12482.11146366442,
+   "upstream_energy_ev": -12482.110514800945,
+   "delta_energy_ev": -0.0009488634750596248,
+   "max_abs_force_diff_ev_per_angstrom": 0.0007446901872754097,
+   "upstream_fmax_ev_per_angstrom": 0.008886605482767438
+  },
+  {
+   "id": "acetic_acid_ionpair__n3__c3",
+   "charge": 0,
+   "alchemi_energy_ev": -12482.180159439804,
+   "upstream_energy_ev": -12482.179411089697,
+   "delta_energy_ev": -0.000748350106732687,
+   "max_abs_force_diff_ev_per_angstrom": 0.0003240439109504223,
+   "upstream_fmax_ev_per_angstrom": 0.00999957376890007
+  },
+  {
+   "id": "acetic_acid_ionpair__n3__c4",
+   "charge": 0,
+   "alchemi_energy_ev": -12482.317536886067,
+   "upstream_energy_ev": -12482.318135314312,
+   "delta_energy_ev": 0.000598428245211835,
+   "max_abs_force_diff_ev_per_angstrom": 0.0001624254509806633,
+   "upstream_fmax_ev_per_angstrom": 0.008912254398717652
+  },
+  {
+   "id": "acetic_acid_ionpair__n3__c5",
+   "charge": 0,
+   "alchemi_energy_ev": -12482.197225737806,
+   "upstream_energy_ev": -12482.198637334244,
+   "delta_energy_ev": 0.0014115964386292035,
+   "max_abs_force_diff_ev_per_angstrom": 0.000403781421482563,
+   "upstream_fmax_ev_per_angstrom": 0.01023338183316737
+  },
+  {
+   "id": "acetic_acid_ionpair__n6__c0",
+   "charge": 0,
+   "alchemi_energy_ev": -18726.49744389207,
+   "upstream_energy_ev": -18726.501551088222,
+   "delta_energy_ev": 0.004107196153199766,
+   "max_abs_force_diff_ev_per_angstrom": 0.0011973259970545769,
+   "upstream_fmax_ev_per_angstrom": 0.00948394561691927
+  },
+  {
+   "id": "acetic_acid_ionpair__n6__c1",
+   "charge": 0,
+   "alchemi_energy_ev": -18726.57000581866,
+   "upstream_energy_ev": -18726.570184117732,
+   "delta_energy_ev": 0.00017829907301347703,
+   "max_abs_force_diff_ev_per_angstrom": 0.00043756701052188873,
+   "upstream_fmax_ev_per_angstrom": 0.009901639242250642
+  },
+  {
+   "id": "acetic_acid_ionpair__n6__c2",
+   "charge": 0,
+   "alchemi_energy_ev": -18726.419093521115,
+   "upstream_energy_ev": -18726.423368671858,
+   "delta_energy_ev": 0.004275150742614642,
+   "max_abs_force_diff_ev_per_angstrom": 0.0006550431717187166,
+   "upstream_fmax_ev_per_angstrom": 0.009152954481882272
+  },
+  {
+   "id": "acetic_acid_ionpair__n6__c3",
+   "charge": 0,
+   "alchemi_energy_ev": -18726.536118690266,
+   "upstream_energy_ev": -18726.53709631142,
+   "delta_energy_ev": 0.0009776211518328637,
+   "max_abs_force_diff_ev_per_angstrom": 0.0008272671839222312,
+   "upstream_fmax_ev_per_angstrom": 0.009824183764775198
+  },
+  {
+   "id": "acetic_acid_ionpair__n6__c4",
+   "charge": 0,
+   "alchemi_energy_ev": -18726.832517118335,
+   "upstream_energy_ev": -18726.830926822633,
+   "delta_energy_ev": -0.0015902957020443864,
+   "max_abs_force_diff_ev_per_angstrom": 0.0007839335594326258,
+   "upstream_fmax_ev_per_angstrom": 0.009178738543379663
+  },
+  {
+   "id": "acetic_acid_ionpair__n6__c5",
+   "charge": 0,
+   "alchemi_energy_ev": -18726.28542293689,
+   "upstream_energy_ev": -18726.286248425527,
+   "delta_energy_ev": 0.0008254886379290838,
+   "max_abs_force_diff_ev_per_angstrom": 0.0008177745621651411,
+   "upstream_fmax_ev_per_angstrom": 0.008430163939928603
+  },
+  {
+   "id": "hydronium__n0__c0",
+   "charge": 1,
+   "alchemi_energy_ev": -2088.501158201864,
+   "upstream_energy_ev": -2088.501255680783,
+   "delta_energy_ev": 9.747891863298719e-05,
+   "max_abs_force_diff_ev_per_angstrom": 0.000153597560711205,
+   "upstream_fmax_ev_per_angstrom": 0.00842615692193851
+  },
+  {
+   "id": "lactic_acid__n0__c0",
+   "charge": 0,
+   "alchemi_energy_ev": -9356.625186530611,
+   "upstream_energy_ev": -9356.626142806595,
+   "delta_energy_ev": 0.0009562759842083324,
+   "max_abs_force_diff_ev_per_angstrom": 0.00012481212615966797,
+   "upstream_fmax_ev_per_angstrom": 0.00909518574856001
+  },
+  {
+   "id": "lactic_acid__n0__c1",
+   "charge": 0,
+   "alchemi_energy_ev": -9356.631945052442,
+   "upstream_energy_ev": -9356.630494147561,
+   "delta_energy_ev": -0.0014509048814943526,
+   "max_abs_force_diff_ev_per_angstrom": 0.0002904348075389862,
+   "upstream_fmax_ev_per_angstrom": 0.009658091049769224
+  },
+  {
+   "id": "lactic_acid__n0__c2",
+   "charge": 0,
+   "alchemi_energy_ev": -9356.625021209025,
+   "upstream_energy_ev": -9356.624544601675,
+   "delta_energy_ev": -0.0004766073507198598,
+   "max_abs_force_diff_ev_per_angstrom": 0.00017272494733333588,
+   "upstream_fmax_ev_per_angstrom": 0.009491024284597326
+  },
+  {
+   "id": "lactic_acid__n0__c3",
+   "charge": 0,
+   "alchemi_energy_ev": -9356.730808259217,
+   "upstream_energy_ev": -9356.731180125149,
+   "delta_energy_ev": 0.000371865931811044,
+   "max_abs_force_diff_ev_per_angstrom": 0.00017685163766145706,
+   "upstream_fmax_ev_per_angstrom": 0.008937585252957458
+  },
+  {
+   "id": "lactic_acid__n0__c4",
+   "charge": 0,
+   "alchemi_energy_ev": -9356.62482782676,
+   "upstream_energy_ev": -9356.624725404374,
+   "delta_energy_ev": -0.00010242238568025641,
+   "max_abs_force_diff_ev_per_angstrom": 0.00019430369138717651,
+   "upstream_fmax_ev_per_angstrom": 0.009368002551227024
+  },
+  {
+   "id": "lactic_acid__n0__c5",
+   "charge": 0,
+   "alchemi_energy_ev": -9356.624388149745,
+   "upstream_energy_ev": -9356.62461986948,
+   "delta_energy_ev": 0.00023171973589342088,
+   "max_abs_force_diff_ev_per_angstrom": 0.0001529306173324585,
+   "upstream_fmax_ev_per_angstrom": 0.009644880984951082
+  },
+  {
+   "id": "lactic_acid__n1__c0",
+   "charge": 0,
+   "alchemi_energy_ev": -11438.170992974721,
+   "upstream_energy_ev": -11438.170420378374,
+   "delta_energy_ev": -0.0005725963474105811,
+   "max_abs_force_diff_ev_per_angstrom": 0.00012368150055408478,
+   "upstream_fmax_ev_per_angstrom": 0.010006286261260114
+  },
+  {
+   "id": "lactic_acid__n1__c1",
+   "charge": 0,
+   "alchemi_energy_ev": -11437.894981144196,
+   "upstream_energy_ev": -11437.894077190338,
+   "delta_energy_ev": -0.0009039538581419038,
+   "max_abs_force_diff_ev_per_angstrom": 4.452746361494064e-05,
+   "upstream_fmax_ev_per_angstrom": 0.009894723724713308
+  },
+  {
+   "id": "lactic_acid__n1__c2",
+   "charge": 0,
+   "alchemi_energy_ev": -11438.188381974629,
+   "upstream_energy_ev": -11438.19154801384,
+   "delta_energy_ev": 0.0031660392105550272,
+   "max_abs_force_diff_ev_per_angstrom": 0.00023084552958607674,
+   "upstream_fmax_ev_per_angstrom": 0.008884312243387848
+  },
+  {
+   "id": "lactic_acid__n1__c3",
+   "charge": 0,
+   "alchemi_energy_ev": -11438.188624619013,
+   "upstream_energy_ev": -11438.190166753624,
+   "delta_energy_ev": 0.0015421346106450073,
+   "max_abs_force_diff_ev_per_angstrom": 0.00023448606953024864,
+   "upstream_fmax_ev_per_angstrom": 0.00972957199994584
+  },
+  {
+   "id": "lactic_acid__n1__c4",
+   "charge": 0,
+   "alchemi_energy_ev": -11437.842392934826,
+   "upstream_energy_ev": -11437.84430141344,
+   "delta_energy_ev": 0.001908478612676845,
+   "max_abs_force_diff_ev_per_angstrom": 0.00034900009632110596,
+   "upstream_fmax_ev_per_angstrom": 0.009583517949374608
+  },
+  {
+   "id": "lactic_acid__n1__c5",
+   "charge": 0,
+   "alchemi_energy_ev": -11438.123118235762,
+   "upstream_energy_ev": -11438.123559942158,
+   "delta_energy_ev": 0.00044170639557705726,
+   "max_abs_force_diff_ev_per_angstrom": 0.00014890730381011963,
+   "upstream_fmax_ev_per_angstrom": 0.00922085173213678
+  },
+  {
+   "id": "lactic_acid__n3__c0",
+   "charge": 0,
+   "alchemi_energy_ev": -15601.06348532849,
+   "upstream_energy_ev": -15601.062244649049,
+   "delta_energy_ev": -0.0012406794412527233,
+   "max_abs_force_diff_ev_per_angstrom": 0.00011703744530677795,
+   "upstream_fmax_ev_per_angstrom": 0.009810268963433344
+  },
+  {
+   "id": "lactic_acid__n3__c1",
+   "charge": 0,
+   "alchemi_energy_ev": -15600.88609432246,
+   "upstream_energy_ev": -15600.887390112932,
+   "delta_energy_ev": 0.001295790470976499,
+   "max_abs_force_diff_ev_per_angstrom": 0.000529781449586153,
+   "upstream_fmax_ev_per_angstrom": 0.010015444842885544
+  },
+  {
+   "id": "lactic_acid__n3__c2",
+   "charge": 0,
+   "alchemi_energy_ev": -15600.942558168206,
+   "upstream_energy_ev": -15600.941623734214,
+   "delta_energy_ev": -0.0009344339923700318,
+   "max_abs_force_diff_ev_per_angstrom": 0.0001982022076845169,
+   "upstream_fmax_ev_per_angstrom": 0.00888815392252394
+  },
+  {
+   "id": "lactic_acid__n3__c3",
+   "charge": 0,
+   "alchemi_energy_ev": -15600.929629838418,
+   "upstream_energy_ev": -15600.928488317735,
+   "delta_energy_ev": -0.00114152068272233,
+   "max_abs_force_diff_ev_per_angstrom": 0.00030684564262628555,
+   "upstream_fmax_ev_per_angstrom": 0.009935562101727505
+  },
+  {
+   "id": "lactic_acid__n3__c4",
+   "charge": 0,
+   "alchemi_energy_ev": -15601.049570753481,
+   "upstream_energy_ev": -15601.049980398759,
+   "delta_energy_ev": 0.00040964527761389036,
+   "max_abs_force_diff_ev_per_angstrom": 9.629270061850548e-05,
+   "upstream_fmax_ev_per_angstrom": 0.008642864232407522
+  },
+  {
+   "id": "lactic_acid__n3__c5",
+   "charge": 0,
+   "alchemi_energy_ev": -15600.647976653861,
+   "upstream_energy_ev": -15600.646903208744,
+   "delta_energy_ev": -0.0010734451170719694,
+   "max_abs_force_diff_ev_per_angstrom": 0.0003388095647096634,
+   "upstream_fmax_ev_per_angstrom": 0.009156116641680957
+  },
+  {
+   "id": "lactic_acid__n6__c0",
+   "charge": 0,
+   "alchemi_energy_ev": -21845.668887326887,
+   "upstream_energy_ev": -21845.670779311193,
+   "delta_energy_ev": 0.0018919843059848063,
+   "max_abs_force_diff_ev_per_angstrom": 0.0002045435830950737,
+   "upstream_fmax_ev_per_angstrom": 0.009753843665280345
+  },
+  {
+   "id": "lactic_acid__n6__c1",
+   "charge": 0,
+   "alchemi_energy_ev": -21845.48104865872,
+   "upstream_energy_ev": -21845.480875629535,
+   "delta_energy_ev": -0.00017302918422501534,
+   "max_abs_force_diff_ev_per_angstrom": 0.00014730263501405716,
+   "upstream_fmax_ev_per_angstrom": 0.008884223435729288
+  },
+  {
+   "id": "lactic_acid__n6__c2",
+   "charge": 0,
+   "alchemi_energy_ev": -21845.154208299242,
+   "upstream_energy_ev": -21845.150958570106,
+   "delta_energy_ev": -0.003249729135859525,
+   "max_abs_force_diff_ev_per_angstrom": 0.0006782994605600834,
+   "upstream_fmax_ev_per_angstrom": 0.010029964634447521
+  },
+  {
+   "id": "lactic_acid__n6__c3",
+   "charge": 0,
+   "alchemi_energy_ev": -21844.915557648095,
+   "upstream_energy_ev": -21844.915620581043,
+   "delta_energy_ev": 6.293294791248627e-05,
+   "max_abs_force_diff_ev_per_angstrom": 0.0008231382817029953,
+   "upstream_fmax_ev_per_angstrom": 0.01005494388983381
+  },
+  {
+   "id": "lactic_acid__n6__c4",
+   "charge": 0,
+   "alchemi_energy_ev": -21845.153943787438,
+   "upstream_energy_ev": -21845.153002343293,
+   "delta_energy_ev": -0.0009414441447006539,
+   "max_abs_force_diff_ev_per_angstrom": 0.0002547584008425474,
+   "upstream_fmax_ev_per_angstrom": 0.009250065564415974
+  },
+  {
+   "id": "lactic_acid__n6__c5",
+   "charge": 0,
+   "alchemi_energy_ev": -21845.411145056518,
+   "upstream_energy_ev": -21845.40990677065,
+   "delta_energy_ev": -0.0012382858694763854,
+   "max_abs_force_diff_ev_per_angstrom": 7.079821079969406e-05,
+   "upstream_fmax_ev_per_angstrom": 0.00999009929296412
+  },
+  {
+   "id": "lactic_acid_anion__n0__c0",
+   "charge": -1,
+   "alchemi_energy_ev": -9341.838753381317,
+   "upstream_energy_ev": -9341.839061739434,
+   "delta_energy_ev": 0.0003083581177634187,
+   "max_abs_force_diff_ev_per_angstrom": 0.00025521591305732727,
+   "upstream_fmax_ev_per_angstrom": 0.008541654068536459
+  },
+  {
+   "id": "lactic_acid_anion__n0__c1",
+   "charge": -1,
+   "alchemi_energy_ev": -9341.840085471655,
+   "upstream_energy_ev": -9341.83903500494,
+   "delta_energy_ev": -0.0010504667152417824,
+   "max_abs_force_diff_ev_per_angstrom": 0.0002602261956781149,
+   "upstream_fmax_ev_per_angstrom": 0.0053780970636314335
+  },
+  {
+   "id": "lactic_acid_anion__n0__c2",
+   "charge": -1,
+   "alchemi_energy_ev": -9341.83888355186,
+   "upstream_energy_ev": -9341.839065510627,
+   "delta_energy_ev": 0.00018195876691606827,
+   "max_abs_force_diff_ev_per_angstrom": 0.0002480680705048144,
+   "upstream_fmax_ev_per_angstrom": 0.009460084283604687
+  },
+  {
+   "id": "lactic_acid_anion__n0__c3",
+   "charge": -1,
+   "alchemi_energy_ev": -9341.838541907207,
+   "upstream_energy_ev": -9341.83899810487,
+   "delta_energy_ev": 0.0004561976620607311,
+   "max_abs_force_diff_ev_per_angstrom": 0.000298977829515934,
+   "upstream_fmax_ev_per_angstrom": 0.009194208089111361
+  },
+  {
+   "id": "lactic_acid_anion__n0__c4",
+   "charge": -1,
+   "alchemi_energy_ev": -9341.83845349485,
+   "upstream_energy_ev": -9341.83858476932,
+   "delta_energy_ev": 0.00013127447164151818,
+   "max_abs_force_diff_ev_per_angstrom": 0.00028628064319491386,
+   "upstream_fmax_ev_per_angstrom": 0.009794604681334664
+  },
+  {
+   "id": "lactic_acid_anion__n0__c5",
+   "charge": -1,
+   "alchemi_energy_ev": -9341.83830748725,
+   "upstream_energy_ev": -9341.838681063833,
+   "delta_energy_ev": 0.00037357658220571466,
+   "max_abs_force_diff_ev_per_angstrom": 0.00027966173365712166,
+   "upstream_fmax_ev_per_angstrom": 0.008889986786582253
+  },
+  {
+   "id": "lactic_acid_anion__n1__c0",
+   "charge": -1,
+   "alchemi_energy_ev": -11423.424629928713,
+   "upstream_energy_ev": -11423.426161287987,
+   "delta_energy_ev": 0.0015313592739403248,
+   "max_abs_force_diff_ev_per_angstrom": 0.0006094668060541153,
+   "upstream_fmax_ev_per_angstrom": 0.009957687977955182
+  },
+  {
+   "id": "lactic_acid_anion__n1__c1",
+   "charge": -1,
+   "alchemi_energy_ev": -11423.375532947899,
+   "upstream_energy_ev": -11423.375794560254,
+   "delta_energy_ev": 0.0002616123547340976,
+   "max_abs_force_diff_ev_per_angstrom": 0.0004847841337323189,
+   "upstream_fmax_ev_per_angstrom": 0.009782236110734682
+  },
+  {
+   "id": "lactic_acid_anion__n1__c2",
+   "charge": -1,
+   "alchemi_energy_ev": -11423.640335376389,
+   "upstream_energy_ev": -11423.640399082667,
+   "delta_energy_ev": 6.370627852447797e-05,
+   "max_abs_force_diff_ev_per_angstrom": 0.0004634866490960121,
+   "upstream_fmax_ev_per_angstrom": 0.009602187761357486
+  },
+  {
+   "id": "lactic_acid_anion__n1__c3",
+   "charge": -1,
+   "alchemi_energy_ev": -11423.639028858148,
+   "upstream_energy_ev": -11423.640343876834,
+   "delta_energy_ev": 0.0013150186860002577,
+   "max_abs_force_diff_ev_per_angstrom": 0.000348204979673028,
+   "upstream_fmax_ev_per_angstrom": 0.009772619844309388
+  },
+  {
+   "id": "lactic_acid_anion__n1__c4",
+   "charge": -1,
+   "alchemi_energy_ev": -11423.37288098536,
+   "upstream_energy_ev": -11423.376330517349,
+   "delta_energy_ev": 0.0034495319887355436,
+   "max_abs_force_diff_ev_per_angstrom": 0.0007791519165039062,
+   "upstream_fmax_ev_per_angstrom": 0.009912212229215196
+  },
+  {
+   "id": "lactic_acid_anion__n1__c5",
+   "charge": -1,
+   "alchemi_energy_ev": -11423.427106605799,
+   "upstream_energy_ev": -11423.427083550445,
+   "delta_energy_ev": -2.3055354176904075e-05,
+   "max_abs_force_diff_ev_per_angstrom": 0.0005624294281005859,
+   "upstream_fmax_ev_per_angstrom": 0.00974139238996527
+  },
+  {
+   "id": "lactic_acid_anion__n3__c0",
+   "charge": -1,
+   "alchemi_energy_ev": -15586.987444172895,
+   "upstream_energy_ev": -15586.990924445205,
+   "delta_energy_ev": 0.0034802723093889654,
+   "max_abs_force_diff_ev_per_angstrom": 0.0005564605817198753,
+   "upstream_fmax_ev_per_angstrom": 0.008677559099228632
+  },
+  {
+   "id": "lactic_acid_anion__n3__c1",
+   "charge": -1,
+   "alchemi_energy_ev": -15586.617666565811,
+   "upstream_energy_ev": -15586.617603869401,
+   "delta_energy_ev": -6.269641016842797e-05,
+   "max_abs_force_diff_ev_per_angstrom": 0.0006301365792751312,
+   "upstream_fmax_ev_per_angstrom": 0.009938091234588733
+  },
+  {
+   "id": "lactic_acid_anion__n3__c2",
+   "charge": -1,
+   "alchemi_energy_ev": -15586.638405370413,
+   "upstream_energy_ev": -15586.640309223045,
+   "delta_energy_ev": 0.0019038526315853233,
+   "max_abs_force_diff_ev_per_angstrom": 0.0007293224334716797,
+   "upstream_fmax_ev_per_angstrom": 0.008314139840559018
+  },
+  {
+   "id": "lactic_acid_anion__n3__c3",
+   "charge": -1,
+   "alchemi_energy_ev": -15586.724485382189,
+   "upstream_energy_ev": -15586.725350923522,
+   "delta_energy_ev": 0.0008655413330416195,
+   "max_abs_force_diff_ev_per_angstrom": 0.0006837537512183189,
+   "upstream_fmax_ev_per_angstrom": 0.00939395115755308
+  },
+  {
+   "id": "lactic_acid_anion__n3__c4",
+   "charge": -1,
+   "alchemi_energy_ev": -15586.832518294364,
+   "upstream_energy_ev": -15586.833090469878,
+   "delta_energy_ev": 0.0005721755132981343,
+   "max_abs_force_diff_ev_per_angstrom": 0.0007107239216566086,
+   "upstream_fmax_ev_per_angstrom": 0.009057140615671705
+  },
+  {
+   "id": "lactic_acid_anion__n3__c5",
+   "charge": -1,
+   "alchemi_energy_ev": -15586.727157997093,
+   "upstream_energy_ev": -15586.729192207518,
+   "delta_energy_ev": 0.002034210425335914,
+   "max_abs_force_diff_ev_per_angstrom": 0.0007308712229132652,
+   "upstream_fmax_ev_per_angstrom": 0.009654616056778666
+  },
+  {
+   "id": "lactic_acid_anion__n6__c0",
+   "charge": -1,
+   "alchemi_energy_ev": -21831.610583530444,
+   "upstream_energy_ev": -21831.613093517175,
+   "delta_energy_ev": 0.002509986730728997,
+   "max_abs_force_diff_ev_per_angstrom": 0.0008577089756727219,
+   "upstream_fmax_ev_per_angstrom": 0.009701151132163192
+  },
+  {
+   "id": "lactic_acid_anion__n6__c1",
+   "charge": -1,
+   "alchemi_energy_ev": -21831.578980159356,
+   "upstream_energy_ev": -21831.574555071973,
+   "delta_energy_ev": -0.0044250873834243976,
+   "max_abs_force_diff_ev_per_angstrom": 0.0007527787238359451,
+   "upstream_fmax_ev_per_angstrom": 0.00968909917895566
+  },
+  {
+   "id": "lactic_acid_anion__n6__c2",
+   "charge": -1,
+   "alchemi_energy_ev": -21831.235385778553,
+   "upstream_energy_ev": -21831.239728021097,
+   "delta_energy_ev": 0.004342242544225883,
+   "max_abs_force_diff_ev_per_angstrom": 0.0014574527740478516,
+   "upstream_fmax_ev_per_angstrom": 0.010037288047323428
+  },
+  {
+   "id": "lactic_acid_anion__n6__c3",
+   "charge": -1,
+   "alchemi_energy_ev": -21831.379539945043,
+   "upstream_energy_ev": -21831.381867937827,
+   "delta_energy_ev": 0.002327992784557864,
+   "max_abs_force_diff_ev_per_angstrom": 0.0010938569903373718,
+   "upstream_fmax_ev_per_angstrom": 0.009094405640758687
+  },
+  {
+   "id": "lactic_acid_anion__n6__c4",
+   "charge": -1,
+   "alchemi_energy_ev": -21831.406284807344,
+   "upstream_energy_ev": -21831.406972025226,
+   "delta_energy_ev": 0.0006872178819321562,
+   "max_abs_force_diff_ev_per_angstrom": 0.0007093064486980438,
+   "upstream_fmax_ev_per_angstrom": 0.00956824867328192
+  },
+  {
+   "id": "lactic_acid_anion__n6__c5",
+   "charge": -1,
+   "alchemi_energy_ev": -21831.192305147197,
+   "upstream_energy_ev": -21831.198180223313,
+   "delta_energy_ev": 0.005875076116353739,
+   "max_abs_force_diff_ev_per_angstrom": 0.0014023743569850922,
+   "upstream_fmax_ev_per_angstrom": 0.010219030148991831
+  },
+  {
+   "id": "lactic_acid_ionpairSS__n3__c0",
+   "charge": 0,
+   "alchemi_energy_ev": -15601.266835736156,
+   "upstream_energy_ev": -15601.266844653848,
+   "delta_energy_ev": 8.91769195732195e-06,
+   "max_abs_force_diff_ev_per_angstrom": 0.0001781838946044445,
+   "upstream_fmax_ev_per_angstrom": 0.009831342116465169
+  },
+  {
+   "id": "lactic_acid_ionpairSS__n3__c1",
+   "charge": 0,
+   "alchemi_energy_ev": -15600.8896035496,
+   "upstream_energy_ev": -15600.890497699858,
+   "delta_energy_ev": 0.0008941502583184047,
+   "max_abs_force_diff_ev_per_angstrom": 0.0005349810235202312,
+   "upstream_fmax_ev_per_angstrom": 0.008995988086319748
+  },
+  {
+   "id": "lactic_acid_ionpairSS__n3__c2",
+   "charge": 0,
+   "alchemi_energy_ev": -15600.893886452226,
+   "upstream_energy_ev": -15600.893164715424,
+   "delta_energy_ev": -0.0007217368020064896,
+   "max_abs_force_diff_ev_per_angstrom": 0.000318942591547966,
+   "upstream_fmax_ev_per_angstrom": 0.009839306924879469
+  },
+  {
+   "id": "lactic_acid_ionpairSS__n6__c0",
+   "charge": 0,
+   "alchemi_energy_ev": -21845.70295502154,
+   "upstream_energy_ev": -21845.704846684515,
+   "delta_energy_ev": 0.0018916629742307123,
+   "max_abs_force_diff_ev_per_angstrom": 0.0002556676045060158,
+   "upstream_fmax_ev_per_angstrom": 0.009499709786133861
+  },
+  {
+   "id": "lactic_acid_ionpairSS__n6__c1",
+   "charge": 0,
+   "alchemi_energy_ev": -21845.18103482294,
+   "upstream_energy_ev": -21845.184710591395,
+   "delta_energy_ev": 0.0036757684538315516,
+   "max_abs_force_diff_ev_per_angstrom": 0.00045914482325315475,
+   "upstream_fmax_ev_per_angstrom": 0.009750617497271245
+  },
+  {
+   "id": "lactic_acid_ionpairSS__n6__c2",
+   "charge": 0,
+   "alchemi_energy_ev": -21844.17432895871,
+   "upstream_energy_ev": -21844.173503016424,
+   "delta_energy_ev": -0.0008259422866103705,
+   "max_abs_force_diff_ev_per_angstrom": 0.0006696004420518875,
+   "upstream_fmax_ev_per_angstrom": 0.008933339961282562
+  },
+  {
+   "id": "lactic_acid_ionpairSS__n6__c4",
+   "charge": 0,
+   "alchemi_energy_ev": -21845.27213957605,
+   "upstream_energy_ev": -21845.268632134146,
+   "delta_energy_ev": -0.0035074419029115234,
+   "max_abs_force_diff_ev_per_angstrom": 0.00025451183319091797,
+   "upstream_fmax_ev_per_angstrom": 0.009184596506180318
+  },
+  {
+   "id": "lactic_acid_ionpairSS__n6__c5",
+   "charge": 0,
+   "alchemi_energy_ev": -21845.49386838223,
+   "upstream_energy_ev": -21845.493706818852,
+   "delta_energy_ev": -0.0001615633773326408,
+   "max_abs_force_diff_ev_per_angstrom": 0.00013637635856866837,
+   "upstream_fmax_ev_per_angstrom": 0.009909158187686585
+  },
+  {
+   "id": "lactic_acid_ionpair__n1__c0",
+   "charge": 0,
+   "alchemi_energy_ev": -11438.1154285323,
+   "upstream_energy_ev": -11438.116009069121,
+   "delta_energy_ev": 0.0005805368218716467,
+   "max_abs_force_diff_ev_per_angstrom": 0.0002237549051642418,
+   "upstream_fmax_ev_per_angstrom": 0.009455411004707374
+  },
+  {
+   "id": "lactic_acid_ionpair__n1__c1",
+   "charge": 0,
+   "alchemi_energy_ev": -11438.032899867521,
+   "upstream_energy_ev": -11438.034848754154,
+   "delta_energy_ev": 0.0019488866328174481,
+   "max_abs_force_diff_ev_per_angstrom": 0.0004900777712464333,
+   "upstream_fmax_ev_per_angstrom": 0.008712388449873123
+  },
+  {
+   "id": "lactic_acid_ionpair__n1__c2",
+   "charge": 0,
+   "alchemi_energy_ev": -11438.192259449112,
+   "upstream_energy_ev": -11438.191335858235,
+   "delta_energy_ev": -0.0009235908764821943,
+   "max_abs_force_diff_ev_per_angstrom": 0.00022482359781861305,
+   "upstream_fmax_ev_per_angstrom": 0.008347784704138432
+  },
+  {
+   "id": "lactic_acid_ionpair__n1__c3",
+   "charge": 0,
+   "alchemi_energy_ev": -11438.191942284984,
+   "upstream_energy_ev": -11438.191154630695,
+   "delta_energy_ev": -0.000787654289524653,
+   "max_abs_force_diff_ev_per_angstrom": 0.00021295296028256416,
+   "upstream_fmax_ev_per_angstrom": 0.009808114551506975
+  },
+  {
+   "id": "lactic_acid_ionpair__n1__c4",
+   "charge": 0,
+   "alchemi_energy_ev": -11438.025609256165,
+   "upstream_energy_ev": -11438.024949439294,
+   "delta_energy_ev": -0.0006598168711207109,
+   "max_abs_force_diff_ev_per_angstrom": 0.000569583848118782,
+   "upstream_fmax_ev_per_angstrom": 0.009939846287530559
+  },
+  {
+   "id": "lactic_acid_ionpair__n1__c5",
+   "charge": 0,
+   "alchemi_energy_ev": -11438.058897299754,
+   "upstream_energy_ev": -11438.059015025072,
+   "delta_energy_ev": 0.00011772531797760166,
+   "max_abs_force_diff_ev_per_angstrom": 0.00027776462957262993,
+   "upstream_fmax_ev_per_angstrom": 0.007397841085810438
+  },
+  {
+   "id": "lactic_acid_ionpair__n3__c0",
+   "charge": 0,
+   "alchemi_energy_ev": -15601.065016027169,
+   "upstream_energy_ev": -15601.064642619505,
+   "delta_energy_ev": -0.0003734076635737438,
+   "max_abs_force_diff_ev_per_angstrom": 0.0001246631145477295,
+   "upstream_fmax_ev_per_angstrom": 0.009715197961839374
+  },
+  {
+   "id": "lactic_acid_ionpair__n3__c1",
+   "charge": 0,
+   "alchemi_energy_ev": -15600.890579390552,
+   "upstream_energy_ev": -15600.89085715547,
+   "delta_energy_ev": 0.0002777649169729557,
+   "max_abs_force_diff_ev_per_angstrom": 0.0005334601737558842,
+   "upstream_fmax_ev_per_angstrom": 0.009735842699594965
+  },
+  {
+   "id": "lactic_acid_ionpair__n3__c2",
+   "charge": 0,
+   "alchemi_energy_ev": -15601.161898162849,
+   "upstream_energy_ev": -15601.161723750403,
+   "delta_energy_ev": -0.0001744124456308782,
+   "max_abs_force_diff_ev_per_angstrom": 0.0003519859164953232,
+   "upstream_fmax_ev_per_angstrom": 0.009895428799598748
+  },
+  {
+   "id": "lactic_acid_ionpair__n3__c3",
+   "charge": 0,
+   "alchemi_energy_ev": -15600.907134280955,
+   "upstream_energy_ev": -15600.907220415835,
+   "delta_energy_ev": 8.613487989350688e-05,
+   "max_abs_force_diff_ev_per_angstrom": 0.0002485055010765791,
+   "upstream_fmax_ev_per_angstrom": 0.008724175205671914
+  },
+  {
+   "id": "lactic_acid_ionpair__n3__c4",
+   "charge": 0,
+   "alchemi_energy_ev": -15601.0429129105,
+   "upstream_energy_ev": -15601.042570962358,
+   "delta_energy_ev": -0.000341948141795001,
+   "max_abs_force_diff_ev_per_angstrom": 7.546320557594299e-05,
+   "upstream_fmax_ev_per_angstrom": 0.009789312563409359
+  },
+  {
+   "id": "lactic_acid_ionpair__n3__c5",
+   "charge": 0,
+   "alchemi_energy_ev": -15600.657570385141,
+   "upstream_energy_ev": -15600.656206384858,
+   "delta_energy_ev": -0.0013640002835018095,
+   "max_abs_force_diff_ev_per_angstrom": 0.00032103247940540314,
+   "upstream_fmax_ev_per_angstrom": 0.009754184391485314
+  },
+  {
+   "id": "lactic_acid_ionpair__n6__c0",
+   "charge": 0,
+   "alchemi_energy_ev": -21845.68384510838,
+   "upstream_energy_ev": -21845.683831302278,
+   "delta_energy_ev": -1.3806100469082594e-05,
+   "max_abs_force_diff_ev_per_angstrom": 0.00022287853062152863,
+   "upstream_fmax_ev_per_angstrom": 0.00961012375902693
+  },
+  {
+   "id": "lactic_acid_ionpair__n6__c1",
+   "charge": 0,
+   "alchemi_energy_ev": -21845.48509980823,
+   "upstream_energy_ev": -21845.484442854595,
+   "delta_energy_ev": -0.000656953634461388,
+   "max_abs_force_diff_ev_per_angstrom": 0.00018147379159927368,
+   "upstream_fmax_ev_per_angstrom": 0.008439889056209599
+  },
+  {
+   "id": "lactic_acid_ionpair__n6__c2",
+   "charge": 0,
+   "alchemi_energy_ev": -21845.150483825906,
+   "upstream_energy_ev": -21845.152415911,
+   "delta_energy_ev": 0.0019320850951771718,
+   "max_abs_force_diff_ev_per_angstrom": 0.0006052888929843903,
+   "upstream_fmax_ev_per_angstrom": 0.008446628266282745
+  },
+  {
+   "id": "lactic_acid_ionpair__n6__c3",
+   "charge": 0,
+   "alchemi_energy_ev": -21844.92385135793,
+   "upstream_energy_ev": -21844.918730852005,
+   "delta_energy_ev": -0.005120505924423924,
+   "max_abs_force_diff_ev_per_angstrom": 0.000826565083116293,
+   "upstream_fmax_ev_per_angstrom": 0.009306096992427145
+  },
+  {
+   "id": "lactic_acid_ionpair__n6__c4",
+   "charge": 0,
+   "alchemi_energy_ev": -21845.156085822236,
+   "upstream_energy_ev": -21845.156057885473,
+   "delta_energy_ev": -2.7936763217439875e-05,
+   "max_abs_force_diff_ev_per_angstrom": 0.00024271709844470024,
+   "upstream_fmax_ev_per_angstrom": 0.009315826922043243
+  },
+  {
+   "id": "lactic_acid_ionpair__n6__c5",
+   "charge": 0,
+   "alchemi_energy_ev": -21845.419245931917,
+   "upstream_energy_ev": -21845.419012147322,
+   "delta_energy_ev": -0.00023378459445666522,
+   "max_abs_force_diff_ev_per_angstrom": 8.820556104183197e-05,
+   "upstream_fmax_ev_per_angstrom": 0.009976145770900344
+  },
+  {
+   "id": "water__n1__c0",
+   "charge": 0,
+   "alchemi_energy_ev": -2081.045206211625,
+   "upstream_energy_ev": -2081.045305664401,
+   "delta_energy_ev": 9.945277588485624e-05,
+   "max_abs_force_diff_ev_per_angstrom": 9.393878281116486e-05,
+   "upstream_fmax_ev_per_angstrom": 0.00894541014059414
+  },
+  {
+   "id": "water_cluster__n3__c0",
+   "charge": 0,
+   "alchemi_energy_ev": -6243.632889546434,
+   "upstream_energy_ev": -6243.631991850526,
+   "delta_energy_ev": -0.0008976959079518565,
+   "max_abs_force_diff_ev_per_angstrom": 0.00028514955192804337,
+   "upstream_fmax_ev_per_angstrom": 0.00851335231751132
+  },
+  {
+   "id": "water_cluster__n3__c1",
+   "charge": 0,
+   "alchemi_energy_ev": -6243.9129613193245,
+   "upstream_energy_ev": -6243.913430180275,
+   "delta_energy_ev": 0.00046886095060472144,
+   "max_abs_force_diff_ev_per_angstrom": 4.195608198642731e-05,
+   "upstream_fmax_ev_per_angstrom": 0.009805576103738568
+  },
+  {
+   "id": "water_cluster__n3__c2",
+   "charge": 0,
+   "alchemi_energy_ev": -6243.676640073503,
+   "upstream_energy_ev": -6243.676567779974,
+   "delta_energy_ev": -7.229352922877297e-05,
+   "max_abs_force_diff_ev_per_angstrom": 0.0001959693618118763,
+   "upstream_fmax_ev_per_angstrom": 0.009752012315218897
+  },
+  {
+   "id": "water_cluster__n3__c3",
+   "charge": 0,
+   "alchemi_energy_ev": -6243.657089819604,
+   "upstream_energy_ev": -6243.656781883118,
+   "delta_energy_ev": -0.0003079364860241185,
+   "max_abs_force_diff_ev_per_angstrom": 0.0002164812758564949,
+   "upstream_fmax_ev_per_angstrom": 0.008936599418829336
+  },
+  {
+   "id": "water_cluster__n6__c0",
+   "charge": 0,
+   "alchemi_energy_ev": -12488.010557393989,
+   "upstream_energy_ev": -12488.011800545595,
+   "delta_energy_ev": 0.0012431516061042203,
+   "max_abs_force_diff_ev_per_angstrom": 0.0005259490571916103,
+   "upstream_fmax_ev_per_angstrom": 0.009649006276030192
+  },
+  {
+   "id": "water_cluster__n6__c1",
+   "charge": 0,
+   "alchemi_energy_ev": -12487.928278063744,
+   "upstream_energy_ev": -12487.927665372807,
+   "delta_energy_ev": -0.0006126909374870593,
+   "max_abs_force_diff_ev_per_angstrom": 0.0003390219062566757,
+   "upstream_fmax_ev_per_angstrom": 0.009691881740067538
+  },
+  {
+   "id": "water_cluster__n6__c2",
+   "charge": 0,
+   "alchemi_energy_ev": -12488.24501249456,
+   "upstream_energy_ev": -12488.245976059261,
+   "delta_energy_ev": 0.0009635647002141923,
+   "max_abs_force_diff_ev_per_angstrom": 0.00021410174667835236,
+   "upstream_fmax_ev_per_angstrom": 0.010049716576972631
+  },
+  {
+   "id": "water_cluster__n6__c3",
+   "charge": 0,
+   "alchemi_energy_ev": -12487.965664962037,
+   "upstream_energy_ev": -12487.966361908366,
+   "delta_energy_ev": 0.0006969463283894584,
+   "max_abs_force_diff_ev_per_angstrom": 0.000387601088732481,
+   "upstream_fmax_ev_per_angstrom": 0.008360093055350182
+  }
+ ]
+}

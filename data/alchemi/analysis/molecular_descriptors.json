@@ -1,0 +1,290 @@
+{
+  "lactic_acid": {
+    "assoc_energy_kcal_by_n": {
+      "1": -9.515016057298388,
+      "3": -27.60482328248234,
+      "6": -61.49883283762617
+    },
+    "assoc_energy_per_water_kcal_by_n": {
+      "1": -9.515016057298388,
+      "3": -9.201607760827446,
+      "6": -10.249805472937695
+    },
+    "assoc_energy_per_water_kcal": -9.65547643035451,
+    "acid_to_water_network_kcal_by_n": {
+      "1": -9.515016057298388,
+      "3": -9.678875126949414,
+      "6": -15.982494858978876
+    },
+    "hbond_min_A": 1.6388945782576574,
+    "hbond_min_OO_A": 2.6381990857161925,
+    "hbond_min_type": "acid->water (carboxyl_OH -> water_O)",
+    "hbond_min_structure": "lactic_acid__n3__c0",
+    "acid_water_hbonds_by_n": {
+      "1": 2,
+      "3": 2,
+      "6": 4
+    },
+    "deprot_energy_separated_ions_n0_kcal": 171.44988758134423,
+    "deprot_energy_n1_kcal": null,
+    "deprot_ion_pair_type_n1": "no stable ion pair: 6/6 starts relaxed back to the neutral acid",
+    "deprot_energy_separated_ions_n1_kcal": 163.5531824395326,
+    "deprot_energy_n3_kcal": null,
+    "deprot_ion_pair_type_n3": "no stable ion pair: 9/9 starts relaxed back to the neutral acid",
+    "deprot_energy_separated_ions_n3_kcal": 152.66288284062662,
+    "deprot_energy_n6_kcal": 11.250146001528442,
+    "deprot_ion_pair_type_n6": "contact_ion_pair",
+    "deprot_energy_separated_ions_n6_kcal": 152.25384962154794,
+    "md_hbonds_by_species_and_T": {
+      "anion_n6": {
+        "278.15": {
+          "acid_water_hbonds_mean": 5.1066666666666665,
+          "acid_water_hbonds_sem": 0.5592355893936333,
+          "all_intermolecular_hbonds_mean": 9.166666666666666,
+          "n_seeds": 3
+        },
+        "295.15": {
+          "acid_water_hbonds_mean": 5.16,
+          "acid_water_hbonds_sem": 0.6401041581909412,
+          "all_intermolecular_hbonds_mean": 9.226666666666667,
+          "n_seeds": 3
+        },
+        "300.15": {
+          "acid_water_hbonds_mean": 4.336666666666667,
+          "acid_water_hbonds_sem": 0.6677657606609606,
+          "all_intermolecular_hbonds_mean": 8.729999999999999,
+          "n_seeds": 3
+        },
+        "310.15": {
+          "acid_water_hbonds_mean": 4.4366666666666665,
+          "acid_water_hbonds_sem": 0.49830824908996946,
+          "all_intermolecular_hbonds_mean": 8.613333333333333,
+          "n_seeds": 3
+        }
+      },
+      "neutral_n3": {
+        "278.15": {
+          "acid_water_hbonds_mean": 1.92,
+          "acid_water_hbonds_sem": 0.06557438524301999,
+          "all_intermolecular_hbonds_mean": 3.753333333333334,
+          "n_seeds": 3
+        },
+        "295.15": {
+          "acid_water_hbonds_mean": 1.9400000000000002,
+          "acid_water_hbonds_sem": 0.03055050463303896,
+          "all_intermolecular_hbonds_mean": 3.65,
+          "n_seeds": 3
+        },
+        "300.15": {
+          "acid_water_hbonds_mean": 1.8,
+          "acid_water_hbonds_sem": 0.1159022576714247,
+          "all_intermolecular_hbonds_mean": 3.6566666666666663,
+          "n_seeds": 3
+        },
+        "310.15": {
+          "acid_water_hbonds_mean": 1.7266666666666666,
+          "acid_water_hbonds_sem": 0.19936008739074237,
+          "all_intermolecular_hbonds_mean": 3.6133333333333333,
+          "n_seeds": 3
+        }
+      },
+      "neutral_n6": {
+        "278.15": {
+          "acid_water_hbonds_mean": 3.6966666666666668,
+          "acid_water_hbonds_sem": 0.10397649306988137,
+          "all_intermolecular_hbonds_mean": 8.123333333333333,
+          "n_seeds": 3
+        },
+        "295.15": {
+          "acid_water_hbonds_mean": 3.776666666666667,
+          "acid_water_hbonds_sem": 0.08969082698049148,
+          "all_intermolecular_hbonds_mean": 8.026666666666666,
+          "n_seeds": 3
+        },
+        "300.15": {
+          "acid_water_hbonds_mean": 3.703333333333333,
+          "acid_water_hbonds_sem": 0.20739120307069703,
+          "all_intermolecular_hbonds_mean": 7.8999999999999995,
+          "n_seeds": 3
+        },
+        "310.15": {
+          "acid_water_hbonds_mean": 3.776666666666667,
+          "acid_water_hbonds_sem": 0.13333333333333347,
+          "all_intermolecular_hbonds_mean": 7.753333333333333,
+          "n_seeds": 3
+        }
+      }
+    }
+  },
+  "acetic_acid": {
+    "assoc_energy_kcal_by_n": {
+      "1": -10.295740556537815,
+      "3": -26.05452354377113,
+      "6": -57.838943657068924
+    },
+    "assoc_energy_per_water_kcal_by_n": {
+      "1": -10.295740556537815,
+      "3": -8.684841181257044,
+      "6": -9.63982394284482
+    },
+    "assoc_energy_per_water_kcal": -9.540135226879892,
+    "acid_to_water_network_kcal_by_n": {
+      "1": -10.295740556537815,
+      "3": -8.128575388238206,
+      "6": -12.322605678421631
+    },
+    "hbond_min_A": 1.4911789725626,
+    "hbond_min_OO_A": 2.5177771625451144,
+    "hbond_min_type": "acid->water (carboxyl_OH -> water_O)",
+    "hbond_min_structure": "acetic_acid__n6__c4",
+    "acid_water_hbonds_by_n": {
+      "1": 2,
+      "3": 3,
+      "6": 2
+    },
+    "deprot_energy_separated_ions_n0_kcal": 185.10668497327202,
+    "deprot_energy_n1_kcal": null,
+    "deprot_ion_pair_type_n1": "no stable ion pair: 6/6 starts relaxed back to the neutral acid",
+    "deprot_energy_separated_ions_n1_kcal": 174.9018964656873,
+    "deprot_energy_n3_kcal": null,
+    "deprot_ion_pair_type_n3": "no stable ion pair: 9/9 starts relaxed back to the neutral acid",
+    "deprot_energy_separated_ions_n3_kcal": 160.1132232284873,
+    "deprot_energy_n6_kcal": null,
+    "deprot_ion_pair_type_n6": "no stable ion pair: 12/12 starts relaxed back to the neutral acid",
+    "deprot_energy_separated_ions_n6_kcal": 147.9622711318076,
+    "md_hbonds_by_species_and_T": {
+      "anion_n6": {
+        "278.15": {
+          "acid_water_hbonds_mean": 3.17,
+          "acid_water_hbonds_sem": 0.07234178138070234,
+          "all_intermolecular_hbonds_mean": 8.876666666666665,
+          "n_seeds": 3
+        },
+        "295.15": {
+          "acid_water_hbonds_mean": 3.3400000000000003,
+          "acid_water_hbonds_sem": 0.2650157228040128,
+          "all_intermolecular_hbonds_mean": 9.13,
+          "n_seeds": 3
+        },
+        "300.15": {
+          "acid_water_hbonds_mean": 3.6,
+          "acid_water_hbonds_sem": 0.1552417469626003,
+          "all_intermolecular_hbonds_mean": 8.623333333333333,
+          "n_seeds": 3
+        },
+        "310.15": {
+          "acid_water_hbonds_mean": 3.78,
+          "acid_water_hbonds_sem": 0.12529964086141676,
+          "all_intermolecular_hbonds_mean": 8.93,
+          "n_seeds": 3
+        }
+      },
+      "neutral_n3": {
+        "278.15": {
+          "acid_water_hbonds_mean": 2.4266666666666667,
+          "acid_water_hbonds_sem": 0.06173419725817373,
+          "all_intermolecular_hbonds_mean": 3.47,
+          "n_seeds": 3
+        },
+        "295.15": {
+          "acid_water_hbonds_mean": 2.5,
+          "acid_water_hbonds_sem": 0.08144527815247073,
+          "all_intermolecular_hbonds_mean": 3.4766666666666666,
+          "n_seeds": 3
+        },
+        "300.15": {
+          "acid_water_hbonds_mean": 2.4433333333333334,
+          "acid_water_hbonds_sem": 0.05811865258054223,
+          "all_intermolecular_hbonds_mean": 3.3633333333333333,
+          "n_seeds": 3
+        },
+        "310.15": {
+          "acid_water_hbonds_mean": 2.4499999999999997,
+          "acid_water_hbonds_sem": 0.07637626158259736,
+          "all_intermolecular_hbonds_mean": 3.42,
+          "n_seeds": 3
+        }
+      },
+      "neutral_n6": {
+        "278.15": {
+          "acid_water_hbonds_mean": 2.5533333333333332,
+          "acid_water_hbonds_sem": 0.1507020607394309,
+          "all_intermolecular_hbonds_mean": 8.23,
+          "n_seeds": 3
+        },
+        "295.15": {
+          "acid_water_hbonds_mean": 2.15,
+          "acid_water_hbonds_sem": 0.01527525231651953,
+          "all_intermolecular_hbonds_mean": 8.146666666666667,
+          "n_seeds": 3
+        },
+        "300.15": {
+          "acid_water_hbonds_mean": 2.3866666666666667,
+          "acid_water_hbonds_sem": 0.22258581366395402,
+          "all_intermolecular_hbonds_mean": 7.803333333333332,
+          "n_seeds": 3
+        },
+        "310.15": {
+          "acid_water_hbonds_mean": 2.6,
+          "acid_water_hbonds_sem": 0.17156145643277035,
+          "all_intermolecular_hbonds_mean": 7.9433333333333325,
+          "n_seeds": 3
+        }
+      }
+    }
+  },
+  "lactic_minus_acetic": {
+    "assoc_energy_per_water_kcal": -0.11534120347461752,
+    "hbond_min_A": 0.14771560569505748,
+    "hbond_min_OO_A": 0.12042192317107814,
+    "deprot_energy_separated_ions_n0_kcal": -13.656797391927796,
+    "deprot_energy_separated_ions_n1_kcal": -11.348714026154681,
+    "deprot_energy_separated_ions_n3_kcal": -7.4503403878606775,
+    "deprot_energy_separated_ions_n6_kcal": 4.2915784897403455
+  },
+  "provenance": {
+    "label": "real: ALCHEMI/AIMNet2 on NVIDIA RTX A6000",
+    "method": "AIMNet2 via nvalchemi-toolkit (PipelineModelWrapper: AIMNet2 + Ewald + DFT-D3(BJ)), FIRE2 optimisation",
+    "gpu": "NVIDIA RTX A6000",
+    "checkpoint": "aimnet2_wb97m_d3_3",
+    "versions": {
+      "python": "3.12.16",
+      "platform": "Linux-6.8.0-90-generic-x86_64-with-glibc2.35",
+      "nvalchemi-toolkit": "0.2.0",
+      "nvalchemi-toolkit-ops": "0.5.0",
+      "aimnet": "0.2.5",
+      "torch": "2.10.0",
+      "warp-lang": "1.18.0+cu12",
+      "ase": "3.29.0",
+      "nvidia-physicsnemo": "2.2.2",
+      "numpy": "2.2.6",
+      "torch_cuda": "12.8",
+      "cudnn": 91002,
+      "gpu": "NVIDIA RTX A6000",
+      "gpu_capability": "8.6",
+      "gpu_memory_gb": 50.91
+    },
+    "note": "cluster-phase (gas-phase microsolvated) 0 K electronic energetics; a relative acidity/solvation signal, not a solution-phase pKa, pH, or sourness prediction",
+    "sampling_caveat": "6 seeded starts per (species, n) and local FIRE2 minimisation; global minima are not guaranteed. Differences of a few kcal/mol at n=6 are comparable to the gap between the lowest and second-lowest starts (see deprotonation_energies.csv *_gap_to_2nd_kcal_mol).",
+    "definitions": {
+      "assoc_energy_per_water_kcal": "mean over n in {1,3,6} of [E(acid.nH2O) - E(acid) - n E(H2O)]/n, lowest-energy conformers",
+      "deprot_energy_n{n}_kcal": "E(anion.H3O+.(n-1)H2O) - E(acid.nH2O), matched composition, lowest-energy structures that remained ion pairs after optimisation (null if none did)",
+      "deprot_energy_separated_ions_n{n}_kcal": "E(anion.nH2O) + E(H3O+) - E(acid.nH2O) - E(H2O); charged energies are gas-phase (periodic Ewald minus Makov-Payne monopole term)",
+      "hbond_min_A": "shortest intermolecular acid/water H...O distance in the lowest-energy neutral clusters",
+      "lactic_minus_acetic": "lactic value minus acetic value for every numeric field present for both",
+      "md_hbonds_by_species_and_T": "NVT Langevin (BAOAB) 2 ps per run at T (K), mean over the 2nd ps of acid(or anion)-water geometric H-bonds; mean and SEM over independent velocity/noise seeds"
+    },
+    "source_files": [
+      "data/alchemi/results/json/",
+      "data/alchemi/analysis/association_energies.csv",
+      "data/alchemi/analysis/deprotonation_energies.csv",
+      "data/alchemi/analysis/hbonds.csv"
+    ],
+    "crosscheck_upstream_aimnet": {
+      "n": 159,
+      "max_abs_delta_energy_ev": 0.005875076116353739,
+      "mean_abs_delta_energy_ev": 0.0010959692859935058,
+      "max_abs_force_diff_ev_per_angstrom": 0.0014574527740478516
+    }
+  }
+}

@@ -1,0 +1,3 @@
+ TYPE                        TARGET_DISK  PROVIDER                 GPU    COUNT  VRAM/GPU  TOTAL_VRAM  CAPABILITY  DISK   $/GB/MO  BOOT     FEATURES  VCPUS  $/HR  
+ hyperstack_A6000            100          hyperstack:shadeform     A6000      1  48        48          8.6         100GB  -        6m30s    -            28  $0.60 
+ massedcompute_A6000         256          massedcompute:shadeform  A6000      1  48        48          8.6         256GB  -        6m30s    -             6  $0.68 

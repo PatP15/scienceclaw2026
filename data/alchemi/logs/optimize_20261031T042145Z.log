@@ -1,0 +1,74 @@
+[2026-10-31T04:21:46Z] mode=optimize device=cuda:0 versions={"python": "3.12.16", "platform": "Linux-6.8.0-90-generic-x86_64-with-glibc2.35", "nvalchemi-toolkit": "0.2.0", "nvalchemi-toolkit-ops": "0.5.0", "aimnet": "0.2.5", "torch": "2.10.0", "warp-lang": "1.18.0+cu12", "ase": "3.29.0", "nvidia-physicsnemo": "2.2.2", "numpy": "2.2.6", "torch_cuda": "12.8", "cudnn": 91002, "gpu": "NVIDIA RTX A6000", "gpu_capability": "8.6", "gpu_memory_gb": 50.91}
+Warp 1.18.0 initialized:
+   CUDA Toolkit 12.9, Driver 12.8
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA RTX A6000" (47 GiB, sm_86, mempool enabled)
+   Kernel cache:
+     /home/shadeform/.cache/warp/1.18.0
+/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemi/models/aimnet2.py:353: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  values = [float(v) for v in (rc_s, rc_v) if v is not None]
+[2026-10-31T04:22:01Z] AIMNet2 'aimnet2_wb97m_d3_3' loaded on cuda:0 in 11.8s; D3(BJ) params used: {'s6': 1.0, 'a1': 0.566, 's8': 0.3908, 'a2': 3.128}
+[2026-10-31T04:22:01Z] optimising 53 structures with FIRE2 (fmax<0.01 eV/A, max 4000 steps)
+[2026-10-31T04:22:19Z] [1/53] acetic_acid_ionpair__n1__c0: E=-8319.226233 eV fmax=0.0100 steps=226 converged (11.2s)
+[2026-10-31T04:22:31Z] [2/53] acetic_acid_ionpair__n1__c1: E=-8319.538328 eV fmax=0.0091 steps=282 converged (7.3s)
+[2026-10-31T04:22:43Z] [3/53] acetic_acid_ionpair__n1__c2: E=-8319.252219 eV fmax=0.0098 steps=287 converged (6.9s)
+[2026-10-31T04:22:53Z] [4/53] acetic_acid_ionpair__n1__c3: E=-8319.538094 eV fmax=0.0097 steps=201 converged (5.0s)
+[2026-10-31T04:23:05Z] [5/53] acetic_acid_ionpair__n1__c4: E=-8319.538903 eV fmax=0.0093 steps=194 converged (5.2s)
+[2026-10-31T04:23:29Z] [6/53] acetic_acid_ionpair__n1__c5: E=-8319.539834 eV fmax=0.0100 steps=213 converged (8.4s)
+[2026-10-31T04:23:55Z] [7/53] acetic_acid_ionpair__n3__c0: E=-12482.112990 eV fmax=0.0068 steps=205 converged (20.0s)
+[2026-10-31T04:24:08Z] [8/53] acetic_acid_ionpairSS__n3__c0: E=-12482.110828 eV fmax=0.0094 steps=211 converged (7.3s)
+[2026-10-31T04:24:22Z] [9/53] acetic_acid_ionpair__n3__c1: E=-12482.109469 eV fmax=0.0096 steps=201 converged (7.3s)
+[2026-10-31T04:24:36Z] [10/53] acetic_acid_ionpairSS__n3__c1: E=-12482.171853 eV fmax=0.0065 steps=260 converged (8.0s)
+[2026-10-31T04:25:01Z] [11/53] acetic_acid_ionpair__n3__c2: E=-12482.111464 eV fmax=0.0088 steps=586 converged (19.6s)
+[2026-10-31T04:25:15Z] [12/53] acetic_acid_ionpair__n3__c3: E=-12482.180159 eV fmax=0.0100 steps=238 converged (7.7s)
+[2026-10-31T04:25:32Z] [13/53] acetic_acid_ionpairSS__n3__c3: E=-12482.162763 eV fmax=0.0090 steps=388 converged (11.9s)
+[2026-10-31T04:25:45Z] [14/53] acetic_acid_ionpair__n3__c4: E=-12482.317537 eV fmax=0.0089 steps=226 converged (7.2s)
+[2026-10-31T04:25:59Z] [15/53] acetic_acid_ionpair__n3__c5: E=-12482.197226 eV fmax=0.0098 steps=270 converged (8.3s)
+[2026-10-31T04:26:12Z] [16/53] acetic_acid_ionpair__n6__c0: E=-18726.497444 eV fmax=0.0091 steps=212 converged (7.2s)
+[2026-10-31T04:26:26Z] [17/53] acetic_acid_ionpairSS__n6__c0: E=-18726.501003 eV fmax=0.0096 steps=257 converged (8.0s)
+[2026-10-31T04:26:38Z] [18/53] acetic_acid_ionpair__n6__c1: E=-18726.570006 eV fmax=0.0099 steps=199 converged (6.5s)
+[2026-10-31T04:26:51Z] [19/53] acetic_acid_ionpairSS__n6__c1: E=-18726.566614 eV fmax=0.0094 steps=220 converged (7.0s)
+[2026-10-31T04:27:02Z] [20/53] acetic_acid_ionpair__n6__c2: E=-18726.419094 eV fmax=0.0091 steps=184 converged (5.6s)
+[2026-10-31T04:27:26Z] [21/53] acetic_acid_ionpairSS__n6__c2: E=-18726.710130 eV fmax=0.0094 steps=524 converged (18.7s)
+[2026-10-31T04:27:38Z] [22/53] acetic_acid_ionpair__n6__c3: E=-18726.536119 eV fmax=0.0100 steps=187 converged (5.3s)
+[2026-10-31T04:27:50Z] [23/53] acetic_acid_ionpairSS__n6__c3: E=-18726.422994 eV fmax=0.0083 steps=222 converged (6.9s)
+[2026-10-31T04:28:01Z] [24/53] acetic_acid_ionpair__n6__c4: E=-18726.832517 eV fmax=0.0092 steps=173 converged (5.2s)
+[2026-10-31T04:28:14Z] [25/53] acetic_acid_ionpairSS__n6__c4: E=-18726.833498 eV fmax=0.0090 steps=218 converged (6.9s)
+[2026-10-31T04:28:26Z] [26/53] acetic_acid_ionpair__n6__c5: E=-18726.285423 eV fmax=0.0083 steps=185 converged (6.1s)
+[2026-10-31T04:28:39Z] [27/53] acetic_acid_ionpairSS__n6__c5: E=-18726.288747 eV fmax=0.0075 steps=212 converged (7.4s)
+W1031 04:28:39.743000 24842 torch/_dynamo/convert_frame.py:1676] [5/8] torch._dynamo hit config.recompile_limit (8)
+W1031 04:28:39.743000 24842 torch/_dynamo/convert_frame.py:1676] [5/8]    function: 'neighbor_list' (/home/shadeform/fermentai/.venv/lib/python3.12/site-packages/nvalchemiops/torch/neighbors/__init__.py:102)
+W1031 04:28:39.743000 24842 torch/_dynamo/convert_frame.py:1676] [5/8]    last reason: 5/6: ___as_tensor(cutoff).item() == 5.0  # (unknown source ___as_tensor(cutoff).item(), please file a bug)
+W1031 04:28:39.743000 24842 torch/_dynamo/convert_frame.py:1676] [5/8] To log all recompilation reasons, use TORCH_LOGS="recompiles".
+W1031 04:28:39.743000 24842 torch/_dynamo/convert_frame.py:1676] [5/8] To diagnose recompilation issues, see https://pytorch.org/docs/main/compile/programming_model.recompilation.html
+[2026-10-31T04:28:55Z] [28/53] lactic_acid_ionpair__n1__c0: E=-11438.115429 eV fmax=0.0097 steps=323 converged (10.2s)
+[2026-10-31T04:29:14Z] [29/53] lactic_acid_ionpair__n1__c1: E=-11438.032900 eV fmax=0.0087 steps=406 converged (13.7s)
+[2026-10-31T04:29:27Z] [30/53] lactic_acid_ionpair__n1__c2: E=-11438.192259 eV fmax=0.0084 steps=239 converged (7.4s)
+[2026-10-31T04:29:39Z] [31/53] lactic_acid_ionpair__n1__c3: E=-11438.191942 eV fmax=0.0097 steps=216 converged (6.5s)
+[2026-10-31T04:29:55Z] [32/53] lactic_acid_ionpair__n1__c4: E=-11438.025609 eV fmax=0.0100 steps=303 converged (9.4s)
+[2026-10-31T04:30:12Z] [33/53] lactic_acid_ionpair__n1__c5: E=-11438.058897 eV fmax=0.0075 steps=303 converged (11.3s)
+[2026-10-31T04:30:25Z] [34/53] lactic_acid_ionpair__n3__c0: E=-15601.065016 eV fmax=0.0097 steps=206 converged (7.1s)
+[2026-10-31T04:30:46Z] [35/53] lactic_acid_ionpairSS__n3__c0: E=-15601.266836 eV fmax=0.0098 steps=492 converged (15.9s)
+[2026-10-31T04:30:59Z] [36/53] lactic_acid_ionpair__n3__c1: E=-15600.890579 eV fmax=0.0097 steps=204 converged (7.3s)
+[2026-10-31T04:31:13Z] [37/53] lactic_acid_ionpairSS__n3__c1: E=-15600.889604 eV fmax=0.0090 steps=208 converged (7.8s)
+[2026-10-31T04:31:44Z] [38/53] lactic_acid_ionpair__n3__c2: E=-15601.161898 eV fmax=0.0099 steps=720 converged (24.6s)
+[2026-10-31T04:32:00Z] [39/53] lactic_acid_ionpairSS__n3__c2: E=-15600.893886 eV fmax=0.0100 steps=340 converged (10.9s)
+[2026-10-31T04:32:14Z] [40/53] lactic_acid_ionpair__n3__c3: E=-15600.907134 eV fmax=0.0087 steps=266 converged (9.0s)
+[2026-10-31T04:32:26Z] [41/53] lactic_acid_ionpair__n3__c4: E=-15601.042913 eV fmax=0.0098 steps=209 converged (6.4s)
+[2026-10-31T04:32:40Z] [42/53] lactic_acid_ionpair__n3__c5: E=-15600.657570 eV fmax=0.0098 steps=251 converged (7.8s)
+[2026-10-31T04:32:51Z] [43/53] lactic_acid_ionpair__n6__c0: E=-21845.683845 eV fmax=0.0096 steps=227 converged (5.9s)
+[2026-10-31T04:33:03Z] [44/53] lactic_acid_ionpairSS__n6__c0: E=-21845.702955 eV fmax=0.0096 steps=228 converged (6.4s)
+[2026-10-31T04:33:14Z] [45/53] lactic_acid_ionpair__n6__c1: E=-21845.485100 eV fmax=0.0084 steps=191 converged (5.4s)
+[2026-10-31T04:33:26Z] [46/53] lactic_acid_ionpairSS__n6__c1: E=-21845.181035 eV fmax=0.0098 steps=328 converged (8.6s)
+[2026-10-31T04:33:37Z] [47/53] lactic_acid_ionpair__n6__c2: E=-21845.150484 eV fmax=0.0084 steps=216 converged (5.5s)
+[2026-10-31T04:33:42Z] [48/53] lactic_acid_ionpairSS__n6__c2: E=-21844.174329 eV fmax=0.0088 steps=214 converged (5.0s)
+[2026-10-31T04:33:48Z] [49/53] lactic_acid_ionpair__n6__c3: E=-21844.923851 eV fmax=0.0093 steps=218 converged (5.2s)
+[2026-10-31T04:33:53Z] [50/53] lactic_acid_ionpair__n6__c4: E=-21845.156086 eV fmax=0.0092 steps=196 converged (4.6s)
+[2026-10-31T04:33:59Z] [51/53] lactic_acid_ionpairSS__n6__c4: E=-21845.272140 eV fmax=0.0092 steps=233 converged (5.5s)
+[2026-10-31T04:34:05Z] [52/53] lactic_acid_ionpair__n6__c5: E=-21845.419246 eV fmax=0.0100 steps=249 converged (5.7s)
+[2026-10-31T04:34:16Z] [53/53] lactic_acid_ionpairSS__n6__c5: E=-21845.493868 eV fmax=0.0099 steps=462 converged (10.7s)
+[2026-10-31T04:34:16Z] optimize done: 53 ok, 0 failed
+[2026-10-31T04:34:16Z] total wall time 749.2s
+exit_code=0
