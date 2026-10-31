@@ -2,21 +2,24 @@
 
 Owner scope: docs/pitch/, docs/demo_script.md, scripts/make_pitch_figures.py, data/figures/, this file.
 
-## Status: COMPLETE (final pass with real ALCHEMI + chain + benchmark data)
-- [x] scripts/make_pitch_figures.py — 6 figures (PNG 3200x1800 + SVG), every number read from data files;
+## Status: COMPLETE — investor framing (4 slides) + 7 figures
+- [x] scripts/make_pitch_figures.py — 7 figures (PNG 3200x1800 + SVG); numbers read from data files;
       byte-identical reruns; ruff clean; no matplotlib warnings
-- [x] evidence_pipeline: real ALCHEMI numbers (from CSVs), chamber_A/B specimens, mild/sour as footnote
-- [x] benchmark_summary (new): in-silico tiles + paired-difference CI plot
-- [x] docs/pitch/slides.md — 403 spoken words = 2:53 @140 wpm; numbers/sources table
+- [x] tech_highlights (new): NVIDIA ALCHEMI | Formlabs PreForm panels, text wordmarks only
+- [x] docs/pitch/slides.md — investor deck: 391 spoken words = 2:48 @140 wpm
+- [x] docs/demo_script.md — investor intro; ~274 spoken words
 - [x] docs/pitch/figure_sources.md
-- [x] docs/demo_script.md — UI names, data-mode indicator, Online Agent/Offline Policy, demo_04 replay,
-      `uv run python -m simulated_devices --chambers A B`; ~272 spoken words
+
+## Pending placeholders
+- PREFORM_ESTIMATES in scripts/make_pitch_figures.py + slide 3 bullet: print time / resin volume
+- [ASK — team to fill] on slide 4 (bullet + notes)
+- data/stl/hero_chamber_AB.png: picked up automatically by tech_highlights when it exists
 
 ## Next
-- Rehearse demo against the committed dashboard (data-mode indicator / replay-from-API were uncommitted at
-  writing time).
-- If firmware is verified on hardware, update "compiled, hardware-unverified" in slides.md + demo_script.md.
+- When the Formlabs agent reports estimates (.progress/formlabs.md / docs/formlabs_workflow.md): fill
+  PREFORM_ESTIMATES, re-run, update slide 3.
+- Rehearse demo against the committed dashboard build.
 
 ## Resume
-uv run python scripts/make_pitch_figures.py [--only evidence_pipeline benchmark_summary ...]
+uv run python scripts/make_pitch_figures.py [--only tech_highlights ...]
 sed -n '/^> /p' docs/pitch/slides.md | sed 's/^> //' | wc -w

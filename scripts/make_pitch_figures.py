@@ -932,6 +932,131 @@ def fig_benchmark_summary():
     return save(fig, "benchmark_summary")
 
 
+# ============================================================================================
+# 7. Technology partners: NVIDIA ALCHEMI | Formlabs PreForm (text wordmarks, no logos)
+# ============================================================================================
+# Placeholders until the PreForm integration reports real estimates. Never invent these.
+PREFORM_ESTIMATES = {
+    "time": "[PreForm: print time — pending]",
+    "resin": "[PreForm: resin volume — pending]",
+}
+HERO_PNG = STL / "hero_chamber_AB.png"
+
+
+def _placeholder(ax, x, y, text, size=11.0, ha="center"):
+    ax.text(x, y, text, ha=ha, va="center", fontsize=size, fontweight="bold", color="#8a6d00",
+            bbox={"boxstyle": "round,pad=0.3", "fc": "#fff6cc", "ec": "#e0c25a", "lw": 1})
+
+
+def _fit_image(ax, im, x0, y0, w, h):
+    ih, iw = im.shape[:2]
+    if iw / ih > w / h:
+        hh = w * ih / iw
+        ext = (x0, x0 + w, y0 + (h - hh) / 2, y0 + (h + hh) / 2)
+    else:
+        ww = h * iw / ih
+        ext = (x0 + (w - ww) / 2, x0 + (w + ww) / 2, y0, y0 + h)
+    ax.imshow(im, extent=ext, zorder=3, interpolation="lanczos")
+    ax.set_xlim(0, W)
+    ax.set_ylim(0, H)
+
+
+def fig_tech_highlights():
+    al = alchemi_numbers()
+    chain = json.loads((STL / "chain_summary.json").read_text())["chambers"]
+    summ = json.loads((ALCH / "analysis_summary.json").read_text())
+    fig, ax = canvas()
+    ax.text(3, 86.5, "Two technology partners, one evidence chain", fontsize=22, fontweight="bold", color=INK,
+            va="top")
+    ax.text(3, 81.2, "Wordmarks are text only. Each panel says what is real today and what is pending.", fontsize=13,
+            color=MUTED, va="top")
+
+    px, pw, py, ph = (3.0, 81.5), 75.5, 4.0, 72.0
+    # ---------------- NVIDIA panel
+    x = px[0]
+    rbox(ax, x, py, pw, ph, fc="white", ec=GREEN, lw=2.6, r=2.0)
+    ax.text(x + 3, py + ph - 5.0, "NVIDIA ALCHEMI", fontsize=24, fontweight="bold", color=INK, va="center")
+    ax.text(x + 3, py + ph - 10.0, f"AIMNet2 ({summ['model'][0]}) on a Brev {summ['versions']['gpu'].replace('NVIDIA ', '')}",
+            fontsize=13, color=MUTED, va="center")
+    badge(ax, x + pw - 3, py + ph - 5.0, "real_gpu", size=12, ha="right")
+    ax.text(x + 3, py + ph - 14.5, "Lactic vs acetic acid in clusters of 0–6 waters:", fontsize=12.5, color=INK,
+            va="top")
+    ax.text(x + 3, py + ph - 18.3, f"{summ['n_converged']} geometry optimisations + 72 molecular-dynamics runs",
+            fontsize=12.5, color=INK, va="top", fontweight="bold")
+    # mini bars: deprotonation at n = 3 (lower = ionises more easily)
+    dl, da = al["deprot_n3"]
+    bx0, bx1, by = x + 21, x + pw - 14, py + 42.0
+    ax.text(x + 3, by + 6.2, "Energy to give up a proton (n = 3 cluster, kcal/mol, lower = easier)", fontsize=12,
+            color=MUTED, va="center")
+    vmax = max(dl, da)
+    for k, (lab, v) in enumerate((("lactic", dl), ("acetic", da))):
+        yy = by - k * 5.2
+        ax.text(x + 3, yy, lab, fontsize=13.5, fontweight="bold", color=INK, va="center")
+        ax.add_patch(Rectangle((bx0, yy - 1.5), (bx1 - bx0) * v / vmax, 3.0, fc=GREEN if k == 0 else "#9fd39f",
+                               ec="none", zorder=2))
+        ax.text(bx0 + (bx1 - bx0) * v / vmax + 1.0, yy, f"{v:.1f}", fontsize=13.5, fontweight="bold", color=INK,
+                va="center")
+    lw_, la_ = al["per_water"]
+    ax.text(x + 3, by - 10.5, f"→ lactic gives up its proton ~{da - dl:.1f} kcal/mol more easily", fontsize=13,
+            fontweight="bold", color=INK, va="center")
+    ax.text(x + 3, by - 14.8, f"Hydration per water: lactic {_m(lw_, 2)} vs acetic {_m(la_, 2)} kcal/mol",
+            fontsize=12.5, color=INK, va="center")
+    # stat tiles
+    tiles = [("~$0.68", "of GPU time"), ("~1.1 h", "on Brev, then deleted"), ("offline", "cached on the Mac")]
+    tw = (pw - 6 - 2 * 2.0) / 3
+    for k, (big, small) in enumerate(tiles):
+        tx = x + 3 + k * (tw + 2.0)
+        rbox(ax, tx, py + 8.0, tw, 10.5, fc=PANEL, ec="none", r=1.4)
+        ax.text(tx + 1.8, py + 15.2, big, fontsize=20, fontweight="bold", color=INK, va="center")
+        ax.text(tx + 1.8, py + 10.4, small, fontsize=11.5, color=MUTED, va="center")
+    p0, p1 = al["potency"]
+    ax.text(x + 3, py + 4.0, f"Constrains one acid term in the model ({p0:.2f} → {p1:.3f}); pH moves < 0.01.",
+            fontsize=11.5, color=GREEN, fontweight="bold", va="center")
+
+    # ---------------- Formlabs panel
+    x = px[1]
+    rbox(ax, x, py, pw, ph, fc="white", ec=PURPLE, lw=2.6, r=2.0)
+    ax.text(x + 3, py + ph - 5.0, "Formlabs PreForm API", fontsize=24, fontweight="bold", color=INK, va="center")
+    ax.text(x + 3, py + ph - 10.0, "printable crumb hypothesis, prepared via the PreForm Local API", fontsize=13,
+            color=MUTED, va="center")
+    badge(ax, x + pw - 3, py + ph - 5.0, "simulated", size=12, ha="right", text="SIMULATED GEOMETRY")
+    # step chips
+    steps = ["STL", "scene", "orient", "supports", "layout", "estimate", ".form"]
+    cw, cg, cy = 8.6, 1.7, py + ph - 17.5
+    for k, stp in enumerate(steps):
+        cx0 = x + 3 + k * (cw + cg)
+        last = k == len(steps) - 1
+        rbox(ax, cx0, cy - 2.4, cw, 4.8, fc=PURPLE if last else PANEL, ec="none", r=1.0)
+        ax.text(cx0 + cw / 2, cy, stp, fontsize=11.5, fontweight="bold", color="white" if last else INK,
+                ha="center", va="center")
+        if not last:
+            ax.text(cx0 + cw + cg / 2, cy, "›", fontsize=14, color=MUTED, ha="center", va="center")
+    ax.text(x + 3, cy - 5.6, "Never auto-prints: a person reviews the .form and presses print.", fontsize=12,
+            color=INK, fontweight="bold", va="center")
+    # images
+    iy0, ih_ = py + 17.0, 27.0
+    if HERO_PNG.exists():
+        from PIL import Image
+
+        _fit_image(ax, np.asarray(Image.open(HERO_PNG).convert("RGB")), x + 3, iy0, pw - 6, ih_)
+    else:
+        for j, c in enumerate("AB"):
+            im = _crop(STL / "crumb_chamber_comparison.png", CHAMBER_THUMB_BOX[c])
+            cx0 = x + 3 + j * (pw - 6) / 2
+            if im is not None:
+                _fit_image(ax, im, cx0 + 2, iy0, (pw - 6) / 2 - 4, ih_ - 4)
+            m = chain[c]["measured_on_mesh"]
+            ax.text(cx0 + (pw - 6) / 4, iy0 + ih_ - 1.0,
+                    f"{c} · {chain[c]['temperature_c']:.0f} °C · {100 * m['cut_face_pore_area_fraction']:.0f} % pores",
+                    fontsize=12.5, fontweight="bold", color=A_COL if c == "A" else "#d4660a", ha="center", va="center")
+    ext = chain["A"]["measured_on_mesh"]["extents_mm"]
+    ax.text(x + 3, py + 13.0, f"{ext[0]:.0f} × {ext[1]:.0f} × {ext[2]:.0f} mm · watertight, validated STL per chamber",
+            fontsize=12, color=INK, va="center")
+    _placeholder(ax, x + 3, py + 6.0, PREFORM_ESTIMATES["time"], ha="left")
+    _placeholder(ax, x + pw - 3, py + 6.0, PREFORM_ESTIMATES["resin"], ha="right")
+    return save(fig, "tech_highlights")
+
+
 FIGURES = {
     "closed_loop": fig_closed_loop,
     "evidence_pipeline": fig_evidence_pipeline,
@@ -939,6 +1064,7 @@ FIGURES = {
     "results_ab": fig_results_ab,
     "agents_exchange": fig_agents_exchange,
     "benchmark_summary": fig_benchmark_summary,
+    "tech_highlights": fig_tech_highlights,
 }
 
 

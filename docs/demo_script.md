@@ -1,5 +1,12 @@
 # FermentAI: three-minute live demo script
 
+This demo follows the four-slide investor pitch (`docs/pitch/slides.md`). It has to prove three
+things to investors and engineers:
+
+- the taste → next-experiment loop works end to end, offline;
+- NVIDIA ALCHEMI and Formlabs PreForm each have a concrete job in it;
+- we are exact about what is real, simulated or pending.
+
 Two roles: the **Presenter** talks, and the **Driver** holds the iPad. One person can do both. Lines in
 quotes are spoken. Lines starting with *Tap* are actions on the iPad, which is in landscape on the
 dashboard. The UI names used here are:
@@ -10,7 +17,7 @@ dashboard. The UI names used here are:
 - the reasoning label **Online Agent** / **Offline Policy**;
 - **Replay example**, **Interpret & plan next experiment** and **▶ Start automaton animation**.
 
-Spoken words come to about 272 (1 min 57 s at 140 wpm). The other ~60 s is for tasting, typing and
+Spoken words come to about 274 (1 min 57 s at 140 wpm). The other ~60 s is for tasting, typing and
 waiting for the agents.
 
 ---
@@ -50,7 +57,7 @@ waiting for the agents.
 |---|---|---|
 | **0:00–0:20** | Hand each judge a slice of A and B. *Tap* **Live Laboratories**. | "Two loaves, same dough, two temperatures. These are the two chambers that fermented them. Each one has its own AI scientist agent." |
 | **0:20–0:40** | Point at the A and B cards and at the mode indicator. | "A is blue and holds 22 degrees. B is orange, at 27. The indicator up here says whether you're seeing live hardware, a replay or a simulation, and every number carries its own badge." |
-| **0:40–0:58** | *Tap* **Digital Twin**. Point at the pH and rise curves. | "This is our fermentation model, and it's a simulation. It predicts B acidifies faster and overproofs early, so the agents learn to cool it partway." |
+| **0:40–0:58** | *Tap* **Digital Twin**. Point at the pH and rise curves, then at the crumb specimens on the table if they're printed. | "This is our fermentation model, and it's a simulation. It predicts B acidifies faster and overproofs early. Each forecast becomes a crumb specimen, prepared for Formlabs printing." |
 | **0:58–1:15** | *Tap* **NVIDIA Molecular Explorer**. | "This part is real: NVIDIA ALCHEMI on a Brev GPU. In small water clusters, lactic acid gives up its proton about seven kilocalories more easily than acetic acid. That constrains one acid term in the model. It doesn't drive the bread." |
 | **1:15–1:42** | *Tap* **Taste → Next Experiment**. Hand the iPad to a judge, or type their words for them into the box under **What did the bread taste like?** | "Now you're the scientist. What did the bread taste like? Plain words are fine." |
 | **1:42–1:47** | *Tap* **Interpret & plan next experiment**. | "It's turning that into sensory preferences." |
