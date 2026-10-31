@@ -1,0 +1,31 @@
+Verbosity level can be increased via `-v, -vv, or -vvv` option
+Collected 8 tests
+
+Processing test_pid in native environment
+--------------------------------------------------------------------------------
+Building...
+Testing...
+test/test_pid/test_main.cpp:366: test_default_gains_step_response	[PASSED]
+test/test_pid/test_main.cpp:367: test_tuned_pi_step_response	[PASSED]
+test/test_pid/test_main.cpp:368: test_tuned_pid_with_derivative	[PASSED]
+test/test_pid/test_main.cpp:369: test_pwm_cap_never_exceeded	[PASSED]
+test/test_pid/test_main.cpp:370: test_antiwindup_integral_bounded_in_saturation	[PASSED]
+test/test_pid/test_main.cpp:371: test_antiwindup_plant_no_large_overshoot_after_drop	[PASSED]
+test/test_pid/test_main.cpp:372: test_no_derivative_kick_on_setpoint_step	[PASSED]
+test/test_pid/test_main.cpp:373: test_derivative_filter_smooths	[PASSED]
+test/test_pid/test_main.cpp:374: test_bumpless_transfer	[PASSED]
+test/test_pid/test_main.cpp:375: test_direction_change_honours_dead_time	[PASSED]
+test/test_pid/test_main.cpp:376: test_dead_time_survives_reset_and_driver_never_double_drives	[PASSED]
+test/test_pid/test_main.cpp:377: test_reset_clears_integral_and_state	[PASSED]
+test/test_pid/test_main.cpp:378: test_deadband_no_chatter	[PASSED]
+test/test_pid/test_main.cpp:379: test_fraction_within_min_max	[PASSED]
+test/test_pid/test_main.cpp:380: test_console_set_print_reset_mode_and_nvs_roundtrip	[PASSED]
+test/test_pid/test_main.cpp:381: test_console_rejects_bad_values_and_ignores_other_commands	[PASSED]
+test/test_pid/test_main.cpp:382: test_nvs_missing_or_corrupt_uses_defaults	[PASSED]
+------------------ native:test_pid [PASSED] Took 0.95 seconds ------------------
+
+=================================== SUMMARY ===================================
+Environment    Test      Status    Duration
+-------------  --------  --------  ------------
+native         test_pid  PASSED    00:00:00.946
+================= 17 test cases: 17 succeeded in 00:00:00.946 =================

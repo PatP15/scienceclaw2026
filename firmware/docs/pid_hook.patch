@@ -1,0 +1,143 @@
+--- a/firmware/src/main.cpp
++++ b/firmware/src/main.cpp
+@@ -24,6 +24,8 @@
+ #endif
+ 
+ #include "app/ChamberStateMachine.h"
++#include "app/PidConsole.h"
++#include "control/PidMode.h"
+ #include "board_config.h"
+ #include "camera/CameraManager.h"
+ #include "command_schema.h"
+@@ -142,6 +144,14 @@
+ SensorManager sensors(&envSensor, &ds, PH_SENSOR_ENABLED ? &ph : nullptr, &door, smConfig());
+ SafetyManager safety(SafetyManager::defaults());
+ TemperatureController controller(ctlConfig());
++PidModeConfig pidModeConfig() {
++  PidModeConfig c;
++  c.min_fraction = cfg::kPeltierMinFraction;
++  c.max_fraction = cfg::kPeltierMaxFraction;
++  c.dead_time_ms = limits::kHeatCoolDeadTimeMs;
++  return c;
++}
++PidMode pidMode(pidModeConfig());
+ PeltierDriver peltier(&pwmA, &pwmB, &peltierEn, peltierConfig());
+ #if MOTOR_ENABLED
+ MotorController motorCtl(&motorGate, &motorCutoff, limits::kMotorMaxDurationMs);
+@@ -337,6 +347,7 @@
+         "status | scan | assign <rom16hex> <starter|internal_heatsink|external_heatsink> |\n"
+         "unassign <role> | phcal 4|7|clear | arm peltier <CHAMBER_ID> | disarm peltier |\n"
+         "arm motor | disarm motor | motor test <ms> | setpoint <C> (local, clamped) |\n"
++        "pid [kp ki kd [alpha]|reset] | mode pid|prop|hyst |\n"
+         "wifi <ssid> <pass> | backend <url> | token <token> | pin <gpio> | pwmdiag | owtest | owsearch | i2cscan | reboot");
+   } else if (!strcmp(cmd, "status")) {
+     printStatus(now);
+@@ -547,6 +558,10 @@
+ #endif
+   } else if (!strcmp(cmd, "reboot")) {
+     ESP.restart();
++  } else if (!strcmp(cmd, "pid") || !strcmp(cmd, "mode")) {
++    char reply[256];
++    handlePidConsole(argc, argv, pidMode, &nvs, reply, sizeof reply);
++    Serial.println(reply);
+   } else {
+     Serial.println("ERR unknown command (try: help)");
+   }
+@@ -755,6 +770,8 @@
+ #endif
+ 
+   nvs.begin();
++  pidMode.load(&nvs);  // defaults (prop mode, kp 0.25) when no "pid" key
++  controller.attachPid(&pidMode);
+   const uint32_t now = millis();
+ 
+ #if FERMENTAI_NOIO
+--- a/firmware/src/control/TemperatureController.h
++++ b/firmware/src/control/TemperatureController.h
+@@ -14,6 +14,8 @@
+ 
+ namespace fa {
+ 
++class PidMode;  // control/PidMode.h
++
+ struct ControlDemand {
+   Direction dir = Direction::None;
+   float fraction = 0.0f;
+@@ -38,13 +40,20 @@
+ 
+   // temp must be valid/finite; caller handles invalid sensors (SafetyManager -> FAULT).
+   ControlDemand compute(float temp_c, float setpoint_c);
+-  void reset() { state_ = Direction::None; }
++  // PID-aware overload: honours PidMode::selected() (hyst | prop | pid). With no PidMode attached
++  // it is identical to compute(temp, setpoint).
++  ControlDemand compute(float temp_c, float setpoint_c, uint32_t now_ms);
++  void attachPid(PidMode* p) { pid_ = p; }
++  void reset();
+   Direction state() const { return state_; }
+   const Config& config() const { return cfg_; }
+ 
+  private:
+   Config cfg_;
+   Direction state_ = Direction::None;
++  PidMode* pid_ = nullptr;
++  uint8_t prev_sel_ = 1;  // ControlSel::Proportional
++  ControlDemand last_{};
+ };
+ 
+ }  // namespace fa
+--- a/firmware/src/control/TemperatureController.cpp
++++ b/firmware/src/control/TemperatureController.cpp
+@@ -1,5 +1,7 @@
+ #include "control/TemperatureController.h"
+ 
++#include "control/PidMode.h"
++
+ namespace fa {
+ 
+ ControlDemand TemperatureController::compute(float temp_c, float setpoint_c) {
+@@ -37,4 +39,34 @@
+   return d;
+ }
+ 
++void TemperatureController::reset() {
++  state_ = Direction::None;
++  if (pid_) pid_->reset();
++}
++
++ControlDemand TemperatureController::compute(float temp_c, float setpoint_c, uint32_t now_ms) {
++  if (!pid_) return compute(temp_c, setpoint_c);
++  const ControlSel sel = pid_->selected();
++  if (sel == ControlSel::Pid) {
++    if (prev_sel_ != (uint8_t)ControlSel::Pid) {  // bumpless hand-over from prop/hyst
++      pid_->engage(last_.dir == Direction::Heat ? last_.fraction
++                   : last_.dir == Direction::Cool ? -last_.fraction : 0.0f);
++      prev_sel_ = (uint8_t)ControlSel::Pid;
++    }
++    last_ = pid_->compute(temp_c, setpoint_c, now_ms);  // signed demand -> dir + fraction
++    state_ = last_.dir;
++    return last_;
++  }
++  if (prev_sel_ == (uint8_t)ControlSel::Pid) state_ = Direction::None;  // restart hysteresis gate
++  prev_sel_ = (uint8_t)sel;
++  if (sel == ControlSel::Hysteresis) {
++    cfg_.mode = Mode::Hysteresis;
++  } else {
++    cfg_.mode = Mode::Proportional;
++    cfg_.kp_per_c = pid_->gains().kp;
++  }
++  last_ = compute(temp_c, setpoint_c);
++  return last_;
++}
++
+ }  // namespace fa
+--- a/firmware/src/app/ChamberStateMachine.cpp
++++ b/firmware/src/app/ChamberStateMachine.cpp
+@@ -76,7 +76,7 @@
+                            !sensors_.doorOpen() && exp_.hasSetpoint() &&
+                            exp_.mode() != ControlMode::Idle;
+   if (may_control) {
+-    const ControlDemand d = ctl_.compute(t.value, exp_.setpoint());
++    const ControlDemand d = ctl_.compute(t.value, exp_.setpoint(), now_ms);
+     dir = d.dir;
+     frac = d.fraction;
+   } else {
