@@ -80,6 +80,16 @@ taste_feedback:
   motor_duration_s: 3.0         # PLAN_MASTER section 14: animate_motor(duration=3000 ms)
   motor_pattern: "wiggle"
 
+# Chef-hat "thinking" pulses: short bounded motor pulses while a station's sous chef is thinking
+# (chat turn -> that station; taste cycle -> both). Normal motor commands (same caps, own command
+# ids, acks, SSE `command` events); they never touch the Peltier path.
+thinking_pulses:
+  motor_on_thinking: true
+  pulse_ms: 2500                # <= motor.max_duration_s
+  min_gap_s: 1.0                # gap between pulses (period = pulse + gap), also across turns
+  max_pulses_per_cycle: 4       # per station, per chat turn / taste cycle
+  pattern: "nod"
+
 # Max HTTP request body sizes (bytes); larger requests get 413 before parsing.
 request_limits:
   telemetry_max_bytes: 65536

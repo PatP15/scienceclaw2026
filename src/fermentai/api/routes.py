@@ -124,7 +124,7 @@ async def post_image(request: Request, principal: Principal = DEVICE):
     if not body.startswith(b"\xff\xd8"):
         raise HTTPException(422, "file is not a JPEG (missing FF D8 header)")
     chamber_id = fields.get("chamber_id") or ""
-    c.authorize(principal, chamber_id, fields.get("device_id"))
+    image_device = c.authorize(principal, chamber_id, fields.get("device_id"))
     source = fields.get("source")
     if source not in ("measured", "real", "simulated", "replay"):
         raise HTTPException(422, "field 'source' must be one of measured | simulated | replay")
@@ -143,13 +143,13 @@ async def post_image(request: Request, principal: Principal = DEVICE):
     exp = fields.get("experiment_id")
     iid = c.db.execute(
         "INSERT INTO images(chamber_id, timestamp_utc, received_at_utc, rel_path, bytes, sha256,"
-        " experiment_id, source) VALUES (?,?,?,?,?,?,?,?)",
+        " experiment_id, source, device_id) VALUES (?,?,?,?,?,?,?,?,?)",
         (chamber_id, iso(ts), iso(now), rel.as_posix(), len(body), sha,
-         _SAFE.sub("_", exp)[:64] if exp else None, source),
+         _SAFE.sub("_", exp)[:64] if exp else None, source, image_device),
     )
     out = {"ok": True, "image_id": iid, "chamber_id": chamber_id, "timestamp_utc": iso(ts),
            "url": f"/api/v1/images/{iid}", "bytes": len(body), "sha256": sha}
-    c.db.emit("image", {**out, "source": source}, chamber_id)
+    c.db.emit("image", {**out, "source": source, "device_id": image_device}, chamber_id)
     return out
 
 
@@ -235,9 +235,11 @@ def chamber_readings(chamber_id: str, request: Request, field: str | None = None
 
 
 @router.get("/devices", tags=["chambers"])
-def devices(request: Request, chamber_id: str | None = None):
-    """Device registry: device_id -> bound chamber, last boot/sequence/uptime."""
-    return svc(request).list_devices(chamber_id)
+def devices(request: Request, chamber_id: str | None = None, active: bool | None = None):
+    """Device registry: device_id -> bound chamber, last boot/sequence/uptime, `active` flag.
+    A chamber whose latest telemetry is measured marks every other (virtual) device inactive."""
+    rows = svc(request).list_devices(chamber_id)
+    return rows if active is None else [r for r in rows if r["active"] == active]
 
 
 # ============================================================================ commands

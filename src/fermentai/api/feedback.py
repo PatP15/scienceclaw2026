@@ -350,10 +350,16 @@ def insert_feedback(svc: ControlService, fb: TasteFeedbackIn, chat_session_id: s
 
 
 def run_feedback(svc: ControlService, settings: Settings, fb: TasteFeedbackIn) -> dict:
+    from .thinking import ThinkingPulses
+
     fid, now = insert_feedback(svc, fb)
     context = build_context(svc, settings, fb, fid)
-    result, available = call_pipeline(fb, context)
-    return persist_cycle(svc, settings, fb, fid, now, result, available)
+    with ThinkingPulses(svc, svc.chamber_ids, "taste cycle") as tp:   # both stations' hats nod
+        result, available = call_pipeline(fb, context)
+    pulse_ids = tp.finish(clear_for_final_wiggle=fb.trigger_motors)
+    response = persist_cycle(svc, settings, fb, fid, now, result, available)
+    response["thinking_pulse_ids"] = pulse_ids
+    return response
 
 
 def normalize_cycle_result(result: dict) -> dict:

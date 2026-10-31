@@ -155,8 +155,13 @@ def test_real_chat_module_end_to_end(client, tmp_path):
     pytest.importorskip("fermentai.agents.chat")
     sid = None
     stages = []
-    for text in ["Hi!", "Loaf A was mild and fluffy. Loaf B was more sour but dense. I want sour and airy.",
-                 "yes, that's right", "yes", "yes", "yes"]:
+    answers = iter(["Hi!", "Loaf A was mild and fluffy. Loaf B was more sour but dense. I want sour and airy.",
+                    "I preferred Loaf B for its sourness, but I want it airier like Loaf A.",
+                    "Loaf A crust was soft, Loaf B crust was crisp and dark. Aroma of A was milky, B vinegary.",
+                    "that's everything", "that's everything", "that's everything", "that's everything"])
+    for _ in range(10):
+        # adaptive guest: confirm when the sous chef asks for confirmation, otherwise describe
+        text = "yes, that's right" if stages and stages[-1] == "confirming" else next(answers, "yes")
         r = chat(client, text=text, session_id=sid, sous_chef="A")
         assert r.status_code == 200, r.text
         j = r.json()

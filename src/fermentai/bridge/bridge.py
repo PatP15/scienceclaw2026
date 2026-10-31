@@ -23,6 +23,7 @@ import hashlib
 import json
 import logging
 import os
+import re
 import time
 from collections import Counter, OrderedDict, deque
 from dataclasses import dataclass, field
@@ -42,6 +43,12 @@ from .serial_link import (
 )
 
 log = logging.getLogger("fermentai.bridge")
+
+
+def P_parse(s: str):  # noqa: N802 - tiny local helper
+    from datetime import UTC, datetime
+    dt = datetime.fromisoformat(str(s).replace("Z", "+00:00"))
+    return dt if dt.tzinfo else dt.replace(tzinfo=UTC)
 
 MAX_IMAGE_BYTES = 2_000_000
 
@@ -87,6 +94,9 @@ class BridgeConfig:
     http_timeout_s: float = 5.0
     max_outbox: int = 500
     parse_status_log: bool = True       # legacy fw 0.3.x plain-text status blocks -> telemetry
+    legacy_console: bool = True         # map animate_motor -> "motor test <ms>" on a legacy console
+    console_reply_timeout_s: float = 3.0
+    console_motor_max_ms: int = 10_000
 
 
 class ReplayChannel:
@@ -184,6 +194,13 @@ class PortSession:
         self._retry_at = 0.0
         self._finished = False
         self.status_parser = StatusLogParser() if self.cfg.parse_status_log else None
+        # legacy console command mapping (fw 0.3.x): only `motor test <ms>` is ever written
+        self.console_pending: deque[dict] = deque()     # sent, awaiting "OK running"/"ERR" reply
+        self.console_running: dict[str, dict] = {}     # command_id -> {done_at, granted_ms}
+        self.console_waiting: deque[dict] = deque()     # animate_motor queued while motor busy
+        self.console_stops: list[dict] = []             # stop_motor acks deferred to run end
+        self.legacy_armed: dict | None = None           # last status block's armed(peltier=, motor=)
+        self.setpoint_reject_cache: dict | None = None  # last rejected console setpoint (anti-spam)
         self.protocol: str | None = None        # "serial_v1" | "legacy_status_log"
 
     # ---------------------------------------------------------------- lifecycle
@@ -242,8 +259,11 @@ class PortSession:
         self.last_rx_mono = self.last_proto_mono = None
         if self.spec.fd is None:
             log.info("[%s] port open (%d baud)", self.name, self.cfg.baud)
-        if self.replay is None:
-            await self._send(P.time_msg())  # device may use host time once it has it
+        # No connect-time write: a legacy fw 0.3.x port is a text console ("ERR unknown command").
+        # serial_v1 devices get `time` right after hello_ack.
+        self.console_pending.clear()
+        self.console_running.clear()
+        self.console_waiting.clear()
         return True
 
     async def _disconnect(self) -> None:
@@ -280,12 +300,17 @@ class PortSession:
             if self.replay is None:
                 # Commands only go to a device that has spoken serial_v1. A legacy fw 0.3.x device
                 # has a text console on this port and would just print "ERR unknown command".
-                talk = self.protocol == "serial_v1"
+                talk = self.protocol == "serial_v1" or (
+                    self.protocol == "legacy_status_log" and cfg.legacy_console)
                 if talk and self.chamber_id and not self.blocked_reason and now >= next_poll:
                     next_poll = now + cfg.poll_interval_s
                     await self._poll_commands()
                 if self.protocol == "legacy_status_log":
-                    next_time = next_ping = now + cfg.time_interval_s     # stay silent on its console
+                    await self._console_tick(now)
+                if self.protocol != "serial_v1":
+                    # time/ping only for devices that have spoken serial_v1: an unidentified or legacy
+                    # fw 0.3.x port is a text console that would answer "ERR unknown command"
+                    next_time, next_ping = now + cfg.time_interval_s, now + cfg.ping_interval_s
                 if now >= next_time:
                     next_time = now + cfg.time_interval_s
                     await self._send(P.time_msg())
@@ -334,6 +359,8 @@ class PortSession:
         p = P.parse_line(raw)
         if p.kind == "log":
             self.counters["rx_log_text"] += 1
+            if self.console_pending and await self._console_reply(p.text, now):
+                return
             if self.status_parser and self.protocol != "serial_v1":
                 before = self.status_parser.lines_parsed
                 recs = self.status_parser.feed(p.text, now)
@@ -445,6 +472,9 @@ class PortSession:
             log.info("[%s] legacy status-log firmware detected (%s fw %s); converting status blocks to "
                      "measured telemetry", self.name, rec.get("device_id"), rec.get("firmware_version"))
         self.counters["legacy_blocks"] += 1
+        armed = (rec.get("diagnostics") or {}).get("armed")
+        if isinstance(armed, dict):
+            self.legacy_armed = armed
         if not self.hello:
             self.device_id = rec.get("device_id") or self.device_id
             self.boot_id = rec.get("boot_id") or self.boot_id
@@ -601,6 +631,12 @@ class PortSession:
         now = time.monotonic()
         pending = sorted((c for c in body.get("commands") or [] if isinstance(c, dict)),
                          key=lambda c: c.get("sequence_number") or 0)
+        if self.protocol == "legacy_status_log":
+            for cmd in pending:
+                await self._console_command(cmd, server_time, now)
+            while len(self.sent) > 500:
+                self.sent.popitem(last=False)
+            return
         for cmd in pending:
             cid = cmd.get("command_id")
             if not cid:
@@ -618,6 +654,166 @@ class PortSession:
                 self.counters["commands_resent"] += 1
         while len(self.sent) > 500:
             self.sent.popitem(last=False)
+
+    # ---------------------------------------------------------------- legacy console (fw 0.3.x)
+    async def _legacy_ack(self, cid: str, status: str, detail: str | None = None,
+                          result: dict | None = None) -> None:
+        payload = {"command_id": cid, "chamber_id": self.chamber_id, "device_id": self.device_id,
+                   "status": status, "detail": (detail or None) and detail[:300], "result": result}
+        self.counters[f"console_ack_{status}"] += 1
+        await self._post("ack", "/api/v1/control-ack", {k: v for k, v in payload.items() if v is not None})
+
+    async def _console_command(self, cmd: dict, server_time: str, now: float) -> None:
+        """Map one pending command_v1 object onto the fw 0.3.x text console. Only animate_motor
+        (-> "motor test <ms>") and stop_motor are handled; everything else is left pending (it will
+        expire unacked on the server: the legacy firmware cannot execute it)."""
+        cid, action = cmd.get("command_id"), cmd.get("action")
+        if not cid or cid in self.sent:
+            return
+        self.sent[cid] = {"first": now, "last": now, "count": 1, "action": action, "console": True}
+        exp, ref = cmd.get("expires_at_utc"), server_time
+        try:
+            remaining = (P_parse(exp) - P_parse(ref)).total_seconds() if exp and ref else None
+        except ValueError:
+            remaining = None
+        if action not in ("animate_motor", "stop_motor", "set_setpoint"):
+            self.counters["console_unsupported_commands"] += 1
+            return
+        if remaining is not None and remaining <= 0:
+            await self._legacy_ack(cid, "expired", "received after expiry; not executed")
+            return
+        if action == "stop_motor":
+            target = (cmd.get("parameters") or {}).get("target_command_id")
+            run = self.console_running.get(target) if target else None
+            if run is None and not target:
+                run = next(iter(self.console_running.values()), None)
+            self.console_waiting = deque(w for w in self.console_waiting if w["command_id"] != target)
+            if run is None:
+                await self._legacy_ack(cid, "completed", "motor was not running (legacy console)")
+            else:   # fw 0.3.0 console has no motor stop: completes when the bounded run ends
+                self.console_stops.append({"command_id": cid, "done_at": run["done_at"]})
+            return
+        deadline = now + (remaining if remaining is not None else 60.0)
+        if action == "set_setpoint":
+            params = cmd.get("parameters") or {}
+            mode = params.get("control_mode") or "auto"
+            try:
+                sp = float(params["setpoint_c"])
+            except (KeyError, TypeError, ValueError):
+                await self._legacy_ack(cid, "rejected", "set_setpoint without a numeric setpoint_c")
+                return
+            if mode == "idle":   # the 0.3.x console can only set a setpoint, not Peltier-off/idle
+                await self._legacy_ack(cid, "rejected", "legacy console (fw 0.3.x) cannot set control_mode "
+                                       "'idle'; it only accepts `setpoint <C>`")
+                return
+            rc = self.setpoint_reject_cache
+            if rc and abs(rc["setpoint_c"] - sp) < 0.005 and now - rc["at"] < 60.0:
+                # same value refused < 60 s ago (e.g. Peltier disarmed): answer from that console
+                # reply instead of writing the same line again (protects the console from a server
+                # that re-issues rejected commands on every poll)
+                self.counters["console_setpoint_cached"] += 1
+                await self._legacy_ack(cid, "rejected", f"{rc['detail']} [cached console reply, "
+                                       f"{now - rc['at']:.0f} s old]", rc["result"])
+                return
+            self.console_waiting.append({"kind": "setpoint", "command_id": cid, "setpoint_c": sp,
+                                         "control_mode": mode, "deadline": deadline})
+            await self._console_tick(now)
+            return
+        dur = int((cmd.get("parameters") or {}).get("duration_ms") or 0)
+        dur = max(1, min(dur, self.cfg.console_motor_max_ms))
+        self.console_waiting.append({"kind": "motor", "command_id": cid, "duration_ms": dur,
+                                     "deadline": deadline})
+        await self._console_tick(now)
+
+    async def _console_tick(self, now: float) -> None:
+        # replies that never came
+        while self.console_pending and now - self.console_pending[0]["sent"] > self.cfg.console_reply_timeout_s:
+            req = self.console_pending.popleft()
+            await self._legacy_ack(req["command_id"], "failed", "no reply from legacy console")
+        # runs that ended (fw 0.3.0 does not report the stop: inferred from the granted duration)
+        for cid, run in list(self.console_running.items()):
+            if now >= run["done_at"]:
+                del self.console_running[cid]
+                await self._legacy_ack(cid, "completed",
+                                       f"motor ran {run['granted_ms']} ms (completion inferred from the "
+                                       "console grant; fw 0.3.0 does not report motor stop)",
+                                       {"ran_ms": run["granted_ms"], "completion": "inferred_from_granted_duration"})
+        for st in [x for x in self.console_stops if now >= x["done_at"]]:
+            self.console_stops.remove(st)
+            await self._legacy_ack(st["command_id"], "completed",
+                                   "legacy console has no stop; motor stopped at the end of its bounded run")
+        # one console request in flight at a time; a motor test also waits for the motor to be idle
+        while self.console_waiting and not self.console_pending:
+            w = next((x for x in self.console_waiting
+                      if x["kind"] == "setpoint" or not self.console_running), None)
+            if w is None:
+                break
+            self.console_waiting.remove(w)
+            if now > w["deadline"]:
+                await self._legacy_ack(w["command_id"], "expired", "expired before the console was free")
+                continue
+            if w["kind"] == "setpoint":
+                text = f"setpoint {w['setpoint_c']:.2f}"
+            else:
+                text = f"motor test {w['duration_ms']}"
+            await self.channel.write_line((text + "\n").encode())
+            self.counters["tx_console_" + w["kind"]] += 1
+            self.bridge.record(self.name, "tx", text)
+            self.console_pending.append({**w, "sent": now})
+            log.info("[%s] legacy console: %s (command %s)", self.name, text, w["command_id"][:8])
+
+    async def _console_reply(self, text: str, now: float) -> bool:
+        """Correlate an "OK running <ms> ms" / "ERR ..." console line with the oldest request."""
+        t = text.strip()
+        kind = self.console_pending[0]["kind"]
+        ok_prefix = "OK running" if kind == "motor" else "OK setpoint in force"
+        if not (t.startswith(ok_prefix) or t.startswith("ERR")):
+            return False
+        req = self.console_pending.popleft()
+        self._log(f"console reply: {t}")
+        if kind == "setpoint":
+            await self._setpoint_reply(req, t)
+            return True
+        if t.startswith("OK running"):
+            m = re.search(r"OK running\s+(\d+)\s*ms", t)
+            granted = int(m.group(1)) if m else req["duration_ms"]
+            self.console_running[req["command_id"]] = {"done_at": now + granted / 1000.0 + 0.25,
+                                                       "granted_ms": granted}
+            await self._legacy_ack(req["command_id"], "accepted", t, {"granted_ms": granted})
+        else:
+            await self._legacy_ack(req["command_id"], "rejected", t)
+        return True
+
+    async def _setpoint_reply(self, req: dict, t: str) -> None:
+        if t.startswith("ERR"):
+            await self._legacy_ack(req["command_id"], "rejected", t)
+            return
+        m = re.search(r"in force:\s*([-+]?[\d.]+|nan)\s*C", t, re.IGNORECASE)
+        try:
+            applied = float(m.group(1)) if m else None
+        except ValueError:
+            applied = None
+        if applied is not None and applied != applied:   # nan: firmware did not take it
+            applied = None
+        result = {"applied_setpoint_c": applied, "stored_locally": applied is not None,
+                  "console": t}
+        if applied is None:
+            await self._legacy_ack(req["command_id"], "rejected", f"console did not confirm a setpoint: {t}", result)
+            return
+        armed = self.legacy_armed or {}
+        result["peltier_armed"] = None if "peltier" not in armed else bool(armed["peltier"])
+        if armed.get("peltier") == 0:
+            # The bridge never arms anything: report that the setpoint cannot take effect.
+            detail = (f"Peltier disarmed on the device (status armed(peltier=0)); setpoint {applied:g} C "
+                      "stored locally but no heating/cooling until an operator arms it on the device")
+            self.setpoint_reject_cache = {"setpoint_c": req["setpoint_c"], "at": time.monotonic(),
+                                          "detail": detail, "result": result}
+            await self._legacy_ack(req["command_id"], "rejected", detail, result)
+            return
+        self.setpoint_reject_cache = None
+        note = None if abs(applied - req["setpoint_c"]) < 0.005 else (
+            f"device holds {applied:g} C (requested {req['setpoint_c']:g} C; clamped locally)")
+        await self._legacy_ack(req["command_id"], "accepted", note or t, result)
 
     # ---------------------------------------------------------------- status
     def status(self) -> dict:

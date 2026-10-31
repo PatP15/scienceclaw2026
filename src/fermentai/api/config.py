@@ -89,6 +89,14 @@ class ImagesCfg(_Cfg):
     recommended_interval_s: int = 300
 
 
+class ThinkingPulsesCfg(_Cfg):
+    motor_on_thinking: bool = True
+    pulse_ms: int = 2500
+    min_gap_s: float = 1.0
+    max_pulses_per_cycle: int = 4
+    pattern: str = "nod"
+
+
 class RequestLimitsCfg(_Cfg):
     telemetry_max_bytes: int = 64 * 1024
     ack_max_bytes: int = 16 * 1024
@@ -122,6 +130,7 @@ class HardwareConfig(_Cfg):
     images: ImagesCfg = Field(default_factory=ImagesCfg)
     taste_feedback: TasteFeedbackCfg = Field(default_factory=TasteFeedbackCfg)
     request_limits: RequestLimitsCfg = Field(default_factory=RequestLimitsCfg)
+    thinking_pulses: ThinkingPulsesCfg = Field(default_factory=ThinkingPulsesCfg)
     capture_image: CaptureCfg = Field(default_factory=CaptureCfg)
     firmware_local_limits: dict[str, float] = Field(default_factory=dict)
 

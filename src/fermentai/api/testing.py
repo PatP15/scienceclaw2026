@@ -36,8 +36,9 @@ def make_app(tmp_path: Path, *, hw_overrides: dict[str, Any] | None = None,
              static_dir: Path | None = None, device_tokens: dict[str, str] | None = None,
              data_dir: Path | None = None) -> FastAPI:
     hw = load_hardware_config()
-    if hw_overrides:
-        hw = HardwareConfig.model_validate(_deep_update(hw.model_dump(), hw_overrides))
+    # thinking pulses add motor commands asynchronously: off unless a test opts in
+    hw_overrides = {"thinking_pulses": {"motor_on_thinking": False}, **(hw_overrides or {})}
+    hw = HardwareConfig.model_validate(_deep_update(hw.model_dump(), hw_overrides))
     settings = Settings(
         api_token=token,
         db_path=tmp_path / "fermentai-test.sqlite3",

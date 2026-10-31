@@ -179,10 +179,28 @@ class ControlService:
                     f"chamber {chamber_id}", 403)
 
     def list_devices(self, chamber_id: str | None = None) -> list[dict]:
+        """Registry rows + `active`/`inactive_reason`. If a chamber's latest telemetry is
+        measured, only that measured device is active; virtual/other ids are marked inactive
+        (kept for history, never deleted). Otherwise devices that have reported are active."""
         if chamber_id:
-            return self.db.query("SELECT * FROM devices WHERE chamber_id=? ORDER BY device_id",
-                                 (chamber_id,))
-        return self.db.query("SELECT * FROM devices ORDER BY chamber_id, device_id")
+            rows = self.db.query("SELECT * FROM devices WHERE chamber_id=? ORDER BY device_id", (chamber_id,))
+        else:
+            rows = self.db.query("SELECT * FROM devices ORDER BY chamber_id, device_id")
+        measured: dict[str, str | None] = {}
+        for cid in {r["chamber_id"] for r in rows}:
+            t = self.db.query_one("SELECT source, device_id FROM telemetry WHERE chamber_id=? ORDER BY id DESC"
+                                  " LIMIT 1", (cid,))
+            measured[cid] = t["device_id"] if t and t["source"] == "measured" else None
+        for r in rows:
+            live = measured.get(r["chamber_id"])
+            if live:
+                r["active"] = r["device_id"] == live
+                r["inactive_reason"] = None if r["active"] else (
+                    f"chamber {r['chamber_id']} has a measured device ({live}); this id is not the live one")
+            else:
+                r["active"] = r["last_seen_at_utc"] is not None
+                r["inactive_reason"] = None if r["active"] else "never seen"
+        return rows
 
     def _clamp(self, v: float) -> float:
         t = self.hw.temperature
@@ -448,8 +466,10 @@ class ControlService:
             if latest is not None:
                 payload = json.loads(latest["payload_json"])
                 remaining = (parse_iso(latest["expires_at_utc"]) - now).total_seconds()
+                # An identical setpoint the device rejected/failed is retried at the normal re-issue
+                # cadence (~45 s), not on every poll (would flood a device that keeps refusing).
                 reuse = (
-                    latest["status"] in ("issued", "accepted")
+                    latest["status"] in ("issued", "accepted", "rejected", "failed")
                     and remaining > cfg.reissue_when_remaining_s
                     and payload.get("temperature_setpoint_c") == setpoint
                     and (payload.get("control_mode") or "auto") == mode
@@ -512,6 +532,7 @@ class ControlService:
     def issue_motor_command(
         self, chamber_id: str, duration_s: float | None = None, pattern: str = "wiggle",
         reason: str = "", source: str = "dashboard", experiment_id: str | None = None,
+        supersede: bool = True,
     ) -> dict:
         self.require_chamber(chamber_id)
         m = self.hw.motor
@@ -528,15 +549,35 @@ class ControlService:
         payload = {"action": "run", "duration_s": duration, "pattern": pattern,
                    "experiment_id": experiment_id}
         with self.db.tx() as conn:
-            # A newer motor command supersedes any not-yet-started one.
-            conn.execute(
-                "UPDATE commands SET status='superseded', status_updated_at_utc=? WHERE chamber_id=?"
-                " AND command_type='motor' AND status='issued'", (iso(now), chamber_id),
-            )
+            # A newer motor command supersedes any not-yet-started one (thinking pulses don't).
+            if supersede:
+                conn.execute(
+                    "UPDATE commands SET status='superseded', status_updated_at_utc=? WHERE chamber_id=?"
+                    " AND command_type='motor' AND status='issued'", (iso(now), chamber_id),
+                )
             cmd = self._insert_command(conn, chamber_id, "motor", m.ttl_s, payload, source, reason)
             cmd["ran"] = False
             self.db.emit("command", cmd, chamber_id, conn=conn)
         return cmd
+
+    def withdraw_motor_commands(self, command_ids: list[str], reason: str = "withdrawn") -> list[str]:
+        """Not-yet-picked-up motor commands -> superseded (silently, no stop traffic)."""
+        if not command_ids:
+            return []
+        now = iso(self.clock())
+        out = []
+        with self.db.tx() as conn:
+            for cid in command_ids:
+                row = conn.execute("SELECT chamber_id, status FROM commands WHERE command_id=? AND"
+                                   " command_type='motor'", (cid,)).fetchone()
+                if row and row["status"] == "issued":
+                    conn.execute("UPDATE commands SET status='superseded', status_updated_at_utc=?,"
+                                 " reason=? WHERE command_id=?", (now, reason[:200], cid))
+                    self.db.emit("command", {"command_id": cid, "command_type": "motor", "action": "animate_motor",
+                                             "chamber_id": row["chamber_id"], "status": "superseded",
+                                             "reason": reason}, row["chamber_id"], conn=conn)
+                    out.append(cid)
+        return out
 
     def issue_capture_command(self, chamber_id: str, source: str = "dashboard", reason: str = "") -> dict:
         self.require_chamber(chamber_id)
@@ -795,6 +836,28 @@ class ControlService:
                              [*params, limit])
 
     # ------------------------------------------------------------------ state
+    def _images_for_state(self, chamber_id: str, tel: dict | None) -> tuple[dict | None, dict | None]:
+        """latest_image only if it comes from the device (and provenance) of the latest telemetry,
+        or if there is no telemetry device to compare with. A newer image from another device /
+        source is returned separately so the dashboard can hide or label it."""
+        def fmt(r):
+            return {**r, "url": f"/api/v1/images/{r['id']}"} if r else None
+        cols = "id, timestamp_utc, received_at_utc, source, device_id"
+        newest = self.db.query_one(f"SELECT {cols} FROM images WHERE chamber_id=? ORDER BY id DESC LIMIT 1",
+                                   (chamber_id,))
+        tel_dev = tel.get("device_id") if tel else None
+        if newest is None or not tel_dev:
+            return fmt(newest), None
+        match = self.db.query_one(
+            f"SELECT {cols} FROM images WHERE chamber_id=? AND device_id=? AND source=? ORDER BY id DESC LIMIT 1",
+            (chamber_id, tel_dev, tel["source"]))
+        stale = None
+        if match is None or match["id"] != newest["id"]:
+            stale = {**fmt(newest), "reason": (
+                f"image from device {newest['device_id'] or 'unknown'} ({newest['source']}) but latest "
+                f"telemetry is from {tel_dev} ({tel['source']})")}
+        return fmt(match), stale
+
     def chamber_state(self, chamber_id: str) -> dict:
         self.require_chamber(chamber_id)
         now = self.clock()
@@ -811,9 +874,8 @@ class ControlService:
         if last_motor:
             last_motor = self._decorate_command(last_motor)
             last_motor.pop("acks", None)
-        img = self.db.query_one(
-            "SELECT id, timestamp_utc, source FROM images WHERE chamber_id=? ORDER BY id DESC LIMIT 1",
-            (chamber_id,))
+        img, stale_img = self._images_for_state(chamber_id, tel)
+        devs = self.list_devices(chamber_id)
         last_change = self.db.query_one(
             "SELECT * FROM setpoint_changes WHERE chamber_id=? ORDER BY id DESC LIMIT 1", (chamber_id,))
         cfg = self.hw.chambers[chamber_id]
@@ -821,7 +883,9 @@ class ControlService:
             "chamber_id": chamber_id,
             "label": cfg.label,
             "device_id": cfg.device_id,
-            "devices": self.list_devices(chamber_id),
+            "devices": [d for d in devs if d["active"]],
+            "inactive_devices": [{"device_id": d["device_id"], "reason": d["inactive_reason"],
+                                  "last_source": d["last_source"]} for d in devs if not d["active"]],
             "server_time_utc": iso(now),
             "latest_telemetry": tel,
             "telemetry_age_s": age,
@@ -840,9 +904,8 @@ class ControlService:
             "last_motor_command": last_motor,
             "motor_ran": bool(last_motor and last_motor.get("ran")),
             "pending_commands": self.pending_commands(chamber_id),
-            "latest_image": (
-                {**img, "url": f"/api/v1/images/{img['id']}"} if img else None
-            ),
+            "latest_image": img,
+            "stale_image_from_other_device": stale_img,
             "limits": {
                 "min_setpoint_c": self.hw.temperature.min_setpoint_c,
                 "max_setpoint_c": self.hw.temperature.max_setpoint_c,

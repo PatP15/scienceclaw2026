@@ -64,6 +64,9 @@ def build_parser() -> argparse.ArgumentParser:
     ap.add_argument("--parse-status-log", action=argparse.BooleanOptionalAction, default=True,
                     help="convert legacy fw 0.3.x plain-text status blocks into measured telemetry "
                          "(default on; disabled per port once the device speaks serial_v1)")
+    ap.add_argument("--legacy-console", action=argparse.BooleanOptionalAction, default=True,
+                    help="on a legacy fw 0.3.x port, map animate_motor to the console's `motor test <ms>` "
+                         "(the only thing ever written to it); --no-legacy-console = never write")
     ap.add_argument("--duration", type=float, default=0.0, help="seconds to run (0 = forever)")
     ap.add_argument("-v", "--verbose", action="store_true")
     return ap
@@ -101,6 +104,7 @@ def config_from_args(args: argparse.Namespace) -> BridgeConfig:
         chambers={c: (cfg.device_id or f"fermentai-esp32-{c.lower()}") for c, cfg in hw.chambers.items()},
         record_path=args.record,
         parse_status_log=args.parse_status_log,
+        legacy_console=args.legacy_console,
     )
 
 

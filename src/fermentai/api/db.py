@@ -275,6 +275,7 @@ ADDED_COLUMNS = {
     "chamber_control": [("control_mode", "TEXT NOT NULL DEFAULT 'auto'")],
     "commands": [("action", "TEXT")],
     "taste_feedback": [("chat_session_id", "TEXT")],
+    "images": [("device_id", "TEXT")],
     "agent_messages": [("message_uid", "TEXT"), ("in_reply_to", "TEXT"), ("chamber_id", "TEXT"),
                        ("cycle_id", "TEXT")],
 }

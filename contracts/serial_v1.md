@@ -113,7 +113,7 @@ Structured log text. Plain non-JSON lines are treated the same way.
 ```
 
 - **`hello_ack`** confirms the chamber mapping. Stop re-sending `hello` once you have it.
-- **`time`** is sent right after the port opens, after `hello_ack`, and every 60 s. It's the
+- **`time`** is sent right after `hello_ack`, and then every 60 s. It's the
   Mac's UTC time. A device may then set its clock and report `timestamp_quality: "synced"`
   (host-derived). Until then: `null` / `"unsynced"`.
 - **`command`**: `payload` is exactly one `command_v1` object, taken from desired-control's
@@ -130,9 +130,10 @@ Structured log text. Plain non-JSON lines are treated the same way.
 
 ## 4. Connection lifecycle and reconnection
 
-1. The bridge opens the port and immediately sends a `time` line. The device may still be
-   booting; anything it misses is repeated later.
-2. The device sends `hello`, then the bridge sends `hello_ack` and `time`.
+1. The bridge opens the port and writes nothing until the device identifies itself: an
+   unidentified port may be a legacy text console (§8b).
+2. The device sends `hello`, then the bridge sends `hello_ack` and `time`. `time` repeats every
+   60 s and `ping` every 15 s, but only to devices that have spoken serial_v1.
 3. Steady state:
    - The device sends `telemetry` every 5–15 s, and `ack`s as commands complete.
    - The bridge polls desired-control every `poll_interval_s` (default 2 s) and writes each
@@ -256,11 +257,20 @@ missing or out of order. The record has:
 `device_id`, chamber, `boot_id` and firmware come from the `[A device]` header, or from the
 `FermentAI 0.3.0 chamber=A device=… boot=…` boot banner when the port was opened mid-block.
 
-While a port is in legacy mode the bridge doesn't write to it: no commands, pings or periodic
-`time` lines, because the firmware's text console would answer "ERR unknown command". Only the
-single connect-time `time` line is sent. Commands are written only after the device has spoken
-serial_v1, which also switches status-text parsing off for that connection. Disable the whole
-feature with `--no-parse-status-log`.
+While a port is in legacy mode, the **only** thing the bridge writes to it is the console
+command `motor test <ms>`. It never sends `time`, `ping` or JSON commands. This mapping is on by
+default; `--no-legacy-console` turns it off so nothing is written at all.
+
+| command_v1 | console line | console reply → ack |
+|---|---|---|
+| `animate_motor {duration_ms}` | `motor test <min(duration_ms, 10000)>` | `OK running <N> ms` → `accepted` (`result.granted_ms`), then `completed` N ms later (`result.completion: "inferred_from_granted_duration"`, because fw 0.3.0 doesn't report the stop). `ERR <why>` (e.g. `ERR motor not armed (commissioning)`, `ERR door open`, `ERR motor already running`) → `rejected`, with the console text as `detail`. No reply within 3 s → `failed`. |
+| `stop_motor` | none (the console has no stop) | `completed` when the bounded run ends, or immediately if the motor isn't running |
+| `set_setpoint`, `capture_image`, … | none | left pending; they expire unacked on the server |
+
+A new `motor test` is held back while a previous run is still in progress, so the console never
+answers "already running" because of the bridge. Commands go to serial_v1 devices only after
+they identify themselves, which also switches status-text parsing off for that connection.
+Disable status parsing with `--no-parse-status-log`.
 
 ## 9. What a firmware implementer must do (checklist)
 

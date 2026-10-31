@@ -146,3 +146,15 @@ def test_config_tightening_is_enforced_at_issue_time(tmp_path):
     c = TestClient(app)
     # chamber B initial 27 is above the tightened max -> clamped everywhere
     assert dc(c, "B")["temperature_setpoint_c"] == 25.0
+
+
+def test_rejected_setpoint_is_not_reissued_every_poll(client, clock):
+    cmd = dc(client, "A")
+    client.post("/api/v1/control-ack", headers=auth(), json={
+        "command_id": cmd["command_id"], "chamber_id": "A", "status": "rejected", "detail": "peltier disarmed"})
+    clock.advance(5)
+    again = dc(client, "A")
+    assert again["command_id"] == cmd["command_id"] and again["commands"] == []   # no flood
+    clock.advance(41)                                                              # < 45 s left -> retry
+    retry = dc(client, "A")
+    assert retry["command_id"] != cmd["command_id"] and retry["commands"][0]["action"] == "set_setpoint"

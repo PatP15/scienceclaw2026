@@ -23,6 +23,7 @@ from .devices import CommandError, ControlService
 from .feedback import build_context, insert_feedback, normalize_cycle_result, persist_cycle
 from .jsonutil import jsonable
 from .schemas import TasteFeedbackIn
+from .thinking import ThinkingPulses
 
 STAGES = ("greeting", "collecting", "confirming", "handoff", "done")
 UNAVAILABLE_LABEL = "chat unavailable: fermentai.agents.chat is not installed (use the taste-feedback form)"
@@ -73,10 +74,12 @@ def chat_turn(svc: ControlService, settings: Settings, *, text: str, session_id:
     context = build_context(svc, settings, None, None, extra={
         "chat_session_id": session_id, "sous_chef": sous_chef, "judge_name": judge_name,
         "channel": "chat", **_store_ctx(settings)})
-    try:
-        raw = mod.chat_turn(session_id, text, context, mode=mode)
-    except Exception as e:  # keep the API alive; the dashboard can fall back to the form
-        raise CommandError(f"chat turn failed: {type(e).__name__}: {e}", 503) from e
+    station = sous_chef or (prev or {}).get("sous_chef") or "A"
+    with ThinkingPulses(svc, [station], f"chat {session_id}") as tp:   # that station's hat nods
+        try:
+            raw = mod.chat_turn(session_id, text, context, mode=mode)
+        except Exception as e:  # keep the API alive; the dashboard can fall back to the form
+            raise CommandError(f"chat turn failed: {type(e).__name__}: {e}", 503) from e
     if not isinstance(raw, dict):
         raise CommandError(f"chat_turn returned {type(raw).__name__}, expected dict", 503)
     result: dict[str, Any] = jsonable(raw)
@@ -100,7 +103,9 @@ def chat_turn(svc: ControlService, settings: Settings, *, text: str, session_id:
     persisted = None
     feedback_id = prev["feedback_id"] if prev else None
     handoff_key = prev["handoff_key"] if prev else None
-    if isinstance(handoff, dict) and _handoff_key(handoff) != handoff_key:
+    new_handoff = isinstance(handoff, dict) and _handoff_key(handoff) != handoff_key
+    pulse_ids = tp.finish(clear_for_final_wiggle=new_handoff)   # no new pulses after the reply
+    if new_handoff:
         handoff_key = _handoff_key(handoff)
         fb = TasteFeedbackIn(text=_guest_text(transcript, str(handoff.get("feedback_text") or text)),
                              judge_name=(judge_name or (prev or {}).get("judge_name") or None),
@@ -124,7 +129,8 @@ def chat_turn(svc: ControlService, settings: Settings, *, text: str, session_id:
             (session_id, now, now, stage, mode, sous_chef, judge_name, len(transcript), handoff_key,
              feedback_id, dumps(result)))
     return {**result, "session_id": session_id, "stage": stage, "feedback_id": feedback_id,
-            "handoff_persisted": persisted is not None, "persisted": persisted}
+            "handoff_persisted": persisted is not None, "persisted": persisted,
+            "thinking_pulse_ids": pulse_ids}
 
 
 def chat_state(svc: ControlService, session_id: str) -> dict:
