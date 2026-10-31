@@ -47,6 +47,9 @@ void GpioOut::begin() {
   if (pin_ < 0) return;
   digitalWrite(pin_, LOW);
   pinMode(pin_, OUTPUT);
+  // Keep the input buffer enabled so the console `pin <n>` command reads back the real pad level
+  // (bring-up evidence that the gate/enable line actually moves).
+  gpio_set_direction((gpio_num_t)pin_, GPIO_MODE_INPUT_OUTPUT);
   digitalWrite(pin_, LOW);
   state_ = false;
 }

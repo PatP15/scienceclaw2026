@@ -211,6 +211,6 @@ able to reach the supply switch.
 | 6 | A, B | B: probe `28d3a9ca00000061` → starter (label 0061). A, in progress: probe 1 found after the OneWire GPIO47 fix, ROM `283e4825000000c6` → starter (cable label 00C6). Hand-warm: 23.5 → 27.1 °C in 40 s, pass. Role persisted across several resets (NVS), pass. Side finding: AHT21 reads ≈3 °C above the DS18B20 in the same air (ENS160 self-heating). Unplug test and probes 2 and 3 pending. | 2026-10-31 | PP + Claude |
 | 7 | | | | |
 | 8 | | | | |
-| 9 | | | | |
+| 9 | A | in progress: D4184 dual-MOSFET module on GPIO48 (ALT map). `arm motor` OK; `motor test 3000` drives the gate HIGH for 3.0 s then LOW (read back via `pin 48`). GPIO48 LOW at boot. Motor/LED observation, door-open stop and backend command test pending. Earlier the board went silent/un-enumerated after the first motor wiring attempt and recovered after re-plugging; cause not identified (suspect motor power on the 5V pin). | 2026-10-31 | PP + Claude |
 | 10a–d | | | | |
 | 11 | | | | |
