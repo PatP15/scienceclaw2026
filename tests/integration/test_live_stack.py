@@ -24,7 +24,7 @@ pytestmark = pytest.mark.integration
 # Gaps the audit found and that are owned by other areas (see docs/acceptance_tests.md).
 KNOWN_PROVENANCE_GAPS = {
     ("GET /api/v1/molecular/summary", "provenance"):
-        "datafiles.molecular_summary returns free text, not a label (api/datafiles.py:56)",
+        "datafiles.molecular_summary returns free text, not a label (api/datafiles.py:74)",
     ("GET /api/v1/stl", "provenance"): "STL listing has no provenance field (api/routes.py stl_list)",
 }
 

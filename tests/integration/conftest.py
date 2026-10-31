@@ -72,9 +72,6 @@ def server_env(root: Path, port: int) -> dict[str, str]:
         "FERMENTAI_DB_PATH": str(root / "fermentai.sqlite3"),
         "FERMENTAI_DATA_DIR": str(make_data_dir(root)),
         "FERMENTAI_FINDINGS_PATH": findings,
-        # agents/state.py reads FERMENTAI_FINDINGS_LOG, the API reads FERMENTAI_FINDINGS_PATH
-        # (see test_agent_state_uses_api_findings_path); set both so they agree.
-        "FERMENTAI_FINDINGS_LOG": findings,
         "FERMENTAI_LLM_MODE": "offline",
         "FERMENTAI_PORT": str(port),
         "FERMENTAI_BASE_URL": f"http://127.0.0.1:{port}",

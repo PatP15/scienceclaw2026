@@ -42,3 +42,5 @@ Provenance of all numbers below: **real** (read from files produced on the Brev 
 - Campaign 2: GPU out-of-memory event at 05:20Z with 14 concurrent processes; affected jobs re-run (logs/failed/c2_oom_*).
 - Campaign 2 relative pKa (lactic - acetic): -3.89 +- 1.73 (cluster-phase, n=6 and 10) vs experiment -0.90; acetic acid cyclic dimer -15.26 kcal/mol vs literature -14 to -16.
 - Bug found and fixed during campaign 1: v1 ion-pair builder placed the transferred proton on top of existing H in 7/53 inputs; those results are archived in data/alchemi/superseded/ionpair_v1/ and are not used.
+
+> **Update (2026-10-31 ~14:05 UTC):** the campaign-2 instance `fermentai-gpu` (vjdcojwux) was deleted by the orchestrator with user approval after the SSH gateway became unreachable; `brev ls` reports no instances. Final campaign-2 time ≈ 9.1 h (≈ $5.5); both campaigns ≈ $6.2 total. See environment/brev_stop.log.

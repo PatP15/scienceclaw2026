@@ -46,3 +46,14 @@ design internals or simulated_devices/ (report bugs instead).
   record in docs/acceptance_tests.md table; then update STATUS/validation_status (items 7, 10 hardware).
 - Brev campaign 2 was in progress at writing time: update STATUS.md spend when .progress/molecular.md closes it.
 - Firmware: no .progress/firmware.md existed; re-read firmware/build_logs + that file when it lands.
+
+## FINAL PASS (after b83297a) — COMPLETE, not committed
+- Removed xfail markers on test_current_setpoints_reach_the_agents and test_agent_state_uses_api_findings_path
+  (API fixes landed; both XPASSed); dropped the FERMENTAI_FINDINGS_LOG workaround from conftest.server_env.
+- Kept test_data_provenance_audit_strict xfail + KNOWN_PROVENANCE_GAPS (datafiles.py:74 free-text label,
+  /stl listing unlabelled — still open).
+- Rewrote docs/STATUS.md (A–I incl. Formlabs live PreForm, campaign 2, ~$6 GPU, commit list, hardware bring-up
+  next steps -> firmware/docs/BRINGUP.md GPIO38/40), docs/validation_status.md, docs/acceptance_tests.md; README Brev
+  section + links (deck, recipe PDF, BRINGUP, STATUS, formlabs). test_report.md regenerated.
+- Stale (molecular-owned): data/alchemi/environment/report.md + c2_release_note.md still say campaign-2 instance running;
+  `brev ls` showed no instances.

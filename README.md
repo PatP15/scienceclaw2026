@@ -75,23 +75,31 @@ The setpoints are hypotheses, not guaranteed flavor outcomes. Agents prioritize 
 
 ## NVIDIA Brev (run on the Mac)
 
-The `brev-cli` Claude Code skill is installed in `~/.claude/skills/brev-cli/`. Core commands:
+The demo never needs a GPU. All ALCHEMI results are cached in `data/alchemi/`. A GPU instance is
+created only for a calculation campaign and **deleted** when it ends. `hyperstack_A6000` instances
+cannot be stopped, so deletion is the only way to stop billing. Before deleting, an rsync dry-run
+must confirm that the Mac copy is complete.
+
+| Campaign | Instance | What ran | Instance time / cost |
+| --- | --- | --- | --- |
+| 1 | `fermentai-gpu`, hyperstack_A6000 (RTX A6000), $0.60/h | 159 optimisations, 72 MD runs | 1.14 h ≈ $0.68 |
+| 2 | `fermentai-gpu` (new instance), same type | 907 optimisations, 79 vibrational analyses, 8 × 20 ps MD; relative pKa cycle | ≈ 8.8 h ≈ $5.3 (about 7 h of that was idle) |
+| **Total** | | | **≈ 10 h ≈ $6** (estimate; Brev's invoice is authoritative) |
+
+`brev ls` currently shows no instances. The details are in `data/alchemi/environment/report.md` and
+`docs/simulation_provenance.md`.
+
+To run a new campaign (with the `brev-cli` Claude Code skill installed in `~/.claude/skills/brev-cli/`):
 
 ```bash
 brew install brevdev/homebrew-brev/brev   # or the release-archive installer
-brev login                                 # browser auth
-brev ls                                    # existing instances
-brev search                                # GPU options and pricing
-
-# after provisioning:
-brev refresh
-brev shell fermentai-gpu                   # or: ssh fermentai-gpu
-nvidia-smi                                 # on the remote
-
-brev stop fermentai-gpu                    # when finished
+brev login && brev ls && brev search      # auth, existing instances, GPU options and pricing
+brev create fermentai-gpu --type hyperstack_A6000
+scripts/setup_brev.sh                     # remote environment (ALCHEMI toolkit, Warp +cu12)
+scripts/run_remote_alchemi.sh <mode>      # runs remotely, then rsyncs results back to data/alchemi/
+scripts/collect_brev_results.sh           # final sync
+scripts/stop_brev.sh --delete-if-unstoppable   # dry-run must show 0 differences, then delete
 ```
-
-`fermentai-gpu` is the proposed instance name; it does not exist yet. Check availability and pricing before creating it. Stopped instances avoid compute charges but may still incur storage charges, and GPU capacity may not be immediately available again, so copy all important results to the Mac before stopping.
 
 ## Install & run
 
@@ -115,6 +123,7 @@ Main entry points:
 | `scripts/run_acceptance.sh` | Every suite + contract + offline check → `docs/test_report.md` (~2–3 min) |
 | `uv run python scripts/simulate_loaves.py` | Regenerate the fermentation predictions in `data/predictions/` |
 | `uv run python scripts/generate_stls.py` | Regenerate the crumb STLs in `data/stl/` |
+| `uv run python scripts/prepare_print.py status` | Formlabs PreForm Local API: prepare and validate the print scene (never prints without two explicit human gates) |
 | `uv run python -m simulated_devices -h` | Virtual ESP32s on their own (and `--replay` for recorded telemetry) |
 | `uv run python -m fermentai.api.contract --check` | Check that `contracts/` and `firmware_contract/` match the API models |
 
@@ -158,6 +167,7 @@ Before judges arrive, run `scripts/offline_check.sh` and the physical checklist 
 │   ├── fermentation/            sourdough kinetics model, scenarios, uncertainty, calibration, plots
 │   ├── molecular/               ALCHEMI structure builders, runner, analysis (Mac-side)
 │   ├── geometry/                crumb STL generator, mesh validation, simulation→crumb mapping, renders
+│   ├── formlabs/                PreForm Local API client (live | recorded mock), print preparation, manifest
 │   ├── design/                  in-silico agent-collaboration benchmark
 │   └── dashboard/static/        offline iPad dashboard (plain ES modules, vendored Plotly)
 ├── tests/                       unit tests (test_<area>_*.py)
@@ -165,23 +175,34 @@ Before judges arrive, run `scripts/offline_check.sh` and the physical checklist 
 ├── data/
 │   ├── alchemi/                 real GPU results, logs, environment report, analysis   (real)
 │   ├── predictions/             fermentation forecasts A/B, uncertainty, charts         (simulated)
-│   ├── stl/                     crumb specimens A/B + validation + previews             (simulated)
+│   ├── stl/                     crumb specimens A/B + validation + previews + hero renders (simulated)
+│   │   └── print/               PreForm .form scenes, API transcript, print manifest     (real API output; estimates)
 │   ├── demos/                   scripted replay scenarios + dashboard screenshots       (replay)
 │   ├── benchmarks/, figures/    benchmark outputs, pitch figures
 │   └── experiments/, images/    runtime state (findings log, uploaded frames; gitignored/regenerated)
-└── docs/                        see below
+└── docs/                        see below (incl. pitch/deck/ investor deck, recipe/ printable recipe PDF)
 ```
 
 Where to read next:
 
-- `PLAN.md`, the spec, including §16 acceptance tests and §17 required outputs. `PLAN_MASTER.md` covers
-  the workstreams, contracts and the §14 judge workflow.
-- `docs/STATUS.md` is the consolidated status: implemented, tested, simulated, hardware-unverified,
-  known bugs, Brev spend.
+- **`docs/STATUS.md`**, the consolidated status report. It covers what is implemented, tested,
+  simulated and hardware-unverified, plus test totals, GPU cost, known bugs and the hardware
+  bring-up next steps.
+- `PLAN.md`, the spec, including §16 acceptance tests and §17 required outputs. `PLAN_MASTER.md`
+  covers the workstreams, contracts and the §14 judge workflow.
 - `docs/acceptance_tests.md` gives PLAN §16 item by item. `docs/test_report.md` is the last automated
   run. `docs/validation_status.md` says what is validated against what, and what is not.
-- `docs/network_setup.md` (offline LAN, iPad, ESP32 addressing), `docs/demo_script.md` (3-minute script),
-  `docs/pitch/slides.md`.
-- `docs/simulation_provenance.md` (ALCHEMI), `docs/scientific_assumptions.md` (kinetics),
-  `docs/morphology_coupling.md` (crumb STLs), `docs/benchmark_results.md` (agent benchmark).
-- `contracts/README.md` and `firmware_contract/README_FOR_ESP32_AGENT.md` for the device interface.
+- Investor deck: https://claude.ai/artifact/8PiJBrwSGu7TDNgc11KCGA (source in `docs/pitch/deck/`).
+  Also `docs/pitch/slides.md` and the 3-minute `docs/demo_script.md`.
+- Printable recipe and bake log: `docs/recipe/FermentAI_sourdough_recipe.pdf`. Rebuild it with
+  `uv run --with reportlab python docs/recipe/build_recipe_pdf.py`.
+- Firmware hardware bring-up: `firmware/docs/BRINGUP.md`. Also `GPIO_MAP.md`, `SENSOR_WIRING.md`,
+  `HARDWARE_UNCERTAINTIES.md`, and `firmware_contract/README_FOR_ESP32_AGENT.md` and
+  `contracts/README.md` for the device interface.
+- `docs/network_setup.md` covers the offline LAN, the iPad and ESP32 addressing.
+- Science and provenance:
+  - `docs/simulation_provenance.md` (ALCHEMI)
+  - `docs/scientific_assumptions.md` (kinetics)
+  - `docs/morphology_coupling.md` (crumb STLs)
+  - `docs/formlabs_workflow.md` (PreForm)
+  - `docs/benchmark_results.md` (agent benchmark)

@@ -24,3 +24,5 @@
     (`rsync -azn --itemize-changes -e "ssh -T" --exclude '*.pt' fermentai-gpu:fermentai/results/ data/alchemi/`),
     then `brev delete fermentai-gpu`.
   * If SSH does not come back, decide whether to `brev delete fermentai-gpu` on the evidence above.
+
+> **Update (2026-10-31 ~14:05 UTC):** the campaign-2 instance `fermentai-gpu` (vjdcojwux) was deleted by the orchestrator with user approval after the SSH gateway became unreachable; `brev ls` reports no instances. Final campaign-2 time ≈ 9.1 h (≈ $5.5); both campaigns ≈ $6.2 total. See environment/brev_stop.log.

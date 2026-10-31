@@ -1,205 +1,248 @@
 # Validation status
 
-What each component has been checked against, and what has **not** been checked. Written by the
-integration/QA workstream on 2026-10-31 (UTC ≈ 05:10), against working tree on top of commit
-`dd3273f`. PLAN.md §17 asks for this document. The PLAN §16 item-by-item table is in
-`docs/acceptance_tests.md`; the latest automated run is in `docs/test_report.md`.
+This document records what each component has been checked against, and what has **not** been
+checked. It was written by the integration/QA workstream at the 2026-10-31 final pass (`HEAD`
+`b83297a`). PLAN.md §17 asks for it.
 
-Vocabulary used below:
+Related documents:
+
+- `docs/acceptance_tests.md`: the PLAN §16 item-by-item table
+- `docs/test_report.md`: the latest automated run
+- `docs/STATUS.md`: the overall status
+
+Vocabulary:
 
 | Word | Meaning here |
 |---|---|
 | **validated against X** | compared with an independent reference X, and the comparison is recorded |
 | **sanity-checked** | checked for internal consistency or physically plausible behaviour, with no reference data |
 | **tested** | automated tests exercise the code path; this says nothing about physical truth |
-| **simulated** | produced by a model or a virtual device, and labelled `simulated` |
+| **real (tool output)** | produced by the real external tool (NVIDIA GPU run, Formlabs PreForm server), not by our models |
+| **simulated** | produced by our model or a virtual device, and labelled `simulated` |
 | **hardware-unverified** | written for hardware that has not been run on that hardware |
 
 ## Summary
 
 | Component | Validated against | Status |
 |---|---|---|
-| NVIDIA ALCHEMI / AIMNet2 molecular energies (campaign 1) | upstream `aimnet` calculator (same structures), NVIDIA official example 08, literature water-cluster and acetic acid·H₂O binding energies | **Real GPU results**, cross-checked; cluster-phase only |
-| Fermentation kinetics | sanity properties only (monotonic acidification, temperature ordering, rise saturates then collapses, mass balance); parameters from literature ranges | **Not calibrated** to any physical dough |
-| Crumb STL specimens | geometric validation (watertight, winding, volume, min thickness, …) | **Not printed**; not compared with a real crumb |
-| Backend API + contract | JSON-schema contract check, 100+ API tests, live end-to-end runs with virtual devices | **Tested (software)** |
-| Virtual ESP32 devices | the real API over HTTP; controller unit tests | **Simulated**; thermal plant is a controller-test model, not a physical simulation |
-| ESP32 firmware | compiles for 3 PlatformIO environments; 94 native unit tests; contract samples validated | **Hardware-unverified** (never flashed to a board in this repo's evidence) |
-| Scientist agents / offline policy | deterministic tests; PLAN_MASTER §14 sentence end-to-end; in-silico benchmark | **Tested (software)**; benchmark is in-silico only |
-| Dashboard | headless Chrome (dashboard workstream), static + live offline scans, HTTP crawl | **Not tested on a physical iPad** |
-| Local network / offline | `scripts/offline_check.sh` on the Mac (0.0.0.0 bind, LAN-address access, outbound audit) | **Not tested on the travel router**; WAN was physically up during the automated run |
+| NVIDIA ALCHEMI / AIMNet2 (campaigns 1 + 2) | Upstream `aimnet` calculator; NVIDIA example 08; **experiment**: ΔpKa(lactic − acetic) −3.89 ± 1.73 vs −0.90; **literature**: acetic acid dimer −15.26 vs −14…−16 kcal/mol, water clusters vs CCSD(T)/CBS | **Real** GPU results, cross-checked. Cluster-phase only. |
+| Fermentation kinetics | Sanity properties only. Parameters come from literature ranges. The ALCHEMI hook is applied (ΔpH ≤ 0.013). | **Not calibrated** to any physical dough |
+| Crumb STL specimens | Geometric validation, plus the **live Formlabs PreForm** scene check (auto-support, printability validation) | **Print-ready per PreForm, never printed**. Not compared with a real crumb. |
+| Backend API + contract | JSON-schema contract check, 103 API tests, live end-to-end runs with virtual devices | **Tested (software)** |
+| Virtual ESP32 devices | Run against the real API over HTTP; controller unit tests | **Simulated**. The thermal plant is a controller-test model. |
+| ESP32 firmware | Compiles for 3 board environments; 94 native unit tests; 8/8 contract samples validated against the API models | **Hardware-unverified** |
+| Scientist agents / offline policy | Deterministic tests; PLAN_MASTER §14 sentence end to end; in-silico benchmark | **Tested (software)**. The benchmark is in-silico only. |
+| Dashboard | Headless Chrome; static and live offline scans; HTTP crawl | **Not tested on a physical iPad** |
+| Local network / offline | `scripts/offline_check.sh` on the Mac: 0.0.0.0 bind, LAN-address access, outbound audit | **Not tested on the travel router**. The WAN was physically up. |
 
 ## 1. NVIDIA ALCHEMI molecular calculations
 
 **Validated against**
 
-- *Upstream reference implementation.* `data/alchemi/selftest/` and
-  `data/alchemi/environment/report.md`: the ALCHEMI pipeline (AIMNet2 + Ewald + DFT-D3) agrees with the
-  upstream `aimnet` calculator to |ΔE| ≤ 1.02 meV and max|ΔF| ≤ 2.8·10⁻⁴ eV/Å on the self-test
-  structures. Across all 159 optimised structures: max |ΔE| 5.9 meV, max |ΔF| 1.5·10⁻³ eV/Å
-  (`molecular_descriptors.json → provenance.crosscheck_upstream_aimnet`).
-- *NVIDIA's own example.* Official example 08 (10 water pentamers) reproduced on the A6000; all
-  converged (`data/alchemi/official_example/`).
-- *Literature values* (`docs/simulation_provenance.md` §8): water trimer −17.9 vs CCSD(T)/CBS ≈ −15.8
-  kcal/mol; water hexamer −45.5 vs ≈ −45.9 kcal/mol; acetic acid·H₂O −10.3 kcal/mol. The direction
-  of the lactic-vs-acetic ion-pair result agrees with the experimental aqueous pKa ordering (3.86 vs
-  4.76). It is **not** a pKa.
-- *Convergence.* 159/159 optimisations converged to fmax < 0.01 eV/Å; 72/72 MD runs completed.
+- **Upstream reference implementation.** The ALCHEMI pipeline (AIMNet2 + Ewald + DFT-D3) agrees with
+  the upstream `aimnet` calculator to |ΔE| ≤ 1.02 meV on the self-test structures. Across all
+  campaign-1 structures it agrees to max |ΔE| 5.9 meV and max |ΔF| 1.5·10⁻³ eV/Å
+  (`data/alchemi/selftest/`, `molecular_descriptors.json`).
+- **NVIDIA's own example.** Official example 08 was reproduced on the A6000
+  (`data/alchemi/official_example/`).
+- **Experiment, relative acidity (campaign 2).** A cluster-phase quasi-harmonic exchange cycle
+  (n = 6 and n = 10 explicit waters, annealed sampling, Boltzmann-averaged) gives
+  ΔpKa(lactic − acetic) = **−3.89 ± 1.73**. The experimental aqueous value is **−0.90**.
+  - The sign is right: lactic acid is the stronger acid.
+  - The magnitude is too large by about 3 pKa units, about 1.7σ.
+  - The estimate moves toward experiment as hydration grows (n = 0, 3, 6, 10: −9.3, −5.7, −4.65,
+    −3.12). That is the expected behaviour of a cluster model with no bulk dielectric.
+  - It is **not** a solution pKa (`docs/simulation_provenance.md`).
+- **Literature, dimerisation (campaign 2).** The acetic acid cyclic (C2h) dimer comes out at
+  ΔE = **−15.26 kcal/mol**, inside the literature range of −14 to −16 kcal/mol.
+- **Literature, campaign 1.** The water trimer comes out at −17.9 kcal/mol against CCSD(T)/CBS
+  ≈ −15.8. The hexamer comes out at −45.5 against ≈ −45.9. Acetic acid·H₂O comes out at
+  −10.3 kcal/mol.
+- **Convergence.**
+  - Campaign 1: 159/159 optimisations (fmax < 0.01 eV/Å) and 72/72 MD runs.
+  - Campaign 2: 907/907 optimisations, 79 vibrational analyses (0 failed) and 8/8 runs of 20 ps MD.
+    16 optimisations and 2 MD runs were re-run after a GPU out-of-memory event; the failed records
+    are kept.
 
-**Where the numbers came from.** Brev instance `fermentai-gpu` (hyperstack_A6000, RTX A6000), created
-03:36:39Z and deleted 04:44:50Z on 2026-10-31. Instance time was 1.14 h, about **$0.68**. Results
-were rsynced to the Mac (a dry-run showed 0 differences) before deletion. The Mac re-derives every
-summary without a GPU (`uv run python -m fermentai.molecular.analysis`).
+**Where the numbers came from.** Brev `fermentai-gpu`, hyperstack_A6000 (RTX A6000), $0.60/h, in two
+campaigns:
+
+- Campaign 1: 1.14 h, about $0.68.
+- Campaign 2: about 8.8 h billed, about $5.3. About 7 h of that was idle.
+- Total: about $6. Both instances are deleted (`brev ls`: no instances).
+
+Results are on the Mac. For campaign 1, an rsync dry-run showed 0 differences. For campaign 2,
+completeness is argued file by file in `data/alchemi/environment/c2_release_note.md`, because the
+SSH gateway failed before the final dry-run. Without a GPU, the Mac re-derives every summary with
+`uv run python -m fermentai.molecular.analysis`. The analysis now writes strict JSON (no NaN).
 
 **Not validated**
 
-- Energies are 0 K, gas-phase microsolvated clusters with 6 seeded starts each. They are not free
-  energies, not bulk solution, and global minima are not guaranteed. The n = 6 deprotonation ordering
-  is inside the sampling noise.
-- Nothing here predicts pH, sourness, CO₂ or crumb structure. The coupling into the kinetics
-  changes predicted pH by ≤ 0.002 (`data/predictions/molecular_coupling_report.json`).
-- **Campaign 2 is in progress** while this is written: `.progress/molecular.md`,
-  `data/alchemi/environment/c2_*`. A new `fermentai-gpu` instance was requested at 04:59:48Z, with a
-  $30 budget. Its results (`results_c2/`) are not covered by this document or by the tests.
-
-**Data-integrity issue found.** `data/alchemi/analysis/analysis_summary.json` contains bare `NaN`
-tokens, which are not valid JSON. Python reads them, but browsers' `JSON.parse` and FastAPI's
-encoder reject them. That made `GET /api/v1/molecular/summary` return HTTP 500. The API endpoint is
-now patched to map NaN → null (`src/fermentai/api/routes.py`, molecular_summary). The file itself
-should still be written with `null` (owner: molecular, `analysis.py:1034`).
+- Energies are gas-phase microsolvated clusters with harmonic (quasi-harmonic) thermochemistry.
+  There is no bulk solvent, and global minima are not guaranteed.
+- The n = 15 clusters are unconverged and are not used.
+- Nothing here predicts pH, sourness, CO₂ or crumb structure directly.
 
 ## 2. Fermentation kinetics (`src/fermentai/fermentation/`)
 
 **Sanity-checked only. No physical calibration.**
 
 - Parameters come from literature ranges, with references in `configs/kinetics.yaml` and
-  `docs/scientific_assumptions.md` §11. Unit tests (`tests/test_fermentation_*.py`) check
-  qualitative properties: B (27 °C) acidifies faster and peaks earlier than A (22 °C); rise saturates,
-  then collapses past capacity; schedules interpolate; calibration recovers parameters from
-  *synthetic* data.
-- Reproducibility: `tests/integration/test_artifacts_reproducible.py` re-runs both nominal scenarios in
-  a clean interpreter with no torch or CUDA loaded. It matches the committed
-  `data/predictions/chamber_{A,B}_prediction.csv` to rtol 2·10⁻⁴.
-- Monte-Carlo envelopes reflect assumed parameter ranges, not structural error.
+  `docs/scientific_assumptions.md`.
+- Unit tests (44) check qualitative properties. B (27 °C) acidifies faster and peaks earlier than A
+  (22 °C). The rise saturates, then collapses. Calibration recovers parameters from *synthetic*
+  data.
+- **ALCHEMI coupling is now `applied`** (`data/predictions/molecular_coupling_report.json`):
+  - The cluster ΔpKa shifts the lactic–acetic pKa gap from −0.90 to −0.95. The shift is capped at
+    0.05, so only the sign of the discrepancy is used.
+  - The undissociated-lactic potency moves from 0.10 to 0.127.
+  - The effect on the forecasts is |ΔpH| ≤ 0.013 at 12–16 h, with no change in peak or overproof
+    timing.
+  - This is transparent and traceable, but not decisive for the forecast.
+- Reproducibility: `tests/integration/test_artifacts_reproducible.py` re-runs both nominal scenarios
+  with no torch or CUDA loaded. They match the committed CSVs to rtol 2·10⁻⁴.
 
-**Not validated:** no pH, rise or temperature data from this flour, starter or vessel has been
-fitted. `calibrate()` exists, but nothing has been run through it with real observations. The model
-does not predict flavour or perceived sourness. Its CO₂ is modelled production, not a sensor
-quantity, and the BME680 gas resistance is not CO₂.
+**Not validated:**
 
-## 3. Crumb STLs (`src/fermentai/geometry/`, `data/stl/`)
+- No pH, rise or temperature data from this flour, starter or vessel has been fitted.
+- The model does not predict flavour or perceived sourness.
+- The model's CO₂ is modelled production. It is not a sensor quantity, and the BME680 gas
+  resistance is not CO₂.
 
-**Validated geometrically. Not printed.**
+## 3. Crumb STLs and Formlabs print preparation
 
-- `crumb_chamber_{A,B}.stl` each pass 10/10 checks in `*_validation.json`: watertight, consistent
-  winding, positive volume, min wall thickness ≥ printable, and others. The integration test also
-  checks the binary-STL size against the triangle count and confirms that A ≠ B.
-- The mapping from simulation to crumb parameters is documented coefficient by coefficient
-  (`docs/morphology_coupling.md`). Most coefficients are labelled `assumption`.
+**Validated geometrically, prepared by the real PreForm server, never printed.**
 
-**Not validated:** no Formlabs print was made (`formlabs_preform.py` is description-only). No PreForm
-import or printability check was done. No comparison was made with a photographed real crumb
-(`analyze_crumb_image` exists, but no photo has been analysed). Chamber A ships un-decimated
-(≈ 22 MB) because mesh simplification falls back.
+- `crumb_chamber_{A,B}.stl` each pass 10/10 checks in `*_validation.json`. The integration test also
+  checks the binary-STL size against the triangle count, and that A ≠ B.
+- **Live PreForm Local API** (PreFormServer 3.64.2, notarized Formlabs build; source
+  `preform_local_api`):
+  - Imported both specimens for Form 4 / Grey V5 / 0.1 mm, open face up.
+  - Auto-generated supports and ran PreForm's printability validation.
+  - Saved `.form` scenes.
+  - PreForm's own **estimates**: 1.36 h and 150.24 mL resin; 185 layers.
+  - PreForm flags cup regions (A: 1, B: 3) as warnings.
+  - The wire transcript and manifest are in `data/stl/print/`. An auto-orient alternative is in
+    `alternative_preform_auto/`.
+- Submission is never automated. It needs `--i-confirm-print` and
+  `FERMENTAI_FORMLABS_CONFIRM_PRINT=yes`, and even then a person starts the print.
+
+**Not validated:**
+
+- No physical print, post-processing or dimensional check.
+- No comparison with a photographed real crumb. `analyze_crumb_image` exists but has not been run
+  on a photo.
+- Most mapping coefficients are labelled `assumption` (`docs/morphology_coupling.md`).
+- Resin parts are display-only and not food-safe.
 
 ## 4. Backend API and contracts (`src/fermentai/api/`, `contracts/`)
 
-**Tested (software).** `uv run python -m fermentai.api.contract --check` is clean: 8 JSON schemas plus
-examples, v1.0 fixtures still validate. The API unit tests and the integration suite drive real HTTP
-against uvicorn with the virtual devices: telemetry, dedup, setpoint clamp, step and rate limits,
-motor accepted→completed, `ran` semantics, cancel, capture, taste feedback, SSE.
+**Tested (software).**
 
-**Known defects** are listed in `docs/STATUS.md` → Known bugs. The most important one is a
-context-key mismatch between the API and the agents. The telemetry part was fixed upstream during
-QA. The setpoint part is still open: the agents assume 22/27 °C rather than the chambers' actual
-setpoints. It is an xfail test in `tests/integration/test_inprocess_flow.py`.
+- `uv run python -m fermentai.api.contract --check` is clean. The JSON-schema contract test now runs
+  with `jsonschema`, so it no longer skips.
+- 103 API tests plus the integration suite drive real HTTP against uvicorn with the virtual devices.
+  They cover telemetry, dedup, the setpoint clamp and its step and rate limits, motor
+  accepted→completed, `ran` semantics, cancel, capture, taste feedback and SSE.
+- The issues found in the first QA pass are fixed:
+  - NaN-safe JSON.
+  - Telemetry, setpoints and limits are passed to the agents.
+  - Agent state reads the API's findings log.
+- Remaining open item: two listing envelopes lack a provenance label (`docs/STATUS.md`).
 
 ## 5. Virtual devices (`simulated_devices/`)
 
-**Simulated, and tested against the real API.** Every record is `source: "simulated"`, with the quality
-flag `simulated_device` and firmware `virtual-0.1`. The starter rise uses the real kinetics
-(`fermentai.fermentation.simulation.simulate`, accelerated clock). The integration test asserts this
-model is the one loaded, not the logistic fallback. The thermal plant is a **controller-test model
-with assumed time constants**, not a validated simulation of the chambers.
+**Simulated, and tested against the real API.**
 
-Note: the virtual devices identify as `fermentai-esp32-a/b`, the same ids as the physical boards.
-Provenance stays correct through `source`, but the device registry cannot tell a virtual board from
-a real one by id.
+- Every record is `source: "simulated"` with quality flag `simulated_device` and firmware
+  `virtual-0.1`.
+- The starter rise uses the real kinetics, and the integration test asserts that this model, not the
+  fallback, is loaded.
+- The thermal plant is a **controller-test model with assumed time constants**. It is not a
+  validated simulation of the chambers.
+- The virtual devices reuse the physical device ids `fermentai-esp32-a/b`.
 
-## 6. ESP32 firmware (`firmware/`)
+## 6. ESP32 firmware (`firmware/`, commit `1e2dfc1`)
 
-**Compiles; native tests pass; hardware-unverified.** This comes from `firmware/build_logs/` as of
-2026-10-31 ≈ 05:03 UTC (the firmware workstream is still editing):
+**Compiles, native tests pass, hardware-unverified** (`.progress/firmware.md`, `firmware/build_logs/`).
 
-- `esp32s3cam_a`, `esp32s3cam_b`, `esp32s3cam_noio`: `pio run` SUCCESS (PlatformIO espressif32 6.9.0).
-- `native` environment: 94/94 unit-test cases passed (commands, telemetry, network, motor, control,
-  sensors).
-- `contract_validation.log`: firmware sample payloads validated against the API models.
+- Builds: `esp32s3cam_a`, `esp32s3cam_b` and `esp32s3cam_noio` all SUCCESS, with 0 warnings from
+  firmware sources. The ALT-pin variant B also builds.
+- Native unit tests: 94/94 (control 20, sensors 18, motor 12, commands 23, telemetry 13, network 8).
+- Contract: the serializer output passes the backend's Pydantic models (8/8). The v1.0 profile
+  passes the frozen v1.0 models.
 
-No `.progress/firmware.md` existed when this was written. **Not verified:** flashing, sensors (BME680,
-DS18B20, pH), Peltier and H-bridge control, thermal safety cut-outs, camera capture, motor actuation,
-Wi-Fi on the travel router. None of these has been exercised on a physical board in recorded
-evidence.
+**Not verified:**
+
+- Flashing.
+- Reset-level pin states (GPIO38/40; see `docs/STATUS.md` → Hardware bring-up next steps).
+- Sensors.
+- Peltier control and its interlocks.
+- Camera.
+- Motor.
+- Wi-Fi on the travel router.
+
+None of these has been exercised on a physical board.
 
 ## 7. Scientist agents (`src/fermentai/agents/`, `src/fermentai/design/`)
 
-**Tested (software).** The PLAN_MASTER §14 sentence yields the structured preference "More sourness /
-Lower density / Preserve good rise". scientist_A and scientist_B exchange distinct findings linked by
-`in_reply_to`, and the round ends with a next experiment that requires human confirmation. Mode
-labels: `offline_policy` / "Offline Policy". Live mode with no LLM falls back to the offline policy
-and says so.
+**Tested (software).**
 
-- `claude -p` live mode was smoke-tested once by the agents workstream (`.progress/agents.md`). It is
-  not part of the automated suite, because it needs a network.
-- The collaboration benchmark (`docs/benchmark_results.md`) is **in-silico**, on simulated worlds.
-  It is not evidence about real bread.
-- Through the API, the agents now receive the chambers' telemetry, but **not** their current
-  setpoints. They assume the defaults (22/27 °C), which is an open bug.
+- The PLAN_MASTER §14 sentence gives the structured preference "More sourness / Lower density /
+  Preserve good rise".
+- scientist_A and scientist_B exchange distinct findings linked by `in_reply_to`. A next experiment
+  requiring human confirmation follows.
+- Through the API the agents now receive the chambers' live telemetry, actual setpoints and
+  hardware limits. Integration tests cover this.
+- Live mode with no LLM falls back to the labelled offline policy.
+- `claude -p` live mode was smoke-tested once by the agents workstream. It is not in the automated
+  suite.
+- The collaboration benchmark (`docs/benchmark_results.md`) is **in-silico**.
 
 ## 8. Dashboard (`src/fermentai/dashboard/`)
 
 **Tested headless. Not on a physical iPad.**
 
 - Static scans find no external URLs, CDN, web fonts or `@import`. Plotly is vendored and
-  byte-identical to the installed package.
-- Live crawl: the integration suite fetches `/` and every referenced asset and ES-module import over
-  real HTTP. All return 200 with JavaScript MIME, and none contains an external URL. The scan reuses
-  the dashboard's own scanner.
-- The dashboard workstream drove headless Chrome (SwiftShader WebGL) at 390, 820 and 1180 px widths,
-  with 0 external requests and 0 console errors (`.progress/dashboard.md`).
-- The dashboard is being edited concurrently, so these results apply to the tree at the time of the
-  run.
+  byte-identical.
+- The live crawl in the integration suite fetches `/` and every referenced asset and ES-module
+  import over HTTP. All return 200 with JavaScript MIME, and none contains an external URL.
+- The dashboard workstream drove headless Chrome at iPad widths, with 0 external requests and
+  0 console errors.
 
-**Not verified:** iPadOS Safari rendering, touch interaction, and the token flow on a physical iPad.
+**Not verified:** iPadOS Safari, touch interaction, and the token flow on a physical iPad.
 
 ## 9. Local network / disconnected mode
 
-**Verified on the Mac only.** `scripts/offline_check.sh` and
+**Verified on the Mac only**, by `scripts/offline_check.sh` and
 `tests/integration/test_replay_contract_offline.py::test_lan_bound_server_full_loop_without_external_traffic`:
 
-- The server is bound to `0.0.0.0` and reached through the Mac's LAN address (Wi-Fi interface, as a
-  stand-in for the iPad).
-- The full judge loop ran with virtual devices.
+- The server is bound to `0.0.0.0` and reached through the Mac's LAN address.
+- The full judge loop ran with the virtual devices.
 - `lsof` showed only loopback or private socket peers.
-- A PEP 578 audit hook recorded **0** DNS lookups or connects to non-private hosts. A positive-control
-  test proves the hook flags public addresses.
+- The PEP 578 audit hook recorded **0** DNS lookups or connections to non-private hosts. A
+  positive-control test proves the hook flags public addresses.
 
-**Not verified:** the GL.iNet or other travel router, a physical iPad, the ESP32s on 2.4 GHz WPA2,
-client isolation, mDNS `fermentai.local`, and the macOS firewall prompt. During the automated run
-the Mac's WAN was **up**. The audit proves the server never *tried* to reach the internet, but no
-run has yet been made with the WAN physically disconnected. The manual procedure is in
-`scripts/offline_check.sh --help` and `docs/acceptance_tests.md`.
+**Not verified:**
+
+- The travel router.
+- A physical iPad.
+- The ESP32s on 2.4 GHz WPA2.
+- mDNS.
+- The macOS firewall prompt.
+- A run with the WAN physically disconnected. The audit proves the server never *tried* to reach the
+  internet.
 
 ## What is NOT validated (consolidated)
 
 1. Any physical measurement. No real telemetry, pH, rise, image or sensory data from the actual
-   chambers or loaves is in the repo. Every chamber reading seen so far is `simulated` or `replay`.
+   chambers or loaves is in the repo.
 2. Kinetics calibration against real dough.
-3. Crumb STL printing (Formlabs) and comparison with a real crumb photo.
-4. ESP32 firmware on hardware: flashing, sensors, Peltier control and safety interlocks, motor,
+3. The physical Formlabs print, and its comparison with a real crumb photo. The print was prepared
+   and validated by PreForm only.
+4. ESP32 firmware on hardware: flashing, reset levels, sensors, Peltier control and safety, motor,
    camera.
-5. Physical iPad and travel-router network. Disconnected mode with the WAN physically off.
-6. Live-LLM agent mode in the automated suite. The one manual `claude -p` smoke test is recorded by
-   the agents workstream.
-7. ALCHEMI campaign 2 (in progress at the time of writing).
-8. Agents using the chambers' actual setpoints through the API (known bug; see `docs/STATUS.md`).
+5. The physical iPad and travel-router network, and disconnected mode with the WAN physically off.
+6. Live-LLM agent mode in the automated suite.
+7. Solution-phase acidity. The ALCHEMI ΔpKa is a cluster-phase estimate and is 3 units too large in
+   magnitude.

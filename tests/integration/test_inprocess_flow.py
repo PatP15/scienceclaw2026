@@ -170,11 +170,9 @@ def test_live_telemetry_reaches_the_agents(tmp_path):
     asyncio.run(go())
 
 
-@pytest.mark.xfail(strict=False, reason=(
-    "BUG api/feedback.py build_context(): passes the chambers' setpoints as 'current_setpoints' "
-    "but agents read context['setpoints'] (offline_policy.setpoints_from_context), so the agents "
-    "assume the default 22/27 C instead of the chambers' actual setpoints"))
 def test_current_setpoints_reach_the_agents(tmp_path):
+    """The agents see the chambers' actual setpoints, not the 22/27 C defaults (was broken:
+    build_context sent only 'current_setpoints'; fixed in api/feedback.py)."""
     async def go():
         rig = Rig(tmp_path)
         async with rig.client:
@@ -189,11 +187,9 @@ def test_current_setpoints_reach_the_agents(tmp_path):
     asyncio.run(go())
 
 
-@pytest.mark.xfail(strict=False, reason=(
-    "BUG api/routes.py agent_state(): calls get_agent_state(agent_id) without the API's "
-    "settings.findings_path; agents/state.py falls back to FERMENTAI_FINDINGS_LOG or "
-    "data/experiments/findings_log.jsonl, while the API writes FERMENTAI_FINDINGS_PATH"))
 def test_agent_state_uses_api_findings_path(tmp_path, monkeypatch):
+    """GET /agents/{id}/state reads the findings log the API writes (settings.findings_path), not
+    the agents' own default (was broken; fixed in api/routes.py agent_state)."""
     # point the agents' default somewhere else (never at the repo's runtime log)
     monkeypatch.setenv("FERMENTAI_FINDINGS_LOG", str(tmp_path / "unrelated_default.jsonl"))
 
