@@ -8,7 +8,7 @@ hardware.** Each item names the bring-up step that resolves it.
 | 1 | The Aideepen ESP32-S3-CAM is a Freenove "ESP32-S3 WROOM CAM" layout clone (camera pins = ESP32-S3-EYE set) | Camera init fails. Peripheral pins could collide with the camera. | Read the module marking and silkscreen. `camera: ok` and image upload (BRINGUP 1, 3). |
 | 2 | Module is N8R8/N16R8 (3.3 V octal PSRAM) | Wrong `memory_type` means no PSRAM (camera limited to VGA, 1 framebuffer). On a "V" (1.8 V) variant GPIO47 is 1.8 V and the OneWire pull-up over-volts it. | BRINGUP 1 (`psram=`), module marking |
 | 3 | Flash size: declared 8 MB, may be 16 MB | None (8 MB layout works on 16 MB). The spare flash is just unused. | Marking; optionally switch to a 16 MB partition table |
-| 4 | **GPIO38/40 have SD-card pull-ups** | Motor and/or BTS7960 enabled during reset/boot (~300 ms before firmware runs) | BRINGUP 2. ALT map (`FERMENTAI_PINMAP_ALT=1`), external pull-downs |
+| 4 | ~~GPIO38/40 have SD-card pull-ups~~ **Confirmed 2026-10-31** (HIGH at boot against internal pull-down). ALT map in force: EN=GPIO2, motor=GPIO48. | Motor and/or BTS7960 enabled during reset/boot (~300 ms before firmware runs) | BRINGUP 2. ALT map (`FERMENTAI_PINMAP_ALT=1`), external pull-downs |
 | 5 | GPIO 1, 14, 21, 38–42, 47 are broken out on the headers | Pin map unusable | BRINGUP 1 |
 | 6 | GPIO39–42 (JTAG pads) behave as plain GPIO after reset | I²C/reed misbehave | eFuse default routes JTAG to USB. BRINGUP 4/5 confirm. |
 | 7 | **IBT-2/BTS7960 module accepts 3.3 V logic** (many use a 74HC244 on 5 V VCC: VIH ≈ 3.5 V) | Peltier doesn't switch, or switches erratically | BRINGUP 10a with a scope. 3.3 V VCC or a 74HCT level shifter. |

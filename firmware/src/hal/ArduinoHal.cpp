@@ -7,8 +7,28 @@
 
 namespace fa {
 
+BootPinSnapshot g_bootPins;
+
 void holdOutputsSafe() {
 #if !FERMENTAI_NOIO
+  // Bring-up diagnostic (BRINGUP step 2, partial): sample each power-control pin as a plain
+  // input (no internal pull) BEFORE driving it. A board pull-up (e.g. SD-card lines 38/40) reads 1
+  // here; that is the level the pin sat at during the boot window. Also sample the ALT-map pins.
+  const int probe[BootPinSnapshot::kN] = {pins::kPeltierPwmA, pins::kPeltierPwmB, pins::kPeltierEnable,
+                                          pins::kMotorGate,   pins::kPeltierEnableAlt, pins::kMotorGateAlt};
+  for (int i = 0; i < BootPinSnapshot::kN; ++i) {
+    g_bootPins.gpio[i] = probe[i];
+    pinMode(probe[i], INPUT);
+    delayMicroseconds(20);
+    g_bootPins.level[i] = (uint8_t)digitalRead(probe[i]);
+    // Second sample with the weak internal pull-down (~45 k): a floating pin now reads 0, a pin
+    // with a real board pull-up (~10 k) still reads 1. Pull-down is the safe direction for a
+    // gate/enable line, and the pin is driven LOW right after this anyway.
+    pinMode(probe[i], INPUT_PULLDOWN);
+    delayMicroseconds(20);
+    g_bootPins.level_pd[i] = (uint8_t)digitalRead(probe[i]);
+    pinMode(probe[i], INPUT);
+  }
   // Power-control outputs LOW immediately. External pull-downs keep them LOW during reset/boot
   // before this code runs (docs/SENSOR_WIRING.md) — software cannot cover that window.
   const int outs[] = {pins::kPeltierPwmA, pins::kPeltierPwmB, pins::kPeltierEnablePin,

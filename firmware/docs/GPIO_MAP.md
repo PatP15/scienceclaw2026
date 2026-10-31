@@ -1,6 +1,6 @@
 # GPIO map: ESP32-S3-CAM (PROVISIONAL)
 
-**Status: provisional. None of these pins has been checked on the physical Aideepen board.**
+**Status: partially verified on chamber A (2026-10-31, see §5).** Camera, I²C 41/42, OneWire 47 and reed 39 work. GPIO38/40 have board pull-ups, so the **ALT map is in force**.
 The firmware compiles, but compile success is not proof of electrical compatibility.
 
 Every pin number lives in `include/board_config.h`. That file is the only place pins are named,
@@ -103,9 +103,9 @@ port with DTR/RTS asserted resets the chip (new `boot_id`), so open it with both
 | Module marking (e.g. ESP32-S3-WROOM-1 N16R8) | esptool: ESP32-S3 rev v0.2, flash 16 MB (mfr 0x68 dev 0x4018), PSRAM ≈8 MB → N16R8-class. Printed marking still to be read off the can. | 2026-10-31 | PP + Claude |
 | PSRAM detected (`status` → psram > 0) | yes: `psram=8179891` free (≈8 MB octal, 3.3 V class, so GPIO47 is a 3.3 V pin) | 2026-10-31 | PP + Claude |
 | Camera init OK with table 1 | yes: boot log `camera: ok` on first try with the ESP32-S3-EYE set | 2026-10-31 | PP + Claude |
-| GPIO38 level during reset (RST held) / after boot | | | |
-| GPIO40 level during reset / after boot | | | |
-| GPIO14 / GPIO21 level during reset | | | |
+| GPIO38 level during reset (RST held) / after boot | **HIGH** sampled as input at the top of `setup()`, still HIGH with the internal pull-down on → strong board pull-up (SD CMD). Default map unsafe for the motor gate. | 2026-10-31 | PP + Claude (firmware snapshot, not multimeter) |
+| GPIO40 level during reset / after boot | **HIGH**, same test and conclusion (SD D0 pull-up). Default map unsafe for Peltier EN. | 2026-10-31 | PP + Claude |
+| GPIO14 / GPIO21 level during reset | LOW (plain input and with pull-down). GPIO2 and GPIO48 also LOW. | 2026-10-31 | PP + Claude |
 | GPIO47 pull-up voltage (must be 3.3 V domain) | 3.3 V class module (8 MB octal PSRAM, not a "V" variant); 4.7 kΩ external pull-up fitted; `owtest` shows clean recovery and a presence pulse. **Stock OneWire 2.3.8 cannot use GPIO46-48 on the S3** (reads always 0, refuses output above GPIO33): fixed by the vendored copy in `lib/OneWire`. | 2026-10-31 | PP + Claude |
 | Pins 1, 14, 21, 38, 39, 40, 41, 42, 47 present on the header | | | |
-| Pin map chosen (default / ALT) | | | |
+| Pin map chosen (default / ALT) | **ALT** (`-DFERMENTAI_PINMAP_ALT=1` now set in both chamber envs): Peltier EN = GPIO2, motor gate = GPIO48. A multimeter check during RST-held and the first second is still owed before step 9/10. | 2026-10-31 | PP + Claude |

@@ -703,6 +703,14 @@ void setup() {
                 FERMENTAI_FIRMWARE_VERSION, CHAMBER_ID, DEVICE_ID, bootId, resetName(resetReason),
                 FERMENTAI_NOIO, FERMENTAI_ALLOW_PELTIER_OUTPUT);
   Serial.println("GPIO map is PROVISIONAL (docs/GPIO_MAP.md). Type 'help' for the console.");
+#if !FERMENTAI_NOIO
+  Serial.print("boot pin levels before drive, plain/with-pulldown (1/1 = board pull-up):");
+  for (int i = 0; i < BootPinSnapshot::kN; ++i)
+    Serial.printf(" GPIO%d=%u/%u", g_bootPins.gpio[i], (unsigned)g_bootPins.level[i],
+                  (unsigned)g_bootPins.level_pd[i]);
+  Serial.printf("\npin map: %s (peltier_en=GPIO%d motor=GPIO%d)\n", FERMENTAI_PINMAP_ALT ? "ALT" : "default",
+                pins::kPeltierEnablePin, pins::kMotorPin);
+#endif
 
   nvs.begin();
   const uint32_t now = millis();

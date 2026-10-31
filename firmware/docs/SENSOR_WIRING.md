@@ -1,6 +1,7 @@
 # Sensor and actuator wiring (per chamber)
 
-Pins refer to the **provisional** default map (`include/board_config.h`; see `GPIO_MAP.md`).
+Pins refer to the **ALT map** chosen at bring-up on 2026-10-31 (`include/board_config.h`, `-DFERMENTAI_PINMAP_ALT=1`;
+see `GPIO_MAP.md` §5): Peltier enable on **GPIO2**, motor gate on **GPIO48**. GPIO38/40 are not used.
 All signal levels are 3.3 V. **No ESP32 pin may see more than 3.3 V.**
 
 ```
@@ -10,8 +11,8 @@ All signal levels are 3.3 V. **No ESP32 pin may see more than 3.3 V.**
  (VDD=3.3V, GND)          BME680 SDA ─ GPIO41    Reed ────┴─ GPIO39 ── reed switch ── GND
                           BME680 SCL ─ GPIO42                 (internal pull-up also on)
  pH board AOUT ── divider ── 1k ── GPIO1 (ADC1_CH0) ── 100nF ── GND
- BTS7960: RPWM ─ GPIO14, LPWM ─ GPIO21, R_EN+L_EN ─ GPIO40   (each 10k to GND)
- N20 MOSFET gate ─ 100Ω ─ GPIO38   (100k gate→GND)
+ BTS7960: RPWM ─ GPIO14, LPWM ─ GPIO21, R_EN+L_EN ─ GPIO2    (each 10k to GND)
+ N20 MOSFET gate ─ 100Ω ─ GPIO48   (100k gate→GND)
  GND: ESP32, sensors, BTS7960 logic GND and MOSFET source share ONE reference point
 ```
 
@@ -125,7 +126,7 @@ the field of view doesn't move between images. The camera is not used for any on
 |---|---|
 | RPWM | GPIO14 + 10 kΩ to GND |
 | LPWM | GPIO21 + 10 kΩ to GND |
-| R_EN and L_EN (tied) | GPIO40 + 10 kΩ to GND |
+| R_EN and L_EN (tied) | GPIO2 + 10 kΩ to GND (ALT map; the on-board LED on GPIO2, if present, lights when enabled) |
 | VCC (logic) | **See the logic-level warning** |
 | GND (logic) | ESP32 GND |
 | B+ / B- | 12 V Peltier supply through a **fuse** sized for the module (e.g. 10 A slow-blow for a 12706 at ~6 A) |
@@ -153,7 +154,7 @@ the field of view doesn't move between images. The camera is not used for any on
 
 ```
  +5V (or motor supply) ── N20 motor ──┬── drain   logic-level N-MOSFET (Vgs(th) < 2 V, e.g. AO3400)
-                          1N5819 ◄────┘           gate ── 100 Ω ── GPIO38 ; 100 kΩ gate→GND
+                          1N5819 ◄────┘           gate ── 100 Ω ── GPIO48 ; 100 kΩ gate→GND
                           (flyback, cathode to +) source ── GND
 ```
 

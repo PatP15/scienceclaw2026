@@ -17,6 +17,15 @@
 namespace fa {
 
 // Drive every power-control pin LOW as the very first thing at boot (before any other init).
+// Levels of the power-control pins sampled as inputs at the very start of setup(), before they
+// are driven LOW (bring-up evidence for the SD-card pull-up question, docs/GPIO_MAP.md §3).
+struct BootPinSnapshot {
+  static constexpr int kN = 6;
+  int gpio[kN] = {-1, -1, -1, -1, -1, -1};
+  uint8_t level[kN] = {0, 0, 0, 0, 0, 0};     // plain input
+  uint8_t level_pd[kN] = {0, 0, 0, 0, 0, 0};  // with internal pull-down: 1 = strong board pull-up
+};
+extern BootPinSnapshot g_bootPins;
 void holdOutputsSafe();
 
 class GpioOut : public IDigitalOut {
