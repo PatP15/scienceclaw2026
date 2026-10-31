@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#121211">
+<meta name="color-scheme" content="dark">
+<title>FermentAI Lab Dashboard</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/dashboard.css">
+<!-- The only third-party library; vendored from the installed plotly Python package. No CDN. -->
+<script src="vendor/plotly.min.js" defer></script>
+<script type="module" src="js/app.js"></script>
+</head>
+<body>
+<div class="sticky-head">
+<header class="topbar">
+  <div class="brand">
+    <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="2" width="28" height="28" rx="8" fill="#1f1f1d"/> <path d="M8 21c0-6 3.5-11 8-11s8 5 8 11c0 1.7-1.3 3-3 3H11c-1.7 0-3-1.3-3-3z" fill="#e8b45a"/> <circle cx="13" cy="18" r="1.6" fill="#1f1f1d"/> <circle cx="18.5" cy="16" r="1.2" fill="#1f1f1d"/> <circle cx="19" cy="20.5" r="1.4" fill="#1f1f1d"/> <path d="M16 6.5c1.2 1 1.2 2.2 0 3.2" stroke="#3987e5" stroke-width="1.6" fill="none" stroke-linecap="round"/> <path d="M20 5.5c1.2 1 1.2 2.2 0 3.2" stroke="#d95926" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
+    <div>
+      <div class="brand-name">FermentAI</div>
+      <div class="brand-sub">two-chamber sourdough lab · local network</div>
+    </div>
+  </div>
+  <div class="status-row" role="status" aria-live="polite">
+    <span id="mode-pill" class="pill pill-mode" title="Decision engine mode">Mode: …</span>
+    <span id="sse-pill" class="pill pill-warn"><span class="dot"></span><span class="txt">Connecting…</span></span>
+    <button id="token-pill" class="pill pill-btn" type="button">Read-only</button>
+    <span id="clock" class="clock">--:--:--</span>
+  </div>
+</header>
+
+<nav class="tabs" role="tablist" aria-label="Dashboard sections">
+  <button role="tab" class="tab" data-tab="live" id="tabbtn-live" aria-controls="tab-live">Live Laboratories</button>
+  <button role="tab" class="tab" data-tab="twin" id="tabbtn-twin" aria-controls="tab-twin">Digital Twin</button>
+  <button role="tab" class="tab" data-tab="molecular" id="tabbtn-molecular" aria-controls="tab-molecular">NVIDIA Molecular Explorer</button>
+  <button role="tab" class="tab tab-key" data-tab="taste" id="tabbtn-taste" aria-controls="tab-taste">Taste → Next Experiment</button>
+</nav>
+</div>
+
+<main>
+  <!-- ===================================================== Live Laboratories -->
+  <section id="tab-live" class="tabpanel" role="tabpanel" aria-labelledby="tabbtn-live">
+    <div class="chambers">
+      <article class="chamber card" id="chamber-A" data-chamber="A"></article>
+      <article class="chamber card" id="chamber-B" data-chamber="B"></article>
+    </div>
+  </section>
+
+  <!-- ===================================================== Digital Twin -->
+  <section id="tab-twin" class="tabpanel" role="tabpanel" aria-labelledby="tabbtn-twin" hidden>
+    <div class="section-head">
+      <div>
+        <h2>Digital Twin <span class="badge prov-simulated">simulated</span></h2>
+        <p class="muted" id="twin-sub">Fermentation model predictions (median with 5–95 % band) for Chamber A vs B, with observed telemetry overlaid where it exists.</p>
+      </div>
+      <div class="head-actions">
+        <button class="btn btn-ghost" id="twin-reload" type="button">Reload predictions</button>
+      </div>
+    </div>
+    <div class="twin-status" id="twin-status"></div>
+    <div class="chart-grid" id="twin-charts"></div>
+    <div class="twin-lower">
+      <div class="card" id="twin-summary"></div>
+      <div class="card" id="twin-morphology"></div>
+    </div>
+  </section>
+
+  <!-- ===================================================== Molecular -->
+  <section id="tab-molecular" class="tabpanel" role="tabpanel" aria-labelledby="tabbtn-molecular" hidden>
+    <div class="section-head">
+      <div>
+        <h2>NVIDIA Molecular Explorer</h2>
+        <p class="muted">ALCHEMI / AIMNet2 geometry optimisations of acetic- and lactic-acid–water clusters, computed on a remote NVIDIA GPU and cached on this Mac.</p>
+      </div>
+      <div class="head-actions">
+        <button class="btn btn-ghost" id="mol-reload" type="button">Check again</button>
+      </div>
+    </div>
+    <div id="mol-body"></div>
+  </section>
+
+  <!-- ===================================================== Taste feedback -->
+  <section id="tab-taste" class="tabpanel" role="tabpanel" aria-labelledby="tabbtn-taste" hidden>
+    <div class="taste-layout">
+      <form class="card taste-form" id="taste-form" autocomplete="off">
+        <h2 class="taste-title">What did the bread taste like?</h2>
+        <p class="muted">Describe both loaves in your own words — flavour, sourness, crumb, texture, what you would change. No special phrases needed.</p>
+        <label class="sr-only" for="taste-text">Your tasting notes</label>
+        <textarea id="taste-text" name="text" rows="5" maxlength="4000" required
+          placeholder="e.g. Loaf A was mild and fluffy. Loaf B was more sour but a little dense. I'd like a stronger sour flavour without losing the airy texture."></textarea>
+        <details class="loaf-notes">
+          <summary>Optional notes per loaf</summary>
+          <div class="loaf-notes-grid">
+            <label><span class="chip chip-A">Loaf A</span><textarea id="taste-a" rows="2" maxlength="2000" placeholder="Loaf A only"></textarea></label>
+            <label><span class="chip chip-B">Loaf B</span><textarea id="taste-b" rows="2" maxlength="2000" placeholder="Loaf B only"></textarea></label>
+            <label class="judge-name">Judge name (optional)<input id="taste-judge" type="text" maxlength="100" placeholder="Name"></label>
+          </div>
+        </details>
+        <div class="taste-controls">
+          <div class="seg" role="radiogroup" aria-label="Decision mode">
+            <button type="button" class="seg-btn" role="radio" data-mode="live" aria-checked="false">Live LLM</button>
+            <button type="button" class="seg-btn" role="radio" data-mode="offline" aria-checked="true">Offline deterministic</button>
+          </div>
+          <div class="replay">
+            <label for="replay-select" class="muted small">Replay example</label>
+            <select id="replay-select"><option value="">— scripted examples (Replay) —</option></select>
+          </div>
+          <button class="btn btn-primary btn-big" id="taste-submit" type="submit">Interpret &amp; plan next experiment</button>
+        </div>
+        <p class="small muted" id="taste-hint"></p>
+      </form>
+
+      <aside class="card plan-card" id="plan-card">
+        <h3>Updated experiment plan</h3>
+        <div id="plan-body" class="muted">Loading experiments…</div>
+      </aside>
+    </div>
+
+    <ol class="steps" id="taste-steps" aria-live="polite"></ol>
+  </section>
+</main>
+
+<footer class="legend-bar">
+  <span class="muted small">Provenance:</span>
+  <span class="badge prov-real">real</span>
+  <span class="badge prov-simulated">simulated</span>
+  <span class="badge prov-replay">replay</span>
+  <span class="badge prov-estimated">estimated</span>
+  <span class="badge prov-imported_human">imported_human</span>
+  <span class="muted small legend-note">Every value carries one of these labels. Gas resistance is a BME680 signal, not CO₂.</span>
+</footer>
+
+<div id="token-dialog" class="dialog" hidden>
+  <div class="dialog-card card" role="dialog" aria-modal="true" aria-labelledby="token-dialog-title">
+    <h3 id="token-dialog-title">Write access</h3>
+    <p class="muted small">Writes (taste feedback, motor animation, apply experiment) need the token printed by <code>scripts/start_demo.sh</code>. Opening the printed <code>?token=…</code> URL stores it automatically.</p>
+    <input id="token-input" type="password" autocomplete="off" placeholder="FERMENTAI_API_TOKEN">
+    <div class="dialog-actions">
+      <button class="btn btn-ghost" type="button" id="token-clear">Forget token</button>
+      <button class="btn btn-ghost" type="button" id="token-cancel">Close</button>
+      <button class="btn btn-primary" type="button" id="token-save">Save</button>
+    </div>
+  </div>
+</div>
+
+<div id="toasts" class="toasts" aria-live="assertive"></div>
+<noscript><p style="padding:2rem">This dashboard needs JavaScript (no network access is required).</p></noscript>
+</body>
+</html>
