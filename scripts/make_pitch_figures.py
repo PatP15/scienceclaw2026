@@ -410,6 +410,7 @@ def alchemi_c2() -> dict:
     cc = re.search(r"Campaign 2: (\d+) optimisations.*?(\d+) vibrational analyses, (\d+) long-MD runs", rep)
     return {
         "dpka": rp["value"], "dpka_unc": rp["uncertainty"], "dpka_exp": rp["experiment"], "by_n": by_n,
+        "pka_exp": {k.replace("_acid", ""): v for k, v in rp["experiment_pka"].items()},
         "dimer": c2["acid_pairs"]["acetic_dimer_kcal"], "dimer_lit": c2["acid_pairs"]["acetic_dimer_literature_kcal"],
         "gpu_h": float(tot.group(1)), "cost_usd": float(tot.group(2)),
         "n_opt": int(c1.group(1)) + int(cc.group(1)), "n_vib": int(cc.group(2)),
@@ -681,62 +682,137 @@ def clear_build_numbers() -> dict | None:
     return {"time_h": e["print_time_h"], "resin_ml": e["material_volume_ml"], "material": m["material"]["label"]}
 
 
+
+
+def _acid_scale(ax, x0, x1, y, c2):
+    """Horizontal pKa / pH scale: experiment (solid), GPU gap anchored on acetic (hollow), sourdough pH band."""
+    lo, hi = -1.5, 6.5
+    PKA_EXP = c2["pka_exp"]  # experimental aqueous pKa, as recorded in c2_summary.json
+
+    def X(v):
+        return x0 + (x1 - x0) * (v - lo) / (hi - lo)
+
+    ax.add_patch(Rectangle((X(3.9), y - 1.8), X(4.3) - X(3.9), 3.6, fc="#f3dcb8", ec="none", zorder=1))
+    ax.plot([x0, x1], [y, y], color=INK, lw=2.5, zorder=2)
+    for v in (0, 2, 4, 6):
+        ax.plot([X(v), X(v)], [y - 0.8, y + 0.8], color=INK, lw=2, zorder=2)
+        ax.text(X(v), y - 2.4, f"{v}", fontsize=SMALL, color=MUTED, ha="center", va="top")
+    # row above: direction words and the unit
+    ax.text(x0, y + 8.0, "◄ stronger acid", fontsize=SMALL, color=MUTED, ha="left", va="center")
+    ax.text(x1, y + 8.0, "weaker acid ►", fontsize=SMALL, color=MUTED, ha="right", va="center")
+    ax.text((x0 + x1) / 2 - 1.0, y + 8.0, "pKa", fontsize=SMALL, color=MUTED, ha="center", va="center")
+    # experiment: solid markers with names just above
+    for v in PKA_EXP.values():
+        ax.add_patch(Circle((X(v), y), 1.25, fc=INK, ec="white", lw=2, zorder=5))
+    ax.text(X(PKA_EXP["lactic"]) + 0.6, y + 2.2, "lactic", fontsize=SMALL, fontweight="bold", color=INK,
+            ha="right", va="bottom")
+    ax.text(X(PKA_EXP["acetic"]) - 0.2, y + 2.2, "acetic", fontsize=SMALL, fontweight="bold", color=INK,
+            ha="left", va="bottom")
+    # GPU: lactic = acetic(exp) + computed dpKa for n = 3, 6, 10, hollow markers walking toward experiment
+    gpu = [PKA_EXP["acetic"] + v for n, v in c2["by_n"] if n in (3, 6, 10)]
+    ax.add_patch(FancyArrowPatch((X(gpu[0]), y + 1.6), (X(PKA_EXP["lactic"]) - 1.6, y + 1.6),
+                                 arrowstyle="-|>,head_length=0.7,head_width=0.4", mutation_scale=18, color=GREEN,
+                                 lw=2.2, alpha=0.55, zorder=3))
+    for v in gpu:
+        ax.add_patch(Circle((X(v), y), 1.15, fc="white", ec=GREEN, lw=3, zorder=4))
+    # row below the tick labels: what the hollow markers are, and the sourdough band
+    ax.text(x0, y - 7.6, "GPU, more water →", fontsize=SMALL, color=GREEN, fontweight="bold", ha="left", va="center")
+    ax.text((X(3.9) + X(4.3)) / 2 + 4.0, y - 7.6, "sourdough pH", fontsize=SMALL, color="#9a6a2c",
+            fontweight="bold", ha="center", va="center")
+
+
+def _mini_curves(ax, x0, y0, w, h, series, t_end=16.0):
+    """Two tiny A/B curves (no axes) in a w x h box; series = [(t, v, colour)]."""
+    vals = np.concatenate([v[t <= t_end] for t, v, _ in series])
+    vmin, vmax = float(vals.min()), float(vals.max())
+    for t, v, col in series:
+        m = t <= t_end
+        ax.plot(x0 + w * t[m] / t_end, y0 + h * (v[m] - vmin) / max(vmax - vmin, 1e-9), color=col, lw=3,
+                solid_capstyle="round", zorder=4)
+
+
 def fig_tech_highlights():
     c2 = alchemi_c2()
     cb = clear_build_numbers()
+    dA, _, sA = _load_chamber("A")
+    dB, _, sB = _load_chamber("B")
     fig, ax = canvas()
-    px, pw, py, ph = (3.0, 81.5), 75.5, 3.0, 84.0
+    ty, th = 46.0, 42.0  # top row
     # ---------------- NVIDIA ALCHEMI
-    x = px[0]
-    rbox(ax, x, py, pw, ph, fc="white", ec=GREEN, lw=3, r=2.2)
-    ax.text(x + 3, py + ph - 6.0, "NVIDIA ALCHEMI", fontsize=32, fontweight="bold", color=INK, va="center")
-    _b(ax, x + pw - 3, py + ph - 6.0, "REAL", "real", ha="right")
-    iax = fig.add_axes(((x + 11.0) / W, (py + 26.0) / H, (pw - 15.0) / W, 40.0 / H))
-    ns = [n for n, _ in c2["by_n"]]
-    iax.axhline(c2["dpka_exp"], color=MUTED, lw=2.4, ls=(0, (5, 4)))
-    iax.plot(ns, [v for _, v in c2["by_n"]], "-o", color=GREEN, lw=4.5, ms=14, mec="white", mew=2.5, zorder=3)
-    iax.text(10.3, c2["dpka_exp"] - 0.5, "experiment", fontsize=SMALL, color=MUTED, va="top", ha="right")
-    iax.set_xlim(-0.8, 10.8)
-    iax.set_ylim(min(v for _, v in c2["by_n"]) - 1.0, 1.0)
-    iax.set_xticks(ns)
-    iax.set_yticks([0, -4, -8])
-    iax.tick_params(labelsize=SMALL, colors=MUTED, length=0, pad=6)
-    iax.grid(axis="y", color="#e6e6e1", lw=1)
-    for sp in ("top", "right", "left"):
-        iax.spines[sp].set_visible(False)
-    iax.spines["bottom"].set_color(FAINT)
-    iax.set_xlabel("waters", fontsize=SMALL, color=MUTED, labelpad=4)
-    iax.set_ylabel("ΔpKa", fontsize=SMALL, color=MUTED, labelpad=6)
+    x, w = 2.0, 68.0
+    rbox(ax, x, ty, w, th, fc="white", ec=GREEN, lw=3, r=2.2)
+    ax.text(x + 2.5, ty + th - 4.5, "NVIDIA ALCHEMI", fontsize=28, fontweight="bold", color=INK, va="center")
+    _b(ax, x + w - 2.5, ty + th - 4.5, "REAL", "real", ha="right")
+    ax.text(x + 2.5, ty + th - 10.0, "which acid is stronger?", fontsize=SMALL, color=MUTED, va="center")
+    _acid_scale(ax, x + 3.0, x + w - 3.0, ty + 18.5, c2)
     for k, big in enumerate((f"{c2['n_opt']:,} runs", f"~${c2['cost_usd']:.0f}")):
-        tw = (pw - 9) / 2
-        tx = x + 3 + k * (tw + 3)
-        rbox(ax, tx, py + 3.0, tw, 13.0, fc=PANEL, ec="none", r=1.8)
-        ax.text(tx + tw / 2, py + 9.5, big, fontsize=34, fontweight="bold", color=INK, ha="center", va="center")
-    # ---------------- Formlabs PreForm API
-    x = px[1]
-    rbox(ax, x, py, pw, ph, fc="white", ec=GREEN, lw=3, r=2.2)
-    ax.text(x + 3, py + ph - 6.0, "Formlabs PreForm API", fontsize=30, fontweight="bold", color=INK, va="center")
-    _b(ax, x + pw - 3, py + ph - 6.0, "REAL", "real", ha="right")
+        bw = (w - 7.5) / 2
+        bx = x + 2.5 + k * (bw + 2.5)
+        rbox(ax, bx, ty + 1.8, bw, 6.0, fc=PANEL, ec="none", r=1.4)
+        ax.text(bx + bw / 2, ty + 4.8, big, fontsize=24, fontweight="bold", color=INK, ha="center", va="center")
+    # ---------------- Fermentation model
+    x, w = 73.0, 85.0
+    rbox(ax, x, ty, w, th, fc="white", ec=PURPLE, lw=3, r=2.2)
+    ax.text(x + 2.5, ty + th - 4.5, "Fermentation model", fontsize=28, fontweight="bold", color=INK, va="center")
+    _b(ax, x + w - 2.5, ty + th - 4.5, "SIMULATED", "simulated", ha="right")
+    top = ty + th - 12.5
+    inputs = ["recipe", "schedule", "starter", "acid terms"]
+    iy = [top - k * 7.6 for k in range(4)]
+    for k, (name, yy) in enumerate(zip(inputs, iy)):
+        col = GREEN if k == 3 else INK
+        ax.text(x + 2.5, yy, name, fontsize=SMALL, fontweight="bold", color=col, va="center")
+        if k == 1:  # tiny temperature-step glyph
+            gx = x + 18.3
+            ax.plot([gx, gx + 2.2, gx + 2.2, gx + 4.4], [yy + 1.0, yy + 1.0, yy - 1.0, yy - 1.0], color=B_COL, lw=3)
+    mbx, mby, mbw, mbh = x + 26.5, ty + 3.0, 20.0, top - ty + 2.5
+    rbox(ax, mbx, mby, mbw, mbh, fc="#f1ecf8", ec=PURPLE, lw=2.5, r=1.8)
+    ax.text(mbx + mbw / 2, mby + mbh - 2.4, "ODE\nkinetics", fontsize=SMALL, fontweight="bold", color=INK,
+            ha="center", va="top", linespacing=1.05)
+    for k, sub in enumerate(("yeast", "bacteria", "sugar", "acids")):
+        ax.text(mbx + mbw / 2, mby + mbh - 12.5 - k * 4.3, sub, fontsize=SMALL, color=MUTED, ha="center",
+                va="center")
+    for k, yy in enumerate(iy):
+        arrow(ax, (x + (23.2 if k == 1 else 22.0), yy), (mbx - 0.4, yy), color=FAINT, lw=2.5, head=16)
+    # green arrow from the NVIDIA panel into "acid terms"
+    arrow(ax, (70.4, iy[3]), (x + 2.0, iy[3]), color=GREEN, lw=3.5, head=20)
+    outs = [("pH", "ph"), ("lactic/acetic", "lactic_acid"), ("CO₂", "co2_cumulative"), ("rise", "expansion_ratio"),
+            ("overproof", None)]
+    ox = mbx + mbw + 2.5
+    oy = [top + 1.0 - k * 6.2 for k in range(5)]
+    for (name, col_), yy in zip(outs, oy):
+        arrow(ax, (mbx + mbw + 0.4, yy), (ox - 0.2, yy), color=FAINT, lw=2.0, head=12)
+        ax.text(ox + 0.5, yy, name, fontsize=SMALL, fontweight="bold", color=INK, va="center")
+        cx0, cw_, ch_ = x + w - 12.5, 10.5, 3.6
+        if col_:
+            _mini_curves(ax, cx0, yy - ch_ / 2, cw_, ch_, [(dA.time_h.to_numpy(), dA[col_].to_numpy(), A_COL),
+                                                             (dB.time_h.to_numpy(), dB[col_].to_numpy(), B_COL)])
+        else:  # overproof onset times on a tiny 0-16 h line
+            ax.plot([cx0, cx0 + cw_], [yy - 1.2, yy - 1.2], color=LINE, lw=2)
+            for o, col in ((sA["overproof_onset_h"], A_COL), (sB["overproof_onset_h"], B_COL)):
+                ax.plot([cx0 + cw_ * o / 16.0], [yy], "v", ms=12, color=col, mec="white", mew=1.5, zorder=5)
+    # ---------------- Formlabs PreForm API (bottom, full width)
+    x, y, w, h = 2.0, 2.0, 156.0, 41.0
+    rbox(ax, x, y, w, h, fc="white", ec=GREEN, lw=3, r=2.2)
+    ax.text(x + 2.5, y + h - 4.5, "Formlabs PreForm API", fontsize=28, fontweight="bold", color=INK, va="center")
+    _b(ax, x + 64.0, y + h - 4.5, "REAL", "real", ha="left")
     if HERO_PNG.exists():
         from PIL import Image
 
         hero = Image.open(HERO_PNG).convert("RGB")
         w_, h_ = hero.size
-        half = (pw - 6.0) / 2
-        for j, (fx0, fx1) in enumerate(((0.015, 0.395), (0.515, 0.895))):  # each slab, without the tiny insets
+        for j, (fx0, fx1) in enumerate(((0.015, 0.395), (0.515, 0.895))):
             crop = hero.crop((int(w_ * fx0), int(h_ * 0.27), int(w_ * fx1), int(h_ * 0.84)))
-            _fit_image(ax, np.asarray(crop), x + 2.5 + j * (half + 1.0), py + 46.0, half, 27.0)
-        _b(ax, x + 4.0, py + 70.0, "SIMULATED", "simulated", ha="left")
+            _fit_image(ax, np.asarray(crop), x + 2.5 + j * 36.0, y + 2.5, 34.0, 29.0)
+        _b(ax, x + 3.5, y + 30.0, "SIMULATED", "simulated", ha="left")
     if CLEAR_ISO.exists():
         from PIL import Image
 
-        _fit_image(ax, np.asarray(Image.open(CLEAR_ISO).convert("RGB")), x + 2.5, py + 3.0, 40.0, 41.0)
+        _fit_image(ax, np.asarray(Image.open(CLEAR_ISO).convert("RGB")), x + 77.0, y + 2.0, 38.0, 35.0)
     if cb:
-        tiles = [f"{cb['time_h']:.1f} h", f"{cb['resin_ml']:.0f} mL", cb["material"]]
-        for k, big in enumerate(tiles):
-            ty = py + 31.0 - k * 13.5
-            rbox(ax, x + 45.0, ty, pw - 48.0, 11.5, fc=PANEL, ec="none", r=1.8)
-            ax.text(x + 45.0 + (pw - 48.0) / 2, ty + 5.75, big, fontsize=32, fontweight="bold", color=INK,
+        for k, big in enumerate((f"{cb['time_h']:.1f} h", f"{cb['resin_ml']:.0f} mL", cb["material"])):
+            tyy = y + 26.5 - k * 11.5
+            rbox(ax, x + 118.0, tyy, w - 120.5, 10.0, fc=PANEL, ec="none", r=1.6)
+            ax.text(x + 118.0 + (w - 120.5) / 2, tyy + 5.0, big, fontsize=30, fontweight="bold", color=INK,
                     ha="center", va="center")
     return save(fig, "tech_highlights")
 

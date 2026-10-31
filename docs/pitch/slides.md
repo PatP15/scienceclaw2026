@@ -19,8 +19,8 @@ Badges are green for REAL, purple for SIMULATED and grey for EXAMPLE. The figure
 every number from the data files. Partner names appear as plain-text wordmarks only. The deck
 sources in `docs/pitch/deck/slides/*.html` mirror this file.
 
-Timing assumes about 140 words per minute. The spoken notes total 407 words, which is
-2 min 54 s (see the table at the end).
+Timing assumes about 140 words per minute. The spoken notes total 401 words, which is
+2 min 52 s (see the table at the end).
 
 ---
 
@@ -75,24 +75,37 @@ is the backup slide.
 
 **Headline:** Two partners: NVIDIA chemistry, Formlabs fabrication
 
-**Figure:** `data/figures/tech_highlights.png`.
+**Figure:** `data/figures/tech_highlights.png`, three panels.
 
-- **Left panel, "NVIDIA ALCHEMI · REAL":** the ΔpKa-vs-cluster-size plot with the experiment line,
-  and tiles for "1,066 runs" and "~$6".
-- **Right panel, "Formlabs PreForm API · REAL":** the hero render (badged SIMULATED geometry);
-  PreForm's own render of the Clear V5 plate, with both crumb specimens and the two chef hats; and
-  tiles for "2.4 h", "239 mL" and "Clear V5".
+- **Top left, "NVIDIA ALCHEMI · REAL", subtitle "which acid is stronger?":** a horizontal pKa scale
+  running from "◄ stronger acid" to "weaker acid ►".
+  - Experimental lactic (3.86) and acetic (4.76) are solid dots.
+  - The GPU's lactic, which is acetic's experimental value plus the computed ΔpKa for n = 3, 6 and 10
+    (−0.9, 0.1 and 1.6), is three hollow dots walking toward the experimental lactic dot ("GPU, more
+    water →").
+  - A shaded "sourdough pH" band covers 3.9–4.3.
+  - Tiles: "1,066 runs" and "~$6".
+- **Top right, "Fermentation model · SIMULATED":**
+  - Inputs: recipe, schedule (with a step glyph), starter and acid terms. A green arrow runs into
+    acid terms from the NVIDIA panel.
+  - Model: an "ODE kinetics" box listing yeast, bacteria, sugar and acids.
+  - Outputs: pH, lactic/acetic, CO₂ and rise, each with tiny A/B curves, and overproof with A/B onset
+    markers.
+- **Bottom, "Formlabs PreForm API · REAL":** the hero render (badged SIMULATED); PreForm's render of
+  the Clear V5 plate, with both specimens and the two chef hats; and tiles for "2.4 h", "239 mL" and
+  "Clear V5".
 
 **On-slide bullets:** none. The figure carries the slide.
 
-**Speaker notes (110 words, 47 s)**
+**Speaker notes (107 words, 46 s)**
 
-> Two technology partners make this credible. NVIDIA ALCHEMI gives us real molecular evidence: over a
-> thousand runs on a Brev GPU for about six dollars, cached so the demo runs offline. A thermodynamic cycle puts lactic acid about four pKa units stronger than acetic.
-> Experiment says about one, so the sign is right, and the estimate converges as the clusters grow.
-> That bounds the model's acid terms, but it doesn't drive the bread. Formlabs makes the prediction
-> physical. The real PreForm API laid out both crumb specimens and our two chef hats on one Form 4
-> plate in clear resin: about two and a half hours. A person presses print.
+> NVIDIA ALCHEMI gives us real molecular evidence: over a thousand GPU runs for about six dollars,
+> cached so the demo runs offline. It finds lactic the stronger acid, by four pKa units against one in
+> experiment, and it moves toward experiment as we add water. That only bounds the model's acid terms.
+> The model itself takes the recipe, the temperature schedule and the starter's state, and predicts
+> pH, acids, gas, rise and overproofing. Formlabs makes the prediction physical. The real PreForm API
+> laid out both crumb specimens and our two chef hats on one Form 4 plate: about two and a half hours.
+> A person presses print.
 
 ---
 
@@ -109,10 +122,9 @@ is the backup slide.
 - Simulated: forecasts · crumb · firmware unverified
 - Ask: 3 pilot kitchens + GPU & printer credits
 
-**Speaker notes (106 words, 45 s)**
+**Speaker notes (103 words, 44 s)**
 
-> Here's where we are, labelled honestly. Working today: the software, two agents and a fully offline
-> demo. The NVIDIA and PreForm results are real. The forecasts and the crumb shapes
+> Labelled honestly: working today are the software, two agents and a fully offline demo. The NVIDIA and PreForm results are real. The forecasts and the crumb shapes
 > are simulations, and the chamber firmware is compiled but not yet proven on hardware. In a simulated
 > benchmark, agents that talk change their choice almost every round, with a modest information gain
 > and the same final pick. Next come real loaves, photo validation and a network of kitchens. We're
@@ -127,9 +139,9 @@ is the backup slide.
 |---|---|---|
 | 1 | 94 | 40 s |
 | 2 | 97 | 42 s |
-| 3 | 110 | 47 s |
-| 4 | 106 | 45 s |
-| **Total** | **407** | **2 min 54 s** |
+| 3 | 107 | 46 s |
+| 4 | 103 | 44 s |
+| **Total** | **401** | **2 min 52 s** |
 
 Recount with `sed -n '/^> /p' docs/pitch/slides.md | sed 's/^> //' | wc -w`.
 

@@ -5,7 +5,7 @@ Owner scope: docs/pitch/, docs/demo_script.md, scripts/make_pitch_figures.py, da
 ## Status: COMPLETE — few-words figures (7) + investor deck
 - [x] scripts/make_pitch_figures.py — few-words rule (<= ~15-21 visible words incl. ticks, text >= 22 pt,
       one-word badges, no sentences/footers); byte-identical reruns; ruff clean
-- [x] docs/pitch/slides.md — short on-slide bullets; notes 407 words = 2:54 @140 wpm; numbers table
+- [x] docs/pitch/slides.md — short on-slide bullets; notes 401 words = 2:52 @140 wpm; tech_highlights = 3 panels (NVIDIA acid scale | model | Formlabs); numbers table
 - [x] docs/pitch/deck/slides/*.html — on-slide text matches slides.md; asides = notes; data-file attrs
       (re-upload all four images before republishing; partners img src is a repo path)
 - [x] docs/pitch/figure_sources.md, docs/demo_script.md
