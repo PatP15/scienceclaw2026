@@ -38,6 +38,20 @@ field needs orchestrator approval (PLAN_MASTER §4).
 Every value in every example is an illustrative interface fixture, not a measurement or a
 model output.
 
+## Transports
+
+The payload contracts don't depend on the transport.
+
+| Transport | Device side | Host side | Spec |
+|---|---|---|---|
+| **USB serial (current hardware plan)** | newline-delimited JSON over USB CDC at 115200 baud: `hello`, `telemetry{payload: telemetry_v1}`, `ack{payload: acknowledgment_v1}`, `image` chunks, `log` | `uv run python -m fermentai.bridge` forwards to the HTTP API and writes `command{payload: command_v1}`, `time`, `hello_ack` | **`serial_v1.md`** |
+| Wi-Fi HTTP (still supported) | device calls the HTTP endpoints directly | FastAPI | this README and `firmware_contract/README_FOR_ESP32_AGENT.md` |
+
+The bridge is a trusted Mac-local HTTP client. It uses each chamber's device token
+(`FERMENTAI_DEVICE_TOKEN_<A|B>`, else `FERMENTAI_API_TOKEN`) plus `X-Device-Id`, so device↔chamber
+binding, dedup, size limits and acknowledgment semantics are identical on both transports. Bridge
+status is at `GET /api/v1/bridge/status`, with `transport: "usb-serial"` and a per-chamber `link`.
+
 ## Versioning
 
 - `schema_version` on the wire stays `"1.0"`. Contract **revision 1.1** only adds optional

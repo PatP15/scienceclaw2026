@@ -548,6 +548,33 @@ def molecular_environment_file(path: str, request: Request):
     return datafiles.serve(settings(request).data_dir / "alchemi" / "environment", path)
 
 
+@router.get("/bridge/status", tags=["data"])
+def bridge_status(request: Request):
+    """USB-serial bridge status (written by `python -m fermentai.bridge` every ~2 s to
+    data/telemetry/bridge_status.json). `bridge_running` is false when the file is > 10 s old."""
+    from datetime import UTC, datetime
+
+    p = settings(request).data_dir / "telemetry" / "bridge_status.json"
+    if not p.is_file():
+        return {"available": False, "transport": "usb-serial", "bridge_running": False,
+                "reason": "bridge not started (no data/telemetry/bridge_status.json)", "chambers": {}}
+    try:
+        st = load_json_file(p)
+    except (OSError, ValueError) as e:
+        return {"available": False, "transport": "usb-serial", "bridge_running": False,
+                "reason": f"status file unreadable: {e}", "chambers": {}}
+    age = None
+    try:
+        age = (datetime.now(UTC) - parse_iso(st.get("updated_at_utc"))).total_seconds()
+    except (TypeError, ValueError):
+        pass
+    running = age is not None and age <= 10
+    if not running:
+        for c in (st.get("chambers") or {}).values():
+            c["link"], c["label"] = "bridge_offline", "USB · bridge not running"
+    return {"available": True, **st, "status_age_s": age, "bridge_running": running}
+
+
 @router.get("/benchmarks", tags=["data"])
 def benchmarks(request: Request):
     """Agent-collaboration benchmark outputs (in-silico; data/benchmarks/)."""

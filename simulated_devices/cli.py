@@ -27,6 +27,8 @@ Examples:
   uv run python -m simulated_devices --chambers A --ph --door-events A:60:30
   uv run python -m simulated_devices --contract v1.0 --duration 120
   uv run python -m simulated_devices --replay recorded.jsonl --replay-speed 10
+  uv run python -m simulated_devices --chambers A --transport serial --port /dev/ttys004
+      (USB-serial protocol contracts/serial_v1.md; pair with `python -m fermentai.bridge`)
 """
 
 
@@ -87,6 +89,10 @@ def build_parser() -> argparse.ArgumentParser:
     ap.add_argument("--replay", type=Path, default=None, help="re-send recorded telemetry (csv/jsonl/json)")
     ap.add_argument("--replay-speed", type=float, default=1.0, help="0 = as fast as possible")
     ap.add_argument("--write-fixtures", action="store_true", help="regenerate camera fixtures and exit")
+    ap.add_argument("--transport", choices=["http", "serial"], default="http",
+                    help="http (default) or serial: speak contracts/serial_v1.md on --port")
+    ap.add_argument("--port", action="append", default=[], metavar="[CHAMBER=]PATH",
+                    help="serial port / pty slave per chamber (in --chambers order, or CHAMBER=PATH)")
     ap.add_argument("-v", "--verbose", action="store_true")
     return ap
 
@@ -125,7 +131,58 @@ def make_configs(args: argparse.Namespace):
     return configs
 
 
+async def run_serial(args: argparse.Namespace) -> int:
+    """--transport serial: each chamber talks contracts/serial_v1.md on its own port."""
+    from .device import VirtualChamber
+    from .transport_serial import SerialDeviceTransport
+
+    if args.replay:
+        log.error("--replay is HTTP-only; replay serial line logs with `python -m fermentai.bridge --replay`")
+        return 2
+    ports: dict[str, str] = {}
+    unnamed = []
+    for item in args.port:
+        ch, sep, path = item.partition("=")
+        if sep and ch.upper() in args.chambers:
+            ports[ch.upper()] = path
+        else:
+            unnamed.append(item)
+    for cid in args.chambers:
+        if cid not in ports and unnamed:
+            ports[cid] = unnamed.pop(0)
+    missing = [c for c in args.chambers if c not in ports]
+    if missing:
+        log.error("--transport serial needs a --port for chamber(s) %s", ", ".join(missing))
+        return 2
+    contract = ContractState(args.contract, fallback=False)
+    stop = asyncio.Event()
+    loop = asyncio.get_running_loop()
+    for sig in (signal.SIGINT, signal.SIGTERM):
+        try:
+            loop.add_signal_handler(sig, stop.set)
+        except (NotImplementedError, RuntimeError):
+            pass
+    devices, transports = [], []
+    for cfg in make_configs(args):
+        tr = SerialDeviceTransport(cfg.chamber_id, cfg.device_id, contract, port=ports[cfg.chamber_id])
+        dev = VirtualChamber(cfg, tr)
+        tr.attach(dev)
+        await tr.start()
+        devices.append(dev)
+        transports.append(tr)
+    log.info("SIMULATED devices %s over USB-serial %s (source=simulated)", args.chambers,
+             ", ".join(f"{c}={p}" for c, p in ports.items()))
+    try:
+        await asyncio.gather(*(d.run(duration_s=args.duration, stop=stop) for d in devices))
+    finally:
+        for tr in transports:
+            await tr.close()
+    return 0
+
+
 async def run_async(args: argparse.Namespace) -> int:
+    if getattr(args, "transport", "http") == "serial":
+        return await run_serial(args)
     from .device import VirtualChamber
     from .replay import replay
 
