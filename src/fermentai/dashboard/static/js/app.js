@@ -9,6 +9,12 @@ import { ChatPanel } from "./chat.js";
 
 const EVENT_TYPES = ["telemetry", "image", "setpoint", "command", "ack", "experiment", "feedback", "feedback_result", "message", "simulation", "chat", "device"];
 const TAB_KEY = "fermentai.tab";
+const AUTO_KEY = "fermentai.token.auto";
+// The documented dev default operator token (.env.example / api/config.py DEFAULT_TOKEN). Used automatically
+// ONLY when this page is opened on the Mac itself (loopback) AND the server reports it still uses that default.
+const DEV_DEFAULT_TOKEN = "change-me-local-device-token";
+const LOOPBACK = ["localhost", "127.0.0.1", "::1", "[::1]"].includes(location.hostname);
+const isAutoToken = () => { try { return localStorage.getItem(AUTO_KEY) === "1"; } catch { return false; } };
 const store = { serverOffsetMs: 0, health: null, modeLabel: null };
 
 captureTokenFromURL();
@@ -65,18 +71,25 @@ function setTokenPill() {
   const b = $("#token-pill");
   const has = !!getToken();
   b.classList.toggle("has-token", has);
-  b.textContent = has ? "✓ Write access" : "Read-only";
-  b.title = has ? "API token stored on this device (tap to change)" : "Tap to enter the API token for writes";
+  b.textContent = has ? (isAutoToken() ? "✓ Write access (this Mac)" : "✓ Write access") : "Read-only";
+  b.title = has ? "API token stored in this browser (click to change)" : "Click to enter the API token for writes";
 }
 document.addEventListener("fermentai:token", setTokenPill);
-document.addEventListener("fermentai:auth-failed", () => toast("The API rejected the stored token. Tap “Write access” to re-enter it.", "bad"));
+document.addEventListener("fermentai:auth-failed", () => {
+  if (isAutoToken()) { try { localStorage.removeItem(AUTO_KEY); } catch { /* */ } setToken(""); }
+  toast("The API rejected the token. Click “Read-only” to enter the operator token.", "bad");
+});
 
 function wireTokenDialog() {
   const dlg = $("#token-dialog"), input = $("#token-input");
   $("#token-pill").addEventListener("click", () => { input.value = getToken(); dlg.hidden = false; input.focus(); });
   $("#token-cancel").addEventListener("click", () => { dlg.hidden = true; });
-  $("#token-clear").addEventListener("click", () => { setToken(""); dlg.hidden = true; toast("Token removed from this device."); });
-  $("#token-save").addEventListener("click", () => { setToken(input.value); dlg.hidden = true; toast(getToken() ? "Token saved on this device." : "Token cleared."); });
+  $("#token-clear").addEventListener("click", () => {
+    try { localStorage.setItem(AUTO_KEY, "off"); } catch { /* */ }  // explicit opt-out: no auto token on reload
+    setToken(""); dlg.hidden = true; toast("Token removed from this browser.");
+  });
+  $("#token-save").addEventListener("click", () => {
+    try { localStorage.removeItem(AUTO_KEY); } catch { /* */ } setToken(input.value); dlg.hidden = true; toast(getToken() ? "Token saved in this browser." : "Token cleared."); });
   input.addEventListener("keydown", (e) => { if (e.key === "Enter") $("#token-save").click(); });
 }
 
@@ -135,6 +148,12 @@ async function boot() {
   try {
     store.health = await get("/api/v1/health");
     store.serverOffsetMs = Date.parse(store.health.server_time_utc) - Date.now();
+    let optedOut = false;
+    try { optedOut = localStorage.getItem(AUTO_KEY) === "off"; } catch { /* */ }
+    if (!getToken() && !optedOut && LOOPBACK && store.health.default_token_in_use === true) {
+      try { localStorage.setItem(AUTO_KEY, "1"); } catch { /* */ }
+      setToken(DEV_DEFAULT_TOKEN);  // dev default on the Mac itself; dropped again on any 401/403
+    }
     const llm = String(store.health.llm_mode || "offline");
     setModePill({ reasoning: llm === "offline" ? "Offline Policy" : "Online Agent (configured)", modeLabel: `server llm_mode=${llm}`, pipeline: store.health.pipeline_available });
   } catch (e) {
@@ -154,7 +173,7 @@ async function boot() {
   await live.load();
   await taste.init();
   await chat.init(stream, store.apiPaths);
-  window.fermentai = { store, stream, live, twin, molecular, taste, chat }; // handy for debugging on the iPad
+  window.fermentai = { store, stream, live, twin, molecular, taste, chat }; // handy for debugging in the browser console
 }
 
 boot();

@@ -1,6 +1,6 @@
 // Section 1: Live Laboratories - chamber A and B side by side, fed by REST snapshots + SSE.
 import { get, post, del, getToken, ApiError } from "./api.js";
-import { h, clear, fmt, fmtOhms, timeAgo, hhmmss, statusBadge, sparkline, agentSide, toast, COLORS, num, normProv, tfield, demoMode, deviceBadge, PROV_LABEL, chefLabel, brigadeText, icon, emptyCard } from "./util.js";
+import { h, clear, fmt, fmtOhms, timeAgo, hhmmss, statusBadge, sparkline, agentSide, toast, COLORS, num, normProv, tfield, demoMode, deviceBadge, PROV_LABEL, chefLabel, brigadeText, icon, emptyCard, agentSide as sideOf, provBadge, normSchedule } from "./util.js";
 import { messageText, messageSender } from "./messages.js";
 
 const CHAMBERS = ["A", "B"];
@@ -43,6 +43,9 @@ export class LivePanel {
     this.agentMsg = {};    // chamber -> latest message row from that agent
     this.motor = {};       // chamber -> latest motor command {command_id, status, ...}
     this.agentState = {};  // chamber -> GET /agents/{id}/state
+    this.allMsgs = [];     // recent agent messages (kitchen pass column)
+    this.experiments = [];
+    this.sideEl = document.getElementById("live-side");
     this.busy = {};
     this.cards = Object.fromEntries(CHAMBERS.map((c) => [c, document.getElementById(`chamber-${c}`)]));
     for (const c of CHAMBERS) this.history[c] = [];
@@ -59,12 +62,13 @@ export class LivePanel {
       this.render(c);
     });
     s.on("setpoint", (f) => { if (f.chamber_id) this.refreshState(f.chamber_id); });
-    s.on("experiment", () => CHAMBERS.forEach((c) => this.refreshState(c)));
+    s.on("experiment", () => { CHAMBERS.forEach((c) => this.refreshState(c)); this.loadExperiments(); });
     s.on("command", (f) => this.onCommand(f.data, f.chamber_id));
     s.on("ack", (f) => this.onCommand({ ...f.data, status: f.data.command_status || f.data.status }, f.chamber_id));
     s.on("message", (f) => {
       const side = agentSide(f.data.sender ?? messageSender(f.data.content));
       if (side) { this.agentMsg[side] = f.data; this.render(side); }
+      this.allMsgs.push(f.data); this.allMsgs = this.allMsgs.slice(-60); this.renderSide();
       clearTimeout(this._agentTimer);
       this._agentTimer = setTimeout(() => CHAMBERS.forEach((c) => this.refreshAgent(c)), 1500);
     });
@@ -104,8 +108,43 @@ export class LivePanel {
     return { cls, text, title, realLinked: cls === "ok" && ch?.simulated === false, deviceId: ch?.device_id || null };
   }
 
+  async loadExperiments() {
+    try { this.experiments = await get("/api/v1/experiments?limit=3"); } catch { /* keep */ }
+    this.renderSide();
+  }
+
+  /** Right-hand "kitchen pass" column: latest Sous Chef conversation + the experiment plan. */
+  renderSide() {
+    if (!this.sideEl) return;
+    const msgs = this.allMsgs.slice(-6);
+    const convo = msgs.length ? h("div", { class: "pass-convo" }, msgs.map((m) => {
+      const sender = m.sender ?? messageSender(m.content);
+      const side = sideOf(sender);
+      const txt = brigadeText(stripArrow(messageText(m.content ?? m)));
+      return h("div", { class: `pmsg ${side ? `pmsg-${side}` : "pmsg-head"}` },
+        h("div", { class: "pwho" }, side ? icon("toque", { size: 14 }) : icon("headchef", { size: 14 }), chefLabel(sender ?? "system"),
+          m.kind ? h("span", { class: "pkind" }, ` · ${m.kind}`) : null, m.created_at_utc ? h("span", { class: "pts" }, ` · ${timeAgo(m.created_at_utc, this.serverNow())}`) : null),
+        h("div", { class: "ptext" }, txt));
+    })) : emptyCard({ icon: "toque", title: "No conversation yet", detail: "The Sous Chefs talk after the guest's feedback (Taste tab).", compact: true });
+    const exps = this.experiments || [];
+    const plan = exps.length ? exps.map((e, i) => h("div", { class: `pass-exp${i === 0 ? " latest" : ""}` },
+      h("div", { class: "pass-exp-t" }, i === 0 ? "★ " : "", e.title || e.experiment_id),
+      h("div", { class: "tiny faint" }, `${e.status || ""} · ${timeAgo(e.created_at_utc, this.serverNow())} `, provBadge(e.provenance || "unknown")),
+      e.schedules ? h("div", { class: "tiny" }, Object.entries(e.schedules).map(([cid, sc]) => {
+        const pts = normSchedule(sc).points;
+        return `${cid}: ${pts.map(([t, c]) => `${fmt(c, 0)}°`).join("→") || "—"}`;
+      }).join(" · ")) : null))
+      : emptyCard({ icon: "headchef", title: "No experiment planned yet", detail: "The Head Chef calls the next plan after a tasting.", compact: true });
+    clear(this.sideEl,
+      h("div", { class: "pass-head" }, icon("headchef", { size: 22 }), h("h3", null, "Kitchen pass"),
+        h("a", { class: "btn btn-sm btn-ghost pass-link", href: "#taste" }, "Talk to a Sous Chef →")),
+      h("h4", null, "Latest conversation"), convo,
+      h("h4", { style: { marginTop: "12px" } }, "Experiment plan"), plan);
+  }
+
   async load() {
     this.startBridgePoll();
+    this.loadExperiments();
     await Promise.all(CHAMBERS.map(async (c) => {
       await this.refreshState(c);
       try {
@@ -116,6 +155,7 @@ export class LivePanel {
         // "all" + client-side filtering: Finding-shaped messages carry agent_id, which the API's
         // per-agent filter (sender_key from from/sender/agent/author) does not index.
         const msgs = await get(`/api/v1/agents/all/messages?limit=60`);
+        if (c === "A") { this.allMsgs = msgs.slice(-60); this.renderSide(); }
         const own = msgs.filter((m) => agentSide(m.sender ?? messageSender(m.content)) === c);
         if (own.length) this.agentMsg[c] = own[own.length - 1];
       } catch (e) { /* none */ }
@@ -181,7 +221,7 @@ export class LivePanel {
   }
 
   async startMotor(c) {
-    if (!getToken()) { toast("Write access needed: open the ?token=… URL or tap “Read-only” to enter the token.", "bad"); return; }
+    if (!getToken()) { toast("Write access needed: click “Read-only” to enter the API token.", "bad"); return; }
     this.busy[c] = true; this.render(c);
     try {
       const cmd = await post(`/api/v1/chambers/${c}/motor`, { duration_s: 5, pattern: "wiggle", reason: "dashboard: start automaton animation", source: "dashboard" });
@@ -343,7 +383,7 @@ export class LivePanel {
       h("span", null, "out ", this.inline(tel, "external_heatsink_temperature_c", (x) => fmt(x, 1, " °C"))),
       tfield(tel, "fan_running") !== null ? h("span", null, `fan ${tfield(tel, "fan_running") ? "on" : "off"}`) : null);
 
-    // Device drawer: identity + diagnostics, collapsed by default (tap to open).
+    // Device drawer: identity + diagnostics, collapsed by default (click to open).
     const health = diag.sensor_health || {};
     const hb = (k, v) => h("span", { class: `badge ${v === "ok" ? "status-good" : /missing|absent|not_installed/.test(v) ? "status-info" : "status-bad"}`, title: `sensor_health.${k} = ${v}` }, `${k.replace(/_/g, " ")}: ${v}`);
     const rssi = num(diag.wifi_rssi_dbm ?? tfield(tel, "wifi_rssi_dbm"));

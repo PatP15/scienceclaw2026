@@ -1,4 +1,4 @@
-// "Talk to Sous Chef A/B": iPad chat on the Taste tab. Contract (API):
+// "Talk to Sous Chef A/B": chat panel on the Taste tab. Contract (API):
 //   POST   /api/v1/chat {session_id?, text, mode, sous_chef, judge_name?} -> {session_id, reply, stage, understood,
 //          questions_remaining, transcript[{role, text, ts}], handoff_result, persisted?, reasoning_mode_label}
 //   GET    /api/v1/chat/{session_id}      DELETE /api/v1/chat/{session_id}      SSE `chat` {session_id, role, text, stage}
@@ -103,7 +103,7 @@ export class ChatPanel {
   updateHint() {
     const parts = [];
     if (this.available === false) parts.push(`Chat not available yet${this.reason ? ` (${this.reason})` : ""} — the form below runs the same cycle.`);
-    else if (!getToken()) parts.push("Read-only: open the ?token=… URL (or tap “Read-only”) to chat.");
+    else if (!getToken()) parts.push("Read-only: click “Read-only” to enter the API token (or open the ?token=… URL) to chat.");
     else parts.push(`Enter sends · Shift+Enter for a new line · ${this.taste.mode === "live" ? "Online Agent requested (falls back to Offline Policy if unavailable)" : "Offline Policy"}`);
     this.hint.textContent = parts.join(" ");
     const disabled = this.available === false || !getToken() || this.pending;
@@ -213,7 +213,7 @@ export class ChatPanel {
   async send() {
     const text = this.input.value.trim();
     if (!text || this.pending) return;
-    if (!getToken()) { toast("Write access needed to chat: open the ?token=… URL or tap “Read-only”.", "bad"); return; }
+    if (!getToken()) { toast("Write access needed to chat: click “Read-only” to enter the API token.", "bad"); return; }
     this.pending = true;
     this.taste.pending = true;  // the hand-off's SSE feedback_result must not trigger a second reveal
     this.transcript.push({ role: "guest", text, ts: new Date().toISOString() });

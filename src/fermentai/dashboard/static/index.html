@@ -49,9 +49,10 @@
 <main>
   <!-- ===================================================== Live Laboratories -->
   <section id="tab-live" class="tabpanel" role="tabpanel" aria-labelledby="tabbtn-live">
-    <div class="chambers">
+    <div class="chambers live-grid">
       <article class="chamber card" id="chamber-A" data-chamber="A"></article>
       <article class="chamber card" id="chamber-B" data-chamber="B"></article>
+      <aside class="card live-side" id="live-side" aria-label="Kitchen pass: conversation and plan"></aside>
     </div>
   </section>
 
@@ -111,8 +112,8 @@
         </details>
         <div class="taste-controls">
           <div class="seg" role="radiogroup" aria-label="Decision mode">
-            <button type="button" class="seg-btn" role="radio" data-mode="live" aria-checked="false">Live LLM</button>
-            <button type="button" class="seg-btn" role="radio" data-mode="offline" aria-checked="true">Offline deterministic</button>
+            <button type="button" class="seg-btn" role="radio" data-mode="live" aria-checked="false" title="requests the configured online LLM; falls back to the Offline Policy (labelled) if unavailable">Online Agent</button>
+            <button type="button" class="seg-btn" role="radio" data-mode="offline" aria-checked="true" title="deterministic decision engine, no internet needed">Offline Policy</button>
           </div>
           <div class="replay">
             <label for="replay-select" class="muted small">Replay example</label>
@@ -150,7 +151,7 @@
 <div id="token-dialog" class="dialog" hidden>
   <div class="dialog-card card" role="dialog" aria-modal="true" aria-labelledby="token-dialog-title">
     <h3 id="token-dialog-title">Write access</h3>
-    <p class="muted small">Writes (taste feedback, motor animation, apply experiment) need the token printed by <code>scripts/start_demo.sh</code>. Opening the printed <code>?token=…</code> URL stores it automatically.</p>
+    <p class="muted small">Writes (taste feedback, chat, motor animation, apply experiment) need the operator token (<code>FERMENTAI_API_TOKEN</code>). On this Mac with the default dev token this is automatic; otherwise paste it here (dev: the <code>?token=…</code> URL printed by <code>scripts/start_demo.sh</code> also stores it).</p>
     <input id="token-input" type="password" autocomplete="off" placeholder="FERMENTAI_API_TOKEN">
     <div class="dialog-actions">
       <button class="btn btn-ghost" type="button" id="token-clear">Forget token</button>

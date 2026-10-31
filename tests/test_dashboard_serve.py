@@ -114,12 +114,12 @@ def test_dashboard_api_calls_match_real_routes(app):
     paths = _api_paths_in_js()
     assert "/api/v1/taste-feedback" in paths and "/api/v1/events/stream" in paths
     missing = [p for p in paths if not any(rx.match(p) for rx in regexes)]
-    # Contracted routes that may not be deployed yet. The dashboard must detect them at runtime
-    # (via /openapi.json) and degrade gracefully; drop an entry once the API ships the route.
-    optional = {"/api/v1/chat", "/api/v1/chat/X"}
+    # Older server processes may lack /api/v1/chat or /api/v1/bridge/status: the dashboard detects
+    # them via /openapi.json and degrades gracefully (checked here, since the routes now exist).
     chat_js = (STATIC_DIR / "js" / "chat.js").read_text()
+    live_js = (STATIC_DIR / "js" / "live.js").read_text()
     assert 'apiPaths.has("/api/v1/chat")' in chat_js and "Chat not available yet" in chat_js
-    missing = [p for p in missing if p not in optional]
+    assert 'paths.has("/api/v1/bridge/status")' in live_js
     assert not missing, f"dashboard calls endpoints that do not exist: {missing}"
 
 

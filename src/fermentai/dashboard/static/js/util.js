@@ -200,7 +200,7 @@ export function plotLayout(extra = {}) {
     ...Object.fromEntries(Object.entries(extra).filter(([k]) => k !== "xaxis" && k !== "yaxis")),
   };
 }
-// Never link out to the Plotly cloud; no mode bar (touch-first, avoids hover-only UI).
+// Never link out to the Plotly cloud; no mode bar (clean, no hover-only controls).
 export const PLOT_CONFIG = { displaylogo: false, displayModeBar: false, responsive: true, showLink: false, showEditInChartStudio: false, showSendToCloud: false, showTips: false, scrollZoom: false };
 
 /** Plotly loads via a deferred classic script; modules may run first. */

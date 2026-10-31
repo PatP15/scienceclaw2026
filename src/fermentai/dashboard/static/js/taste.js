@@ -122,10 +122,10 @@ export class TastePanel {
   }
   updateHint() {
     const parts = [];
-    if (!getToken()) parts.push("⚠ Read-only: open the ?token=… URL from start_demo.sh (or tap “Read-only” above) to submit.");
+    if (!getToken()) parts.push("⚠ Read-only: click “Read-only” above to enter the API token (dev: the ?token=… URL printed by start_demo.sh also works).");
     parts.push(this.mode === "live"
-      ? "Live mode asks the configured LLM; if it is unreachable the server falls back to the deterministic policy and says so."
-      : "Offline mode uses the deterministic decision engine (no internet needed).");
+      ? "Online Agent asks the configured LLM; if it is unreachable the server falls back to the Offline Policy and labels it."
+      : "Offline Policy: the deterministic decision engine (no internet needed).");
     this.hint.textContent = parts.join(" ");
   }
 
@@ -223,7 +223,7 @@ export class TastePanel {
   async submit() {
     const text = this.text.value.trim();
     if (!text) { toast("Please describe how the bread tasted.", "bad"); this.text.focus(); return; }
-    if (!getToken()) { toast("Write access needed: open the ?token=… URL or tap “Read-only” to enter the token.", "bad"); return; }
+    if (!getToken()) { toast("Write access needed: click “Read-only” to enter the API token.", "bad"); return; }
     if (this.pending) return;
     this.pending = true;
     this.submitBtn.disabled = true;

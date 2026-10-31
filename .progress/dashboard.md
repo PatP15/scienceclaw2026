@@ -62,6 +62,13 @@ LIVE/MEASURED only if the latest telemetry is from that device_id AND not source
 Test harness for the not-yet-wired chat routes: scratchpad chat_harness.py (not in repo).
 Contract test allows /api/v1/chat* as optional until the API ships the routes (remove from `optional` then).
 
+## v7: desktop target (Mac screen, 1440x900 .. 1920x1080)
+Live tab = Station A | Station B | "Kitchen pass" column (latest Sous Chef conversation + experiment plan, sticky)
+at >= 1280 px; bigger hero (--fs-display 3rem); container queries keep station cards tidy; camera frame uncropped.
+Loopback + server default_token_in_use -> auto write access with the documented dev token (pill "Write access
+(this Mac)"), dropped on 401/403, opt-out via "Forget token". iPad/touch wording removed. Mode toggle labels
+Online Agent / Offline Policy. Screenshots are 1440x900 @2x.
+
 ## Open items for other areas
 - API: /molecular/summary -> HTTP 500 (NaN in analysis_summary.json; jsonable() the summaries).
 - API/agents: build_context passes `recent_telemetry` (reduced keys, no received_at_utc/v1.1 fields) but the

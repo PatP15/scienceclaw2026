@@ -1,4 +1,4 @@
-/* FermentAI dashboard - dark, high-contrast, touch-first. System fonts only (no web fonts). */
+/* FermentAI dashboard - dark, high-contrast, desktop (Mac) first. System fonts only (no web fonts). */
 :root {
   color-scheme: dark;
   /* calm dark theme with warm cream / crust accents (contrast-checked: body text >= 4.5:1 on every surface) */
@@ -660,3 +660,49 @@ main { padding: var(--gap); }
 .ch-id { flex: 1 1 240px; }
 .ch-title, .ch-sub { white-space: nowrap; }
 .ch-badges { flex: 0 1 auto; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+
+/* =====================================================================================
+   DESKTOP (Mac laptop/monitor, ~1440x900 .. 1920x1080): use the width
+   ===================================================================================== */
+.chambers.live-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.live-side { grid-column: 1 / -1; }
+.chamber { container-type: inline-size; }
+.pass-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; color: var(--accent); }
+.pass-head h3 { margin: 0; color: var(--text-primary); }
+.pass-link { margin-left: auto; text-decoration: none; min-height: 34px; }
+.live-side h4 { font-size: var(--fs-caption); text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); margin: 4px 0 6px; }
+.pass-convo { display: flex; flex-direction: column; gap: 6px; }
+.pmsg { padding: 7px 10px; border-radius: 12px; font-size: var(--fs-body); background: var(--surface-2); border: 1px solid var(--border); max-width: 92%; }
+.pmsg-A { align-self: flex-start; border-color: rgba(57, 135, 229, .55); background: var(--chamber-A-soft); border-top-left-radius: 4px; }
+.pmsg-B { align-self: flex-end; border-color: rgba(217, 89, 38, .55); background: var(--chamber-B-soft); border-top-right-radius: 4px; }
+.pmsg-head { align-self: center; border-color: rgba(184, 107, 58, .6); background: #121417; }
+.pwho { display: flex; align-items: center; gap: 5px; font-size: var(--fs-caption); font-weight: 700; color: var(--text-secondary); }
+.pmsg-A .pwho { color: var(--chamber-A-text); } .pmsg-B .pwho { color: var(--chamber-B-text); } .pmsg-head .pwho { color: var(--accent); }
+.pkind, .pts { font-weight: 500; color: var(--text-muted); }
+.ptext { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; color: var(--text-primary); }
+.pass-exp { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 10px; margin-bottom: 6px; background: var(--surface-2); }
+.pass-exp.latest { border-color: var(--accent); }
+.pass-exp-t { font-weight: 650; }
+
+@media (min-width: 1280px) {
+  :root { --fs-display: 3rem; }              /* bigger hero numbers on a laptop/monitor */
+  .taste-title { font-size: 2.5rem; }
+  .chambers.live-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(300px, .72fr); align-items: start; }
+  .live-side { grid-column: auto; position: sticky; top: 120px; max-height: calc(100vh - 140px); overflow-y: auto; }
+  .taste-layout { grid-template-columns: minmax(0, 1.7fr) minmax(320px, 1fr); }
+}
+@media (min-width: 1700px) {
+  main { padding: 16px 20px; }
+  .chambers.live-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(360px, .62fr); }
+}
+/* station card internals adapt to the card's own width (3-column desktop layout) */
+@container (max-width: 600px) {
+  .ch-main { grid-template-columns: minmax(0, 1fr) 40%; }
+  .metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@container (max-width: 380px) { .ch-main { grid-template-columns: 1fr; } }
+/* show the whole camera frame (never crop away the measurement scale) */
+.snap img { object-fit: contain; background: #0c0d0f; }
+.device-drawer > summary { flex-wrap: nowrap; min-width: 0; }
+.device-drawer > summary b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.drawer-hint { white-space: nowrap; }
