@@ -21,11 +21,15 @@ Outputs (data/stl/), simulation-derived chamber specimens:
   crumb_chamber_comparison.png                   side-by-side render
   chain_summary.json                             STL <-> kinetics numbers <-> ALCHEMI provenance
 
+Presentation renders (--hero; rendered from the STLs already in --out, 3200 x 1800 px):
+  hero_chamber_A.png, hero_chamber_B.png, hero_chamber_AB.png, hero_mild_sour.png
+
 Usage:  uv run python scripts/generate_stls.py [--out data/stl] [--skip-validation]
                                                [--from-simulation | --presets-only]
-                                               [--predictions data/predictions]
+                                               [--predictions data/predictions] [--hero]
   (default: both families; --from-simulation: chamber specimens only;
-   --presets-only: the original mild/sour baseline only)
+   --presets-only: the original mild/sour baseline only;
+   --hero: only the presentation renders, from existing STLs; missing STLs are generated first)
 """
 
 from __future__ import annotations
@@ -56,15 +60,37 @@ def main() -> int:
                       help="only the simulation-derived chamber specimens (A, B)")
     mode.add_argument("--presets-only", action="store_true",
                       help="only the original mild/sour baseline presets")
+    mode.add_argument("--hero", action="store_true",
+                      help="only the presentation hero renders (from existing STLs)")
     args = ap.parse_args()
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
+
+    if args.hero:
+        return run_hero(out, Path(args.predictions))
 
     ok = True
     if not args.from_simulation:
         ok &= run_presets(out, args.skip_validation)
     if not args.presets_only:
         ok &= run_simulation(out, Path(args.predictions), args.skip_validation)
+    return 0 if ok else 1
+
+
+def run_hero(out: Path, predictions: Path) -> int:
+    """Presentation renders of the chamber specimens and the mild/sour presets."""
+    from fermentai.geometry.hero import render_heroes
+
+    ok = True
+    if not all((out / f"crumb_{n}.stl").exists() for n in ("mild", "sour")):
+        ok &= run_presets(out, skip_validation=False)
+    if not all((out / f).exists() for f in ("crumb_chamber_A.stl", "crumb_chamber_B.stl",
+                                            "chain_summary.json")):
+        ok &= run_simulation(out, predictions, skip_validation=False)
+    t0 = time.time()
+    for p in render_heroes(out):
+        print(f"[hero] {p}")
+    print(f"[hero] {time.time() - t0:.1f}s")
     return 0 if ok else 1
 
 

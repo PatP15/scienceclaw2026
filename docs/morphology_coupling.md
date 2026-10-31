@@ -126,6 +126,30 @@ fewer, larger, irregular and merged cells, with thinner walls.
 Measured section diameters exceed the generator's sphere-equivalent mean. This is because
 clustered pores merge after the wall-thickness opening.
 
+**Mapped vs measured pore size: the median order reverses. Report the measured values.**
+
+| Pore size (mm) | A | B | Order |
+|---|---|---|---|
+| Mapped median (generator input, 3D sphere-equivalent) | 1.99 | 2.56 | B > A |
+| Measured cut-face section diameter, median | 2.86 | 2.59 | **A > B** |
+| Measured cut-face section diameter, mean | 3.73 | 4.35 | B > A |
+
+Coalescence during wall-thickening reverses the median. The `min_wall_mm` opening merges A's
+denser population of nearby pores (A has more pores, a thicker wall of 1.18 vs 1.05 mm, and higher
+porosity), so many of A's small cells fuse into mid-sized merged sections. B's distribution keeps
+more small isolated sections next to a long tail of very large merged cells: p90 10.1 vs 7.7 mm.
+Both have a single giant merged section, max 24.2 mm for B and 26.5 mm for A.
+
+As a result, B's *mean* is larger but its *median* is slightly smaller. The **measured** cut-face
+values are what we report: in the hero renders, the slide deck and any comparison with photos. The
+mapped median is a generator input, not a prediction of what a photo would show. The robust A/B
+contrasts are:
+- B has fewer pores (53 vs 92).
+- B has a lower pore fraction (0.34 vs 0.39).
+- B has a heavier large-cell tail (higher mean and p90).
+
+"B has larger typical pores" is not a robust contrast.
+
 A's mesh is not decimated. `manifold3d` simplification succeeds, but `crumb._clean` then removes a
 degenerate face, so `_simplify` falls back to the valid full-resolution mesh. The result is still
 watertight, still validates and is within the 25 MB STL budget.
@@ -194,8 +218,22 @@ A single loaf pair cannot separate the mapping from loaf-to-loaf variability.
 ```bash
 uv run python scripts/generate_stls.py                    # presets + chamber specimens (~60 s)
 uv run python scripts/generate_stls.py --from-simulation  # chamber specimens only (~35 s)
-uv run pytest tests/test_geometry_*.py                    # ~60 s
+uv run python scripts/generate_stls.py --hero             # presentation renders only (~70 s)
+uv run pytest tests/test_geometry_*.py                    # ~65 s
 ```
+
+**Presentation renders.** `--hero` uses `fermentai.geometry.hero.render_heroes` to write
+`data/stl/hero_chamber_A.png`, `hero_chamber_B.png`, `hero_chamber_AB.png` and
+`hero_mild_sour.png` (3200 × 1800, 16:9, very light opaque background `#f8f5ef`).
+
+- **Geometry.** Each render is a headless orthographic ray-cast of the STL's top-surface heightmap
+  (0.05 mm, 2× supersampled): a 3/4 oblique view plus a top-down inset.
+- **Shading.** Lambert lighting plus ambient, an ambient-occlusion-like local height deficit,
+  depth-toned crumb and a crust-coloured rim.
+- **Fidelity.** These are renders of the printable model, not photographs, and pore undercuts are
+  not visible. Every image carries a "SIMULATED" badge.
+- **Numbers.** The values shown are *measured* on the model's cut face (pore fraction, pore count,
+  median section diameter), read from `chain_summary.json` / `crumb_summary.json`.
 
 The output is deterministic: the mapped parameters are rounded to 1e-4 and the seed is fixed. It
 re-reads the molecular descriptors on every run. If the ALCHEMI file changes, for example when

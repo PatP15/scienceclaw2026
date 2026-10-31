@@ -16,6 +16,10 @@
 - Bug fix in crumb._clean (stale inverted face_normals after fix_normals when simplify falls back);
   documented in docs/morphology_coupling.md §8.
 
+- Hero renders (pitch deck): src/fermentai/geometry/hero.py; `generate_stls.py --hero` ->
+  data/stl/hero_chamber_{A,B,AB}.png, hero_mild_sour.png (3200x1800); tests/test_geometry_hero.py.
+- docs: mapped vs measured median pore size note (order reverses; report measured).
+
 ## Next (optional)
 - Fit MAPPING_CONFIG to real loaf photos (analyze_crumb_image + compare_to_params).
 - Propagate kinetics uncertainty (map p05/p95 runs -> parameter ranges).
@@ -23,4 +27,4 @@
   A ships un-decimated (22 MB). Could repair the single hole instead of falling back.
 
 ## Resume
-- `uv run python scripts/generate_stls.py --from-simulation` ; `uv run pytest tests/test_geometry_*.py`
+- `uv run python scripts/generate_stls.py --from-simulation` ; `... --hero` ; `uv run pytest tests/test_geometry_*.py`
