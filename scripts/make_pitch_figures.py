@@ -29,6 +29,7 @@ import numpy as np
 import pandas as pd
 from matplotlib.patches import (
     Circle,
+    Ellipse,
     FancyArrowPatch,
     FancyBboxPatch,
     Polygon,
@@ -879,9 +880,9 @@ def _acid_scale(ax, x0, x1, y, c2):
     # experiment: solid markers with names just above
     for v in PKA_EXP.values():
         ax.add_patch(Circle((X(v), y), 1.25, fc=INK, ec="white", lw=2, zorder=5))
-    ax.text(X(PKA_EXP["lactic"]) + 0.6, y + 2.2, "lactic", fontsize=SMALL, fontweight="bold", color=INK,
+    ax.text(X(PKA_EXP["lactic"]) + 0.6, y + 2.9, "lactic", fontsize=SMALL, fontweight="bold", color=INK,
             ha="right", va="bottom")
-    ax.text(X(PKA_EXP["acetic"]) - 0.2, y + 2.2, "acetic", fontsize=SMALL, fontweight="bold", color=INK,
+    ax.text(X(PKA_EXP["acetic"]) - 0.2, y + 2.9, "acetic", fontsize=SMALL, fontweight="bold", color=INK,
             ha="left", va="bottom")
     # GPU: lactic = acetic(exp) + computed dpKa for n = 3, 6, 10, hollow markers walking toward experiment
     gpu = [PKA_EXP["acetic"] + v for n, v in c2["by_n"] if n in (3, 6, 10)]
@@ -906,27 +907,9 @@ def _mini_curves(ax, x0, y0, w, h, series, t_end=16.0):
                 solid_capstyle="round", zorder=4)
 
 
-def fig_tech_highlights():
-    c2 = alchemi_c2()
-    cb = clear_build_numbers()
-    dA, _, sA = _load_chamber("A")
-    dB, _, sB = _load_chamber("B")
-    fig, ax = canvas()
-    ty, th = 46.0, 42.0  # top row
-    # ---------------- NVIDIA ALCHEMI
-    x, w = 2.0, 68.0
-    rbox(ax, x, ty, w, th, fc="white", ec=TEAL, lw=3, r=2.2)
-    ax.text(x + 2.5, ty + th - 4.5, "NVIDIA ALCHEMI", fontsize=28, fontweight="bold", color=INK, va="center")
-    _b(ax, x + w - 2.5, ty + th - 4.5, "COMPUTED", "computed", ha="right")
-    ax.text(x + 2.5, ty + th - 10.0, "which acid is stronger?", fontsize=SMALL, color=MUTED, va="center")
-    _acid_scale(ax, x + 3.0, x + w - 3.0, ty + 18.5, c2)
-    for k, big in enumerate((f"{c2['n_opt']:,} GPU runs",)):  # single tile; no cost on figures
-        bw = w - 5.0
-        bx = x + 2.5
-        rbox(ax, bx, ty + 1.8, bw, 6.0, fc=PANEL, ec="none", r=1.4)
-        ax.text(bx + bw / 2, ty + 4.8, big, fontsize=24, fontweight="bold", color=INK, ha="center", va="center")
+def _model_io_panel(ax, x, w, ty, th, dA, dB, sA, sB):
+    """Inputs -> ODE kinetics -> outputs (with tiny A/B curves)."""
     # ---------------- Fermentation model
-    x, w = 73.0, 85.0
     rbox(ax, x, ty, w, th, fc="white", ec=PURPLE, lw=3, r=2.2)
     ax.text(x + 2.5, ty + th - 4.5, "Fermentation model", fontsize=28, fontweight="bold", color=INK, va="center")
     _b(ax, x + w - 2.5, ty + th - 4.5, "MODELED", "modeled", ha="right")
@@ -949,7 +932,7 @@ def fig_tech_highlights():
     for k, yy in enumerate(iy):
         arrow(ax, (x + (23.2 if k == 1 else 22.0), yy), (mbx - 0.4, yy), color=FAINT, lw=2.5, head=16)
     # green arrow from the NVIDIA panel into "acid terms"
-    arrow(ax, (70.4, iy[3]), (x + 2.0, iy[3]), color=TEAL, lw=3.5, head=20)
+    arrow(ax, (x - 6.0, iy[3]), (x + 2.0, iy[3]), color=TEAL, lw=3.5, head=20)
     outs = [("pH", "ph"), ("lactic/acetic", "lactic_acid"), ("CO₂", "co2_cumulative"), ("rise", "expansion_ratio"),
             ("overproof", None)]
     ox = mbx + mbw + 2.5
@@ -965,11 +948,101 @@ def fig_tech_highlights():
             ax.plot([cx0, cx0 + cw_], [yy - 1.2, yy - 1.2], color=LINE, lw=2)
             for o, col in ((sA["overproof_onset_h"], A_COL), (sB["overproof_onset_h"], B_COL)):
                 ax.plot([cx0 + cw_ * o / 16.0], [yy], "v", ms=12, color=col, mec="white", mew=1.5, zorder=5)
-    # ---------------- Formlabs PreForm API (bottom, full width)
-    x, y, w, h = 2.0, 2.0, 156.0, 41.0
-    rbox(ax, x, y, w, h, fc="white", ec=TEAL, lw=3, r=2.2)
-    ax.text(x + 2.5, y + h - 4.5, "Formlabs PreForm API", fontsize=28, fontweight="bold", color=INK, va="center")
-    _b(ax, x + 55.0, y + h - 4.5, "COMPUTED", "computed", ha="left")
+
+
+def fig_model_io():
+    """Backup: the fermentation model as inputs -> ODE kinetics -> outputs."""
+    dA, _, sA = _load_chamber("A")
+    dB, _, sB = _load_chamber("B")
+    fig, ax = canvas()
+    _model_io_panel(ax, 37.5, 85.0, 24.0, 42.0, dA, dB, sA, sB)
+    ax.text(31.0, 24.0 + 42.0 - 12.5 - 3 * 7.6, "ALCHEMI", fontsize=SMALL, fontweight="bold", color=TEAL, ha="right",
+            va="center")
+    return save(fig, "model_io")
+
+
+def _half_up(x: float, nd: int = 1) -> str:
+    from decimal import ROUND_HALF_UP, Decimal
+
+    return str(Decimal(repr(x)).quantize(Decimal(1).scaleb(-nd), rounding=ROUND_HALF_UP))
+
+
+def hydration_per_water() -> dict:
+    """Mean association energy per water (n = 1, 3, 6; lowest-energy conformers), kcal/mol."""
+    a = pd.read_csv(ALCH / "association_energies.csv")
+    a = a[a["is_lowest_energy_conformer"].astype(bool)]
+    return a.groupby("acid")["dE_assoc_per_water_kcal_mol"].mean().to_dict()
+
+
+def fig_tech_highlights():
+    """Two results panels (ALCHEMI computed | model) + a thin Formlabs footer."""
+    c2 = alchemi_c2()
+    hyd = hydration_per_water()
+    cb = clear_build_numbers()
+    dA, _, sA = _load_chamber("A")
+    dB, _, sB = _load_chamber("B")
+    fig, ax = canvas()
+    py, ph = 17.0, 71.0
+    # ---------------- NVIDIA ALCHEMI (computed)
+    x, w = 2.0, 76.0
+    rbox(ax, x, py, w, ph, fc="white", ec=TEAL, lw=3, r=2.2)
+    ax.text(x + 2.5, py + ph - 5.0, "NVIDIA ALCHEMI", fontsize=28, fontweight="bold", color=INK, va="center")
+    _b(ax, x + w - 2.5, py + ph - 5.0, "COMPUTED", "computed", ha="right")
+    ax.text(x + 2.5, py + ph - 10.5, "which acid is stronger?", fontsize=SMALL, color=MUTED, va="center")
+    _acid_scale(ax, x + 4.0, x + w - 4.0, py + 42.0, c2)
+    ax.text(x + 2.5, py + 26.0, "hydration / water", fontsize=SMALL, color=MUTED, va="center")
+    vmax = max(abs(v) for v in hyd.values())
+    for k, (key, lab) in enumerate((("lactic_acid", "lactic"), ("acetic_acid", "acetic"))):
+        yy = py + 20.5 - k * 4.6
+        v = hyd[key]
+        bl = 34.0 * abs(v) / vmax
+        ax.text(x + 2.5, yy, lab, fontsize=SMALL, fontweight="bold", color=INK, va="center")
+        ax.add_patch(Rectangle((x + 16.0, yy - 1.6), bl, 3.2, fc=TEAL if k == 0 else "#7fc4bd", ec="none", zorder=2))
+        ax.text(x + 17.0 + bl, yy, f"{v:.2f}".replace("-", "−"), fontsize=SMALL, fontweight="bold", color=INK,
+                va="center")
+    rbox(ax, x + 2.5, py + 2.5, w - 5.0, 6.5, fc=PANEL, ec="none", r=1.4)
+    ax.text(x + w / 2, py + 5.75, f"{c2['n_opt']:,} GPU runs", fontsize=SMALL, fontweight="bold", color=INK,
+            ha="center", va="center")
+    # ---------------- Fermentation model (modeled results)
+    x, w = 81.0, 77.0
+    rbox(ax, x, py, w, ph, fc="white", ec=PURPLE, lw=3, r=2.2)
+    ax.text(x + 2.5, py + ph - 5.0, "Fermentation model", fontsize=28, fontweight="bold", color=INK, va="center")
+    _b(ax, x + w - 2.5, py + ph - 5.0, "MODELED", "modeled", ha="right")
+    tmax = 18.0
+    for k, (col, title, ylim, yt) in enumerate((("ph", "pH", (3.7, 5.3), [4.0, 5.0]),
+                                               ("expansion_ratio", "rise", (0.95, 2.3), [1.0, 2.0]))):
+        cax = fig.add_axes(((x + 8.0 + k * 36.0) / W, (py + 25.0) / H, 28.0 / W, 30.0 / H))
+        for d, c in ((dA, A_COL), (dB, B_COL)):
+            m = d.time_h <= tmax
+            cax.plot(d.time_h[m], d[col][m], color=c, lw=3.5, solid_capstyle="round")
+        if col == "ph":
+            for d, c, lab in ((dA, A_COL, "A"), (dB, "#d4660a", "B")):
+                cax.text(tmax + 0.4, float(np.interp(tmax, d.time_h, d.ph)), lab, fontsize=SMALL, fontweight="bold",
+                         color=c, va="center", clip_on=False)
+        if col == "expansion_ratio":
+            for d, s_, c in ((dA, sA, A_COL), (dB, sB, B_COL)):
+                o = s_["overproof_onset_h"]
+                cax.plot([o], [float(np.interp(o, d.time_h, d.expansion_ratio))], "v", ms=15, color="#c62828",
+                         mec="white", mew=2, zorder=5)
+        cax.set_xlim(0, tmax)
+        cax.set_ylim(*ylim)
+        cax.set_xticks([0, 8, 16])
+        cax.set_yticks(yt)
+        cax.tick_params(labelsize=SMALL, colors=MUTED, length=0, pad=4)
+        cax.grid(axis="y", color="#e6e6e1", lw=1)
+        for sp in ("top", "right", "left"):
+            cax.spines[sp].set_visible(False)
+        cax.spines["bottom"].set_color(FAINT)
+        cax.set_title(title, fontsize=24, fontweight="bold", color=INK, loc="left", pad=6)
+        cax.set_facecolor("white")
+    tiles = (f"pH 16 h:  A {sA['ph_at_16h']:.2f} · B {sB['ph_at_16h']:.2f}",
+             f"overproof:  A {_half_up(sA['overproof_onset_h'])} h · B {_half_up(sB['overproof_onset_h'])} h")
+    for k, t in enumerate(tiles):
+        ty0 = py + 11.5 - k * 8.5
+        rbox(ax, x + 2.5, ty0, w - 5.0, 7.0, fc=PANEL, ec="none", r=1.4)
+        ax.text(x + w / 2, ty0 + 3.5, t, fontsize=SMALL, fontweight="bold", color=INK, ha="center", va="center")
+    # ---------------- Formlabs footer strip
+    rbox(ax, 2.0, 2.0, 156.0, 12.5, fc=PANEL, ec="none", r=2.0)
     if HERO_PNG.exists():
         from PIL import Image
 
@@ -977,62 +1050,95 @@ def fig_tech_highlights():
         w_, h_ = hero.size
         for j, (fx0, fx1) in enumerate(((0.015, 0.395), (0.515, 0.895))):
             crop = hero.crop((int(w_ * fx0), int(h_ * 0.27), int(w_ * fx1), int(h_ * 0.84)))
-            _fit_image(ax, np.asarray(crop), x + 2.5 + j * 36.0, y + 2.5, 34.0, 29.0)
-        _b(ax, x + 3.5, y + 30.0, "MODELED", "modeled", ha="left")
-    if CLEAR_ISO.exists():
-        from PIL import Image
-
-        _fit_image(ax, np.asarray(Image.open(CLEAR_ISO).convert("RGB")), x + 77.0, y + 2.0, 38.0, 35.0)
+            _fit_image(ax, np.asarray(crop), 4.0 + j * 15.0, 3.0, 14.0, 10.5)
     if cb:
-        for k, big in enumerate((f"{cb['time_h']:.1f} h", f"{cb['resin_ml']:.0f} mL", cb["material"])):
-            tyy = y + 26.5 - k * 11.5
-            rbox(ax, x + 118.0, tyy, w - 120.5, 10.0, fc=PANEL, ec="none", r=1.6)
-            ax.text(x + 118.0 + (w - 120.5) / 2, tyy + 5.0, big, fontsize=30, fontweight="bold", color=INK,
-                    ha="center", va="center")
+        ax.text(36.0, 8.25, f"prepared via Formlabs PreForm API · {cb['material']} · {cb['time_h']:.1f} h",
+                fontsize=SMALL, fontweight="bold", color=INK, va="center")
     return save(fig, "tech_highlights")
 
 
-def _kitchen_tile(ax, x, y, w, h):
-    """Compact kitchen: sous chefs A/B at a local pass, line cooks, two locked stations."""
-    rbox(ax, x, y, w, h, fc="#f7f6f2", ec=LINE, lw=1.5, r=2.0, zorder=1)
-    cw, ch = 0.28 * w, 0.24 * h
-    for cx, col in ((x + 0.06 * w, A_COL), (x + 0.66 * w, B_COL)):
-        rbox(ax, cx, y + 0.66 * h, cw, ch, fc=col, ec=col, r=1.2, zorder=2)
-        icon_toque(ax, cx + cw / 2, y + 0.66 * h + 0.22 * ch, 0.2 * ch, tall=1.0)
-        for k in range(3):
-            _pan(ax, cx + 0.15 * cw + k * 0.33 * cw, y + 0.56 * h, 0.035 * w)
-    ax.add_patch(Rectangle((x + 0.36 * w, y + 0.77 * h), 0.28 * w, 0.025 * h + 0.4, fc="#9aa3ab", ec="none",
-                           zorder=2))
-    for sx in (x + 0.06 * w, x + 0.54 * w):
-        rbox(ax, sx, y + 0.08 * h, 0.4 * w, 0.32 * h, fc="white", ec=GREEN, lw=2, ls=(0, (4, 2.5)), r=1.2, zorder=2)
-        icon_lock(ax, sx + 0.2 * w, y + 0.22 * h, 0.07 * h, color=INK)
+
+
+def _pin(ax, cx, cy, s, color=SLATE):
+    """Map-style location pin; (cx, cy) is the tip."""
+    ax.add_patch(Polygon([(cx, cy), (cx - 0.75 * s, cy + 1.3 * s), (cx + 0.75 * s, cy + 1.3 * s)], fc=color,
+                         ec="none", zorder=4))
+    ax.add_patch(Circle((cx, cy + 1.55 * s), 0.85 * s, fc=color, ec="none", zorder=4))
+    ax.add_patch(Circle((cx, cy + 1.55 * s), 0.35 * s, fc="white", ec="none", zorder=5))
+
+
+def _kitchen(ax, x, w, top, h, city, big=False):
+    """One kitchen: city pin, Head Chef, Sous Chefs A/B, line cooks, locked stations."""
+    y0 = top - h
+    rbox(ax, x, y0, w, h, fc="#f7f6f2", ec=LINE, lw=1.6, r=2.2, zorder=1)
+    k = 1.0 if big else 0.62  # scale of the inner drawing
+    _pin(ax, x + 3.0, top - 5.2 * k - 1.0, 1.9 * k + 0.4)
+    ax.text(x + 5.2, top - 3.4 * k - 1.0, city, fontsize=24 if big else 20, fontweight="bold", color=SLATE,
+            va="center", zorder=4)
+    # head chef
+    hw, hh = (32.0, 8.0) if big else (12.0, 6.0)
+    hy = top - 9.0 * k - 8.0 * (1 if big else 0.75) - 1.5
+    rbox(ax, x + w / 2 - hw / 2, hy, hw, hh, fc=INK, ec=INK, r=1.6, zorder=2)
+    if big:
+        icon_toque(ax, x + w / 2 - 12.0, hy + 1.6, 1.9, tall=1.25)
+        ax.text(x + w / 2 + 2.5, hy + hh / 2, "Head Chef", fontsize=24, fontweight="bold", color="white",
+                ha="center", va="center", zorder=3)
+    else:
+        icon_toque(ax, x + w / 2, hy + 1.2, 1.5, tall=1.25)
+    # sous chefs A / B
+    sw, sh = (13.0, 8.5) if big else (8.0, 6.0)
+    sy = hy - (5.0 if big else 3.5) - sh
+    for cx, col in ((x + w * 0.27, A_COL), (x + w * 0.73, B_COL)):
+        ax.plot([x + w / 2, cx], [hy, sy + sh], color=FAINT, lw=2, zorder=1)
+        rbox(ax, cx - sw / 2, sy, sw, sh, fc=col, ec=col, r=1.4, zorder=2)
+        icon_toque(ax, cx, sy + 0.25 * sh, 0.2 * sh, tall=1.1)
+        for j in range(3):  # line cooks
+            _pan(ax, cx - sw * 0.33 + j * sw * 0.3, sy - (2.4 if big else 1.8), 0.9 if big else 0.6)
+    # locked stations
+    st_h = (12.0 if big else 8.0)
+    st_y = sy - (6.0 if big else 4.0) - st_h
+    for cx in (x + w * 0.27, x + w * 0.73):
+        stw = sw + (2.0 if big else 1.0)
+        rbox(ax, cx - stw / 2, st_y, stw, st_h, fc="white", ec=GREEN, lw=2.2, ls=(0, (4, 2.5)), r=1.2, zorder=2)
+        icon_lock(ax, cx, st_y + st_h * 0.42, (2.6 if big else 1.8), color=INK)
 
 
 def fig_scale():
-    """One kitchen -> many kitchens, sharing a replicated findings log."""
+    """Hierarchy across locations: Executive Chef -> shared pass -> one Head Chef per kitchen -> sous chefs."""
     fig, ax = canvas()
-    ax.text(80.0, 85.0, "one kitchen → many kitchens", fontsize=32, fontweight="bold", color=INK, ha="center",
-            va="center")
-    # chips above the shared bar
-    rbox(ax, 30.0, 66.0, 44.0, 10.0, fc=INK, ec=INK, r=2.4, zorder=2)
-    icon_toque(ax, 36.0, 68.4, 2.0, tall=1.2)
-    ax.text(55.0, 71.0, "executive chef", fontsize=26, fontweight="bold", color="white", ha="center", va="center",
-            zorder=3)
-    rbox(ax, 83.0, 66.0, 54.0, 10.0, fc="white", ec=TEAL, lw=3, r=2.4, zorder=2)
-    ax.text(110.0, 71.0, "pantry · ALCHEMI cache", fontsize=24, fontweight="bold", color=TEAL, ha="center",
-            va="center", zorder=3)
-    for cx in (52.0, 110.0):
-        ax.plot([cx, cx], [66.0, 61.5], color=FAINT, lw=3, zorder=1)
-    # the shared pass
-    rbox(ax, 4.0, 55.0, 152.0, 6.5, fc="#5f6b75", ec="none", r=1.6, zorder=2)
-    ax.text(80.0, 58.25, "shared pass · replicated findings log", fontsize=24, fontweight="bold", color="white",
-            ha="center", va="center", zorder=3)
-    # one kitchen (left, larger) and three more (right)
-    tiles = [(6.0, 6.0, 46.0, 44.0)] + [(62.0 + k * 32.0, 14.0, 28.0, 28.0) for k in range(3)]
-    for (tx, ty, tw, th) in tiles:
-        ax.plot([tx + tw / 2, tx + tw / 2], [ty + th, 55.0], color=FAINT, lw=3, zorder=0)
-        _kitchen_tile(ax, tx, ty, tw, th)
+    # faint dotted globe behind the kitchens: different locations, no words
+    for rx in (70.0, 52.0, 30.0, 8.0):
+        ax.add_patch(Ellipse((80.0, 30.0), 2 * rx, 2 * 30.0, fill=False, ec="#e3e0d8", lw=1.6, ls=(0, (2, 3)),
+                             zorder=0))
+    for dy in (-20.0, -10.0, 0.0, 10.0, 20.0):
+        half = 70.0 * np.sqrt(max(0.0, 1 - (dy / 30.0) ** 2))
+        ax.plot([80 - half, 80 + half], [30 + dy, 30 + dy], color="#e3e0d8", lw=1.6, ls=(0, (2, 3)), zorder=0)
+    # top: executive chef with two chips
+    rbox(ax, 57.0, 75.0, 46.0, 12.5, fc=INK, ec=INK, r=2.6, zorder=3)
+    icon_toque(ax, 64.0, 76.8, 2.6, tall=1.35)
+    ax.text(84.0, 81.25, "Executive Chef", fontsize=28, fontweight="bold", color="white", ha="center",
+            va="center", zorder=4)
+    rbox(ax, 4.0, 77.0, 46.0, 8.5, fc="white", ec=TEAL, lw=3, r=2.0, zorder=3)
+    ax.text(27.0, 81.25, "pantry · ALCHEMI cache", fontsize=22, fontweight="bold", color=TEAL, ha="center",
+            va="center", zorder=4)
+    rbox(ax, 110.0, 77.0, 46.0, 8.5, fc="#5f6b75", ec="#5f6b75", r=2.0, zorder=3)
+    ax.text(133.0, 81.25, "shared pass · findings log", fontsize=22, fontweight="bold", color="white",
+            ha="center", va="center", zorder=4)
+    # the shared pass: everything talks through it
+    rbox(ax, 4.0, 67.5, 152.0, 3.0, fc="#5f6b75", ec="none", r=1.0, zorder=3)
+    ax.plot([80.0, 80.0], [75.0, 70.5], color=INK, lw=3, zorder=2)
+    # kitchens: this demo (large) + three more, anywhere
+    kitchens = [(4.0, 50.0, 64.0, 54.5, "Boston", True), (59.0, 31.0, 64.0, 38.0, "Lisbon", False),
+                (92.0, 31.0, 64.0, 38.0, "Tokyo", False), (125.0, 31.0, 64.0, 38.0, "São Paulo", False)]
+    for x, w, top, h, city, big in kitchens:
+        ax.plot([x + w / 2, x + w / 2], [67.5, top], color=INK, lw=3, zorder=2)
+        _kitchen(ax, x, w, top, h, city, big)
+    rbox(ax, 32.0, 59.2, 20.0, 3.6, fc=HUMAN, ec="none", r=1.2, zorder=4)
+    ax.text(42.0, 61.0, "you are here", fontsize=18, fontweight="bold", color="white", ha="center", va="center",
+            zorder=5)
     return save(fig, "scale")
+
+
 
 
 FIGURES = {
@@ -1044,6 +1150,7 @@ FIGURES = {
     "benchmark_summary": fig_benchmark_summary,
     "tech_highlights": fig_tech_highlights,
     "dataflow": fig_dataflow,
+    "model_io": fig_model_io,
     "scale": fig_scale,
 }
 

@@ -28,8 +28,8 @@ EXAMPLE is grey. The figures live in
 every number from the data files. Partner names appear as plain-text wordmarks only. The deck
 sources in `docs/pitch/deck/slides/*.html` mirror this file.
 
-Timing assumes about 140 words per minute. The spoken notes total 410 words, which is
-2 min 56 s (see the table at the end).
+Timing assumes about 140 words per minute. The spoken notes total 407 words, which is
+2 min 54 s (see the table at the end).
 
 ---
 
@@ -113,37 +113,36 @@ and is not in the deck yet.
 
 **Headline:** Two partners: NVIDIA chemistry, Formlabs fabrication
 
-**Figure:** `data/figures/tech_highlights.png`, three panels.
+**Figure:** `data/figures/tech_highlights.png`, two results panels plus a thin footer.
 
-- **Top left, "NVIDIA ALCHEMI · COMPUTED", subtitle "which acid is stronger?":** a horizontal pKa scale
-  running from "◄ stronger acid" to "weaker acid ►".
-  - Experimental lactic (3.86) and acetic (4.76) are solid dots.
-  - The GPU's lactic, which is acetic's experimental value plus the computed ΔpKa for n = 3, 6 and 10
-    (−0.9, 0.1 and 1.6), is three hollow dots walking toward the experimental lactic dot ("GPU, more
-    water →").
-  - A shaded "sourdough pH" band covers 3.9–4.3.
-  - Tile: "1,066 GPU runs". Cost is not shown on any figure.
-- **Top right, "Fermentation model · MODELED":**
-  - Inputs: recipe, schedule (with a step glyph), starter and acid terms. A green arrow runs into
-    acid terms from the NVIDIA panel.
-  - Model: an "ODE kinetics" box listing yeast, bacteria, sugar and acids.
-  - Outputs: pH, lactic/acetic, CO₂ and rise, each with tiny A/B curves, and overproof with A/B onset
-    markers.
-- **Bottom, "Formlabs PreForm API · COMPUTED":** the hero render (badged MODELED); PreForm's render of
-  the Clear V5 plate, with both specimens and the two chef hats; and tiles for "2.4 h", "239 mL" and
-  "Clear V5".
+- **Left, "NVIDIA ALCHEMI · COMPUTED", subtitle "which acid is stronger?":**
+  - A pKa scale from "◄ stronger acid" to "weaker acid ►". Experimental lactic (3.86) and acetic
+    (4.76) are solid dots. The GPU's lactic (acetic's experimental value + the computed ΔpKa for
+    n = 3, 6, 10) is three hollow dots walking toward experiment ("GPU, more water →"). A "sourdough
+    pH" band covers 3.9–4.3.
+  - "hydration / water" bars: lactic −9.66 and acetic −9.54 kcal/mol, the association energy per
+    water.
+  - Tile: "1,066 GPU runs".
+- **Right, "Fermentation model · MODELED":** model results rather than the inputs diagram.
+  - Two small A/B charts: pH vs time and rise vs time, with overproof markers.
+  - Tiles: "pH 16 h: A 4.13 · B 3.90" and "overproof: A 12.9 h · B 9.5 h".
+- **Footer strip:** the two hero crumb thumbnails and "prepared via Formlabs PreForm API · Clear V5 ·
+  2.4 h". Nothing has been printed yet, so it says "prepared", not "printed".
+
+The inputs → outputs model diagram is now `data/figures/model_io.png`, a backup that is not in the
+deck.
 
 **On-slide bullets:** none. The figure carries the slide.
 
-**Speaker notes (110 words, 47 s)**
+**Speaker notes (107 words, 46 s)**
 
-> NVIDIA ALCHEMI gives us computed molecular evidence, checked against published experiments: over a
-> thousand GPU runs for a few dollars, cached so the demo runs offline. It finds lactic the stronger acid, by four pKa units against one in
-> experiment, and it moves toward experiment as we add water. That only bounds the model's acid terms.
-> The model itself takes the recipe, the temperature schedule and the starter's state, and predicts
-> pH, acids, gas, rise and overproofing. Formlabs makes the prediction physical. The PreForm API
-> laid out both crumb specimens and our two chef hats on one Form 4 plate: about two and a half hours.
-> A person presses print.
+> NVIDIA ALCHEMI gives us computed molecular evidence: over a thousand GPU runs, cached so the demo
+> runs offline. It finds lactic the stronger acid, by four pKa units against one in experiment, and
+> it moves toward experiment as we add water. That only bounds the model's acid terms. The model is
+> built from published sourdough kinetics, Gänzle 1998 and Rosso 1993, with every parameter cited or
+> labelled an assumption. It takes the recipe, the temperature schedule and the starter's state, and
+> predicts pH, acids, gas, rise and overproofing. Formlabs makes the prediction physical: the
+> PreForm API prepares both crumb specimens for print, and a person presses print.
 
 ---
 
@@ -159,6 +158,10 @@ and is not in the deck yet.
 - Computed: GPU chemistry · print prep
 - Modeled: forecasts · crumb · benchmark
 - Ask: 3 pilot kitchens + GPU & printer credits
+
+**Roadmap / Q&A line:** one Head Chef per kitchen and an Executive Chef across kitchens. Kitchens
+can be anywhere, synced through the shared pass. The figure for this is `data/figures/scale.png`
+(backup, not in the deck).
 
 **Speaker notes (112 words, 48 s)**
 
@@ -178,9 +181,9 @@ and is not in the deck yet.
 |---|---|---|
 | 1 | 94 | 40 s |
 | 2 | 94 | 40 s |
-| 3 | 110 | 47 s |
+| 3 | 107 | 46 s |
 | 4 | 112 | 48 s |
-| **Total** | **410** | **2 min 56 s** |
+| **Total** | **407** | **2 min 54 s** |
 
 Recount with `sed -n '/^> /p' docs/pitch/slides.md | sed 's/^> //' | wc -w`.
 
