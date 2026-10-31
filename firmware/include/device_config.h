@@ -87,7 +87,10 @@ constexpr float kPlausibleMaxC = 80.0f;
 namespace cfg {
 // Thermal control (engineering assumptions, tune during commissioning)
 constexpr float kHysteresisC = 0.5f;          // contract minimum is 0.3 C
-constexpr float kPeltierMaxFraction = 0.80f;  // PWM limit (fraction of full duty)
+#ifndef FERMENTAI_PELTIER_MAX_FRACTION
+#define FERMENTAI_PELTIER_MAX_FRACTION 0.80f  // PWM limit (fraction of full duty); commissioning builds lower it
+#endif
+constexpr float kPeltierMaxFraction = FERMENTAI_PELTIER_MAX_FRACTION;
 constexpr float kPeltierMinFraction = 0.15f;  // below this the module does little useful work
 constexpr float kProportionalGainPerC = 0.25f;// fraction per degC of error (proportional mode)
 constexpr float kRampPerSecond = 0.10f;       // max duty increase per second (soft start)
