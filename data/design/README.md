@@ -6,10 +6,12 @@ and brings every sensor the hackathon chambers use, plus the chef-hat automaton.
 
 **This is a concept rendering, not hardware that exists.** See "Real today vs concept" below.
 
-- `sensor_module_mockup.png` (3200 × 2160): hero view + callout views + spec strip
-- `sensor_module_context.png` (1640 × 1040): in-context vignette (proofing box + phone tile)
-- `*.svg`: the vector sources for both PNGs
-- `assets/*.svg`: text-free illustrations (hero A/B, callouts A/B, proofing box) used by the canvas
+- `sensor_module_mockup.png` (3200 × 2160): hero view + callout views + spec strip, in the **black** colourway (current)
+- `sensor_module_context.png` (1640 × 1040): in-context vignette (proofing box + phone tile), black
+- `sensor_module_cap_variants.png` (1640 × 760): cap options, dark walnut (chosen) vs anodised charcoal
+- `sensor_module_mockup_cream.png`, `sensor_module_context_cream.png`: the first cream colourway, kept for comparison
+- `*.svg`: the vector sources for every PNG
+- `assets/*.svg`: text-free illustrations (hero A/B, callouts A/B, proofing box, cap variants) used by the canvas
 - `canvas/`: the design-canvas artboards (`.dc.html`) and index, mirrored from the Claude design
   artifact <https://claude.ai/artifact/GxTEVat8DfByxUbL4xYFA3> (private until shared). Their
   `/_blob/…` image URLs resolve only inside that artifact.
@@ -38,9 +40,15 @@ A 120 × 80 × 35 mm soft-cornered bar, wall-mounted inside the chamber, facing 
 | Right side | BNC pH port (isolated interface inside) with a tethered **shorting cap** that doubles as a 0 mV electronics check before buffer calibration |
 | Back | Charcoal magnetic plate (4 magnets) + 2 keyholes, or VHB tape |
 
-**Materials (3):** matte cream PC/ABS shell, oiled walnut cap, charcoal (anodised parts, smoked
-lens glass, cables). The only accent colour is the chamber colour. Light comes from the top
-left in every view, with soft wall shadows down-right.
+**Colourways.** The current one is **black**: a matte charcoal PC shell (about `#1f2124`, with a top-left
+highlight on the face and a lit chamfer so it still reads as a form), a dark walnut cap, a smoked lens
+with a smoked-silver frosted ring light, black cables and probe sleeve, a white chef hat, and a
+**light** e-ink strip so the numbers stay readable. An anodised-charcoal cap is shown as the
+alternative (`black_anodised`). The original **cream** colourway (matte cream PC + oiled walnut +
+charcoal) is kept as `*_cream.png`. In every colourway the only accent is the chamber-colour status
+ring. Light comes from the top left, with soft wall shadows down-right (softer for the dark body
+on the light page). Leader lines have a light halo so they stay legible where they cross the
+dark body.
 
 **Specs shown (targets, not measurements):** 120 × 80 × 35 mm · IP54 splash · 5–40 °C ·
 Wi-Fi 2.4 GHz (ESP32-S3) · USB-C 20 W · 1 m probe cables.
@@ -70,7 +78,8 @@ board (see `firmware/docs/GPIO_MAP.md`).
 
 ## Iterating
 
-Every visual parameter lives in `make_mockup.py`. Palette `C`, body size and radius
+Every visual parameter lives in `make_mockup.py`. The page palette is `C` and the material colourways are `THEMES`
+(`cream`, `black`, `black_anodised`; one run renders black + cream). Body size and radius
 (`W_MM`, `H_MM`, `R_MM`, `CAP_MM`), oblique depth `DX`/`DY`, the part functions
 (`camera_eye`, `eink`, `grille`, `hat`, `probe`) and label tables (`LEFT_LABELS`,
 `RIGHT_LABELS`, `PORT_LEGEND`, `SPECS`) are all there. After changing the art, run with

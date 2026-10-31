@@ -24,12 +24,12 @@ a{color:#8A6338}a:hover{color:#5B3720}
     <div style="display: flex; align-items: center; height: 48px; padding: 0 28px; border: 2px solid #B08A5E; border-radius: 24px; font-size: 18px; font-weight: 700; letter-spacing: 2.4px; color: #7A5530">CONCEPT MOCKUP</div>
   </div>
   <div style="position: relative; width: 1480px; height: 1500px; border-radius: 36px; overflow: hidden">
-    <img src="{{heroSrc}}" alt="FermentAI Node mounted on a chamber wall: matte cream body, walnut top cap with a chef-hat automaton, camera eye with a glowing status ring, e-ink strip, air vent grille, probe, pH and power cables" style="display: block; width: 1480px; height: 1500px">
+    <img src="{{heroSrc}}" alt="FermentAI Node mounted on a chamber wall: matte charcoal body, dark walnut top cap with a chef-hat automaton, camera eye with a glowing status ring, e-ink strip, air vent grille, probe, pH and power cables" style="display: block; width: 1480px; height: 1500px">
     <p style="position: absolute; left: 48px; top: 44px; margin: 0; font-size: 22px; line-height: 30px; font-weight: 600; color: #5B5248; letter-spacing: 0.3px">Mounted on the inner wall · chamber {{chamber}}</p>
     <div style="position: absolute; right: 48px; top: 44px; display: flex; gap: 36px; align-items: center; font-size: 20px; line-height: 30px; font-weight: 500; color: #5B5248">
-      <div style="display: flex; gap: 10px; align-items: center"><span style="width: 30px; height: 30px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #FCF8F1, #D9CBB2); box-shadow: 0 2px 5px rgba(0,0,0,0.15)"></span>Matte cream PC</div>
-      <div style="display: flex; gap: 10px; align-items: center"><span style="width: 30px; height: 30px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #A06C43, #5B3720); box-shadow: 0 2px 5px rgba(0,0,0,0.15)"></span>Oiled walnut</div>
-      <div style="display: flex; gap: 10px; align-items: center"><span style="width: 30px; height: 30px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #5A544D, #1F1D1A); box-shadow: 0 2px 5px rgba(0,0,0,0.15)"></span>Charcoal + smoked glass</div>
+      <div style="display: flex; gap: 10px; align-items: center"><span style="width: 30px; height: 30px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #55595F, #141517); box-shadow: 0 2px 5px rgba(0,0,0,0.15)"></span>Matte charcoal PC</div>
+      <div style="display: flex; gap: 10px; align-items: center"><span style="width: 30px; height: 30px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #7C573A, #372317); box-shadow: 0 2px 5px rgba(0,0,0,0.15)"></span>Dark walnut</div>
+      <div style="display: flex; gap: 10px; align-items: center"><span style="width: 30px; height: 30px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #6A7D90, #1C2530 50%, #050607); box-shadow: 0 2px 5px rgba(0,0,0,0.15)"></span>Smoked glass</div>
     </div>
   </div>
 </div>
@@ -38,7 +38,7 @@ a{color:#8A6338}a:hover{color:#5B3720}
 class Component extends DCLogic {
   renderVals() {
     const ch = this.props.chamber === 'A' ? 'A' : 'B';
-    const src = { A: '/_blob/6bbf9de9fa163d2b66c8e1fa88563a0c', B: '/_blob/d9ede08c421af9aa4cc400567eeb5afb' };
+    const src = { A: '/_blob/e922479906df674169020e70664b7ec5', B: '/_blob/3627e14ebc51666b75fd4fb2924d0fe7' };
     return { chamber: ch, heroSrc: src[ch] };
   }
 }

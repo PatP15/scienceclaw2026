@@ -39,6 +39,65 @@ W_MM, H_MM, R_MM, CAP_MM = 120, 80, 18, 13          # body footprint, corner rad
 DX, DY = 13.0, -9.5                                  # oblique depth vector for 35 mm
 READ = {"A": ("22.0", "pH 4.4", "rise 1.4×"), "B": ("27.0", "pH 3.9", "rise 1.8×")}
 
+_CREAM = {
+    "edge": [(0, "#FAF4EA"), (0.5, "#E4D8C4"), (1, "#C9B89C")],
+    "face": [(0, "#FCF8F1"), (0.55, "#F0E7D7"), (1, "#E0D3BC")],
+    "cap": [(0, "#9A673F"), (0.55, "#774A2B"), (1, "#5B3720")],
+    "grain": [("#B98557", 0.22), ("#3A2112", 0.28)], "grain_amp": 1.0, "groove_hi": 0.7,
+    "side": [(0, "#A06C43"), (0.12, "#6E4428"), (0.163, "#5C381F"), (0.166, "#E7DCC8"), (0.5, "#D2C3A9"), (1, "#B2A084")],
+    "bezel": [(0, "#4D4740"), (1, "#211E1B")], "ring_inner": "#26231F",
+    "glass": [(0, "#3B4A5A"), (0.45, "#18202A"), (1, "#07090B")], "iris": "#4E6C86",
+    "dbez": [(0, "#4A443E"), (1, "#25221F")], "dbez_stroke": "none",
+    "lip": ("#FFFFFF", 0.7), "hole": "#8E7E68",
+    "frost": [(0, "#FFFFFF"), (0.62, "#FBF8F1"), (0.85, "#EDE7DB"), (1, "#D9D1C3")], "frost_rim": 0.8,
+    "cable": "#2B2825", "usb": "#EFE7DA", "usb_hi": 0.6, "bootc": [(0, "#FBF6EE"), (1, "#D3C6B0")], "cab_sh": 0.18,
+    "sleeve": [(0, "#FFFCF5"), (0.45, "#EFE6D6"), (1, "#C9BBA2")], "sleeve_line": "#CDBFA8", "sleeve_flat": "#EFE6D6",
+    "sh1": 0.30, "sh1_blur": 6.5, "sh2": 0.30, "osh": 0.22, "osh2": 0.2,
+    "under": [(0, "#D9CCB5"), (0.5, "#E9DFCD"), (1, "#F3EBDD")], "engrave": "#9E8D74", "rim_hi": 0.6,
+    "sidev": [(0, "#F1E8D8"), (1, "#D3C4AA")], "tether": "#D8CCB7", "capg": [(0, "#FFFCF5"), (1, "#D5C7AF")],
+    "capline": "#CDBFA8", "captext": "#8F7F67",
+    "backrim": [(0, "#EFE6D6"), (1, "#D4C5AC")], "plate": [(0, "#46413B"), (1, "#26231F")],
+    "materials": [("Matte cream PC", [(0, "#FCF8F1"), (1, "#D9CBB2")]), ("Oiled walnut", [(0, "#A06C43"), (1, "#5B3720")]),
+                  ("Charcoal + smoked glass", [(0, "#5A544D"), (1, "#1F1D1A")])],
+}
+_BLACK = dict(_CREAM)
+_BLACK.update({
+    "edge": [(0, "#585C62"), (0.35, "#2C2F33"), (1, "#101113")],
+    "face": [(0, "#44474D"), (0.5, "#26282C"), (1, "#18191C")],
+    "cap": [(0, "#6E4C34"), (0.55, "#503424"), (1, "#372317")],
+    "grain": [("#C0926A", 0.16), ("#140B06", 0.38)], "groove_hi": 0.16,
+    "side": [(0, "#7C573A"), (0.12, "#503424"), (0.163, "#3A2618"), (0.166, "#34373C"), (0.5, "#222428"), (1, "#141517")],
+    "bezel": [(0, "#4A4E54"), (1, "#0B0C0D")], "ring_inner": "#0E0F11",
+    "glass": [(0, "#2A333D"), (0.45, "#0E1216"), (1, "#020304")], "iris": "#3A4F62",
+    "dbez": [(0, "#17181B"), (1, "#0A0B0C")], "dbez_stroke": "#4A4E54",
+    "lip": ("#FFFFFF", 0.17), "hole": "#030304",
+    "frost": [(0, "#EEEBE5"), (0.6, "#D3CFC7"), (0.85, "#ABA79F"), (1, "#86827B")], "frost_rim": 0.35,
+    "cable": "#161719", "usb": "#1C1D20", "usb_hi": 0.3, "bootc": [(0, "#3E4146"), (1, "#141517")], "cab_sh": 0.11,
+    "sleeve": [(0, "#50545A"), (0.45, "#2C2F33"), (1, "#16171A")], "sleeve_line": "#4E5258", "sleeve_flat": "#2A2C30",
+    "sh1": 0.17, "sh1_blur": 8.5, "sh2": 0.20, "osh": 0.13, "osh2": 0.12,
+    "under": [(0, "#141517"), (0.5, "#1F2124"), (1, "#2C2F33")], "engrave": "#9A9DA3", "rim_hi": 0.14,
+    "sidev": [(0, "#34373C"), (1, "#16171A")], "tether": "#44474D", "capg": [(0, "#50545A"), (1, "#1C1D20")],
+    "capline": "#5C6066", "captext": "#B4B7BC",
+    "backrim": [(0, "#34373C"), (1, "#17181A")], "plate": [(0, "#4A4D52"), (1, "#222427")],
+    "materials": [("Matte charcoal PC", [(0, "#55595F"), (1, "#141517")]), ("Dark walnut", [(0, "#7C573A"), (1, "#372317")]),
+                  ("Smoked glass", [(0, "#6A7D90"), (0.5, "#1C2530"), (1, "#050607")])],
+})
+_ANOD = dict(_BLACK)
+_ANOD.update({
+    "cap": [(0, "#5E6268"), (0.55, "#3E4146"), (1, "#2A2C30")],
+    "grain": [("#FFFFFF", 0.07), ("#000000", 0.16)], "grain_amp": 0.0,
+    "side": [(0, "#686C72"), (0.12, "#3E4146"), (0.163, "#2C2F33"), (0.166, "#34373C"), (0.5, "#222428"), (1, "#141517")],
+    "materials": [("Matte charcoal PC", [(0, "#55595F"), (1, "#141517")]), ("Anodised charcoal", [(0, "#6A6E74"), (1, "#2A2C30")]),
+                  ("Smoked glass", [(0, "#6A7D90"), (0.5, "#1C2530"), (1, "#050607")])],
+})
+THEMES = {"cream": _CREAM, "black": _BLACK, "black_anodised": _ANOD}
+T = THEMES["black"]
+
+
+def set_theme(name):
+    global T
+    T = THEMES[name]
+
 
 # --------------------------------------------------------------------------- defs helper
 class Defs:
@@ -109,9 +168,9 @@ def wood_grain(d: Defs, x0, y0, w, h, seed=1):
         pts = []
         for k in range(25):
             x = x0 + w * k / 24
-            yy = y + amp * math.sin(k * 0.55 + i * 2.3 + seed) + 0.25 * math.sin(k * 1.9 + i)
+            yy = y + T["grain_amp"] * (amp * math.sin(k * 0.55 + i * 2.3 + seed) + 0.25 * math.sin(k * 1.9 + i))
             pts.append(f"{x:.2f},{yy:.2f}")
-        col, op = ("#3A2112", 0.28) if i % 2 else ("#B98557", 0.22)
+        col, op = T["grain"][i % 2]
         out.append(f'<polyline points="{" ".join(pts)}" fill="none" stroke="{col}" '
                    f'stroke-width="{0.16 + 0.08 * (i % 3)}" opacity="{op}"/>')
     return "".join(out)
@@ -122,20 +181,20 @@ def camera_eye(d: Defs, cx, cy, ch_col, glow=True):
     if glow:
         o.append(f'<circle cx="{cx}" cy="{cy}" r="23" fill="{d.rad("ringglow", [(0, ch_col, 0.0), (0.55, ch_col, 0.0), (0.66, ch_col, 0.22), (1, ch_col, 0)])}"/>')
     o.append(f'<circle cx="{cx}" cy="{cy + 0.5}" r="15.6" fill="#000" opacity="0.18" filter="{d.blur(0.6)}"/>')
-    o.append(f'<circle cx="{cx}" cy="{cy}" r="15.2" fill="{d.lin("bezel", [(0, "#4D4740"), (1, "#211E1B")])}"/>')
+    o.append(f'<circle cx="{cx}" cy="{cy}" r="15.2" fill="{d.lin("bezel", T["bezel"])}"/>')
     # status ring (chamber colour) + bloom
     o.append(f'<circle cx="{cx}" cy="{cy}" r="14.1" fill="none" stroke="{ch_col}" stroke-width="2.0" opacity="0.85" filter="{d.blur(0.7)}"/>')
     o.append(f'<circle cx="{cx}" cy="{cy}" r="14.1" fill="none" stroke="{ch_col}" stroke-width="1.05"/>')
     o.append(f'<circle cx="{cx}" cy="{cy}" r="14.1" fill="none" stroke="#FFFFFF" stroke-width="0.3" opacity="0.55"/>')
-    o.append(f'<circle cx="{cx}" cy="{cy}" r="13.1" fill="#26231F"/>')
+    o.append(f'<circle cx="{cx}" cy="{cy}" r="13.1" fill="{T["ring_inner"]}"/>')
     # frosted ring light
-    o.append(f'<circle cx="{cx}" cy="{cy}" r="12.3" fill="{d.rad("frost", [(0, "#FFFFFF"), (0.62, "#FBF8F1"), (0.85, "#EDE7DB"), (1, "#D9D1C3")], cx=0.42, cy=0.38, r=0.62)}"/>')
-    o.append(f'<circle cx="{cx}" cy="{cy}" r="12.3" fill="none" stroke="#FFFFFF" stroke-width="0.35" opacity="0.8"/>')
+    o.append(f'<circle cx="{cx}" cy="{cy}" r="12.3" fill="{d.rad("frost", T["frost"], cx=0.42, cy=0.38, r=0.62)}"/>')
+    o.append(f'<circle cx="{cx}" cy="{cy}" r="12.3" fill="none" stroke="#FFFFFF" stroke-width="0.35" opacity="{T["frost_rim"]}"/>')
     o.append(f'<circle cx="{cx}" cy="{cy}" r="8.2" fill="#1B1A19"/>')
     o.append(f'<circle cx="{cx}" cy="{cy}" r="8.2" fill="none" stroke="#000" stroke-width="0.4" opacity="0.35"/>')
     # lens
-    o.append(f'<circle cx="{cx}" cy="{cy}" r="6.4" fill="{d.rad("glass", [(0, "#3B4A5A"), (0.45, "#18202A"), (1, "#07090B")], cx=0.45, cy=0.42, r=0.6)}"/>')
-    o.append(f'<circle cx="{cx}" cy="{cy}" r="3.9" fill="none" stroke="#4E6C86" stroke-width="0.55" opacity="0.75"/>')
+    o.append(f'<circle cx="{cx}" cy="{cy}" r="6.4" fill="{d.rad("glass", T["glass"], cx=0.45, cy=0.42, r=0.6)}"/>')
+    o.append(f'<circle cx="{cx}" cy="{cy}" r="3.9" fill="none" stroke="{T["iris"]}" stroke-width="0.55" opacity="0.75"/>')
     o.append(f'<circle cx="{cx}" cy="{cy}" r="2.1" fill="#040506"/>')
     o.append(f'<ellipse cx="{cx - 2.3}" cy="{cy - 2.6}" rx="1.7" ry="0.95" transform="rotate(-38 {cx - 2.3} {cy - 2.6})" fill="#FFFFFF" opacity="0.78"/>')
     o.append(f'<circle cx="{cx + 2.4}" cy="{cy + 2.3}" r="0.55" fill="#FFFFFF" opacity="0.35"/>')
@@ -145,7 +204,7 @@ def camera_eye(d: Defs, cx, cy, ch_col, glow=True):
 def eink(d: Defs, x, y, ch):
     temp, ph, rise = READ[ch]
     o = [rrect(x, y + 0.5, 57, 23, 3.4, fill="#000", opacity="0.16", filter=d.blur(0.5)),
-         rrect(x, y, 57, 23, 3.4, fill=d.lin("dbez", [(0, "#4A443E"), (1, "#25221F")])),
+         rrect(x, y, 57, 23, 3.4, fill=d.lin("dbez", T["dbez"]), stroke=T["dbez_stroke"], stroke_width="0.3"),
          rrect(x + 1.7, y + 1.7, 53.6, 19.6, 1.6, fill=d.lin("paper", [(0, "#EDEAE2"), (1, "#DEDAD0")])),
          rrect(x + 1.7, y + 1.7, 53.6, 3, 1.6, fill=d.lin("pshade", [(0, "#000", 0.13), (1, "#000", 0)])),
          text(x + 4.0, y + 14.6, temp, 10.5, "#24211F", 500, ls=-0.3),
@@ -170,23 +229,23 @@ def grille(d: Defs, x0, y0, cols=19, rows=4, pitch=2.8):
     for r in range(rows):
         for c in range(cols):
             x, y = x0 + c * pitch + (pitch / 2 if r % 2 else 0), y0 + r * pitch
-            o.append(f'<circle cx="{x:.2f}" cy="{y + 0.22:.2f}" r="0.62" fill="#FFFFFF" opacity="0.7"/>')
-            o.append(f'<circle cx="{x:.2f}" cy="{y:.2f}" r="0.62" fill="#8E7E68"/>')
+            o.append(f'<circle cx="{x:.2f}" cy="{y + 0.22:.2f}" r="0.62" fill="{T["lip"][0]}" opacity="{T["lip"][1]}"/>')
+            o.append(f'<circle cx="{x:.2f}" cy="{y:.2f}" r="0.62" fill="{T["hole"]}"/>')
     return "".join(o)
 
 
 def front_face(d: Defs, ch):
     col = C[ch]
     cl = d.clip("faceclip", rrect(0.9, 0.9, W_MM - 1.8, H_MM - 1.8, R_MM - 0.9))
-    o = [rrect(0, 0, W_MM, H_MM, R_MM, fill=d.lin("edge", [(0, "#FAF4EA"), (0.5, "#E4D8C4"), (1, "#C9B89C")])),
+    o = [rrect(0, 0, W_MM, H_MM, R_MM, fill=d.lin("edge", T["edge"])),
          rrect(0.9, 0.9, W_MM - 1.8, H_MM - 1.8, R_MM - 0.9,
-               fill=d.rad("face", [(0, "#FCF8F1"), (0.55, "#F0E7D7"), (1, "#E0D3BC")], cx=0.28, cy=0.18, r=0.95)),
+               fill=d.rad("face", T["face"], cx=0.26, cy=0.14, r=0.95)),
          f'<g clip-path="{cl}">',
-         rrect(0, 0, W_MM, CAP_MM, 0, fill=d.lin("wal", [(0, "#9A673F"), (0.55, "#774A2B"), (1, "#5B3720")])),
+         rrect(0, 0, W_MM, CAP_MM, 0, fill=d.lin("wal", T["cap"])),
          wood_grain(d, 0, 0.6, W_MM, CAP_MM - 1.2),
          rrect(0, 0, W_MM, 1.6, 0, fill="#FFFFFF", opacity="0.10"),
          f'<line x1="0" y1="{CAP_MM}" x2="{W_MM}" y2="{CAP_MM}" stroke="#2E1A0E" stroke-width="0.45" opacity="0.65"/>',
-         f'<line x1="0" y1="{CAP_MM + 0.45}" x2="{W_MM}" y2="{CAP_MM + 0.45}" stroke="#FFFFFF" stroke-width="0.35" opacity="0.7"/>',
+         f'<line x1="0" y1="{CAP_MM + 0.45}" x2="{W_MM}" y2="{CAP_MM + 0.45}" stroke="#FFFFFF" stroke-width="0.35" opacity="{T["groove_hi"]}"/>',
          "</g>",
          camera_eye(d, 30, 46.5, col),
          eink(d, 53.5, 21.5, ch),
@@ -223,7 +282,7 @@ def cable(d: Defs, path, w, col, hi="#FFFFFF", hi_op=0.28, shadow=True):
     o = []
     if shadow:
         o.append(f'<path d="{path}" transform="translate(2.6 3.4)" fill="none" stroke="#3A2A1A" stroke-width="{w}" '
-                 f'stroke-linecap="round" opacity="0.18" filter="{d.blur(1.6)}"/>')
+                 f'stroke-linecap="round" opacity="{T["cab_sh"]}" filter="{d.blur(1.6)}"/>')
     o.append(f'<path d="{path}" fill="none" stroke="{col}" stroke-width="{w}" stroke-linecap="round"/>')
     o.append(f'<path d="{path}" transform="translate(-{w * 0.18:.2f} -{w * 0.12:.2f})" fill="none" stroke="{hi}" '
              f'stroke-width="{w * 0.28:.2f}" stroke-linecap="round" opacity="{hi_op}"/>')
@@ -237,12 +296,12 @@ def probe(d: Defs, x, y, ang, ch, needle=36):
     o = [f'<g transform="translate({x} {y}) rotate({ang})">',
          f'<g transform="translate(2.4 3.2)" opacity="0.2" filter="{d.blur(1.4)}"><rect x="0" y="-2.9" width="{17 + needle}" height="5.8" rx="2.8" fill="#3A2A1A"/></g>',
          '<path d="M 0 -1.3 L 4 -2.4 L 4 2.4 L 0 1.3 Z" fill="#2B2825"/>',
-         rrect(3.6, -2.9, 14.5, 5.8, 2.8, fill=d.lin("sleeve", [(0, "#FFFCF5"), (0.45, "#EFE6D6"), (1, "#C9BBA2")])),
+         rrect(3.6, -2.9, 14.5, 5.8, 2.8, fill=d.lin("sleeve", T["sleeve"])),
          rrect(6.0, -2.95, 1.6, 5.9, 0.4, fill=col),
-         f'<line x1="11" y1="-2.4" x2="11" y2="2.4" stroke="#CDBFA8" stroke-width="0.25"/>',
-         f'<line x1="13" y1="-2.4" x2="13" y2="2.4" stroke="#CDBFA8" stroke-width="0.25"/>',
+         f'<line x1="11" y1="-2.4" x2="11" y2="2.4" stroke="{T["sleeve_line"]}" stroke-width="0.25"/>',
+         f'<line x1="13" y1="-2.4" x2="13" y2="2.4" stroke="{T["sleeve_line"]}" stroke-width="0.25"/>',
          f'<path d="M 18.1 -1.55 L {18.1 + needle - 3} -1.2 L {18.1 + needle} 0 L {18.1 + needle - 3} 1.2 L 18.1 1.55 Z" fill="{st}"/>',
-         f'<line x1="18.4" y1="-0.75" x2="{18.1 + needle - 3}" y2="-0.6" stroke="#FFFFFF" stroke-width="0.35" opacity="0.7"/>',
+         f'<line x1="18.4" y1="-0.75" x2="{18.1 + needle - 3}" y2="-0.6" stroke="#FFFFFF" stroke-width="0.35" opacity="{T["groove_hi"]}"/>',
          "</g>"]
     return "".join(o)
 
@@ -264,21 +323,20 @@ def module_hero(d: Defs, ch, with_cables=True):
     """Oblique module in mm: front face at (0,0)-(120,80), back face offset (DX, DY)."""
     o = []
     # wall shadows (back face is on the wall)
-    o.append(rrect(DX + 6, DY + 10, W_MM, H_MM, R_MM, fill="#4A3826", opacity="0.30", filter=d.blur(6.5)))
-    o.append(rrect(DX + 1.6, DY + 2.6, W_MM, H_MM, R_MM, fill="#3A2A1A", opacity="0.30", filter=d.blur(1.8)))
+    o.append(rrect(DX + 6, DY + 10, W_MM, H_MM, R_MM, fill="#4A3826", opacity=T["sh1"], filter=d.blur(T["sh1_blur"])))
+    o.append(rrect(DX + 1.6, DY + 2.6, W_MM, H_MM, R_MM, fill="#3A2A1A", opacity=T["sh2"], filter=d.blur(2.2)))
     if with_cables:
-        o.append(cable(d, "M 120 46 C 150 46 158 60 156 95 S 150 150 152 190", 2.4, "#2B2825"))
-        o.append(cable(d, "M 72 76 C 72 108 86 128 100 190", 3.4, "#2B2825"))
-        o.append(cable(d, "M 101 76 C 101 104 114 126 124 190", 2.3, "#EFE7DA", hi="#FFFFFF", hi_op=0.6))
-        o.append(cable(d, "M 16 76 C 16 98 8 102 -1 107", 2.0, "#2B2825"))
+        o.append(cable(d, "M 120 46 C 150 46 158 60 156 95 S 150 150 152 190", 2.4, T["cable"]))
+        o.append(cable(d, "M 72 76 C 72 108 86 128 100 190", 3.4, T["cable"]))
+        o.append(cable(d, "M 101 76 C 101 104 114 126 124 190", 2.3, T["usb"], hi="#FFFFFF", hi_op=T["usb_hi"]))
+        o.append(cable(d, "M 16 76 C 16 98 8 102 -1 107", 2.0, T["cable"]))
         # plug boots under the bottom edge
         o.append(rrect(68.6, 78, 6.8, 9, 1.4, fill=d.lin("boot", [(0, "#45403A"), (1, "#22201D")], 0, 0, 1, 0)))
-        o.append(rrect(98.4, 78, 5.2, 7.5, 1.4, fill=d.lin("bootc", [(0, "#FBF6EE"), (1, "#D3C6B0")], 0, 0, 1, 0)))
+        o.append(rrect(98.4, 78, 5.2, 7.5, 1.4, fill=d.lin("bootc", T["bootc"], 0, 0, 1, 0)))
         o.append(rrect(14.0, 78, 4.0, 6.0, 1.2, fill=d.lin("boot", [(0, "#45403A"), (1, "#22201D")], 0, 0, 1, 0)))
         o.append(probe(d, -1.5, 107.5, 124, ch))
     # extrusion
-    side = d.lin("side", [(0, "#A06C43"), (0.12, "#6E4428"), (0.163, "#5C381F"), (0.166, "#E7DCC8"),
-                          (0.5, "#D2C3A9"), (1, "#B2A084")])
+    side = d.lin("side", T["side"])
     n = 56
     for i in range(n, 0, -1):
         t = i / n
@@ -297,7 +355,7 @@ def module_hero(d: Defs, ch, with_cables=True):
 
 # --------------------------------------------------------------------------- orthographic views (mm)
 def module_front_ortho(d: Defs, ch):
-    o = [rrect(2, 6, W_MM, H_MM, R_MM, fill="#4A3826", opacity="0.22", filter=d.blur(4)),
+    o = [rrect(2, 6, W_MM, H_MM, R_MM, fill="#4A3826", opacity=T["osh"], filter=d.blur(5)),
          front_face(d, ch),
          f'<g transform="translate(90 0.2)">{hat(d, ch, motion=False, puck_ry=1.1)}</g>']
     return "".join(o)
@@ -308,11 +366,11 @@ def module_bottom(d: Defs):
     jack = lambda x, r: (f'<circle cx="{x}" cy="17.5" r="{r + 0.8}" fill="#2B2825"/>'
                          f'<circle cx="{x}" cy="17.5" r="{r}" fill="{d.lin("jm", [(0, "#E6E7E4"), (1, "#7E8282")])}"/>'
                          f'<circle cx="{x}" cy="17.5" r="{r * 0.72}" fill="#0E0F10"/>')
-    eng = lambda x, s: text(x, 27.2, s, 2.3, "#9E8D74", 700, "middle", 0.25)
-    o = [rrect(1.5, 3, W_MM, 35, 11, fill="#4A3826", opacity="0.2", filter=d.blur(2.5)),
-         rrect(0, 0, W_MM, 35, 11, fill=d.lin("under", [(0, "#D9CCB5"), (0.5, "#E9DFCD"), (1, "#F3EBDD")])),
+    eng = lambda x, s: text(x, 27.2, s, 2.3, T["engrave"], 700, "middle", 0.25)
+    o = [rrect(1.5, 3, W_MM, 35, 11, fill="#4A3826", opacity=T["osh2"], filter=d.blur(3)),
+         rrect(0, 0, W_MM, 35, 11, fill=d.lin("under", T["under"])),
          rrect(10, 0, W_MM - 20, 3.0, 1.2, fill="#2E2B27", opacity="0.85"),
-         rrect(0.6, 0.6, W_MM - 1.2, 33.8, 10.4, fill="none", stroke="#FFFFFF", stroke_width="0.35", opacity="0.6"),
+         rrect(0.6, 0.6, W_MM - 1.2, 33.8, 10.4, fill="none", stroke="#FFFFFF", stroke_width="0.35", opacity=T["rim_hi"]),
          jack(14, 2.2), eng(14, "T1"), jack(28, 2.2), eng(28, "T2"), jack(42, 1.7), eng(42, "DOOR"),
          rrect(61, 14.3, 18, 6.4, 1.2, fill="#2B2825"), rrect(62, 15.3, 16, 4.4, 0.8, fill="#121212"),
          rrect(66, 12.6, 8, 1.9, 0.6, fill="#2B2825")]
@@ -330,10 +388,10 @@ def module_side(d: Defs):
     shape = "M 9 0 L 31 0 Q 35 0 35 4 L 35 76 Q 35 80 31 80 L 9 80 Q 0 80 0 71 L 0 9 Q 0 0 9 0 Z"
     cl = d.clip("sideclip", f'<path d="{shape}"/>')
     m = d.rad("bncf", [(0, "#F4F4F1"), (0.6, "#BFC1C0"), (1, "#808484")], cx=0.4, cy=0.35, r=0.7)
-    o = [f'<path d="{shape}" transform="translate(2 4)" fill="#4A3826" opacity="0.22" filter="{d.blur(3)}"/>',
-         f'<path d="{shape}" fill="{d.lin("sidev", [(0, "#F1E8D8"), (1, "#D3C4AA")], 0, 0, 1, 0)}"/>',
+    o = [f'<path d="{shape}" transform="translate(2 4)" fill="#4A3826" opacity="{T["osh2"]}" filter="{d.blur(3)}"/>',
+         f'<path d="{shape}" fill="{d.lin("sidev", T["sidev"], 0, 0, 1, 0)}"/>',
          f'<g clip-path="{cl}">',
-         rrect(0, 0, 35, CAP_MM, 0, fill=d.lin("wal", [(0, "#9A673F"), (0.55, "#774A2B"), (1, "#5B3720")])),
+         rrect(0, 0, 35, CAP_MM, 0, fill=d.lin("wal", T["cap"])),
          wood_grain(d, 0, 0.6, 35, CAP_MM - 1.2, seed=4),
          f'<line x1="0" y1="{CAP_MM}" x2="35" y2="{CAP_MM}" stroke="#2E1A0E" stroke-width="0.45" opacity="0.65"/>',
          rrect(31.6, 0, 3.4, 80, 0, fill="#2E2B27"),
@@ -345,18 +403,18 @@ def module_side(d: Defs):
          f'<circle cx="16" cy="43.6" r="0.7" fill="#D9B45A"/>',
          rrect(10.2, 43.1, 1.4, 1.0, 0.3, fill="#8C9090"), rrect(20.4, 43.1, 1.4, 1.0, 0.3, fill="#8C9090"),
          # tethered shorting / calibration cap
-         '<path d="M 16 49 C 13 54 13 58 16 61.5" fill="none" stroke="#D8CCB7" stroke-width="0.9" stroke-linecap="round"/>',
+         f'<path d="M 16 49 C 13 54 13 58 16 61.5" fill="none" stroke="{T["tether"]}" stroke-width="0.9" stroke-linecap="round"/>',
          f'<circle cx="16" cy="66.2" r="4.9" fill="#000" opacity="0.15" filter="{d.blur(0.6)}"/>',
-         f'<circle cx="16" cy="65.8" r="4.7" fill="{d.rad("capg", [(0, "#FFFCF5"), (1, "#D5C7AF")], cx=0.4, cy=0.35, r=0.7)}"/>',
-         f'<circle cx="16" cy="65.8" r="3.2" fill="none" stroke="#CDBFA8" stroke-width="0.35"/>',
-         text(16, 66.7, "0 mV", 1.9, "#8F7F67", 700, "middle", 0.1)]
+         f'<circle cx="16" cy="65.8" r="4.7" fill="{d.rad("capg", T["capg"], cx=0.4, cy=0.35, r=0.7)}"/>',
+         f'<circle cx="16" cy="65.8" r="3.2" fill="none" stroke="{T["capline"]}" stroke-width="0.35"/>',
+         text(16, 66.7, "0 mV", 1.9, T["captext"], 700, "middle", 0.1)]
     return "".join(o)
 
 
 def module_back(d: Defs):
-    o = [rrect(1.5, 4, W_MM, H_MM, R_MM, fill="#4A3826", opacity="0.2", filter=d.blur(3)),
-         rrect(0, 0, W_MM, H_MM, R_MM, fill=d.lin("backrim", [(0, "#EFE6D6"), (1, "#D4C5AC")])),
-         rrect(7, 7, W_MM - 14, H_MM - 14, R_MM - 7, fill=d.lin("plate", [(0, "#46413B"), (1, "#26231F")]))]
+    o = [rrect(1.5, 4, W_MM, H_MM, R_MM, fill="#4A3826", opacity=T["osh2"], filter=d.blur(3.5)),
+         rrect(0, 0, W_MM, H_MM, R_MM, fill=d.lin("backrim", T["backrim"])),
+         rrect(7, 7, W_MM - 14, H_MM - 14, R_MM - 7, fill=d.lin("plate", T["plate"]))]
     for (x, y) in ((22, 22), (98, 22), (22, 58), (98, 58)):
         o.append(f'<circle cx="{x}" cy="{y}" r="6" fill="{d.rad("mag", [(0, "#8A857D"), (1, "#3A3631")], cx=0.4, cy=0.35, r=0.7)}"/>')
         o.append(f'<circle cx="{x}" cy="{y}" r="6" fill="none" stroke="#1A1816" stroke-width="0.5"/>')
@@ -433,8 +491,10 @@ def callout_body(d: Defs, ch, labels=True):
     o.append(f'<g transform="translate({SX} {SY}) scale({SS})">{module_side(d)}</g>')
     o.append(f'<g transform="translate({KX} {KY}) scale({KS})">{module_back(d)}</g>')
     # leaders
-    lead = lambda pts: (f'<polyline points="{" ".join(f"{x:.1f},{y:.1f}" for x, y in pts)}" fill="none" '
-                        f'stroke="{C["lead"]}" stroke-width="1.6" stroke-linejoin="round"/>')
+    def lead(pts):
+        pp = " ".join(f"{x:.1f},{y:.1f}" for x, y in pts)
+        return (f'<polyline points="{pp}" fill="none" stroke="#FFFFFF" stroke-width="5" stroke-linejoin="round" opacity="0.75"/>'
+                f'<polyline points="{pp}" fill="none" stroke="{C["lead"]}" stroke-width="1.7" stroke-linejoin="round"/>')
     dot = lambda x, y: (f'<circle cx="{x:.1f}" cy="{y:.1f}" r="6.5" fill="#FFFFFF" opacity="0.9"/>'
                         f'<circle cx="{x:.1f}" cy="{y:.1f}" r="3.6" fill="{C["ink"]}"/>')
     for _, _, (tx, ty), ly in LEFT_LABELS:
@@ -485,16 +545,11 @@ def callout_text(ch):
 COMP_W, COMP_H = 3200, 2160
 SPECS = [("120 × 80 × 35 mm", "SIZE"), ("IP54", "SPLASH-RESISTANT"), ("5–40 °C", "OPERATING RANGE"),
          ("Wi-Fi 2.4 GHz", "ESP32-S3"), ("USB-C 20 W", "POWER"), ("1 m", "PROBE CABLES")]
-MATERIALS = [("Matte cream PC", "mat_cream"), ("Oiled walnut", "mat_wal"), ("Charcoal + smoked glass", "mat_char")]
-
-
 def materials_row(d: Defs, x, y):
-    grads = {"mat_cream": [(0, "#FCF8F1"), (1, "#D9CBB2")], "mat_wal": [(0, "#A06C43"), (1, "#5B3720")],
-             "mat_char": [(0, "#5A544D"), (1, "#1F1D1A")]}
     o, cx = [], x
-    for label, key in MATERIALS:
+    for i, (label, stops) in enumerate(T["materials"]):
         o.append(f'<circle cx="{cx + 16}" cy="{y + 2}" r="16" fill="#000" opacity="0.12" filter="{d.blur(2)}"/>')
-        o.append(f'<circle cx="{cx + 16}" cy="{y}" r="16" fill="{d.rad(key, grads[key], cx=0.35, cy=0.3, r=0.8)}"/>')
+        o.append(f'<circle cx="{cx + 16}" cy="{y}" r="16" fill="{d.rad(f"mat{i}", stops, cx=0.35, cy=0.3, r=0.8)}"/>')
         o.append(text(cx + 42, y + 7, label, 20, C["ink2"], 500))
         cx += 42 + len(label) * 10.2 + 40
     return "".join(o)
@@ -510,8 +565,8 @@ def composite(ch="B"):
          text(2536, 109, "RING COLOUR", 17, C["ink3"], 700, "end", 2), f'<circle cx="2560" cy="102" r="9" fill="{C["A"]}"/>', text(2576, 110, "A", 22, C["ink2"], 600),
          f'<circle cx="2628" cy="102" r="9" fill="{C["B"]}"/>', text(2644, 110, "B", 22, C["ink2"], 600),
          f'<g transform="translate(80 210)">{hero_body(d, ch)}'
-         + text(48, 70, f"Mounted on the inner wall · chamber {ch}", 22, C["ink3"], 600, ls=0.3)
-         + materials_row(d, 744, 62) + "</g>",
+         + text(48, 70, f"Mounted on the inner wall · chamber {ch}", 22, C["ink2"], 600, ls=0.3)
+         + materials_row(d, 1432 - sum(82 + len(m[0]) * 10.2 for m in T["materials"]) + 40, 62) + "</g>",
          f'<g transform="translate(1640 210)">{callout_body(d, ch)}</g>']
     # spec strip
     sy = 1760
@@ -540,8 +595,8 @@ def proofing_box(d: Defs, ch, ox=110, oy=150):
     col = C[ch]
     bw, bh, br = 900, 760, 34
     bdx, bdy = 70, -48
-    o = [rrect(ox + bdx * 0.4 + 20, oy + 40, bw, bh, br, fill="#4A3826", opacity="0.28", filter=d.blur(28)),
-         rrect(ox - 10, oy + bh - 6, bw + bdx + 20, 26, 13, fill="#3A2A1A", opacity="0.25", filter=d.blur(10))]
+    o = [rrect(ox + bdx * 0.4 + 20, oy + 40, bw, bh, br, fill="#4A3826", opacity="0.17", filter=d.blur(34)),
+         rrect(ox - 10, oy + bh - 6, bw + bdx + 20, 26, 13, fill="#3A2A1A", opacity="0.15", filter=d.blur(12))]
     side = d.lin("boxside", [(0, "#F1EADF"), (1, "#C9BCA7")])
     for i in range(30, 0, -1):
         t = i / 30
@@ -580,9 +635,9 @@ def proofing_box(d: Defs, ch, ox=110, oy=150):
     # module on the back wall (front view, small) + probe cable into the jar
     ms = 2.3
     mx, my = ix + 120, iy + 110
-    o.append(cable(d, f"M {mx + 16 * ms} {my + 78 * ms} C {mx + 16 * ms} {my + 200} {jx + 70} {jy - 80} {jx + 70} {jy + 40}", 4.5, "#2B2825"))
+    o.append(cable(d, f"M {mx + 16 * ms} {my + 78 * ms} C {mx + 16 * ms} {my + 200} {jx + 70} {jy - 80} {jx + 70} {jy + 40}", 4.5, T["cable"]))
     o.append(rrect(jx + 66, jy - 30, 9, 190, 4, fill=d.lin("steelv", [(0, "#F4F4F1"), (0.5, "#B9BBBB"), (1, "#8C9090")], 0, 0, 1, 0)))
-    o.append(rrect(jx + 62, jy - 70, 17, 46, 7, fill="#EFE6D6"))
+    o.append(rrect(jx + 62, jy - 70, 17, 46, 7, fill=T["sleeve_flat"]))
     o.append(rrect(jx + 62, jy - 60, 17, 5, 1, fill=col))
     o.append(f'<g transform="translate({mx} {my}) scale({ms})">{module_front_ortho(d, ch)}</g>')
     o.append("</g>")
@@ -667,11 +722,46 @@ def render_png(svg: pathlib.Path, png: pathlib.Path, w: int, h: int):
     return "cairosvg"
 
 
+VAR_W, VAR_H = 1640, 760
+VARIANTS = [("black", "Dark walnut cap", "warm, ties to the crust palette; RF-transparent"),
+            ("black_anodised", "Anodised charcoal cap", "monolithic and pro-kitchen; antenna needs a slot")]
+
+
+def variants_body(labels=True):
+    """Cap options: two front views side by side (each with its own Defs, so gradients don't collide)."""
+    defs, o = [], [rrect(0, 0, VAR_W, VAR_H, 36, fill=C["card"])]
+    for i, (theme, title, sub) in enumerate(VARIANTS):
+        set_theme(theme)
+        d = Defs(f"v{i}")
+        x0 = 140 + i * 780
+        o.append(f'<g transform="translate({x0} 220) scale(5)">{module_front_ortho(d, "B")}</g>')
+        if labels:
+            o.append(text(x0, 680, title, 28, C["ink"], 600))
+            o.append(text(x0, 716, sub, 21, C["ink2"]))
+        defs.append(d.xml())
+    set_theme("black")
+    if labels:
+        o.append(text(60, 84, "Cap options", 34, C["ink"], 600))
+    return "".join(defs), "".join(o)
+
+
+def variants_doc(labels=True):
+    defs, body = variants_body(labels)
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{VAR_W}" height="{VAR_H}" viewBox="0 0 {VAR_W} {VAR_H}">'
+            f'{defs}<rect width="{VAR_W}" height="{VAR_H}" fill="{C["page"]}"/>{body}</svg>')
+
+
 def main():
     ASSETS.mkdir(parents=True, exist_ok=True)
+    # cream colourway kept for comparison (composite + context only)
+    set_theme("cream")
+    cream = {HERE / "sensor_module_mockup_cream.svg": (composite("B"), COMP_W, COMP_H),
+             HERE / "sensor_module_context_cream.svg": (context_doc("B"), CTX_W, CTX_H)}
+    set_theme("black")
     outs = {
         HERE / "sensor_module_mockup.svg": (composite("B"), COMP_W, COMP_H),
         HERE / "sensor_module_context.svg": (context_doc("B"), CTX_W, CTX_H),
+        HERE / "sensor_module_cap_variants.svg": (variants_doc(), VAR_W, VAR_H),
     }
     for ch in "AB":
         d = Defs(f"h{ch}")
@@ -679,21 +769,20 @@ def main():
         d = Defs(f"k{ch}")
         outs[ASSETS / f"callouts_{ch}.svg"] = (svg_doc(CAL_W, CAL_H, d, callout_body(d, ch, labels=False)), CAL_W, CAL_H)
     outs[ASSETS / "context_box_B.svg"] = (context_asset("B"), 1100, CTX_H)
-    for p, (s, _, _) in outs.items():
-        p.write_text(s)
-    eng = render_png(HERE / "sensor_module_mockup.svg", HERE / "sensor_module_mockup.png", COMP_W, COMP_H)
-    render_png(HERE / "sensor_module_context.svg", HERE / "sensor_module_context.png", CTX_W, CTX_H)
-    if "--assets-png" in sys.argv:
-        for p, (_, w, h) in outs.items():
-            if p.parent == ASSETS:
-                render_png(p, p.with_suffix(".png"), w, h)
-    # label coordinates for the design canvas (px within the 1480 x 1440 callout board)
+    outs[ASSETS / "cap_variants.svg"] = (variants_doc(labels=False), VAR_W, VAR_H)
+    eng = None
+    for group in (cream, outs):
+        for p, (s, w, h) in group.items():
+            p.write_text(s)
+            if p.parent == HERE or "--assets-png" in sys.argv:
+                eng = render_png(p, p.with_suffix(".png"), w, h)
+    # label coordinates for the design canvas (px within the callout board)
     lab = {"left": [(t, s, round(fpx(*tg)[1]), ly) for t, s, tg, ly in LEFT_LABELS],
            "right": [(t, s, ly) for t, s, _, ly in RIGHT_LABELS],
            "side": [(t, s, ly) for t, s, _, ly in SIDE_LABELS],
            "back_label_y": KY + 80 * KS + 44}
-    (HERE / "assets" / "callout_labels.json").write_text(json.dumps(lab, indent=1, ensure_ascii=False))
-    print(f"rendered with {eng}:", *[str(p.relative_to(HERE)) for p in outs], sep="\n  ")
+    (ASSETS / "callout_labels.json").write_text(json.dumps(lab, indent=1, ensure_ascii=False))
+    print(f"rendered with {eng}:", *[str(p.relative_to(HERE)) for p in {**cream, **outs}], sep="\n  ")
 
 
 if __name__ == "__main__":

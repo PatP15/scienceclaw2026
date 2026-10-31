@@ -1,6 +1,6 @@
 # Checkpoint: product mockup (data/design/)
 
-## Status: COMPLETE (not committed; pending orchestrator/user review)
+## Status: COMPLETE — black colourway (v2) delivered; cream kept as *_cream.png (not committed)
 - [x] context read (README, PLAN_MASTER §1/§5, SENSOR_WIRING, GPIO_MAP, hero/closed_loop figures)
 - [x] design canvas: https://claude.ai/artifact/GxTEVat8DfByxUbL4xYFA3 (private) — artboards Main (hero, A/B tweak),
       Callouts (A/B tweak, live HTML labels), Context (phone tile, accent tweak), Specs
@@ -13,3 +13,8 @@
 ## Resume
 python3 data/design/make_mockup.py [--assets-png]   # headless Chrome render; cairosvg fallback
 Canvas art change: re-upload assets PNGs to the artifact, repoint /_blob ids in canvas/*.dc.html.
+
+## v2 black colourway
+- THEMES dict in make_mockup.py (cream / black / black_anodised); main renders black (+assets) and cream (*_cream)
+- canvas v6: all 4 artboards repointed to black assets + new CapOptions artboard (dark walnut chosen)
+- critique: fixed f-string bug (tether), toned ring light to smoked silver, grille lip, swatch, softer shadows, leader halos
