@@ -12,3 +12,4 @@ data/alchemi/**/*.pt
 *.egg-info/
 data/experiments/findings_log.jsonl
 data/images/*/
+data/experiments/chat_sessions.jsonl
