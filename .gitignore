@@ -10,3 +10,4 @@ node_modules/
 data/fermentai.sqlite3*
 data/alchemi/**/*.pt
 *.egg-info/
+data/experiments/findings_log.jsonl
