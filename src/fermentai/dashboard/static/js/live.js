@@ -73,7 +73,39 @@ export class LivePanel {
     setInterval(() => CHAMBERS.forEach((c) => this.refreshState(c)), 20000);  // server truth
   }
 
+  // ------------------------------------------------------------------ USB serial bridge status
+  startBridgePoll() {
+    const paths = this.store.apiPaths;
+    if (paths && !paths.has("/api/v1/bridge/status")) { this.bridge = { unsupported: true }; return; }
+    const poll = async () => {
+      try { this.bridge = await get("/api/v1/bridge/status"); }
+      catch (e) { if (e.status === 404) { this.bridge = { unsupported: true }; clearInterval(this.bridgeTimer); } }
+      CHAMBERS.forEach((c) => this.render(c));
+    };
+    poll();
+    this.bridgeTimer = setInterval(poll, 5000);
+  }
+
+  /** {cls, text, title, realLinked, deviceId} for a station's USB link, or null when unsupported. */
+  usbLink(c) {
+    const b = this.bridge;
+    if (!b || b.unsupported) return null;
+    const ch = (b.chambers || {})[c] || null;
+    const link = String(ch?.link || (b.bridge_running ? "disconnected" : "bridge_offline")).toLowerCase();
+    let text, cls;
+    if (!b.bridge_running || link === "bridge_offline") { text = "USB · bridge not running"; cls = "off"; }
+    else if (link === "connected") { text = "USB · connected"; cls = "ok"; }
+    else if (/log/.test(link)) { text = "USB · printing logs only"; cls = "warn"; }
+    else { text = "USB · disconnected"; cls = "bad"; }
+    if (ch?.label && /^USB/.test(ch.label) && !(cls === "ok" && ch.simulated === true)) text = ch.label;
+    if (cls === "ok" && ch?.simulated === true) text = "USB · connected (simulated)";
+    const title = [b.transport || "usb-serial", ch?.port && `port ${ch.port}`, ch?.device_id && `device ${ch.device_id}`, ch?.firmware_version && `fw ${ch.firmware_version}`,
+      ch?.last_seen && `last seen ${ch.last_seen}`, !b.bridge_running && b.reason].filter(Boolean).join(" · ");
+    return { cls, text, title, realLinked: cls === "ok" && ch?.simulated === false, deviceId: ch?.device_id || null };
+  }
+
   async load() {
+    this.startBridgePoll();
     await Promise.all(CHAMBERS.map(async (c) => {
       await this.refreshState(c);
       try {
@@ -203,7 +235,13 @@ export class LivePanel {
     if (!card || !st) return;
     const tel = st.latest_telemetry || null;
     const stale = st.telemetry_stale === true && !tel ? true : this.isStale(st);
-    const prov = tel ? tel.source : null;
+    const usb = this.usbLink(c);
+    // A real (non-simulated) device linked over USB makes the station LIVE / MEASURED - but only when the
+    // latest telemetry actually comes from that device (otherwise we would relabel someone else's data).
+    // Never relabel records whose own source says "simulated" (virtual devices may reuse the real device id).
+    const telFromLinked = usb?.realLinked && tel && (!usb.deviceId || tfield(tel, "device_id") === usb.deviceId)
+      && normProv(tel.source, "device") !== "simulated_device";
+    const prov = telFromLinked ? "measured" : (tel ? tel.source : null);
     const mode = demoMode(prov);
     document.dispatchEvent(new CustomEvent("fermentai:source", { detail: { chamber: c, source: prov, mode, stale } }));
     const diag = tfield(tel, "diagnostics") || {};
@@ -218,6 +256,8 @@ export class LivePanel {
       h("div", { class: "ch-badges" },
         prov ? deviceBadge(prov) : statusBadge("no device", "info"),
         tel ? (stale ? statusBadge("stale", "bad") : statusBadge("fresh", "good")) : null,
+        usb ? h("span", { class: `usb-chip usb-${usb.cls}`, title: usb.title }, usb.text) : null,
+        usb?.realLinked && tel && !telFromLinked ? h("span", { class: "usb-chip usb-warn", title: `A real USB device${usb.deviceId ? ` (${usb.deviceId})` : ""} is linked, but the latest telemetry is labelled ${tel.source || "?"} from ${tfield(tel, "device_id") || "an unknown device"} — shown as recorded.` }, "latest data not from USB device") : null,
         st.experiment_id ? h("span", { class: "badge status-info", title: "current experiment" }, st.experiment_id) : null));
 
     const devId = tfield(tel, "device_id") || st.device_id;

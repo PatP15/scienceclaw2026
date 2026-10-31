@@ -602,3 +602,61 @@ main { padding: var(--gap); }
 .msg-more { margin-top: 6px; }
 .msg-more > summary { min-height: 32px; font-size: var(--fs-caption); color: var(--accent); }
 .legend-strip { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; }
+
+/* ---------------- USB link chip ---------------- */
+.usb-chip { font-size: var(--fs-caption); font-weight: 650; padding: 1px 8px; border-radius: 6px; border: 1px solid var(--border); white-space: nowrap; color: var(--text-secondary); }
+.usb-chip::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: currentColor; margin-right: 5px; vertical-align: middle; }
+.usb-ok { color: #7ee0a1; border-color: rgba(31, 179, 107, .55); }
+.usb-warn { color: var(--warning); border-color: rgba(250, 178, 25, .55); }
+.usb-bad { color: #ff9a9a; border-color: rgba(208, 59, 59, .6); }
+.usb-off { color: var(--text-muted); }
+
+/* ---------------- chat with a Sous Chef ---------------- */
+.taste-main { display: flex; flex-direction: column; gap: var(--gap); min-width: 0; }
+.chat-card { --cc: var(--chamber-A); --cc-soft: var(--chamber-A-soft); --cc-text: var(--chamber-A-text); border-color: rgba(57, 135, 229, .45); }
+.chat-card[data-chef="B"] { --cc: var(--chamber-B); --cc-soft: var(--chamber-B-soft); --cc-text: var(--chamber-B-text); border-color: rgba(217, 89, 38, .45); }
+.chat-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.chat-ico { color: var(--cc-text); display: inline-flex; }
+.chat-title { margin: 0; font-size: var(--fs-title); }
+.chat-head-actions { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+.seg-sm .seg-btn { min-height: 36px; font-size: var(--fs-caption); }
+.seg-sm .seg-btn[data-chef="A"][aria-checked="true"] { color: var(--chamber-A-text); }
+.seg-sm .seg-btn[data-chef="B"][aria-checked="true"] { color: var(--chamber-B-text); }
+.chat-log { display: flex; flex-direction: column; gap: 8px; max-height: 340px; min-height: 120px; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding: 10px; border-radius: var(--radius-sm); background: var(--surface-2); }
+.chat-empty { display: flex; flex-direction: column; gap: 6px; }
+.cmsg { display: flex; gap: 8px; align-items: flex-end; max-width: 86%; }
+.cmsg .chat-av { flex: none; width: 30px; height: 30px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--surface-3); color: var(--text-secondary); }
+.cbubble { padding: 8px 12px; border-radius: 14px; font-size: var(--fs-body); line-height: 1.45; min-width: 0; }
+.cwho { font-size: var(--fs-caption); font-weight: 700; opacity: .8; }
+.cts { font-weight: 500; }
+.cmsg-guest { align-self: flex-end; }
+.cmsg-guest .cbubble { background: #f3efe6; color: #15171a; border-bottom-right-radius: 4px; }
+.cmsg-guest .chat-av { color: var(--prov-manual); }
+.cmsg.chef { align-self: flex-start; }
+.cmsg.chef .cbubble { background: var(--chamber-A-soft); border: 1px solid rgba(57, 135, 229, .5); border-bottom-left-radius: 4px; }
+.cmsg.chef .chat-av { color: var(--chamber-A-text); background: var(--chamber-A-soft); }
+.cmsg.chef-B .cbubble { background: var(--chamber-B-soft); border-color: rgba(217, 89, 38, .5); }
+.cmsg.chef-B .chat-av { color: var(--chamber-B-text); background: var(--chamber-B-soft); }
+.cmsg.chef-A .cwho { color: var(--chamber-A-text); }
+.cmsg.chef-B .cwho { color: var(--chamber-B-text); }
+.cmsg-head { align-self: center; max-width: 92%; }
+.cmsg-head .cbubble { background: #121417; border: 1px solid rgba(184, 107, 58, .6); text-align: center; }
+.cmsg-head .cwho { color: var(--accent); }
+.cmsg-head .chat-av { background: var(--accent); color: #15171a; }
+.dots { display: inline-flex; gap: 4px; padding: 4px 2px; }
+.dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--text-secondary); animation: blink 1.2s infinite; }
+.dots i:nth-child(2) { animation-delay: .2s; } .dots i:nth-child(3) { animation-delay: .4s; }
+.chat-chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 8px 0 0; min-height: 4px; }
+.uchip { font-size: var(--fs-caption); font-weight: 650; padding: 2px 10px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface-2); }
+.uchip-A { color: var(--chamber-A-text); border-color: rgba(57, 135, 229, .55); }
+.uchip-B { color: var(--chamber-B-text); border-color: rgba(217, 89, 38, .55); }
+.uchip-wants { color: #7ee0a1; border-color: rgba(31, 179, 107, .5); }
+.chat-compose { display: flex; gap: 8px; align-items: stretch; margin-top: 10px; }
+.chat-input { flex: 1; min-height: 56px; font-size: var(--fs-title); resize: none; }
+.chat-send { min-width: 110px; }
+.chat-hint { margin-top: 4px; }
+.ch-head { flex-wrap: wrap; row-gap: 6px; }
+.ch-id { flex: 1 1 240px; }
+.ch-title, .ch-sub { white-space: nowrap; }
+.ch-badges { flex: 0 1 auto; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }

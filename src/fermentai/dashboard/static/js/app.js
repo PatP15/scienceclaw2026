@@ -5,8 +5,9 @@ import { LivePanel } from "./live.js";
 import { TwinPanel } from "./twin.js";
 import { MolecularPanel } from "./molecular.js";
 import { TastePanel } from "./taste.js";
+import { ChatPanel } from "./chat.js";
 
-const EVENT_TYPES = ["telemetry", "image", "setpoint", "command", "ack", "experiment", "feedback", "feedback_result", "message", "simulation"];
+const EVENT_TYPES = ["telemetry", "image", "setpoint", "command", "ack", "experiment", "feedback", "feedback_result", "message", "simulation", "chat", "device"];
 const TAB_KEY = "fermentai.tab";
 const store = { serverOffsetMs: 0, health: null, modeLabel: null };
 
@@ -141,15 +142,19 @@ async function boot() {
     toast(`Cannot reach the local API: ${e.message}`, "bad");
   }
 
+  // Which optional routes this server has (chat, USB bridge status) - avoids polling 404s.
+  try { store.apiPaths = new Set(Object.keys((await get("/openapi.json")).paths || {})); } catch { store.apiPaths = null; }
   const live = new LivePanel(store, stream);
   const twin = new TwinPanel(store);
   const molecular = new MolecularPanel();
   const taste = new TastePanel(store, stream, live);
   if (store.health && store.health.llm_mode && store.health.llm_mode !== "offline") taste.setMode("live");
   wireTabs({ live, twin, molecular, taste });
+  const chat = new ChatPanel(document.getElementById("chat-card"), taste);
   await live.load();
   await taste.init();
-  window.fermentai = { store, stream, live, twin, molecular, taste }; // handy for debugging on the iPad
+  await chat.init(stream, store.apiPaths);
+  window.fermentai = { store, stream, live, twin, molecular, taste, chat }; // handy for debugging on the iPad
 }
 
 boot();

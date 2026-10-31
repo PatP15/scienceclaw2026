@@ -52,6 +52,16 @@ line, device drawer (identity+diagnostics), no-device empty state; Taste: conver
 reasoning details folded, "plated" kitchen ticket. Before/after: data/demos/{before,after}_*.png,
 data/demos/polish_contact_sheet.png.
 
+## v6: chat panel + USB link chip
+js/chat.js (ChatPanel, understoodChips): "Talk to Sous Chef A/B" above the form; POST/GET/DELETE /api/v1/chat,
+SSE `chat`; session in localStorage fermentai.chat.session; hand-off (stage handoff/done) plays the 12-step reveal
+from `persisted` (taste-feedback response shape) or `handoff_result`; Head Chef summary bubble; degrades to
+"Chat not available yet" (route detected via /openapi.json; 404/503 at runtime). Mode toggle shared (event
+fermentai:taste-mode). live.js: GET /api/v1/bridge/status every 5 s -> "USB · …" chip; real linked device ->
+LIVE/MEASURED only if the latest telemetry is from that device_id AND not source=simulated (else warning chip).
+Test harness for the not-yet-wired chat routes: scratchpad chat_harness.py (not in repo).
+Contract test allows /api/v1/chat* as optional until the API ships the routes (remove from `optional` then).
+
 ## Open items for other areas
 - API: /molecular/summary -> HTTP 500 (NaN in analysis_summary.json; jsonable() the summaries).
 - API/agents: build_context passes `recent_telemetry` (reduced keys, no received_at_utc/v1.1 fields) but the

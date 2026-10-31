@@ -121,3 +121,24 @@ def test_brigade_legend_and_no_scientist_labels_left():
     assert "`Scientist ${" not in js, "agent names must use the Sous Chef display mapping"
     for s in ("Head Chef sets the goal", "Head Chef calls the plan", "Line cooks · candidate simulations", "Hat bobs · new assignment"):
         assert s in js, s
+
+
+@pytest.mark.skipif(_node() is None, reason="needs Node >= 22 to import the ES modules")
+def test_chat_understood_chips():
+    """Partial interpretation -> live chips ("A: mild · fluffy", "B: …", "wants: …")."""
+    chat = (STATIC_DIR / "js" / "chat.js").as_uri()
+    understood = {
+        "loaves": {
+            "A": {"attributes": {"sourness": {"label": "mild", "evidence": [{"text": "mild"}]},
+                                 "texture": {"label": "open / airy / fluffy", "evidence": [{"text": "fluffy"}]}}},
+            "B": {"attributes": {"sourness": {"label": "sour", "evidence": [{"text": "more sour"}]}}},
+        },
+        "desired": {"sourness": {"direction": "increase"}, "texture": {"direction": "maintain"}},
+    }
+    script = (f"const m = await import({json.dumps(chat)});"
+              f"console.log(JSON.stringify([m.understoodChips({json.dumps(understood)}), m.understoodChips({{structured_preference: ['More sourness']}}), m.understoodChips(null)]))")
+    out = subprocess.run([_node(), "--input-type=module", "-e", script], capture_output=True, text=True, timeout=30)
+    assert out.returncode == 0, out.stderr
+    full, pref, none = json.loads(out.stdout.strip().splitlines()[-1])
+    assert [c["text"] for c in full] == ["A: mild · fluffy", "B: more sour", "wants: more sour, keep it airy"]
+    assert pref == [{"side": "wants", "text": "wants: More sourness"}] and none == []

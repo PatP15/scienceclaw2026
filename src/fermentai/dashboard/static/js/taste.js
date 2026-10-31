@@ -55,7 +55,7 @@ export class TastePanel {
 
   // ------------------------------------------------------------------ form
   buildForm() {
-    document.querySelectorAll(".seg-btn").forEach((b) => b.addEventListener("click", () => this.setMode(b.dataset.mode)));
+    document.querySelectorAll(".seg-btn[data-mode]").forEach((b) => b.addEventListener("click", () => this.setMode(b.dataset.mode)));
     // Replay scenarios come from GET /api/v1/demos (data/demos/*.json, label "Replay").
     const sel = document.getElementById("replay-select");
     sel.addEventListener("change", async () => {
@@ -76,8 +76,9 @@ export class TastePanel {
   }
   setMode(m) {
     this.mode = m === "live" ? "live" : "offline";
-    document.querySelectorAll(".seg-btn").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.mode === this.mode)));
+    document.querySelectorAll(".seg-btn[data-mode]").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.mode === this.mode)));
     this.updateHint();
+    document.dispatchEvent(new CustomEvent("fermentai:taste-mode", { detail: { mode: this.mode } }));
   }
   async loadDemos() {
     const sel = document.getElementById("replay-select");
