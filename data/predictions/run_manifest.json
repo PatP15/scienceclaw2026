@@ -1,12 +1,12 @@
 {
   "provenance": "simulated",
-  "generated_utc": "2026-10-31T04:02:47+00:00",
+  "generated_utc": "2026-10-31T04:51:45+00:00",
   "generator": "scripts/simulate_loaves.py",
   "model": "fermentai.fermentation (SciPy LSODA ODE), configs/kinetics.yaml",
   "n_uncertainty_samples": 128,
   "seed": 0,
   "alchemi_descriptors_status": "partial",
-  "runtime_s": 5.71,
+  "runtime_s": 6.27,
   "note": "All values are simulated. Model CO2 is modelled production; the BME680 does not measure CO2.",
   "files": [
     "data/predictions/chamber_A_prediction.csv",

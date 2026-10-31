@@ -109,6 +109,7 @@
           "d_assoc_per_water_kcal",
           "d_hbond_min_A",
           "lactic.assoc_energy_per_water_kcal",
+          "lactic.deprot_energy_n6_kcal",
           "lactic.hbond_min_A",
           "-> kinetics parameter undissociated_lactic_rel_potency"
         ],
@@ -148,6 +149,7 @@
           "d_assoc_per_water_kcal",
           "d_hbond_min_A",
           "lactic.assoc_energy_per_water_kcal",
+          "lactic.deprot_energy_n6_kcal",
           "lactic.hbond_min_A",
           "-> kinetics parameter undissociated_lactic_rel_potency"
         ],
@@ -189,6 +191,7 @@
           "d_assoc_per_water_kcal",
           "d_hbond_min_A",
           "lactic.assoc_energy_per_water_kcal",
+          "lactic.deprot_energy_n6_kcal",
           "lactic.hbond_min_A",
           "-> kinetics parameter undissociated_lactic_rel_potency"
         ],
@@ -222,6 +225,7 @@
           "d_assoc_per_water_kcal",
           "d_hbond_min_A",
           "lactic.assoc_energy_per_water_kcal",
+          "lactic.deprot_energy_n6_kcal",
           "lactic.hbond_min_A",
           "-> kinetics parameter undissociated_lactic_rel_potency"
         ],
@@ -260,6 +264,7 @@
           "d_assoc_per_water_kcal",
           "d_hbond_min_A",
           "lactic.assoc_energy_per_water_kcal",
+          "lactic.deprot_energy_n6_kcal",
           "lactic.hbond_min_A",
           "-> kinetics parameter undissociated_lactic_rel_potency"
         ],
@@ -301,6 +306,7 @@
           "d_assoc_per_water_kcal",
           "d_hbond_min_A",
           "lactic.assoc_energy_per_water_kcal",
+          "lactic.deprot_energy_n6_kcal",
           "lactic.hbond_min_A",
           "-> kinetics parameter undissociated_lactic_rel_potency"
         ],
@@ -336,6 +342,7 @@
           "d_assoc_per_water_kcal",
           "d_hbond_min_A",
           "lactic.assoc_energy_per_water_kcal",
+          "lactic.deprot_energy_n6_kcal",
           "lactic.hbond_min_A",
           "-> kinetics parameter undissociated_lactic_rel_potency"
         ],
@@ -370,6 +377,7 @@
           "d_assoc_per_water_kcal",
           "d_hbond_min_A",
           "lactic.assoc_energy_per_water_kcal",
+          "lactic.deprot_energy_n6_kcal",
           "lactic.hbond_min_A",
           "-> kinetics parameter undissociated_lactic_rel_potency"
         ],
@@ -404,6 +412,7 @@
           "d_assoc_per_water_kcal",
           "d_hbond_min_A",
           "lactic.assoc_energy_per_water_kcal",
+          "lactic.deprot_energy_n6_kcal",
           "lactic.hbond_min_A",
           "-> kinetics parameter undissociated_lactic_rel_potency"
         ],
@@ -438,6 +447,7 @@
           "d_assoc_per_water_kcal",
           "d_hbond_min_A",
           "lactic.assoc_energy_per_water_kcal",
+          "lactic.deprot_energy_n6_kcal",
           "lactic.hbond_min_A",
           "-> kinetics parameter undissociated_lactic_rel_potency"
         ],
@@ -472,6 +482,7 @@
           "d_assoc_per_water_kcal",
           "d_hbond_min_A",
           "lactic.assoc_energy_per_water_kcal",
+          "lactic.deprot_energy_n6_kcal",
           "lactic.hbond_min_A",
           "-> kinetics parameter undissociated_lactic_rel_potency"
         ],
@@ -506,6 +517,7 @@
           "d_assoc_per_water_kcal",
           "d_hbond_min_A",
           "lactic.assoc_energy_per_water_kcal",
+          "lactic.deprot_energy_n6_kcal",
           "lactic.hbond_min_A",
           "-> kinetics parameter undissociated_lactic_rel_potency"
         ],

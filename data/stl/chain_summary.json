@@ -99,6 +99,7 @@
         "descriptors_used": {
           "lactic": {
             "assoc_energy_per_water_kcal": -9.65547643035451,
+            "deprot_energy_n6_kcal": 11.250146001528442,
             "hbond_min_A": 1.6388945782576574
           },
           "acetic": {
@@ -356,6 +357,7 @@
         "descriptors_used": {
           "lactic": {
             "assoc_energy_per_water_kcal": -9.65547643035451,
+            "deprot_energy_n6_kcal": 11.250146001528442,
             "hbond_min_A": 1.6388945782576574
           },
           "acetic": {
