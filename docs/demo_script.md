@@ -2,30 +2,45 @@
 
 Two roles: the **Presenter** talks, and the **Driver** holds the iPad. One person can do both. Lines in
 quotes are spoken. Lines starting with *Tap* are actions on the iPad, which is in landscape on the
-dashboard. Tab, button and control names are the exact labels in
-`src/fermentai/dashboard/static/index.html`.
+dashboard. The UI names used here are:
 
-Spoken words come to about 270 (about 1 min 55 s at 140 wpm). The other ~65 s is for tasting, typing
-and waiting for the agents.
+- the tabs **Live Laboratories**, **Digital Twin**, **NVIDIA Molecular Explorer** and
+  **Taste → Next Experiment**;
+- the top-bar mode indicator **LIVE / REPLAY / SIMULATION**;
+- the reasoning label **Online Agent** / **Offline Policy**;
+- **Replay example**, **Interpret & plan next experiment** and **▶ Start automaton animation**.
+
+Spoken words come to about 272 (1 min 57 s at 140 wpm). The other ~60 s is for tasting, typing and
+waiting for the agents.
 
 ---
 
 ## Before the judges arrive (T−10 min, not timed)
 
-1. **Start the backend.** On the Mac, run `scripts/start_demo.sh`.
-   - If no ESP32 is connected or responding, use `scripts/start_demo.sh --with-simulated-devices`
-     instead. Telemetry is then labelled **SIMULATED** on every screen.
-2. **Open the dashboard.** Open the printed `http://<mac-ip>:8000/?token=…` URL on the iPad. The top-bar
-   pill should change from **Read-only** to write access, and the connection pill should go green.
-3. **Check the decision mode.** Go to **Taste → Next Experiment**, then the mode switch:
-   - **Offline deterministic** is the default. It is labelled and never needs the internet.
-   - **Live LLM** is only for when internet and Claude are confirmed working right now.
-4. **Run the disconnected-mode test** in `docs/network_setup.md` §6 once, so that a motor command
+1. **Start the backend.** On the Mac, run `scripts/start_demo.sh`. It prints the iPad URL with
+   `?token=…`.
+2. **Start the chambers.**
+   - **With the ESP32 chambers:** power them on and check that both cards in Live Laboratories update.
+     The ESP32 firmware is *compiled but unverified on hardware*, so do a full dry run before the
+     judges arrive.
+   - **Without them**, or if either chamber fails the dry run: in a second terminal, run
+     `uv run python -m simulated_devices --chambers A B`. The mode indicator then reads
+     **SIMULATION**, and the chamber cards and camera frames are labelled simulated.
+3. **Open the dashboard.** Open the printed URL on the iPad. The token pill should change from
+   **Read-only** to write access, and the connection pill should go green.
+4. **Choose how the agents reason.** Go to **Taste → Next Experiment**, then the mode switch:
+   - **Offline deterministic** is the default. Results are labelled **Offline Policy**.
+   - Use **Live LLM** only if internet and Claude are confirmed working right now. Results are then
+     labelled **Online Agent**.
+5. **Run the disconnected-mode test** in `docs/network_setup.md` §6 once, so that a motor command
    reaches `completed`.
-5. **Set out the loaves.** Slice Loaf A (blue card) and Loaf B (orange card) on two plates. Put the
-   printed crumb specimens, mild and sour, next to them.
-6. **Prepare the Replay fallback.** In the **Replay example** dropdown, find a scripted example but
-   leave it unselected.
+6. **Set out the loaves.** Slice Loaf A (blue card) and Loaf B (orange card) on two plates. Put the
+   printed chamber specimens, `crumb_chamber_A` and `crumb_chamber_B`, next to them.
+7. **Prepare the scripted input.** In the **Replay example** dropdown, find
+   *"PLAN_MASTER §14 judge script ('more sour, but still fluffy')"* (`demo_04`) and leave it
+   unselected. It is the fallback input. It reads: *"Loaf A tastes mild and has nice texture. Loaf B
+   is more sour, which I prefer, but the crumb is too dense. I'd like a more sour loaf that's still
+   fluffy."*
 
 ---
 
@@ -33,26 +48,39 @@ and waiting for the agents.
 
 | Time | Screen / action | Say |
 |---|---|---|
-| **0:00–0:20** | Hand each judge a slice of A and B. *Tap* **Live Laboratories**. | "Two loaves, same dough, two temperatures. These are the two chambers that fermented them. Each one is an ESP32 with a Peltier, sensors and a camera, run by its own AI scientist agent." |
-| **0:20–0:40** | Point at the A and B cards: temperature, setpoint, rise, provenance badge. | "Chamber A is blue and holds 22 degrees. B is orange and warmer, at 27. Every number carries a badge saying whether it's real, simulated or replay." |
-| **0:40–1:00** | *Tap* **Digital Twin**. Point at the pH and rise curves. | "This is our fermentation model, and it is a simulation. It predicts B gets more acidic and overproofs earlier, so the agents learn to cool it down partway." |
-| **1:00–1:15** | *Tap* **NVIDIA Molecular Explorer**. | "The acid chemistry comes from real NVIDIA ALCHEMI calculations on a Brev GPU, cached on this Mac, so the demo doesn't need the GPU or the internet." *(When the numbers are in, add: "[ALCHEMI: ΔE_assoc lactic vs acetic — pending]".)* |
-| **1:15–1:45** | *Tap* **Taste → Next Experiment**. Hand the iPad to a judge, or type their words for them into the box under **What did the bread taste like?** | "Now you're the scientist. What did the bread taste like? Plain words are fine, there's no magic phrase." |
-| **1:45–1:50** | *Tap* **Interpret & plan next experiment**. | "It's parsing that into sensory preferences." |
-| **1:50–2:20** | Scroll the step list as it fills: interpretation, comparison, Agent A hypothesis, Agent B critique, recommended experiment. Then point at **Updated experiment plan**. | "Here are your words as structured preferences. Agent A proposes a new temperature schedule. Agent B checks it against its own model and pushes back. They agree, and the plan on the right updates." |
-| **2:20–2:35** | Look at the chambers. The chef-hats wiggle for up to 5 s. If they don't, *tap* **Live Laboratories**, then **▶ Start automaton animation** on A and on B. | "The chef-hats announce the new experiment. That motor is a separate, time-limited command. The language model never controls power. Setpoints are clamped by the API and again in the firmware." |
+| **0:00–0:20** | Hand each judge a slice of A and B. *Tap* **Live Laboratories**. | "Two loaves, same dough, two temperatures. These are the two chambers that fermented them. Each one has its own AI scientist agent." |
+| **0:20–0:40** | Point at the A and B cards and at the mode indicator. | "A is blue and holds 22 degrees. B is orange, at 27. The indicator up here says whether you're seeing live hardware, a replay or a simulation, and every number carries its own badge." |
+| **0:40–0:58** | *Tap* **Digital Twin**. Point at the pH and rise curves. | "This is our fermentation model, and it's a simulation. It predicts B acidifies faster and overproofs early, so the agents learn to cool it partway." |
+| **0:58–1:15** | *Tap* **NVIDIA Molecular Explorer**. | "This part is real: NVIDIA ALCHEMI on a Brev GPU. In small water clusters, lactic acid gives up its proton about seven kilocalories more easily than acetic acid. That constrains one acid term in the model. It doesn't drive the bread." |
+| **1:15–1:42** | *Tap* **Taste → Next Experiment**. Hand the iPad to a judge, or type their words for them into the box under **What did the bread taste like?** | "Now you're the scientist. What did the bread taste like? Plain words are fine." |
+| **1:42–1:47** | *Tap* **Interpret & plan next experiment**. | "It's turning that into sensory preferences." |
+| **1:47–2:20** | Scroll the steps as they fill: interpretation, comparison, Agent A hypothesis, Agent B critique, recommended experiment. Point at the **Offline Policy** or **Online Agent** label, then at **Updated experiment plan**. | "Here are your words as structured preferences. Agent A proposes a new temperature schedule. Agent B checks it against its own model and pushes back. They agree, and the plan updates. This label says the deterministic offline policy made the decision, not a live model." *(If it says Online Agent, say "Claude made this decision live".)* |
+| **2:20–2:35** | Look at the chambers. The chef-hats wiggle for up to 5 s. If they don't, *tap* **Live Laboratories**, then **▶ Start automaton animation** on A and on B. | "The chef-hats announce the new experiment. The motor is a separate, time-limited command. The language model never controls power. Setpoints are clamped by the API and again in the firmware." |
 | **2:35–2:55** | Stay on the plan card. | *(Read the real-vs-simulated line below, word for word.)* |
-| **2:55–3:00** | — | "Taste, type, and the lab runs the next experiment. Thank you." |
+| **2:55–3:00** | — | "Taste, type, and the lab plans the next experiment. Thank you." |
+
+**What to expect from the scripted input.** With `demo_04` in Offline Policy mode, the plan should be
+**Trial 002**:
+
+- Chamber A: *Hot 32 °C 5 h → cool 18 °C*.
+- Chamber B: *Steady 24 °C, 12 h*.
+
+Those come from `data/demos/demo_04_master_plan_judge_script.json`. A judge's own words will
+usually give a different plan, and that's fine.
 
 ### The "what's real vs simulated" line (say it word for word)
 
-> "To be precise about what's real: the chambers, their sensor readings, your feedback and the motor
-> command are real, and so are the NVIDIA ALCHEMI energies, computed on a GPU. The fermentation curves
-> and the printed crumb are model predictions, labelled simulated. Anything scripted says replay."
+With the chamber hardware connected:
 
-If the chambers are running with `--with-simulated-devices`, replace the first sentence with:
-"To be precise about what's real: your feedback and the NVIDIA ALCHEMI energies are real. Today the
-chamber readings come from a labelled simulated device, so they say simulated."
+> "To be precise: your feedback, the chamber readings and the motor command are real, and so are the
+> NVIDIA ALCHEMI energies, computed on a GPU. The fermentation curves and the printed crumb are model
+> predictions, labelled simulated. Anything scripted says replay."
+
+With virtual devices (the mode indicator reads **SIMULATION**):
+
+> "To be precise: your feedback and the NVIDIA ALCHEMI energies are real. Today's chamber readings
+> come from labelled virtual devices, and the curves and printed crumb are model predictions.
+> Anything scripted says replay."
 
 ---
 
@@ -60,11 +88,12 @@ chamber readings come from a labelled simulated device, so they say simulated."
 
 | What's missing | What to do | What to say |
 |---|---|---|
-| **Internet** (venue Wi-Fi is down, or Claude is unreachable) | Leave the mode on **Offline deterministic**. The backend also falls back by itself if a live call fails. | "We're running the offline policy. It's deterministic and labelled, so you get the same answer every time." |
-| **GPU / Brev** | Do nothing. The demo never calls the GPU live, and results are cached on the Mac. If the ALCHEMI numbers aren't signed off yet, skip the bracketed sentence at 1:00. | "Those were computed earlier on the GPU and cached here." |
-| **Chamber hardware** (ESP32 offline, Peltier fault) | Restart with `scripts/start_demo.sh --with-simulated-devices`. The cards show **SIMULATED**. | Use the simulated-device version of the real-vs-simulated line. |
-| **Chef-hat motor doesn't move** | Go to **Live Laboratories**, then **▶ Start automaton animation**. Use **Cancel** if it sticks. A simulated device acknowledges the command in the log. | "The command was sent and acknowledged. The motor is just for show, so it never touches the heater." |
-| **The judge won't type, or the time is nearly up** | In **Replay example**, pick a scripted example, then tap **Interpret & plan next experiment**. It is labelled **REPLAY**. | "Here's a recorded example, labelled replay." |
+| **Internet** (venue Wi-Fi is down, or Claude is unreachable) | Leave the mode on **Offline deterministic**. The backend also falls back by itself if a live call fails, and the result says **Offline Policy**. | "We're running the offline policy. It's deterministic and labelled, so you get the same answer every time." |
+| **GPU / Brev** | Do nothing. The demo never calls the GPU live, and the Brev instance has already been deleted. All results are cached on the Mac. | "Those were computed earlier on the GPU and cached here." |
+| **Chamber hardware** (ESP32 offline, Peltier fault, firmware misbehaving) | Run `uv run python -m simulated_devices --chambers A B`. The indicator reads **SIMULATION**. | Use the virtual-device version of the real-vs-simulated line. |
+| **Chef-hat motor doesn't move** | Go to **Live Laboratories**, then **▶ Start automaton animation**. Use **Cancel** if it sticks. Virtual devices acknowledge the command in their log. | "The command was sent and acknowledged. The motor is just for show, so it never touches the heater." |
+| **The judge won't type** | In **Replay example**, pick the `demo_04` "PLAN_MASTER §14 judge script" entry, then tap **Interpret & plan next experiment**. It shows a **REPLAY** banner, and the decision cycle and motors run live on the scripted text. | "Here's a scripted example, labelled replay. The decision you see is computed live from it." |
+| **The time is nearly up**, or the backend is struggling | Pick the `demo_04` entry, then tap **▶ Show recorded replay**. This shows only the stored output, and nothing is sent to the devices. | "This is the recorded result for that input, labelled replay." |
 | **iPad can't reach the Mac** | Open `http://127.0.0.1:8000/` in the Mac browser and turn the screen toward the judges. | (Nothing. Keep going.) |
 | **Write actions are greyed out** (the pill says **Read-only**) | Tap the token pill, then paste the `FERMENTAI_API_TOKEN` printed by `start_demo.sh`. | (Nothing. Do this before the judges arrive.) |
 
@@ -72,9 +101,23 @@ chamber readings come from a labelled simulated device, so they say simulated."
 
 ## Notes and limits (for the team, not for the judges)
 
+- **ESP32 firmware status: compiled, not yet verified on hardware.** Don't claim the firmware has
+  run on the chambers until someone has watched it do so.
 - Do not claim continuous pH from both chambers. There is one experimental pH probe (see README).
-- Don't say the printed crumb "is" the loaf's crumb. It's a parameterised hypothesis, and the real loaf
-  photo is the check.
+- **The printed specimens are simulation-derived hypotheses.** Kinetics do not uniquely determine
+  crumb. The real loaf photo is the check. The mild/sour presets are only a baseline.
+- **The deprotonation ordering is solid only at n = 3.** At n = 6 it flips, within the conformer
+  spread. If asked, say "in small clusters", not "in dough".
+- **The benchmark is in-silico.** If asked, say that talking changes choices and removes duplicates,
+  but the final recommendation is the same.
 - The motor animation marks a *planned* experiment. The machine has not mixed or baked anything new.
-- When this was written, the taste-panel JavaScript (`taste.js`) had not landed. The step names at 1:50
-  follow PLAN §11. Rehearse once against the live build and update this table if the labels differ.
+- **Rehearse once against the build you will demo.** When this was written, the dashboard changes
+  this script relies on were in the working tree but not yet committed:
+  - the top-bar `#data-mode` LIVE/REPLAY/SIMULATION indicator, which is derived from the telemetry
+    source actually arriving;
+  - the Online Agent / Offline Policy pill;
+  - replay entries loaded from `GET /api/v1/demos`, so `demo_04` comes from `data/demos/`;
+  - **▶ Show recorded replay**.
+
+  If a label differs on the day, follow the screen. If the replay list is empty, type the `demo_04`
+  sentence by hand. It is printed above.

@@ -7,11 +7,14 @@ Outputs (data/figures/): <name>.png at 200 dpi on a 16 x 9 in canvas (3200 x 180
 a 1600 x 900 slide) plus <name>.svg for every figure.
 
 Inputs (read-only): data/predictions/chamber_{A,B}_prediction.csv, *_uncertainty.csv,
-*_summary.json, data/stl/crumb_summary.json, data/stl/crumb_{mild,sour}.png, and the fermentation
-simulator (fermentai.fermentation.simulation) for the one "B cooled at 6 h" intervention curve.
+*_summary.json, molecular_coupling_report.json; data/alchemi/analysis/association_energies.csv,
+deprotonation_energies.csv, analysis_summary.json; data/stl/chain_summary.json,
+crumb_chamber_comparison.png, crumb_summary.json; data/benchmarks/summary.json and
+benchmark_results.csv; and the fermentation simulator (fermentai.fermentation.simulation) for the one
+"B cooled at 6 h" intervention curve.
 
-ALCHEMI numbers are deliberately NOT read here: they are shown as the placeholders in
-ALCHEMI_PLACEHOLDERS until the team signs off on the GPU results. Fill that dict, re-run, done.
+Every number on a figure is read from those files at build time (none is typed in by hand), except
+the Brev run cost/MD count in ALCHEMI_RUN_NOTE, which comes from data/alchemi/environment/report.md.
 """
 
 from __future__ import annotations
@@ -41,14 +44,39 @@ PRED = ROOT / "data" / "predictions"
 STL = ROOT / "data" / "stl"
 OUT = ROOT / "data" / "figures"
 
-# --------------------------------------------------------------------------------------------
-# Placeholders that await the GPU results. Never invent these; replace the strings when the
-# ALCHEMI numbers are confirmed and re-run the script.
-# --------------------------------------------------------------------------------------------
-ALCHEMI_PLACEHOLDERS = {
-    "assoc": "[ALCHEMI: ΔE_assoc lactic vs acetic — pending]",
-    "deprot": "[ALCHEMI: ΔE_deprot lactic vs acetic — pending]",
-}
+ALCH = ROOT / "data" / "alchemi" / "analysis"
+BENCH = ROOT / "data" / "benchmarks"
+# From data/alchemi/environment/report.md ("Runtime and cost"); Brev's invoice is authoritative.
+ALCHEMI_RUN_NOTE = "72 MD runs, ~1.1 GPU-hours (~$0.68)"
+
+
+def alchemi_numbers() -> dict:
+    """Lactic vs acetic energetics from the real ALCHEMI/AIMNet2 analysis CSVs (kcal/mol)."""
+    a = pd.read_csv(ALCH / "association_energies.csv")
+    a = a[a["is_lowest_energy_conformer"].astype(bool)]
+    per_w = a.groupby("acid")["dE_assoc_per_water_kcal_mol"].mean()  # mean over n = 1, 3, 6
+    n6 = a[a.n_water == 6].set_index("acid")["dE_assoc_kcal_mol"]
+    d = pd.read_csv(ALCH / "deprotonation_energies.csv").set_index(["acid", "n_water"])
+    dep = d["dE_deprot_separated_ions_kcal_mol"]
+    summ = json.loads((ALCH / "analysis_summary.json").read_text())
+    v = summ["versions"]
+    rep = json.loads((PRED / "molecular_coupling_report.json").read_text())["per_chamber"]
+    pot = rep["A"]["parameters"]["undissociated_lactic_rel_potency"]
+    dph = max(abs(e[k]["alchemi_informed"] - e[k]["literature"])
+              for c in rep.values() for e in [c["effect_on_chamber"]] for k in e if k.startswith("ph_"))
+    return {
+        "per_water": (per_w["lactic_acid"], per_w["acetic_acid"]),
+        "n6": (n6["lactic_acid"], n6["acetic_acid"]),
+        "deprot_n3": (dep[("lactic_acid", 3)], dep[("acetic_acid", 3)]),
+        "deprot_n6": (dep[("lactic_acid", 6)], dep[("acetic_acid", 6)]),
+        "ion_pair_n6": d["dE_deprot_ion_pair_kcal_mol"].dropna().to_dict(),
+        "potency": (pot["literature_value"], pot["value"]),
+        "max_dph": dph,
+        "provenance": (f"real: AIMNet2 ({summ['model'][0]}) via NVIDIA ALCHEMI toolkit {v['nvalchemi-toolkit']} "
+                       f"on an {v['gpu'].replace('NVIDIA ', '')} — {summ['n_converged']} optimisations, "
+                       f"{ALCHEMI_RUN_NOTE}"),
+    }
+
 
 # --------------------------------------------------------------------------------------------
 # Style: one palette for every figure
@@ -376,24 +404,35 @@ def fig_closed_loop():
 # ============================================================================================
 # 2. Evidence pipeline
 # ============================================================================================
-def _stl_thumb(name: str):
-    p = STL / f"crumb_{name}.png"
-    if not p.exists():
+def _crop(png: Path, box_frac: tuple[float, float, float, float]):
+    if not png.exists():
         return None
     from PIL import Image
 
-    im = Image.open(p).convert("RGB")
+    im = Image.open(png).convert("RGB")
     w, h = im.size
-    # oblique-view region of the generate_stls.py render (2240 x 868 layout)
-    box = (int(w * 0.385), int(h * 0.30), int(w * 0.655), int(h * 0.80))
-    return np.asarray(im.crop(box))
+    x0, y0, x1, y1 = box_frac
+    return np.asarray(im.crop((int(w * x0), int(h * y0), int(w * x1), int(h * y1))))
+
+
+# oblique-view regions of data/stl/crumb_chamber_comparison.png (generate_stls.py layout)
+CHAMBER_THUMB_BOX = {"A": (0.375, 0.185, 0.64, 0.445), "B": (0.375, 0.635, 0.64, 0.895)}
+
+
+def _m(x: float, nd: int) -> str:
+    """Format with a true minus sign."""
+    return f"{x:.{nd}f}".replace("-", "−")
 
 
 def fig_evidence_pipeline():
     crumb = json.loads((STL / "crumb_summary.json").read_text())
-    m = {d["name"]: d for d in crumb["models"]}
+    base = {d["name"]: d for d in crumb["models"]}
+    chain = json.loads((STL / "chain_summary.json").read_text())["chambers"]
     sA = json.loads((PRED / "chamber_A_summary.json").read_text())
     sB = json.loads((PRED / "chamber_B_summary.json").read_text())
+    al = alchemi_numbers()
+    meas = {c: chain[c]["measured_on_mesh"] for c in "AB"}
+    par = {c: chain[c]["alchemi"]["attribution"]["crumb_param_deltas"] for c in "AB"}
 
     fig, ax = canvas()
     ax.text(3, 86.5, "Evidence pipeline: molecules → model → specimen → real loaf", fontsize=21, fontweight="bold",
@@ -401,25 +440,36 @@ def fig_evidence_pipeline():
     ax.text(3, 81.2, "Each stage hands one thing to the next — and says whether it is real or simulated.", fontsize=13,
             color=MUTED, va="top")
 
-    bw, gap, x0, y0, bh = 27.2, 4.5, 3.0, 9.0, 60.0
+    lw_, la_ = al["per_water"]
+    dl, da = al["deprot_n3"]
+    bw, gap, x0, y0, bh = 27.2, 4.5, 3.0, 11.0, 58.0
     stages = [
         {"t": "NVIDIA ALCHEMI", "s": "AIMNet2 on Brev GPU", "b": "real_gpu", "icon": "alchemi",
-             "out": "Energetics of lactic vs acetic acid in small water clusters: association, deprotonation, H-bonds.",
-             "nums": [ALCHEMI_PLACEHOLDERS["assoc"], ALCHEMI_PLACEHOLDERS["deprot"]], "placeholder": True},
+         "out": "Real energetics of lactic vs acetic acid in small water clusters.",
+         "nums": ["kcal/mol · lactic vs acetic", f"hydration/H₂O  {_m(lw_, 2)} vs {_m(la_, 2)}",
+                  f"deprot. (n=3)  {dl:.1f} vs {da:.1f}", f"lactic ionises ~{da - dl:.1f} easier"],
+         "num_size": 10.2},
         {"t": "Kinetics model", "s": "SciPy ODE on the Mac", "b": "simulated", "icon": icon_curves,
-             "out": "Predicts pH, lactic / acetic acid, CO₂ and dough rise for A (22 °C) and B (27 °C).",
-             "nums": [f"pH @16 h:  A {sA['ph_at_16h']:.2f}  ·  B {sB['ph_at_16h']:.2f}",
-                   f"lactic:  A {sA['lactic_at_16h']:.1f}  ·  B {sB['lactic_at_16h']:.1f} g/kg"]},
+         "out": "Predicts pH, lactic / acetic acid, CO₂ and dough rise for A (22 °C) and B (27 °C).",
+         "nums": [f"pH @16 h:  A {sA['ph_at_16h']:.2f}  ·  B {sB['ph_at_16h']:.2f}",
+                  f"lactic:  A {sA['lactic_at_16h']:.1f}  ·  B {sB['lactic_at_16h']:.1f} g/kg"]},
         {"t": "Morphology map", "s": "assumed mapping", "b": "simulated", "icon": icon_pores,
-             "out": "Turns rise, gas and acid into crumb parameters: porosity, pore size, clustering.",
-             "nums": ["porosity target:", f"mild {m['mild']['porosity_target']:.2f}  ·  sour {m['sour']['porosity_target']:.2f}"]},
-        {"t": "STL specimen", "s": "Formlabs-printable", "b": "simulated", "icon": "stl",
-             "out": "Two printable 80 × 80 × 12\u00a0mm crumb cross-sections you can hold.",
-             "nums": [f"mild {100 * m['mild']['cut_face_pore_area_fraction']:.1f} % · {m['mild']['cut_face_pore_count']} pores",
-                   f"sour {100 * m['sour']['cut_face_pore_area_fraction']:.0f} % · {m['sour']['cut_face_pore_count']} pores"]},
+         "out": "Maps rise, retained gas and acid at 16 h to crumb parameters (a stated hypothesis).",
+         "nums": ["mapped parameters: A · B",
+                  (f"porosity  {par['A']['porosity_target']['alchemi_informed']:.2f}  ·  "
+                  f"{par['B']['porosity_target']['alchemi_informed']:.2f}"),
+                  (f"median pore  {par['A']['pore_diam_median_mm']['alchemi_informed']:.1f}  ·  "
+                  f"{par['B']['pore_diam_median_mm']['alchemi_informed']:.1f} mm")],
+         "num_size": 11.0},
+        {"t": "Specimens", "s": "one STL per chamber", "b": "simulated", "icon": "stl",
+         "out": "One printable 80 × 80 × 12 mm crumb section per chamber, generated from its simulation.",
+         "nums": ["measured: porosity · pores",
+                  f"A {100 * meas['A']['cut_face_pore_area_fraction']:.1f} %  ·  {meas['A']['cut_face_pore_count']}",
+                  f"B {100 * meas['B']['cut_face_pore_area_fraction']:.1f} %  ·  {meas['B']['cut_face_pore_count']}"],
+         "num_size": 11.0},
         {"t": "Loaf photos", "s": "image analysis", "b": "real_pending", "icon": icon_camera,
-             "out": "Real crumb photos analysed and compared back to the specimens and the model.",
-             "nums": ["same metrics: porosity,", "pore count, pore size"]},
+         "out": "Real crumb photos analysed and compared back to the specimens and the model.",
+         "nums": ["same metrics: porosity,", "pore count, pore size"]},
     ]
     for i, st in enumerate(stages):
         bx = x0 + i * (bw + gap)
@@ -432,48 +482,59 @@ def fig_evidence_pipeline():
         ax.text(bx + 6.6, y0 + bh - 2.6, st["t"], fontsize=15, fontweight="bold", color=INK, va="center")
         ax.text(bx + 6.6, y0 + bh - 5.6, st["s"], fontsize=11.5, color=MUTED, va="center")
         badge(ax, bx + bw / 2, y0 + bh - 10.2, st["b"], size=10.5)
-        icx, icy = bx + bw / 2, y0 + 35.5
+        icx, icy = bx + bw / 2, y0 + 35.0
         if st["icon"] == "alchemi":
             icon_gpu(ax, icx - 6.5, icy, 3.6)
             icon_molecule(ax, icx + 6.0, icy, 5.0)
         elif st["icon"] == "stl":
-            for j, nm in enumerate(("mild", "sour")):
-                im = _stl_thumb(nm)
+            for j, c in enumerate("AB"):
+                im = _crop(STL / "crumb_chamber_comparison.png", CHAMBER_THUMB_BOX[c])
                 ex = (bx + 1.4 + j * (bw / 2 - 0.6), bx + 1.4 + j * (bw / 2 - 0.6) + bw / 2 - 2.2)
                 if im is not None:
-                    ax.imshow(im, extent=(ex[0], ex[1], icy - 6.5, icy + 3.8), zorder=3, interpolation="lanczos")
+                    hh = (ex[1] - ex[0]) * im.shape[0] / im.shape[1]
+                    ax.imshow(im, extent=(ex[0], ex[1], icy - hh / 2 - 1.0, icy + hh / 2 - 1.0), zorder=3,
+                              interpolation="lanczos")
                 else:
                     icon_pores(ax, (ex[0] + ex[1]) / 2, icy, 4.5)
-                ax.text((ex[0] + ex[1]) / 2, icy + 5.2, nm, ha="center", fontsize=11.5, fontweight="bold",
-                        color=A_COL if nm == "mild" else B_COL)
+                ax.text((ex[0] + ex[1]) / 2, icy + 5.4, f"{c} · {chain[c]['temperature_c']:.0f} °C", ha="center",
+                        fontsize=11.5, fontweight="bold", color=A_COL if c == "A" else "#d4660a")
             ax.set_xlim(0, W)
             ax.set_ylim(0, H)
         else:
             st["icon"](ax, icx, icy, 6.0)
-        wrapped = textwrap.fill(st["out"], 27)
-        ax.text(bx + 1.8, y0 + 23.5, wrapped, fontsize=12, color=INK, va="top", linespacing=1.3)
-        for j, n in enumerate(st["nums"]):
-            ph = st.get("placeholder")
-            yy = (y0 + 9.6 - j * 6.2) if ph else (y0 + 6.6 - j * 3.4)
-            ax.text(bx + bw / 2, yy, textwrap.fill(n, 30) if ph else n, ha="center", va="center",
-                    fontsize=10 if ph else 11.5, fontweight="bold", linespacing=1.15,
-                    color="#8a6d00" if ph else INK, family=FONT,
-                    bbox={"boxstyle": "round,pad=0.25", "fc": "#fff6cc", "ec": "#e0c25a", "lw": 1} if ph else None)
+        ax.text(bx + 1.8, y0 + 24.0, textwrap.fill(st["out"], 27), fontsize=12, color=INK, va="top",
+                linespacing=1.3)
+        n = len(st["nums"])
+        dy = 3.4 if n <= 2 else 2.9
+        top = y0 + 3.2 + dy * (n - 1) + (0.0 if n <= 2 else 0.4)
+        for j, txt in enumerate(st["nums"]):
+            ax.text(bx + bw / 2, top - j * dy, txt, ha="center", va="center", fontsize=st.get("num_size", 11.5),
+                    fontweight="bold", color=MUTED if (n > 2 and j == 0) else INK)
         if i < len(stages) - 1:
-            ay = y0 + 35.5
-            arrow(ax, (bx + bw + 0.5, ay), (bx + bw + gap - 0.5, ay), color=INK if i else GREEN, lw=3, head=20)
+            arrow(ax, (bx + bw + 0.5, icy), (bx + bw + gap - 0.5, icy), color=INK if i else GREEN, lw=3, head=20)
 
-    # callout: ALCHEMI informs acid chemistry only
+    # callout: ALCHEMI constrains the acid chemistry only
     bx1 = x0 + bw / 2
     bx2 = x0 + bw + gap + bw / 2
     yb = y0 + bh + 2.0
+    p0, p1 = al["potency"]
     ax.plot([bx1, bx1, bx2, bx2], [yb - 0.8, yb + 0.8, yb + 0.8, yb - 0.8], color=GREEN, lw=2)
-    ax.text((bx1 + bx2) / 2 + 17.5, yb + 0.8,
-            "informs only the acid-chemistry terms (small, bounded nudge) — ALCHEMI does not predict bread",
+    ax.text(bx2 + 1.5, yb + 0.8,
+            f"constrains the acid chemistry (potency {p0:.2f} → {p1:.3f}, pH Δ < {max(0.01, al['max_dph']):.2f})"
+            " — does not drive the bread",
             fontsize=12, color=GREEN, fontweight="bold", va="center", ha="left",
             bbox={"boxstyle": "round,pad=0.3", "fc": "white", "ec": "none"})
-    ax.text(3, 3.2, "Crumb mapping is a stated hypothesis: sourness does not by itself determine crumb structure.   "
-                    "Yellow = awaiting final GPU numbers.", fontsize=10.5, color=MUTED, va="center")
+    ax.text(3, 7.6, "ALCHEMI provenance — " + al["provenance"], fontsize=10.3, color=MUTED, va="center")
+    l6, a6 = al["deprot_n6"]
+    ip = ", ".join(f"{k[0].split('_')[0]} n={k[1]} ({v:+.1f})" for k, v in al["ion_pair_n6"].items())
+    ax.text(3, 4.7, f"Deprotonation order flips at n=6 ({l6:.1f} vs {a6:.1f}), within the conformer spread.  "
+                    f"Contact ion pair survives only for {ip} kcal/mol.  0 K cluster energetics, not solution pKa.",
+            fontsize=10.3, color=MUTED, va="center")
+    ax.text(3, 1.8, "Crumb mapping is a stated hypothesis (kinetics do not uniquely determine crumb).  Baseline presets, "
+                    f"not simulation-derived: mild {100 * base['mild']['cut_face_pore_area_fraction']:.1f} % / "
+                    f"{base['mild']['cut_face_pore_count']} pores, sour "
+                    f"{100 * base['sour']['cut_face_pore_area_fraction']:.0f} % / {base['sour']['cut_face_pore_count']} pores.",
+            fontsize=10.3, color=MUTED, va="center")
     return save(fig, "evidence_pipeline")
 
 
@@ -797,12 +858,87 @@ def fig_agents_exchange():
     return save(fig, "agents_exchange")
 
 
+# ============================================================================================
+# 6. In-silico benchmark summary
+# ============================================================================================
+def benchmark_numbers(variant: str = "well_specified") -> dict:
+    summ = json.loads((BENCH / "summary.json").read_text())
+    pf = summ["variants"][variant]["paired_final"]
+    df = pd.read_csv(BENCH / "benchmark_results.csv")
+    last = df[(df.variant == variant) & (df["round"] == df["round"].max())]
+    g = last.groupby(["selector", "mode"])[["within_round_dup_cum", "peer_changed_cum"]].mean()
+    return {
+        "n_worlds": summ["variants"][variant]["n_worlds"],
+        "n_rounds": summ["config"]["n_rounds"],
+        "changed": g.loc[("agent", "collaborative"), "peer_changed_cum"],
+        "dup_ind": g.loc[("agent", "independent"), "within_round_dup_cum"],
+        "dup_col": g.loc[("agent", "collaborative"), "within_round_dup_cum"],
+        "info": {s: pf[s]["pooled_info_gain_nats"] for s in ("agent", "info")},
+        "regret": pf["agent"]["agent_regret"],
+    }
+
+
+def fig_benchmark_summary():
+    b = benchmark_numbers()
+    n = b["n_worlds"]
+    fig, ax = canvas()
+    ax.text(3, 86.5, "In simulation, agents that talk choose differently — gains are modest", fontsize=21,
+            fontweight="bold", color=INK, va="top")
+    ax.text(3, 81.2, f"{n} simulated worlds · 8-experiment budget · collaborative vs independent agents, "
+                     "deployed offline policy unless noted", fontsize=13, color=MUTED, va="top")
+    badge(ax, 157, 86.0, "simulated", size=13, ha="right", va="top", text="IN-SILICO BENCHMARK")
+
+    ri = b["regret"]
+    tiles = [
+        (f"{b['changed']:.1f} / {b['n_rounds']}", "rounds where the peer changed\nits choice after reading the proposal"),
+        (f"{b['dup_ind']:.1f} → {b['dup_col']:.0f}", "same-round duplicate\nexperiments per world"),
+        (f"+{b['info']['agent']['mean']:.2f} nats", (f"more information from the same\n8 experiments "
+                                                    f"({b['info']['agent']['n_pos']}/{n} worlds)")),
+        ("no change", f"in the final recommendation\n(regret Δ {_m(ri['mean'], 3)}, CI spans 0)"),
+    ]
+    tw, tg, ty, th = 36.5, 3.0, 52.0, 23.0
+    for i, (big, small) in enumerate(tiles):
+        x = 3 + i * (tw + tg)
+        rbox(ax, x, ty, tw, th, fc=PANEL, ec="none", r=1.8)
+        ax.text(x + 2.4, ty + th - 7.0, big, fontsize=30, fontweight="bold", color=INK if i < 3 else MUTED,
+                va="center")
+        ax.text(x + 2.4, ty + 7.0, small, fontsize=13, color=MUTED, va="center", linespacing=1.3)
+
+    # paired difference, pooled information (collaborative − independent), with 95 % CI
+    pax = fig.add_axes((0.30, 0.15, 0.52, 0.29))
+    rows = [("info", "info-aware selector\n(benchmark only)"), ("agent", "deployed policy\n(used in the demo)")]
+    for k, (sel, _lab) in enumerate(rows):
+        r = b["info"][sel]
+        pax.plot([r["lo"], r["hi"]], [k, k], color=INK, lw=3.2, solid_capstyle="round")
+        pax.plot([r["mean"]], [k], "o", ms=13, color=INK, mec="white", mew=2.5, zorder=3)
+        pax.text(max(r["hi"], 0.0) + 0.05, k, f"{r['mean']:+.2f}  [{r['lo']:+.2f}, {r['hi']:+.2f}]".replace("-", "−"),
+                 fontsize=13, va="center", color=INK, fontweight="bold")
+    pax.axvline(0, color=FAINT, lw=1.6, ls=(0, (4, 3)))
+    pax.set_yticks([0, 1], [lab for _, lab in rows], fontsize=13, color=INK)
+    pax.set_ylim(-0.6, 1.6)
+    pax.set_xlim(-0.45, 1.55)
+    pax.tick_params(axis="x", labelsize=12, colors=MUTED, length=0)
+    pax.tick_params(axis="y", length=0)
+    for sp in ("top", "right", "left"):
+        pax.spines[sp].set_visible(False)
+    pax.spines["bottom"].set_color(FAINT)
+    pax.set_xlabel("extra information from the same budget (nats), talking − independent · 95 % CI", fontsize=12.5,
+                   color=MUTED)
+    pax.text(-0.02, 1.62, "← independent better", fontsize=11, color=MUTED, ha="right", va="bottom")
+    pax.text(0.02, 1.62, "talking better →", fontsize=11, color=MUTED, ha="left", va="bottom")
+    ax.text(3, 2.8, "Simulator plays nature; no dough, sensor or judge involved. Most of the agents' own-model gain "
+                    "comes from sharing data, not smarter choices. Source: docs/benchmark_results.md.",
+            fontsize=10.5, color=MUTED, va="center")
+    return save(fig, "benchmark_summary")
+
+
 FIGURES = {
     "closed_loop": fig_closed_loop,
     "evidence_pipeline": fig_evidence_pipeline,
     "architecture": fig_architecture,
     "results_ab": fig_results_ab,
     "agents_exchange": fig_agents_exchange,
+    "benchmark_summary": fig_benchmark_summary,
 }
 
 
