@@ -9,7 +9,7 @@ number on a figure is read from the data files at build time.
 - about 15 visible words per figure or fewer;
 - names of 2 words or fewer;
 - one number per tile;
-- one-word badges (REAL / SIMULATED / EXAMPLE);
+- one-word badges (MEASURED / COMPUTED / MODELED / EXAMPLE);
 - no sentences, footers or sources, all of which live in `docs/pitch/slides.md`;
 - text of at least 22 pt on the 16 × 9 in canvas, so at least ~37 px when a figure spans 1920 px.
 
@@ -18,12 +18,13 @@ matplotlib.
 
 | Figure | Slide | Visible text (words, incl. tick labels) | Data it reads |
 |---|---|---|---|
-| `closed_loop` | 1 | Bake · Taste · Parse · Compare · Debate · Publish · Ferment · Recalibrate, plus the centre "Taste → next experiment" (13). Ring colours: green physical, purple simulated, slate AI, crimson human | none (conceptual) |
-| `evidence_pipeline` | 2 | NVIDIA ALCHEMI / Kinetics model / Crumb map / Printed specimens / Loaf photos, with badges REAL / SIMULATED ×3 / REAL (dashed = after bake), "acid terms only", and A / B (21) | `data/stl/crumb_chamber_comparison.png` (specimen crops) |
-| `architecture` | 2 (backup) | optional · Brev GPU · Claude · Mac · no internet needed · Wi-Fi AP · Chamber A · iPad · Chamber B (18) | none |
-| `tech_highlights` | 3 | Three panels, about 25 words each or fewer. **NVIDIA ALCHEMI · REAL**, "which acid is stronger?": a pKa scale (◄ stronger acid · pKa · weaker acid ►, ticks 0–6) with experimental lactic and acetic as solid dots, GPU lactic (acetic exp + ΔpKa, n = 3/6/10) as hollow dots labelled "GPU, more water →", a "sourdough pH" band at 3.9–4.3, and tiles "1,066 runs" and "~$6". **Fermentation model · SIMULATED**: recipe, schedule, starter and acid terms (green arrow from NVIDIA) → ODE kinetics (yeast, bacteria, sugar, acids) → pH, lactic/acetic, CO₂ and rise, each with tiny A/B curves, plus overproof with A/B markers. **Formlabs PreForm API · REAL**: hero render (SIMULATED), the PreForm Clear V5 render, and tiles "2.4 h", "239 mL", "Clear V5" | `data/alchemi/analysis/c2_summary.json` (ΔpKa by n), experimental pKa 3.86 / 4.76 (`c2_summary.relative_pka_estimate.experiment_pka`), `data/alchemi/environment/report.md`; `data/predictions/chamber_{A,B}_prediction.csv`, `*_summary.json`; `data/stl/hero_chamber_AB.png`, `data/stl/print/clear_form4_build1_{manifest.json, iso.png}` |
-| `benchmark_summary` | 4 | SIMULATED + "3.9 / 4 choices changed", "3.1 → 0 duplicate experiments", "+0.68 nats more information", "same final pick" (17) | `data/benchmarks/summary.json`, `benchmark_results.csv` |
-| `results_ab` | 4 (backup) | SIMULATED, panel titles pH / Rise, line labels A / B, "B more acidic", "B overproofs ~3 h earlier", "hours" (17) | `data/predictions/chamber_{A,B}_{prediction,uncertainty}.csv`, `*_summary.json` |
+| `closed_loop` | 1 | Bake · Taste · Parse · Compare · Debate · Publish · Ferment · Recalibrate, plus the centre "Taste → next experiment" (13). Ring colours: dashed green = physical steps (MEASURED, pending), purple = MODELED, slate = AI agent, crimson = human | none (conceptual) |
+| `evidence_pipeline` | 2 | NVIDIA ALCHEMI / Kinetics model / Crumb map / Printed specimens / Loaf photos, with badges COMPUTED / MODELED ×3 / COMPUTED (dashed = after bake), "acid terms only", and A / B (21) | `data/stl/crumb_chamber_comparison.png` (specimen crops) |
+| `architecture` | 2 (backup) | Scientist A / Scientist B (agent bubbles) with the exchange "32 °C, then cool →", "← overproof risk: 24 °C", "trial 002 agreed"; NVIDIA ALCHEMI [COMPUTED] → "acid evidence" and Fermentation model [MODELED] → "forecasts", each feeding both agents; a judge icon → "judge feedback"; "new schedule" down to Chamber A · ESP32 / Chamber B · ESP32 (dashed = measured, pending; sensor, chef-hat and lock glyphs, "safety limits"); a thin "local backend" bar (42 words) | none (illustrative; the trial 002 schedules are from `data/demos/demo_04_master_plan_judge_script.json`) |
+| `dataflow` | Q&A (not in deck) | Left chain: NVIDIA ALCHEMI [COMPUTED] → "ΔpKa, hydration, H-bond" → Fermentation model [MODELED] (side: "recipe, schedule, starter →") → "pH, CO₂, rise, overproof" → Morphology map [MODELED] → "porosity, pore size, clustering" → Crumb generator [MODELED] → "STL" → PreForm API [COMPUTED] → ".form" → Form 4 print (dashed). Right, the physical loop (dashed green, MEASURED · pending): Judges taste → "free text" → Agents A/B → "new schedule" → model; Chambers A/B → "temp, RH, gas, height" → recalibrate the model; Bake → Photo analysis → "porosity, pore size" ↔ compare with the morphology map (58 words, of which 9 are badge words) | none |
+| `tech_highlights` | 3 | Three panels, about 25 words each or fewer. **NVIDIA ALCHEMI · COMPUTED**, "which acid is stronger?": a pKa scale (◄ stronger acid · pKa · weaker acid ►, ticks 0–6) with experimental lactic and acetic as solid dots, GPU lactic (acetic exp + ΔpKa, n = 3/6/10) as hollow dots labelled "GPU, more water →", a "sourdough pH" band at 3.9–4.3, and tiles "1,066 runs" and "~$6". **Fermentation model · MODELED**: recipe, schedule, starter and acid terms (green arrow from NVIDIA) → ODE kinetics (yeast, bacteria, sugar, acids) → pH, lactic/acetic, CO₂ and rise, each with tiny A/B curves, plus overproof with A/B markers. **Formlabs PreForm API · COMPUTED**: hero render (MODELED), the PreForm Clear V5 render, and tiles "2.4 h", "239 mL", "Clear V5" | `data/alchemi/analysis/c2_summary.json` (ΔpKa by n), experimental pKa 3.86 / 4.76 (`c2_summary.relative_pka_estimate.experiment_pka`), `data/alchemi/environment/report.md`; `data/predictions/chamber_{A,B}_prediction.csv`, `*_summary.json`; `data/stl/hero_chamber_AB.png`, `data/stl/print/clear_form4_build1_{manifest.json, iso.png}` |
+| `benchmark_summary` | 4 | MODELED + "3.9 / 4 choices changed", "3.1 → 0 duplicate experiments", "+0.68 nats more information", "same final pick" (17) | `data/benchmarks/summary.json`, `benchmark_results.csv` |
+| `results_ab` | 4 (backup) | MODELED, panel titles pH / Rise, line labels A / B, "B more acidic", "B overproofs ~3 h earlier", "hours" (17) | `data/predictions/chamber_{A,B}_{prediction,uncertainty}.csv`, `*_summary.json` |
 | `agents_exchange` | Q&A | EXAMPLE, "A proposes" / "B critiques" / "Agreed", "27 °C", "27 → 22 °C", A / B, with mini schedules (13) | none (illustrative; numbers from `docs/scientific_assumptions.md` §5) |
 
 ## What the figures no longer say
@@ -44,9 +45,9 @@ These are in `docs/pitch/slides.md`, either in the speaker notes or in the numbe
 - Chamber A is `#1f77b4` (blue) and Chamber B is `#ff7f0e` (orange), with direct text labels on every
   orange mark.
 - Badges are defined once, in `BADGES` in the script:
-  - REAL / PHYSICAL is green.
-  - SIMULATED is purple.
+  - MEASURED is green (physical world). It is drawn dashed or hollow as "MEASURED · pending" while nothing is measured.
+  - COMPUTED is teal `#00897b` (a calculation that ran, with logs: ALCHEMI, PreForm).
+  - MODELED is purple (our own model: forecasts, crumb geometry, benchmark).
   - EXAMPLE is grey.
   - AI is slate.
   - HUMAN is crimson.
-  - A dashed, hollow badge means real but not yet collected.

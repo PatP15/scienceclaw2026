@@ -819,7 +819,7 @@ C 292.851878 142.833525 287.086234 156.753022 287.086234 171.264935
 C 287.086234 185.776849 292.851878 199.696346 303.113351 209.957818 
 C 313.374824 220.219291 327.29432 225.984935 341.806234 225.984935 
 z
-" clip-path="url(#p1f4ea97d91)" style="fill: #ffffff; stroke: #2ca02c; stroke-width: 4; stroke-linejoin: miter"/>
+" clip-path="url(#p1f4ea97d91)" style="fill: #ffffff; stroke-dasharray: 16,10; stroke-dashoffset: 0; stroke: #2ca02c; stroke-width: 4; stroke-linejoin: miter"/>
    </g>
    <g id="text_1">
     <!-- Bake -->
@@ -1300,7 +1300,7 @@ C 527.045644 511.568589 521.28 525.488086 521.28 540
 C 521.28 554.511914 527.045644 568.431411 537.307117 578.692883 
 C 547.568589 588.954356 561.488086 594.72 576 594.72 
 z
-" clip-path="url(#p1f4ea97d91)" style="fill: #ffffff; stroke: #2ca02c; stroke-width: 4; stroke-linejoin: miter"/>
+" clip-path="url(#p1f4ea97d91)" style="fill: #ffffff; stroke-dasharray: 16,10; stroke-dashoffset: 0; stroke: #2ca02c; stroke-width: 4; stroke-linejoin: miter"/>
    </g>
    <g id="text_6">
     <!-- Publish -->
@@ -1392,7 +1392,7 @@ C 292.851878 448.303654 287.086234 462.223151 287.086234 476.735065
 C 287.086234 491.246978 292.851878 505.166475 303.113351 515.427948 
 C 313.374824 525.68942 327.29432 531.455065 341.806234 531.455065 
 z
-" clip-path="url(#p1f4ea97d91)" style="fill: #ffffff; stroke: #2ca02c; stroke-width: 4; stroke-linejoin: miter"/>
+" clip-path="url(#p1f4ea97d91)" style="fill: #ffffff; stroke-dasharray: 16,10; stroke-dashoffset: 0; stroke: #2ca02c; stroke-width: 4; stroke-linejoin: miter"/>
    </g>
    <g id="text_7">
     <!-- Ferment -->

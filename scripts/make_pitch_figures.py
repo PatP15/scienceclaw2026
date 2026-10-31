@@ -53,8 +53,9 @@ BENCH = ROOT / "data" / "benchmarks"
 # --------------------------------------------------------------------------------------------
 A_COL = "#1f77b4"  # Chamber A (matches existing charts' hue family)
 B_COL = "#ff7f0e"  # Chamber B
-GREEN = "#2ca02c"  # real / physical
-PURPLE = "#9467bd"  # simulated
+GREEN = "#2ca02c"  # MEASURED: from the physical world (sensors, loaf photos, tasting)
+TEAL = "#00897b"  # COMPUTED: a calculation that actually ran, with logs (ALCHEMI, PreForm)
+PURPLE = "#9467bd"  # MODELED: our own process model (forecasts, crumb geometry, benchmark)
 GREY = "#7f7f7f"  # replay / example
 SLATE = "#37474f"  # AI agent step
 HUMAN = "#c2185b"  # the judge
@@ -67,10 +68,10 @@ PANEL = "#f6f6f3"
 
 BADGES = {
     # key: (label, colour)
-    "real": ("REAL", GREEN),
-    "real_gpu": ("REAL · GPU", GREEN),
-    "real_pending": ("REAL · AFTER BAKE", GREEN),
-    "simulated": ("SIMULATED", PURPLE),
+    "measured": ("MEASURED", GREEN),
+    "measured_pending": ("MEASURED · pending", GREEN),  # drawn hollow + dashed: nothing measured yet
+    "computed": ("COMPUTED", TEAL),
+    "modeled": ("MODELED", PURPLE),
     "replay": ("REPLAY", GREY),
     "example": ("EXAMPLE", GREY),
     "physical": ("PHYSICAL", GREEN),
@@ -120,7 +121,7 @@ def save(fig, name: str, svg: bool = True) -> list[Path]:
 def badge(ax, x, y, kind, size=10.5, ha="center", va="center", hollow=False, text=None, zorder=6):
     label, col = BADGES[kind]
     label = text or label
-    hollow = hollow or kind == "real_pending"
+    hollow = hollow or kind == "measured_pending"
     ax.text(
         x, y, label, ha=ha, va=va, fontsize=size, fontweight="bold",
         color=col if hollow else "white", zorder=zorder,
@@ -232,7 +233,7 @@ def icon_fit(ax, cx, cy, s):
             zorder=4)
 
 
-def icon_gpu(ax, cx, cy, s, color=GREEN):
+def icon_gpu(ax, cx, cy, s, color=TEAL):
     rbox(ax, cx - 0.65 * s, cy - 0.65 * s, 1.3 * s, 1.3 * s, fc=INK, ec=INK, lw=1, r=0.12 * s, zorder=4)
     for k in np.linspace(-0.45, 0.45, 4):
         for (x0, y0, x1, y1) in ((cx + k * s, cy + 0.65 * s, cx + k * s, cy + 0.9 * s),
@@ -464,9 +465,9 @@ def fig_closed_loop():
     cx, cy, rx, ry, r = 80.0, 45.0, 46.0, 30.0, 7.6
     nodes = [
         (135, "physical", "Bake", icon_loaf), (90, "human", "Taste", icon_person),
-        (45, "ai", "Parse", icon_sliders), (0, "simulated", "Compare", icon_bars),
+        (45, "ai", "Parse", icon_sliders), (0, "modeled", "Compare", icon_bars),
         (-45, "ai", "Debate", icon_chat), (-90, "physical", "Publish", icon_chefhat),
-        (-135, "physical", "Ferment", icon_chamber), (180, "simulated", "Recalibrate", icon_fit),
+        (-135, "physical", "Ferment", icon_chamber), (180, "modeled", "Recalibrate", icon_fit),
     ]
     pos = [(cx + rx * np.cos(np.deg2rad(a)), cy + ry * np.sin(np.deg2rad(a))) for a, *_ in nodes]
     rad = [r + (1.8 if k == "human" else 0.0) for _, k, *_ in nodes]
@@ -490,7 +491,8 @@ def fig_closed_loop():
         col = BADGES[kind][1]
         if kind == "human":
             ax.add_patch(Circle((x, y), rr + 1.4, fc="#fbe3ec", ec="none", zorder=2))
-        ax.add_patch(Circle((x, y), rr, fc="white", ec=col, lw=6 if kind == "human" else 4, zorder=3))
+        ax.add_patch(Circle((x, y), rr, fc="white", ec=col, lw=6 if kind == "human" else 4, zorder=3,
+                            ls=(0, (4, 2.5)) if kind == "physical" else "-"))  # dashed green = measured, pending
         icon(ax, x, y + 0.3, rr * 0.62)
         dx, dy, ha, va = place[ang]
         ax.text(x + dx * (rr + 1.8), y + dy * (rr + 1.6), name, ha=ha, va=va, fontsize=LBL, fontweight="bold",
@@ -502,14 +504,15 @@ def fig_closed_loop():
 def fig_evidence_pipeline():
     fig, ax = canvas()
     bw, gap, x0, y0, bh = 28.0, 4.0, 2.0, 14.0, 54.0
-    stages = [("NVIDIA\nALCHEMI", "real", "REAL", "alchemi"), ("Kinetics\nmodel", "simulated", "SIMULATED", icon_curves),
-              ("Crumb\nmap", "simulated", "SIMULATED", icon_pores),
-              ("Printed\nspecimens", "simulated", "SIMULATED", "stl"), ("Loaf\nphotos", "real_pending", "REAL", icon_camera)]
+    stages = [("NVIDIA\nALCHEMI", "computed", "COMPUTED", "alchemi"),
+              ("Kinetics\nmodel", "modeled", "MODELED", icon_curves), ("Crumb\nmap", "modeled", "MODELED", icon_pores),
+              ("Printed\nspecimens", "modeled", "MODELED", "stl"),
+              ("Loaf\nphotos", "measured_pending", "MEASURED", icon_camera)]
     icy = y0 + 16.0
     for i, (name, kind, word, icon) in enumerate(stages):
         bx = x0 + i * (bw + gap)
         col = BADGES[kind][1]
-        pend = kind == "real_pending"
+        pend = kind == "measured_pending"
         rbox(ax, bx, y0, bw, bh, fc="white", ec=col, lw=3, r=2.0, ls="--" if pend else "-")
         ax.text(bx + bw / 2, y0 + bh - 3.0, name, ha="center", va="top", fontsize=LBL, fontweight="bold", color=INK,
                 linespacing=1.1)
@@ -528,51 +531,154 @@ def fig_evidence_pipeline():
         else:
             icon(ax, bx + bw / 2, icy, 8.5)
         if i < len(stages) - 1:
-            arrow(ax, (bx + bw + 0.4, icy), (bx + bw + gap - 0.4, icy), color=GREEN if i == 0 else INK, lw=4, head=24)
+            arrow(ax, (bx + bw + 0.4, icy), (bx + bw + gap - 0.4, icy), color=TEAL if i == 0 else INK, lw=4, head=24)
     # ALCHEMI informs only the acid terms of the kinetics model
     bx1, bx2, yb = x0 + bw / 2, x0 + bw + gap + bw / 2, y0 + bh + 2.6
-    ax.plot([bx1, bx1, bx2, bx2], [yb - 1.0, yb + 1.0, yb + 1.0, yb - 1.0], color=GREEN, lw=3)
-    ax.text(bx2 + 2.0, yb + 1.0, "acid terms only", fontsize=LBL, color=GREEN, fontweight="bold", va="center")
+    ax.plot([bx1, bx1, bx2, bx2], [yb - 1.0, yb + 1.0, yb + 1.0, yb - 1.0], color=TEAL, lw=3)
+    ax.text(bx2 + 2.0, yb + 1.0, "acid terms only", fontsize=LBL, color=TEAL, fontweight="bold", va="center")
     return save(fig, "evidence_pipeline")
 
 
+def icon_lock(ax, cx, cy, s, color=INK):
+    """Padlock: firmware safety limits."""
+    ax.add_patch(matplotlib.patches.Arc((cx, cy + 0.35 * s), 0.9 * s, 1.1 * s, theta1=0, theta2=180, color=color,
+                                        lw=2.6, zorder=5))
+    ax.plot([cx - 0.45 * s, cx - 0.45 * s], [cy + 0.35 * s, cy + 0.1 * s], color=color, lw=2.6, zorder=5)
+    ax.plot([cx + 0.45 * s, cx + 0.45 * s], [cy + 0.35 * s, cy + 0.1 * s], color=color, lw=2.6, zorder=5)
+    rbox(ax, cx - 0.7 * s, cy - 0.6 * s, 1.4 * s, 0.75 * s, fc=color, ec=color, r=0.12 * s, zorder=6)
+
+
 def fig_architecture():
+    """Two scientist agents, one per chamber, debating; fed by ALCHEMI + the model and by judge feedback."""
     fig, ax = canvas()
-    yb = 61.0
-    ax.add_patch(Rectangle((0, yb), W, H - yb, fc="#f3f1fa", ec="none", zorder=0))
-    ax.plot([0, W], [yb, yb], color=FAINT, lw=2, ls=(0, (6, 4)))
-    ax.text(3, H - 3.0, "optional", fontsize=SMALL, fontweight="bold", color=MUTED, va="top")
-
-    def named_box(x, y, w, h, name, ec, icon, ls="-", size=LBL, fc="white"):
-        rbox(ax, x, y, w, h, fc=fc, ec=ec, lw=3, ls=ls, r=2.0, zorder=2)
-        icon(ax, x + 7.0, y + h / 2, min(4.2, h / 3.2))
-        ax.text(x + 13.5, y + h / 2, name, fontsize=size, fontweight="bold", color=INK, va="center", zorder=4)
-
-    named_box(22, 66, 40, 16, "Brev GPU", PURPLE, lambda a, x, y, s: icon_gpu(a, x, y, s * 0.9), ls=(0, (5, 3)))
-    named_box(98, 66, 40, 16, "Claude", SLATE, lambda a, x, y, s: icon_chat(a, x, y, s * 1.1), ls=(0, (5, 3)))
-    mx, my, mw, mh = 62, 36, 36, 18
-    named_box(mx, my, mw, mh, "Mac", INK, icon_laptop, size=34, fc="#eef4fa")
-    for x_cloud, col in ((42, PURPLE), (118, SLATE)):
-        ax.add_patch(FancyArrowPatch((x_cloud, 65.6), (mx + (8 if x_cloud < 80 else mw - 8), my + mh + 0.4),
-                                     arrowstyle="<|-|>,head_length=0.9,head_width=0.5", mutation_scale=20,
-                                     color=col, lw=2.6, ls=(0, (5, 3)), zorder=1, shrinkA=0, shrinkB=0))
-    rbox(ax, 3, 35, 44, 22, fc=GREEN, ec=GREEN, r=2.2, zorder=3)
-    ax.text(25, 46, "no internet\nneeded", fontsize=34, fontweight="bold", color="white", ha="center", va="center",
-            zorder=4, linespacing=1.15)
-    apx, apy = 80, 26.5
-    ax.plot([apx, apx], [my, apy + 3.5], color=INK, lw=3, zorder=1)
-    rbox(ax, apx - 12, apy - 3.5, 24, 7.0, fc="white", ec=GREEN, lw=3, r=1.6, zorder=2)
-    icon_router(ax, apx - 7.0, apy - 0.4, 2.4)
-    ax.text(apx + 3.5, apy, "Wi-Fi AP", fontsize=SMALL, fontweight="bold", color=INK, ha="center", va="center",
-            zorder=4)
-    dy, dh = 3.0, 13.5
-    for x, w, name, col, icon in ((4, 44, "Chamber A", A_COL, icon_chamber), (60, 40, "iPad", HUMAN, icon_tablet),
-                                  (112, 44, "Chamber B", B_COL, icon_chamber)):
-        rbox(ax, x, dy, w, dh, fc="white", ec=col, lw=3.5, r=2.0, zorder=2)
-        icon(ax, x + 7.0, dy + dh / 2, 4.0)
-        ax.text(x + 14.0, dy + dh / 2, name, fontsize=LBL, fontweight="bold", color=INK, va="center", zorder=4)
-        ax.plot([apx, x + w / 2], [apy - 3.5, dy + dh], color=INK, lw=3, zorder=1)
+    # evidence sources (top corners) and the judge (top centre)
+    for x, name, kind, word, icon in ((3, "NVIDIA ALCHEMI", "computed", "COMPUTED", lambda a, cx, cy: icon_gpu(a, cx, cy, 3.4)),
+                                      (98, "Fermentation model", "modeled", "MODELED",
+                                       lambda a, cx, cy: icon_curves(a, cx, cy, 3.6))):
+        col = BADGES[kind][1]
+        rbox(ax, x, 74.0, 59.0, 14.0, fc="white", ec=col, lw=3, r=2.0, zorder=2)
+        icon(ax, x + 6.5, 81.0)
+        ax.text(x + 12.5, 84.0, name, fontsize=LBL, fontweight="bold", color=INK, va="center", zorder=4)
+        _b(ax, x + 12.5, 77.6, word, kind, ha="left")
+    icon_person(ax, 80.0, 83.0, 4.2)
+    # buses: ALCHEMI (teal) and the model (purple) each feed BOTH agents
+    for src_x, y_bus, col, lab, lab_x, ha, drops in ((29.0, 69.0, TEAL, "acid evidence", 31.0, "left", (26.0, 122.0)),
+                                                       (131.0, 65.0, PURPLE, "forecasts", 133.0, "left", (38.0, 134.0))):
+        ax.plot([src_x, src_x], [74.0, y_bus], color=col, lw=3.5, zorder=1)
+        ax.plot([drops[0], drops[1]], [y_bus, y_bus], color=col, lw=3.5, zorder=1)
+        for dx in drops:
+            arrow(ax, (dx, y_bus), (dx, 58.6), color=col, lw=3.5, head=18, zorder=1)
+        ax.text(lab_x, y_bus + (0.9 if col == TEAL else 4.5), lab, fontsize=SMALL, fontweight="bold", color=col, ha=ha,
+                va="bottom")
+    arrow(ax, (80.0, 77.0), (80.0, 57.2), color=HUMAN, lw=3.5, head=20, zorder=1)
+    ax.text(81.5, 72.0, "judge feedback", fontsize=SMALL, fontweight="bold", color=HUMAN, ha="left", va="center")
+    # the two scientist agents (speech-bubble style)
+    for x, name, col, tail in ((6, "Scientist A", A_COL, 1), (104, "Scientist B", B_COL, -1)):
+        rbox(ax, x, 46.0, 50.0, 12.5, fc=col, ec=col, r=3.0, zorder=3)
+        tx = x + 50.0 if tail > 0 else x
+        ax.add_patch(Polygon([(tx, 50.0), (tx + tail * 3.2, 47.5), (tx, 54.0)], fc=col, ec=col, zorder=3))
+        ax.text(x + 25.0, 52.25, name, fontsize=30, fontweight="bold", color="white", ha="center", va="center",
+                zorder=4)
+    # the exchange between them
+    bubbles = [("32 °C, then cool →", "#e3eef8", A_COL, 54.0), ("← overproof risk: 24 °C", "#fde9d8", "#d4660a", 47.0),
+               ("trial 002 agreed", INK, "white", 40.0)]
+    for text, fc, tc, by in bubbles:
+        rbox(ax, 58.5, by - 2.8, 43.0, 5.6, fc=fc, ec="none", r=2.4, zorder=3)
+        ax.text(80.0, by, text, fontsize=SMALL, fontweight="bold", color=tc, ha="center", va="center", zorder=4)
+    # thin local backend bar
+    rbox(ax, 3, 31.0, 154.0, 4.2, fc=PANEL, ec=LINE, lw=1.5, r=1.2, zorder=0)
+    ax.text(80.0, 33.1, "local backend", fontsize=SMALL, color=MUTED, ha="center", va="center", zorder=1)
+    # each agent sends its own chamber a new schedule; firmware clamps it
+    for ax_x, lab_x, ha in ((31.0, 32.5, "left"), (129.0, 127.5, "right")):
+        arrow(ax, (ax_x, 46.0), (ax_x, 24.6), color=INK, lw=3.5, head=20, zorder=2)
+        ax.text(lab_x, 39.5, "new schedule", fontsize=SMALL, fontweight="bold", color=INK, ha=ha, va="center")
+    for x, name, col, (cx_, hx_, lx_) in ((6, "Chamber A · ESP32", A_COL, (12.0, 27.0, 44.0)),
+                                          (104, "Chamber B · ESP32", B_COL, (38.0, 23.0, 6.0))):
+        rbox(ax, x, 3.0, 50.0, 21.0, fc="white", ec=col, lw=3.5, ls=(0, (5, 3)), r=2.0, zorder=2)
+        ax.text(x + 25.0, 19.5, name, fontsize=LBL, fontweight="bold", color=INK, ha="center", va="center", zorder=4)
+        icon_chamber(ax, x + cx_, 9.5, 4.6)
+        icon_chefhat(ax, x + hx_, 9.5, 4.0)
+        icon_lock(ax, x + lx_, 9.0, 3.6, color=INK)
+    ax.plot([52.5, 107.5], [9.0, 9.0], color=FAINT, lw=1.6, ls=(0, (2, 3)), zorder=1)
+    ax.text(80.0, 10.4, "safety limits", fontsize=SMALL, fontweight="bold", color=INK, ha="center", va="bottom")
     return save(fig, "architecture")
+
+
+def fig_dataflow():
+    """What passes between the boxes: modeled/computed chain (left) and the physical loop (right)."""
+    fig, ax = canvas()
+    bh, gap, lx, lw_, rx, rw = 10.5, 4.6, 36.0, 44.0, 122.0, 35.0
+    tops = [89.0 - k * (bh + gap) for k in range(6)]  # box tops, row k
+    mid = [t - bh / 2 for t in tops]
+
+    def box(x, w, row, name, kind=None, word=None, ec=INK, ls="-"):
+        y0 = tops[row] - bh
+        rbox(ax, x, y0, w, bh, fc="white", ec=BADGES[kind][1] if kind else ec, lw=3, ls=ls, r=1.8, zorder=2)
+        if word:
+            ax.text(x + 2.0, y0 + bh - 3.4, name, fontsize=LBL, fontweight="bold", color=INK, va="center", zorder=4)
+            _b(ax, x + 2.0, y0 + 3.0, word, kind, size=18, ha="left")
+        else:
+            ax.text(x + w / 2, y0 + bh / 2, name, fontsize=LBL, fontweight="bold", color=INK, ha="center",
+                    va="center", zorder=4)
+
+    def down(x, row, label, side="left"):
+        y0, y1 = tops[row] - bh - 0.2, tops[row + 1] + 0.2
+        arrow(ax, (x, y0), (x, y1), color=INK, lw=3, head=16, zorder=1)
+        if label:
+            if side == "left":
+                ax.text(x - 2.0, (y0 + y1) / 2, label, fontsize=SMALL, color=INK, ha="right", va="center")
+            else:
+                ax.text(x + 2.0, (y0 + y1) / 2, label, fontsize=SMALL, color=INK, ha="left", va="center")
+
+    # ---- left: computed / modeled chain
+    left = [("NVIDIA ALCHEMI", "computed", "COMPUTED"), ("Fermentation model", "modeled", "MODELED"),
+            ("Morphology map", "modeled", "MODELED"), ("Crumb generator", "modeled", "MODELED"),
+            ("PreForm API", "computed", "COMPUTED"), ("Form 4 print", None, None)]
+    for k, (name, kind, word) in enumerate(left):
+        box(lx, lw_, k, name, kind, word, ls=(0, (5, 3)) if kind is None else "-")
+    cxl = lx + lw_ / 2
+    for k, lab in enumerate(("ΔpKa, hydration, H-bond", "pH, CO₂, rise, overproof", "porosity, pore size, clustering",
+                             "STL", ".form")):
+        down(cxl, k, lab)
+    ax.text(lx - 1.5, mid[1], "recipe, schedule,\nstarter →", fontsize=SMALL, color=MUTED, ha="right", va="center",
+            linespacing=1.1)
+    # ---- right: the physical loop (dashed green = measured, pending)
+    right = ["Judges taste", "Agents A/B", None, "Chambers A/B", "Bake", "Photo analysis"]
+    for k, name in enumerate(right):
+        if name:
+            pend = name not in ("Agents A/B",)
+            box(rx, rw, k, name, ec=GREEN if pend else SLATE, ls=(0, (5, 3)) if pend else "-")
+    _b(ax, rx + rw, tops[2] - bh / 2, "MEASURED · pending", "measured_pending", size=20, ha="right")
+    cxr = rx + rw / 2
+    down(cxr, 0, "free text", side="right")
+    for k in (3, 4):
+        down(cxr, k, None)
+    # cross-links into the left chain
+    xr, xl = rx - 0.3, lx + lw_ + 0.3
+    arrow(ax, (xr, mid[1]), (xl, mid[1]), color=SLATE, lw=3, head=18)
+    ax.text((xr + xl) / 2, mid[1] + 1.0, "new schedule", fontsize=SMALL, fontweight="bold", color=SLATE,
+            ha="center", va="bottom")
+    # chambers -> model: sensor data, recalibrate (elbow up into the model box)
+    ex = xl + 16.0
+    ax.plot([xr, ex], [mid[3], mid[3]], color=GREEN, lw=3, ls=(0, (5, 3)), zorder=1)
+    ax.plot([ex, ex], [mid[3], mid[1] - 3.0], color=GREEN, lw=3, ls=(0, (5, 3)), zorder=1)
+    arrow(ax, (ex, mid[1] - 3.0), (xl, mid[1] - 3.0), color=GREEN, lw=3, head=18)
+    ax.text((xr + ex) / 2, mid[3] + 1.0, "temp, RH,\ngas, height", fontsize=SMALL, fontweight="bold",
+            color=GREEN, ha="center", va="bottom")
+    ax.text(ex + 1.5, (mid[3] + mid[1] - 3.0) / 2 + 2.0, "recalibrate", fontsize=SMALL, color=GREEN, ha="left",
+            va="center")
+    # photo analysis <-> morphology map output
+    ex2 = xl + 8.0
+    ax.plot([xr, ex2], [mid[5], mid[5]], color=GREEN, lw=3, ls=(0, (5, 3)), zorder=1)
+    ax.plot([ex2, ex2], [mid[5], mid[2] - 2.0], color=GREEN, lw=3, ls=(0, (5, 3)), zorder=1)
+    ax.add_patch(FancyArrowPatch((ex2, mid[2] - 2.0), (xl, mid[2] - 2.0), arrowstyle="<|-|>,head_length=0.8,head_width=0.45",
+                                 mutation_scale=18, color=GREEN, lw=3, zorder=2, shrinkA=0, shrinkB=0))
+    ax.text((xr + ex2) / 2 - 1.0, mid[5] + 1.0, "porosity, pore size", fontsize=SMALL, fontweight="bold",
+            color=GREEN, ha="center", va="bottom")
+    ax.text(ex2 + 1.5, (mid[5] + mid[2]) / 2, "compare", fontsize=SMALL, color=GREEN, ha="left", va="center")
+    return save(fig, "dataflow")
+
+
 
 
 def fig_results_ab():
@@ -581,7 +687,7 @@ def fig_results_ab():
     tmax = 18.0
     fig = plt.figure(figsize=(16, 9))
     axs = [fig.add_axes((0.075, 0.15, 0.40, 0.70)), fig.add_axes((0.575, 0.15, 0.40, 0.70))]
-    fig.text(0.975, 0.95, "SIMULATED", fontsize=SMALL, fontweight="bold", color="white", ha="right", va="center",
+    fig.text(0.975, 0.95, "MODELED", fontsize=SMALL, fontweight="bold", color="white", ha="right", va="center",
              bbox={"boxstyle": "round,pad=0.4,rounding_size=0.6", "fc": PURPLE, "ec": PURPLE})
     for ax, title in zip(axs, ("pH", "Rise")):
         ax.axvspan(12, 16, color="#ecebe6", zorder=0, lw=0)
@@ -656,7 +762,7 @@ def fig_agents_exchange():
 def fig_benchmark_summary():
     b = benchmark_numbers()
     fig, ax = canvas()
-    _b(ax, 157, 87.0, "SIMULATED", "simulated", ha="right", va="top")
+    _b(ax, 157, 87.0, "MODELED · in-silico", "modeled", ha="right", va="top")
     tiles = [(f"{b['changed']:.1f} / {b['n_rounds']}", "choices changed"),
              (f"{b['dup_ind']:.1f} → {b['dup_col']:.0f}", "duplicate experiments"),
              (f"+{b['info']['agent']['mean']:.2f} nats", "more information"),
@@ -711,12 +817,12 @@ def _acid_scale(ax, x0, x1, y, c2):
     # GPU: lactic = acetic(exp) + computed dpKa for n = 3, 6, 10, hollow markers walking toward experiment
     gpu = [PKA_EXP["acetic"] + v for n, v in c2["by_n"] if n in (3, 6, 10)]
     ax.add_patch(FancyArrowPatch((X(gpu[0]), y + 1.6), (X(PKA_EXP["lactic"]) - 1.6, y + 1.6),
-                                 arrowstyle="-|>,head_length=0.7,head_width=0.4", mutation_scale=18, color=GREEN,
+                                 arrowstyle="-|>,head_length=0.7,head_width=0.4", mutation_scale=18, color=TEAL,
                                  lw=2.2, alpha=0.55, zorder=3))
     for v in gpu:
-        ax.add_patch(Circle((X(v), y), 1.15, fc="white", ec=GREEN, lw=3, zorder=4))
+        ax.add_patch(Circle((X(v), y), 1.15, fc="white", ec=TEAL, lw=3, zorder=4))
     # row below the tick labels: what the hollow markers are, and the sourdough band
-    ax.text(x0, y - 7.6, "GPU, more water →", fontsize=SMALL, color=GREEN, fontweight="bold", ha="left", va="center")
+    ax.text(x0, y - 7.6, "GPU, more water →", fontsize=SMALL, color=TEAL, fontweight="bold", ha="left", va="center")
     ax.text((X(3.9) + X(4.3)) / 2 + 4.0, y - 7.6, "sourdough pH", fontsize=SMALL, color="#9a6a2c",
             fontweight="bold", ha="center", va="center")
 
@@ -740,26 +846,26 @@ def fig_tech_highlights():
     ty, th = 46.0, 42.0  # top row
     # ---------------- NVIDIA ALCHEMI
     x, w = 2.0, 68.0
-    rbox(ax, x, ty, w, th, fc="white", ec=GREEN, lw=3, r=2.2)
+    rbox(ax, x, ty, w, th, fc="white", ec=TEAL, lw=3, r=2.2)
     ax.text(x + 2.5, ty + th - 4.5, "NVIDIA ALCHEMI", fontsize=28, fontweight="bold", color=INK, va="center")
-    _b(ax, x + w - 2.5, ty + th - 4.5, "REAL", "real", ha="right")
+    _b(ax, x + w - 2.5, ty + th - 4.5, "COMPUTED", "computed", ha="right")
     ax.text(x + 2.5, ty + th - 10.0, "which acid is stronger?", fontsize=SMALL, color=MUTED, va="center")
     _acid_scale(ax, x + 3.0, x + w - 3.0, ty + 18.5, c2)
-    for k, big in enumerate((f"{c2['n_opt']:,} runs", f"~${c2['cost_usd']:.0f}")):
-        bw = (w - 7.5) / 2
-        bx = x + 2.5 + k * (bw + 2.5)
+    for k, big in enumerate((f"{c2['n_opt']:,} GPU runs",)):  # single tile; no cost on figures
+        bw = w - 5.0
+        bx = x + 2.5
         rbox(ax, bx, ty + 1.8, bw, 6.0, fc=PANEL, ec="none", r=1.4)
         ax.text(bx + bw / 2, ty + 4.8, big, fontsize=24, fontweight="bold", color=INK, ha="center", va="center")
     # ---------------- Fermentation model
     x, w = 73.0, 85.0
     rbox(ax, x, ty, w, th, fc="white", ec=PURPLE, lw=3, r=2.2)
     ax.text(x + 2.5, ty + th - 4.5, "Fermentation model", fontsize=28, fontweight="bold", color=INK, va="center")
-    _b(ax, x + w - 2.5, ty + th - 4.5, "SIMULATED", "simulated", ha="right")
+    _b(ax, x + w - 2.5, ty + th - 4.5, "MODELED", "modeled", ha="right")
     top = ty + th - 12.5
     inputs = ["recipe", "schedule", "starter", "acid terms"]
     iy = [top - k * 7.6 for k in range(4)]
     for k, (name, yy) in enumerate(zip(inputs, iy)):
-        col = GREEN if k == 3 else INK
+        col = TEAL if k == 3 else INK
         ax.text(x + 2.5, yy, name, fontsize=SMALL, fontweight="bold", color=col, va="center")
         if k == 1:  # tiny temperature-step glyph
             gx = x + 18.3
@@ -774,7 +880,7 @@ def fig_tech_highlights():
     for k, yy in enumerate(iy):
         arrow(ax, (x + (23.2 if k == 1 else 22.0), yy), (mbx - 0.4, yy), color=FAINT, lw=2.5, head=16)
     # green arrow from the NVIDIA panel into "acid terms"
-    arrow(ax, (70.4, iy[3]), (x + 2.0, iy[3]), color=GREEN, lw=3.5, head=20)
+    arrow(ax, (70.4, iy[3]), (x + 2.0, iy[3]), color=TEAL, lw=3.5, head=20)
     outs = [("pH", "ph"), ("lactic/acetic", "lactic_acid"), ("CO₂", "co2_cumulative"), ("rise", "expansion_ratio"),
             ("overproof", None)]
     ox = mbx + mbw + 2.5
@@ -792,9 +898,9 @@ def fig_tech_highlights():
                 ax.plot([cx0 + cw_ * o / 16.0], [yy], "v", ms=12, color=col, mec="white", mew=1.5, zorder=5)
     # ---------------- Formlabs PreForm API (bottom, full width)
     x, y, w, h = 2.0, 2.0, 156.0, 41.0
-    rbox(ax, x, y, w, h, fc="white", ec=GREEN, lw=3, r=2.2)
+    rbox(ax, x, y, w, h, fc="white", ec=TEAL, lw=3, r=2.2)
     ax.text(x + 2.5, y + h - 4.5, "Formlabs PreForm API", fontsize=28, fontweight="bold", color=INK, va="center")
-    _b(ax, x + 64.0, y + h - 4.5, "REAL", "real", ha="left")
+    _b(ax, x + 55.0, y + h - 4.5, "COMPUTED", "computed", ha="left")
     if HERO_PNG.exists():
         from PIL import Image
 
@@ -803,7 +909,7 @@ def fig_tech_highlights():
         for j, (fx0, fx1) in enumerate(((0.015, 0.395), (0.515, 0.895))):
             crop = hero.crop((int(w_ * fx0), int(h_ * 0.27), int(w_ * fx1), int(h_ * 0.84)))
             _fit_image(ax, np.asarray(crop), x + 2.5 + j * 36.0, y + 2.5, 34.0, 29.0)
-        _b(ax, x + 3.5, y + 30.0, "SIMULATED", "simulated", ha="left")
+        _b(ax, x + 3.5, y + 30.0, "MODELED", "modeled", ha="left")
     if CLEAR_ISO.exists():
         from PIL import Image
 
@@ -825,6 +931,7 @@ FIGURES = {
     "agents_exchange": fig_agents_exchange,
     "benchmark_summary": fig_benchmark_summary,
     "tech_highlights": fig_tech_highlights,
+    "dataflow": fig_dataflow,
 }
 
 

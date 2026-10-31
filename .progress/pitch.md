@@ -10,6 +10,9 @@ Owner scope: docs/pitch/, docs/demo_script.md, scripts/make_pitch_figures.py, da
       (re-upload all four images before republishing; partners img src is a repo path)
 - [x] docs/pitch/figure_sources.md, docs/demo_script.md
 
+- [x] badge vocabulary MEASURED (green, dashed=pending) / COMPUTED (teal #00897b) / MODELED (purple) everywhere;
+      no cost on any figure; new architecture (agents-focused) + dataflow.png (Q&A only)
+
 ## Pending placeholders
 - none (relative pKa filled from c2_summary.json; ask filled on slide 4)
 
