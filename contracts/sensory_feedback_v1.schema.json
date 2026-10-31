@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fermentai.local/contracts/sensory_feedback_v1.schema.json",
+  "title": "FermentAI sensory feedback (POST /api/v1/taste-feedback)",
+  "x-contract-revision": "1.1",
+  "x-generated-by": "uv run python -m fermentai.api.contract --write-schemas (source: src/fermentai/api/schemas.py)",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "text": {
+      "maxLength": 4000,
+      "minLength": 1,
+      "title": "Text",
+      "type": "string"
+    },
+    "loaf_a_notes": {
+      "anyOf": [
+        {
+          "maxLength": 2000,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Loaf A Notes"
+    },
+    "loaf_b_notes": {
+      "anyOf": [
+        {
+          "maxLength": 2000,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Loaf B Notes"
+    },
+    "judge_name": {
+      "anyOf": [
+        {
+          "maxLength": 100,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Judge Name"
+    },
+    "mode": {
+      "default": "offline",
+      "enum": [
+        "live",
+        "offline"
+      ],
+      "title": "Mode",
+      "type": "string"
+    },
+    "apply_schedule": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Override hardware.yaml taste_feedback.apply_first_schedule_step.",
+      "title": "Apply Schedule"
+    },
+    "trigger_motors": {
+      "default": true,
+      "title": "Trigger Motors",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "text"
+  ],
+  "type": "object",
+  "examples": [
+    {
+      "text": "Loaf A tastes mild and has nice texture. Loaf B is more sour, which I prefer, but the crumb is too dense. I'd like a more sour loaf that's still fluffy.",
+      "judge_name": "Judge 1",
+      "mode": "offline"
+    }
+  ]
+}

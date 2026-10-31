@@ -16,7 +16,7 @@
   "motor_running": false,
   "source": "simulated",
   "quality_flags": [],
-  "device_id": "esp32-chamber-a",
+  "device_id": "fermentai-esp32-a",
   "firmware_version": "1.0.0",
   "uptime_s": 3600.0,
   "wifi_rssi_dbm": -58.0,

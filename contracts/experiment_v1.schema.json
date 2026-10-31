@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fermentai.local/contracts/experiment_v1.schema.json",
+  "title": "FermentAI experiment definition (POST /api/v1/experiments)",
+  "x-contract-revision": "1.1",
+  "x-generated-by": "uv run python -m fermentai.api.contract --write-schemas (source: src/fermentai/api/schemas.py)",
+  "$defs": {
+    "ScheduleStep": {
+      "additionalProperties": true,
+      "properties": {
+        "t_h": {
+          "description": "Hours from experiment start.",
+          "minimum": 0,
+          "title": "T H",
+          "type": "number"
+        },
+        "setpoint_c": {
+          "title": "Setpoint C",
+          "type": "number"
+        }
+      },
+      "required": [
+        "t_h",
+        "setpoint_c"
+      ],
+      "title": "ScheduleStep",
+      "type": "object"
+    }
+  },
+  "additionalProperties": true,
+  "properties": {
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "experiment_id": {
+      "anyOf": [
+        {
+          "maxLength": 64,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Experiment Id"
+    },
+    "title": {
+      "default": "Untitled experiment",
+      "maxLength": 200,
+      "title": "Title",
+      "type": "string"
+    },
+    "hypothesis": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Hypothesis"
+    },
+    "objective": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Objective"
+    },
+    "schedules": {
+      "additionalProperties": {
+        "items": {
+          "$ref": "#/$defs/ScheduleStep"
+        },
+        "type": "array"
+      },
+      "description": "Chamber id -> steps, e.g. {\"A\": [{\"t_h\":0,\"setpoint_c\":22}]}; [t_h, setpoint_c] pairs and {\"points\": [...]} objects are accepted.",
+      "title": "Schedules",
+      "type": "object"
+    },
+    "status": {
+      "default": "proposed",
+      "enum": [
+        "proposed",
+        "approved",
+        "running",
+        "completed",
+        "abandoned"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "proposed_by": {
+      "default": "operator",
+      "maxLength": 64,
+      "title": "Proposed By",
+      "type": "string"
+    },
+    "provenance": {
+      "default": "imported_human",
+      "maxLength": 64,
+      "title": "Provenance",
+      "type": "string"
+    }
+  },
+  "type": "object",
+  "examples": [
+    {
+      "schema_version": "1.0",
+      "experiment_id": "exp_example_001",
+      "title": "Illustrative warm-finish trial",
+      "hypothesis": "A warmer late phase raises acidity without losing rise.",
+      "objective": null,
+      "schedules": {
+        "A": [
+          {
+            "t_h": 0.0,
+            "setpoint_c": 22.0
+          },
+          {
+            "t_h": 8.0,
+            "setpoint_c": 25.0
+          }
+        ],
+        "B": [
+          {
+            "t_h": 0.0,
+            "setpoint_c": 27.0
+          },
+          {
+            "t_h": 6.0,
+            "setpoint_c": 24.0
+          }
+        ]
+      },
+      "status": "proposed",
+      "proposed_by": "scientist_A",
+      "provenance": "offline_policy"
+    }
+  ]
+}

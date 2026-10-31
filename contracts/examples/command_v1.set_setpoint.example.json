@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "command_id": "6f1c2a9e-0d3b-4c1e-9a57-2b8d4e6f7a10",
+  "chamber_id": "A",
+  "experiment_id": "experiment_001",
+  "issued_at_utc": "2026-10-31T15:00:00Z",
+  "expires_at_utc": "2026-10-31T15:01:30Z",
+  "sequence_number": 42,
+  "action": "set_setpoint",
+  "parameters": {
+    "setpoint_c": 24.0,
+    "control_mode": "auto"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.0",
+  "simulation_id": 1,
+  "status": "ok",
+  "provenance": "simulated",
+  "schedule": {
+    "breakpoints": [
+      [
+        0.0,
+        27.0
+      ],
+      [
+        6.0,
+        24.0
+      ]
+    ],
+    "mode": "piecewise_constant"
+  },
+  "result": {
+    "summary": {
+      "provenance": "simulated",
+      "note": "illustrative contract fixture"
+    },
+    "timeseries": {
+      "columns": [
+        "time_h",
+        "ph"
+      ],
+      "data": {
+        "time_h": [
+          0.0,
+          0.05
+        ],
+        "ph": [
+          null,
+          null
+        ]
+      }
+    },
+    "attrs": {
+      "note": "illustrative contract fixture, NOT model output"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "command_id": "c3d5e7f9-2b4c-4d6e-9f0a-1b2c3d4e5f60",
+  "chamber_id": "A",
+  "experiment_id": "experiment_001",
+  "issued_at_utc": "2026-10-31T15:00:00Z",
+  "expires_at_utc": "2026-10-31T15:00:30Z",
+  "sequence_number": 44,
+  "action": "stop_motor",
+  "parameters": {
+    "target_command_id": "b2c4d6e8-1a3b-4c5d-8e9f-0a1b2c3d4e5f"
+  }
+}

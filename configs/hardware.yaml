@@ -11,13 +11,18 @@
 schema_version: "1.0"
 
 chambers:
+  # device_id: the physical ESP32 (PLAN_MASTER section 5.2). device_ids: every other id allowed
+  # to write this chamber (simulated stand-ins). A listed device can NEVER write another chamber;
+  # an unlisted device id is auto-bound to the first chamber it posts for (see contracts/README.md).
   A:
     label: "Chamber A - mild hypothesis"
-    device_id: "esp32-chamber-a"
+    device_id: "fermentai-esp32-a"
+    device_ids: ["simulated-esp32-a", "virtual-esp32-a", "fermentai-virtual-a"]
     initial_setpoint_c: 22.0     # PLAN.md section 5, Chamber A starting target
   B:
     label: "Chamber B - more-acidic hypothesis"
-    device_id: "esp32-chamber-b"
+    device_id: "fermentai-esp32-b"
+    device_ids: ["simulated-esp32-b", "virtual-esp32-b", "fermentai-virtual-b"]
     initial_setpoint_c: 27.0     # PLAN.md section 5, Chamber B starting target
 
 temperature:
@@ -63,7 +68,7 @@ polling:
   desired_control_interval_s: 5
 
 images:
-  max_bytes: 3000000
+  max_bytes: 2000000            # PLAN_MASTER section 4: bounded request sizes
   recommended_interval_s: 300
 
 taste_feedback:
@@ -72,8 +77,18 @@ taste_feedback:
   # Default false: the proposed experiment is displayed and an operator applies it
   # via POST /api/v1/experiments/{experiment_id}/apply (human in the loop).
   apply_first_schedule_step: false
-  motor_duration_s: 5.0
+  motor_duration_s: 3.0         # PLAN_MASTER section 14: animate_motor(duration=3000 ms)
   motor_pattern: "wiggle"
+
+# Max HTTP request body sizes (bytes); larger requests get 413 before parsing.
+request_limits:
+  telemetry_max_bytes: 65536
+  ack_max_bytes: 16384
+  image_max_bytes: 2065536      # 2 MB JPEG + multipart overhead
+  default_max_bytes: 1000000
+
+capture_image:
+  ttl_s: 60                     # capture_image command lifetime
 
 # Limits the ESP32 firmware must enforce LOCALLY and independently (documented in
 # firmware_contract/README_FOR_ESP32_AGENT.md). The server never relaxes these.

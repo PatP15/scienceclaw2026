@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "id": "f_0123456789abcdef",
+  "agent_id": "scientist_A",
+  "timestamp_utc": "2026-10-31T15:00:00Z",
+  "type": "hypothesis",
+  "content": "[scientist_A -> scientist_B] Illustrative hypothesis text.",
+  "payload": {
+    "decision_source": "offline_policy"
+  },
+  "evidence_source": "simulated",
+  "in_reply_to": null,
+  "chamber_id": "A",
+  "cycle_id": "cycle_example",
+  "to_agent_id": null
+}

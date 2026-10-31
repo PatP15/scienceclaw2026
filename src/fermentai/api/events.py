@@ -21,7 +21,7 @@ from .db import Database
 
 EVENT_TYPES = (
     "telemetry", "image", "setpoint", "command", "ack", "experiment",
-    "feedback", "feedback_result", "message", "simulation",
+    "feedback", "feedback_result", "message", "simulation", "device",
 )
 
 

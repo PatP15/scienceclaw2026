@@ -33,16 +33,19 @@ def _deep_update(d: dict, u: dict) -> dict:
 
 def make_app(tmp_path: Path, *, hw_overrides: dict[str, Any] | None = None,
              token: str = TEST_TOKEN, clock: FakeClock | None = None,
-             static_dir: Path | None = None) -> FastAPI:
+             static_dir: Path | None = None, device_tokens: dict[str, str] | None = None,
+             data_dir: Path | None = None) -> FastAPI:
     hw = load_hardware_config()
     if hw_overrides:
         hw = HardwareConfig.model_validate(_deep_update(hw.model_dump(), hw_overrides))
     settings = Settings(
         api_token=token,
         db_path=tmp_path / "fermentai-test.sqlite3",
-        data_dir=tmp_path / "data",
+        data_dir=data_dir or tmp_path / "data",
         hardware=hw,
         dashboard_static_dir=static_dir or tmp_path / "no-dashboard",
+        device_tokens=dict(device_tokens or {}),
+        findings_path=tmp_path / "findings_log.jsonl",  # never touch the repo's runtime log
     )
     app = create_app(settings)
     if clock is not None:

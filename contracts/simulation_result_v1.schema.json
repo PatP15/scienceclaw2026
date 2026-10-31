@@ -1,0 +1,191 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fermentai.local/contracts/simulation_result_v1.schema.json",
+  "title": "FermentAI simulation result (POST /api/v1/simulations/run, GET /simulations/{id})",
+  "x-contract-revision": "1.1",
+  "x-generated-by": "uv run python -m fermentai.api.contract --write-schemas (source: src/fermentai/api/schemas.py)",
+  "$defs": {
+    "SimulationPayload": {
+      "properties": {
+        "summary": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Summary"
+        },
+        "timeseries": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SimulationTimeseries"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "attrs": {
+          "additionalProperties": true,
+          "title": "Attrs",
+          "type": "object"
+        }
+      },
+      "title": "SimulationPayload",
+      "type": "object"
+    },
+    "SimulationSchedule": {
+      "properties": {
+        "breakpoints": {
+          "description": "[[t_h, temp_c], ...]",
+          "items": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "type": "array"
+          },
+          "title": "Breakpoints",
+          "type": "array"
+        },
+        "mode": {
+          "default": "piecewise_constant",
+          "enum": [
+            "piecewise_constant",
+            "piecewise_linear"
+          ],
+          "title": "Mode",
+          "type": "string"
+        }
+      },
+      "required": [
+        "breakpoints"
+      ],
+      "title": "SimulationSchedule",
+      "type": "object"
+    },
+    "SimulationTimeseries": {
+      "properties": {
+        "columns": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Columns",
+          "type": "array"
+        },
+        "data": {
+          "additionalProperties": {
+            "items": {},
+            "type": "array"
+          },
+          "title": "Data",
+          "type": "object"
+        }
+      },
+      "required": [
+        "columns",
+        "data"
+      ],
+      "title": "SimulationTimeseries",
+      "type": "object"
+    }
+  },
+  "description": "Response of POST /simulations/run. MODEL OUTPUT ONLY (provenance = simulated).",
+  "properties": {
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "simulation_id": {
+      "title": "Simulation Id",
+      "type": "integer"
+    },
+    "status": {
+      "enum": [
+        "ok",
+        "error"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "provenance": {
+      "const": "simulated",
+      "default": "simulated",
+      "title": "Provenance",
+      "type": "string"
+    },
+    "schedule": {
+      "$ref": "#/$defs/SimulationSchedule"
+    },
+    "result": {
+      "$ref": "#/$defs/SimulationPayload"
+    }
+  },
+  "required": [
+    "simulation_id",
+    "status",
+    "schedule",
+    "result"
+  ],
+  "type": "object",
+  "examples": [
+    {
+      "schema_version": "1.0",
+      "simulation_id": 1,
+      "status": "ok",
+      "provenance": "simulated",
+      "schedule": {
+        "breakpoints": [
+          [
+            0.0,
+            27.0
+          ],
+          [
+            6.0,
+            24.0
+          ]
+        ],
+        "mode": "piecewise_constant"
+      },
+      "result": {
+        "summary": {
+          "provenance": "simulated",
+          "note": "illustrative contract fixture"
+        },
+        "timeseries": {
+          "columns": [
+            "time_h",
+            "ph"
+          ],
+          "data": {
+            "time_h": [
+              0.0,
+              0.05
+            ],
+            "ph": [
+              null,
+              null
+            ]
+          }
+        },
+        "attrs": {
+          "note": "illustrative contract fixture, NOT model output"
+        }
+      }
+    }
+  ]
+}

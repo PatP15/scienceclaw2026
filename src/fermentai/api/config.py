@@ -45,7 +45,12 @@ class _Cfg(BaseModel):
 class ChamberCfg(_Cfg):
     label: str = ""
     device_id: str = ""
+    # Every device id allowed to write this chamber (real + simulated stand-ins).
+    device_ids: list[str] = Field(default_factory=list)
     initial_setpoint_c: float = 22.0
+
+    def all_device_ids(self) -> list[str]:
+        return list(dict.fromkeys([d for d in [self.device_id, *self.device_ids] if d]))
 
 
 class TemperatureCfg(_Cfg):
@@ -80,13 +85,24 @@ class PollingCfg(_Cfg):
 
 
 class ImagesCfg(_Cfg):
-    max_bytes: int = 3_000_000
+    max_bytes: int = 2_000_000
     recommended_interval_s: int = 300
+
+
+class RequestLimitsCfg(_Cfg):
+    telemetry_max_bytes: int = 64 * 1024
+    ack_max_bytes: int = 16 * 1024
+    image_max_bytes: int = 2_000_000 + 64 * 1024   # JPEG + multipart overhead
+    default_max_bytes: int = 1_000_000
+
+
+class CaptureCfg(_Cfg):
+    ttl_s: int = 60
 
 
 class TasteFeedbackCfg(_Cfg):
     apply_first_schedule_step: bool = False
-    motor_duration_s: float = 5.0
+    motor_duration_s: float = 3.0
     motor_pattern: str = "wiggle"
 
 
@@ -105,7 +121,19 @@ class HardwareConfig(_Cfg):
     polling: PollingCfg = Field(default_factory=PollingCfg)
     images: ImagesCfg = Field(default_factory=ImagesCfg)
     taste_feedback: TasteFeedbackCfg = Field(default_factory=TasteFeedbackCfg)
+    request_limits: RequestLimitsCfg = Field(default_factory=RequestLimitsCfg)
+    capture_image: CaptureCfg = Field(default_factory=CaptureCfg)
     firmware_local_limits: dict[str, float] = Field(default_factory=dict)
+
+    def device_bindings(self) -> dict[str, str]:
+        """device_id -> chamber_id for every device listed in hardware.yaml."""
+        out: dict[str, str] = {}
+        for cid, c in self.chambers.items():
+            for d in c.all_device_ids():
+                if d in out and out[d] != cid:
+                    raise ValueError(f"hardware.yaml: device {d!r} bound to two chambers")
+                out[d] = cid
+        return out
 
     def validate_sane(self) -> None:
         t = self.temperature
@@ -113,6 +141,7 @@ class HardwareConfig(_Cfg):
             raise ValueError("hardware.yaml: min_setpoint_c must be < max_setpoint_c")
         if t.max_step_c_per_update <= 0:
             raise ValueError("hardware.yaml: max_step_c_per_update must be > 0")
+        self.device_bindings()
         if self.motor.max_duration_s <= 0 or self.motor.default_duration_s > self.motor.max_duration_s:
             raise ValueError("hardware.yaml: motor durations invalid")
 
@@ -142,6 +171,8 @@ class Settings:
     findings_path: Path | None = None
     llm_mode: str = "offline"
     token_is_default: bool = False
+    # chamber_id -> per-device token (env FERMENTAI_DEVICE_TOKEN_<CHAMBER>); optional.
+    device_tokens: dict[str, str] = field(default_factory=dict)
     extra: dict = field(default_factory=dict)
 
     @classmethod
@@ -152,12 +183,18 @@ class Settings:
         if not token:
             token = DEFAULT_TOKEN
         data_dir = _resolve(os.environ.get("FERMENTAI_DATA_DIR", "data"))
+        hardware = load_hardware_config()
+        device_tokens = {
+            cid: tok.strip() for cid in hardware.chambers
+            if (tok := os.environ.get(f"FERMENTAI_DEVICE_TOKEN_{cid.upper()}", "").strip())
+        }
         findings = os.environ.get("FERMENTAI_FINDINGS_PATH")
         kwargs = dict(
             api_token=token,
             db_path=_resolve(os.environ.get("FERMENTAI_DB_PATH", "data/fermentai.sqlite3")),
             data_dir=data_dir,
-            hardware=load_hardware_config(),
+            hardware=hardware,
+            device_tokens=device_tokens,
             dashboard_static_dir=REPO_ROOT / "src" / "fermentai" / "dashboard" / "static",
             findings_path=_resolve(findings) if findings else None,
             llm_mode=os.environ.get("FERMENTAI_LLM_MODE", "offline"),

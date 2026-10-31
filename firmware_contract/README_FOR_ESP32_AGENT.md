@@ -1,4 +1,9 @@
-# FermentAI firmware contract v1.0 (FROZEN)
+# FermentAI firmware contract v1.0 (FROZEN) + revision 1.1 (additive)
+
+**New in revision 1.1 (2026-10-31): see §9.** It covers boot_id and sequence numbers, null
+timestamps, the `commands[]` list, the new ack shape, per-device tokens and `X-Device-Id`.
+Everything in §1–§8 still works unchanged. The canonical JSON Schemas live in `contracts/`
+(`contracts/README.md`).
 
 This is the interface between each chamber's ESP32-S3 and the FermentAI backend running on the Mac.
 It is **frozen at schema_version `"1.0"`**. Don't rename, remove or change the type of any field.
@@ -101,7 +106,7 @@ Request: see `telemetry_example.json`.
   "motor_running": false,
   "source": "real",
   "quality_flags": [],
-  "device_id": "esp32-chamber-a",
+  "device_id": "fermentai-esp32-a",
   "firmware_version": "1.0.0",
   "uptime_s": 3600.0,
   "wifi_rssi_dbm": -58.0,
@@ -260,7 +265,7 @@ Content-Type: image/jpeg
 **Multipart:** `multipart/form-data` with the fields `file` (JPEG), `chamber_id`, `source`
 (`real`, `simulated` or `replay`), and the optional `timestamp_utc` and `experiment_id`.
 
-- The body must be a JPEG starting with `FF D8` and no larger than 3,000,000 bytes (aim for
+- The body must be a JPEG starting with `FF D8` and no larger than 2,000,000 bytes (aim for
   ≤ 200 KB: SVGA, quality around 12).
 - Response: `image_upload_response_example.json`. The file is stored under
   `data/images/<chamber>/`.
@@ -366,6 +371,124 @@ curl -s http://<mac-ip>:8000/api/v1/commands?chamber_id=A | jq
 The example JSON files in this folder can be posted as-is. (`telemetry_example.json` is labelled
 `source: "simulated"` because it's a fixture.)
 
+## 9. Revision 1.1 additions (additive; `schema_version` stays `"1.0"`)
+
+Firmware written against PLAN_MASTER §4/§5 should implement this section. A device that only
+implements §1–§8 keeps working.
+
+### 9.1 Identity and auth
+
+- `DEVICE_ID`: `fermentai-esp32-a` for chamber A, `fermentai-esp32-b` for chamber B (bound in
+  `configs/hardware.yaml`). A device id can only ever write its own chamber. Anything else gets 403.
+- Send `X-Device-Id: <DEVICE_ID>` on every request, and the same value as `device_id` in bodies.
+  If the two differ, the request gets 403.
+- Token: `Authorization: Bearer <FERMENTAI_DEVICE_TOKEN_A>` (or `_B`). A device token only
+  works for its own chamber, and only on the device endpoints (telemetry, images,
+  desired-control, control-ack). If the Mac has no per-device token set, use the shared
+  `FERMENTAI_API_TOKEN` (v1.0 behaviour).
+
+### 9.2 Telemetry: clock, dedup, extra fields
+
+PLAN_MASTER §4 example (`contracts/examples/telemetry_plan_master_s4.json`):
+
+```json
+{
+  "schema_version": "1.0", "device_id": "fermentai-esp32-a", "chamber_id": "A",
+  "experiment_id": "experiment_001", "boot_id": "boot_a001", "sequence_number": 120,
+  "timestamp_utc": null, "timestamp_quality": "unsynced", "device_uptime_ms": 120000,
+  "chamber_temperature_c": 24.3, "starter_temperature_c": 23.9,
+  "internal_heatsink_temperature_c": 31.2, "external_heatsink_temperature_c": 37.1,
+  "relative_humidity_percent": 72.0, "pressure_pa": 101325.0, "gas_resistance_ohms": 105432.0,
+  "ph": null, "ph_method": null, "starter_height_mm": null, "door_open": false,
+  "peltier_mode": "heating", "peltier_output_fraction": 0.35, "temperature_setpoint_c": 25.0,
+  "motor_running": false, "source": "simulated", "quality_flags": []
+}
+```
+
+Real hardware sends `"source": "measured"` (`"real"` is still accepted). For the full v1.1
+example with `diagnostics` and `field_provenance`, see `telemetry_v1_1_example.json`.
+
+- `boot_id`: random at every boot (for example 8 hex characters from `esp_random()`).
+- `sequence_number`: starts at 1 per boot and increments per telemetry message.
+  **Retry a failed post with the same `sequence_number`.** The server answers
+  `{"duplicate": true}` and doesn't store it twice. Keep a small local queue (≤ 50) while offline.
+- `timestamp_utc: null` with `timestamp_quality: "unsynced"` until you have a real time source.
+  Never fabricate a wall-clock time. You may set `"synced"` after setting the clock from
+  `server_time_utc` (that's server-derived; `"estimated"` is also acceptable). The server always
+  records `received_at_utc` itself.
+- `device_uptime_ms`: `millis()`.
+- New optional fields: `internal_heatsink_temperature_c`, `external_heatsink_temperature_c`,
+  `pressure_pa`, `peltier_output_fraction` (0–1),
+  `diagnostics {wifi_rssi_dbm, free_heap_bytes, firmware_version, last_command_id, sensor_health}`
+  and `field_provenance {field: measured|simulated|replay|manual|estimated}`.
+- `sensor_health` uses sensor names (`bme680`, `sht31`, `ds18b20_starter`,
+  `ds18b20_heatsink_internal`, `ds18b20_heatsink_external`, `ph`, `camera`, `door`) or field
+  names. Values are `ok | missing | stale | invalid | uncalibrated`.
+- `peltier_mode` may be `heating`/`cooling` (PLAN_MASTER) or `heat`/`cool` (v1.0).
+- The body must be ≤ 64 KB.
+
+### 9.3 Commands list
+
+Every desired-control response also carries `commands`: the pending commands for this chamber.
+They're unacked and unexpired, and sorted by ascending `sequence_number`. Example:
+`command_example.json`. Schema: `contracts/command_v1.schema.json`.
+
+```json
+"commands": [
+  {"schema_version": "1.0", "command_id": "6f1c…", "chamber_id": "A", "experiment_id": "experiment_001",
+   "action": "set_setpoint", "parameters": {"setpoint_c": 24.0, "control_mode": "auto"},
+   "issued_at_utc": "2026-10-31T15:00:00Z", "expires_at_utc": "2026-10-31T15:01:30Z", "sequence_number": 42},
+  {"schema_version": "1.0", "command_id": "b2c4…", "chamber_id": "A", "experiment_id": "experiment_001",
+   "action": "animate_motor", "parameters": {"duration_ms": 3000, "pattern": "wiggle"},
+   "issued_at_utc": "2026-10-31T15:00:00Z", "expires_at_utc": "2026-10-31T15:01:00Z", "sequence_number": 43}
+]
+```
+
+For each command, in order:
+
+1. Skip it if you've already processed this `command_id`.
+2. Skip it if `sequence_number` ≤ the highest you've processed. This is **one counter per
+   chamber across all actions**. Reset your tracking when `server_epoch` changes.
+3. If `expires_at_utc − server_time_utc` (both from this response) ≤ 0, don't execute it. Ack
+   `expired`.
+4. Execute it, then ack:
+
+| action | do | ack |
+|---|---|---|
+| `set_setpoint` | clamp `setpoint_c` to the LOCAL 4–35 °C limits. `control_mode`: `auto` = regulate; `hold` = keep regulating at this setpoint; `idle` = Peltier off (fan overrun rules apply) | `accepted`, `result: {"applied_setpoint_c": x}` |
+| `animate_motor` | if the door is closed and there's no fault, run for `min(duration_ms, 10000)` ms on a hardware timer | `accepted` at start; `completed` with `result: {"ran_ms": n}` at stop; `rejected` with `detail: "door open"` if refused |
+| `stop_motor` | stop the motor immediately (idempotent) | `completed` |
+| `capture_image` | take a photo, upload it with `POST /images`, never block control | `completed` (or `failed`) |
+| `noop` | nothing | `completed` |
+
+- A queued motor command is **not** reported as having run. Only your `completed` ack marks the
+  motor as having run.
+- `set_setpoint` is re-issued with a fresh id about every 45 s while it's unchanged. Every fresh
+  valid one resets the 1800 s offline-hold timer (§5.8).
+
+### 9.4 Ack shape (v1.1)
+
+```json
+{"command_id": "b2c4…", "device_id": "fermentai-esp32-a", "chamber_id": "A", "status": "completed",
+ "device_uptime_ms": 123456, "detail": "motor ran 3000 ms", "result": {"ran_ms": 3000}}
+```
+
+`status` is one of `accepted | rejected | completed | expired | failed`. The v1.0 ack shape (§3.3)
+is still accepted. Example: `control_ack_v1_1_example.json`. Maximum body: 16 KB.
+
+### 9.5 Images
+
+The `POST /images` fields are unchanged, plus an optional `device_id`. Set `source` to
+`measured` for real images. Maximum JPEG size is **2 MB**.
+
 ## 8. Changelog
 
 - **1.0** (2026-10-30): initial frozen contract.
+- **1.1** (2026-10-31), additive:
+  - boot_id, sequence_number, timestamp_quality and device_uptime_ms, with null timestamps and dedup
+  - extra sensor fields, diagnostics and field_provenance; `measured` source; `heating`/`cooling`
+  - `commands[]` with set_setpoint, animate_motor, stop_motor, capture_image and noop, using one
+    sequence counter per chamber
+  - v1.1 ack shape
+  - per-device tokens, `X-Device-Id` and device↔chamber binding
+  - size limits: telemetry 64 KB, image 2 MB

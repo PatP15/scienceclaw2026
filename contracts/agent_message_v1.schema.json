@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fermentai.local/contracts/agent_message_v1.schema.json",
+  "title": "FermentAI agent-to-agent message / finding",
+  "x-contract-revision": "1.1",
+  "x-generated-by": "uv run python -m fermentai.api.contract --write-schemas (source: src/fermentai/api/schemas.py)",
+  "additionalProperties": false,
+  "description": "Structured agent-to-agent message / finding (mirrors fermentai.agents.communication.Finding).",
+  "properties": {
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "id": {
+      "maxLength": 64,
+      "title": "Id",
+      "type": "string"
+    },
+    "agent_id": {
+      "description": "e.g. scientist_A",
+      "maxLength": 64,
+      "title": "Agent Id",
+      "type": "string"
+    },
+    "timestamp_utc": {
+      "title": "Timestamp Utc",
+      "type": "string"
+    },
+    "type": {
+      "enum": [
+        "observation",
+        "hypothesis",
+        "prediction",
+        "uncertainty",
+        "proposed_measurement",
+        "proposed_intervention",
+        "critique",
+        "rationale"
+      ],
+      "title": "Type",
+      "type": "string"
+    },
+    "content": {
+      "title": "Content",
+      "type": "string"
+    },
+    "payload": {
+      "additionalProperties": true,
+      "title": "Payload",
+      "type": "object"
+    },
+    "evidence_source": {
+      "enum": [
+        "real",
+        "simulated",
+        "replay",
+        "estimated",
+        "imported_human",
+        "judge_feedback"
+      ],
+      "title": "Evidence Source",
+      "type": "string"
+    },
+    "in_reply_to": {
+      "anyOf": [
+        {
+          "maxLength": 64,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "In Reply To"
+    },
+    "chamber_id": {
+      "anyOf": [
+        {
+          "pattern": "^[A-Za-z0-9_-]{1,16}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Chamber Id"
+    },
+    "cycle_id": {
+      "anyOf": [
+        {
+          "maxLength": 64,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Cycle Id"
+    },
+    "to_agent_id": {
+      "anyOf": [
+        {
+          "maxLength": 64,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Optional explicit recipient.",
+      "title": "To Agent Id"
+    }
+  },
+  "required": [
+    "id",
+    "agent_id",
+    "timestamp_utc",
+    "type",
+    "content",
+    "evidence_source"
+  ],
+  "type": "object",
+  "examples": [
+    {
+      "schema_version": "1.0",
+      "id": "f_0123456789abcdef",
+      "agent_id": "scientist_A",
+      "timestamp_utc": "2026-10-31T15:00:00Z",
+      "type": "hypothesis",
+      "content": "[scientist_A -> scientist_B] Illustrative hypothesis text.",
+      "payload": {
+        "decision_source": "offline_policy"
+      },
+      "evidence_source": "simulated",
+      "in_reply_to": null,
+      "chamber_id": "A",
+      "cycle_id": "cycle_example",
+      "to_agent_id": null
+    }
+  ]
+}

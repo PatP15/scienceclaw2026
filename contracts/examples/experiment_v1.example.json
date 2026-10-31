@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "experiment_id": "exp_example_001",
+  "title": "Illustrative warm-finish trial",
+  "hypothesis": "A warmer late phase raises acidity without losing rise.",
+  "objective": null,
+  "schedules": {
+    "A": [
+      {
+        "t_h": 0.0,
+        "setpoint_c": 22.0
+      },
+      {
+        "t_h": 8.0,
+        "setpoint_c": 25.0
+      }
+    ],
+    "B": [
+      {
+        "t_h": 0.0,
+        "setpoint_c": 27.0
+      },
+      {
+        "t_h": 6.0,
+        "setpoint_c": 24.0
+      }
+    ]
+  },
+  "status": "proposed",
+  "proposed_by": "scientist_A",
+  "provenance": "offline_policy"
+}

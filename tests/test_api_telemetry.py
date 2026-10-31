@@ -39,7 +39,8 @@ def test_plan_fixture_and_nullable_fields(client):
     minimal = {"schema_version": "1.0", "chamber_id": "B", "source": "real"}  # all sensors missing
     r = client.post("/api/v1/telemetry", headers=auth(), json=minimal)
     assert r.status_code == 200
-    assert "timestamp_missing_server_time_used" in r.json()["quality_flags"]
+    assert "timestamp_unavailable" in r.json()["quality_flags"]  # never invented (v1.1)
+    assert client.get("/api/v1/chambers/B/state").json()["latest_telemetry"]["timestamp_utc"] is None
 
 
 @pytest.mark.parametrize("bad, fragment", [

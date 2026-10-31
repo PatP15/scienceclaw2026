@@ -55,16 +55,28 @@ the iPad URL and the ESP32 base URL.
 
 ### Auth model
 
-- The ESP32s and every write from the dashboard (taste feedback, motor button, setpoint, apply
-  experiment, cancel command) send `Authorization: Bearer <FERMENTAI_API_TOKEN>`.
-- `GET /api/v1/chambers/{id}/desired-control` also needs the token, because issuing a command is
-  a side effect.
-- **Read-only GETs are unauthenticated**: health, chamber state, telemetry history, commands log,
-  events and SSE stream, predictions, molecular summary, STL and findings. That lets any browser on
-  the isolated demo LAN view the dashboard without a login. It's acceptable only because the
-  network is a private AP with WPA2. Don't expose port 8000 to an untrusted network.
-- The iPad URL carries `?token=…`. The dashboard should read it once, keep it in `localStorage`,
-  and send it as the Bearer header on writes.
+The full details are in contracts/README.md, under "Device authentication and isolation".
+
+- **Operator token** `FERMENTAI_API_TOKEN`. The dashboard, agents and Mac-local simulators use
+  it. It's valid on every write (taste feedback, motor button, setpoint, apply experiment,
+  capture image, cancel command) and can act as any device.
+- **Per-device tokens** `FERMENTAI_DEVICE_TOKEN_A` and `FERMENTAI_DEVICE_TOKEN_B` are optional
+  but recommended for real hardware. Flash each ESP32 with only its own token. A device token
+  works only on that chamber's device endpoints (telemetry, images, desired-control,
+  control-ack), so ESP32 A can't post as B and can't call operator endpoints. If a device token
+  isn't set, that chamber's device uses the operator token.
+- Devices also send `X-Device-Id` (`fermentai-esp32-a` or `fermentai-esp32-b`). Device ids are
+  bound to one chamber.
+- `GET /api/v1/chambers/{id}/desired-control` needs a token, because issuing a command is a side
+  effect.
+- **Read-only GETs are unauthenticated**: health, chamber state, telemetry and readings history,
+  commands log, devices, events and SSE stream, predictions, molecular summary, STL, findings and
+  demos. That lets any browser on the isolated demo LAN view the dashboard without a login. It's
+  acceptable only because the network is a private AP with WPA2. Don't expose port 8000 to an
+  untrusted network.
+- The iPad URL carries `?token=<operator token>`. The dashboard reads it once, keeps it in
+  `localStorage`, and sends it as the Bearer header on writes.
+- Request size limits: telemetry 64 KB, ack 16 KB, image 2 MB, everything else 1 MB.
 
 ## 4. macOS firewall
 

@@ -137,3 +137,35 @@ def test_apply_experiment_endpoint(client):
     assert exp["warnings"]
     r = client.post(f"/api/v1/experiments/{exp['experiment_id']}/apply", headers=auth())
     assert r.json()["applied_setpoints"]["B"]["applied_c"] == 30.0  # 27 + 3 step, below 35 clamp
+
+
+def test_real_pipeline_messages_and_provenance(client, tmp_path):
+    """Dashboard requests: Finding.agent_id -> sender, in_reply_to + recipient stored, experiment
+    provenance = pipeline provenance.decision_source; hypotheses/schedules tables populated."""
+    pytest.importorskip("fermentai.agents.pipeline")
+    text = ("Loaf A tastes mild and has nice texture. Loaf B is more sour, which I prefer, but the "
+            "crumb is too dense. I'd like a more sour loaf that's still fluffy.")
+    r = client.post("/api/v1/taste-feedback", headers=auth(), json={"text": text})
+    assert r.status_code == 200, r.text
+    j = r.json()
+    assert j["pipeline_available"] is True
+    decision = j["result"]["provenance"]["decision_source"]
+    assert j["experiment"]["provenance"] == decision == "offline_policy"
+    msgs = client.get("/api/v1/agents/all/messages").json()
+    assert msgs and all(m["sender"] in ("scientist_A", "scientist_B") for m in msgs)
+    by_uid = {m["message_uid"]: m for m in msgs}
+    replies = [m for m in msgs if m["in_reply_to"]]
+    assert replies and all(m["recipient"] == by_uid[m["in_reply_to"]]["sender"] for m in replies)
+    assert msgs[0]["recipient"] in ("scientist_A", "scientist_B") and msgs[0]["recipient"] != msgs[0]["sender"]
+    a_msgs = client.get("/api/v1/agents/A/messages").json()
+    assert a_msgs and all("a" in (m["sender_key"], m["recipient_key"]) for m in a_msgs)
+    db = client.app.state.service.db
+    exp_id = j["experiment"]["experiment_id"]
+    assert exp_id == j["result"]["next_experiment"]["id"]
+    assert {r["chamber_id"] for r in db.query("SELECT chamber_id FROM temperature_schedules WHERE experiment_id=?",
+                                                  (exp_id,))} == {"A", "B"}
+    hyp = db.query_one("SELECT * FROM scientist_hypotheses WHERE feedback_id=?", (j["feedback_id"],))
+    assert hyp and hyp["statement"] and hyp["provenance"] == "offline_policy"
+    assert all(m["duration_s"] == 3.0 and m["experiment_id"] == exp_id for m in j["motor_commands"])
+    st = client.get("/api/v1/agents/scientist_A/state").json()
+    assert st["agent_id"] == "scientist_A"

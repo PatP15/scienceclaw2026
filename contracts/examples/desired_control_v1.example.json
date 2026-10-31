@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0",
+  "command_type": "control",
+  "command_id": "6f1c2a9e-0d3b-4c1e-9a57-2b8d4e6f7a10",
+  "sequence_number": 42,
+  "server_epoch": "3f9a1c2b7d4e",
+  "issued_at_utc": "2026-10-31T15:00:00Z",
+  "expires_at_utc": "2026-10-31T15:01:30Z",
+  "ttl_s": 90,
+  "server_time_utc": "2026-10-31T15:00:00Z",
+  "chamber_id": "A",
+  "experiment_id": "experiment_001",
+  "temperature_setpoint_c": 24.0,
+  "control_mode": "auto",
+  "peltier_mode_hint": "heat",
+  "motor": {
+    "command_id": "b2c4d6e8-1a3b-4c5d-8e9f-0a1b2c3d4e5f",
+    "action": "run",
+    "run": true,
+    "duration_s": 3.0,
+    "pattern": "wiggle",
+    "sequence_number": 43,
+    "ttl_s": 60,
+    "expires_at_utc": "2026-10-31T15:01:00Z"
+  },
+  "limits": {
+    "min_setpoint_c": 4.0,
+    "max_setpoint_c": 35.0,
+    "max_step_c_per_update": 3.0,
+    "motor_max_duration_s": 10.0
+  },
+  "poll_interval_s": 5,
+  "commands": [
+    {
+      "schema_version": "1.0",
+      "command_id": "6f1c2a9e-0d3b-4c1e-9a57-2b8d4e6f7a10",
+      "chamber_id": "A",
+      "experiment_id": "experiment_001",
+      "issued_at_utc": "2026-10-31T15:00:00Z",
+      "expires_at_utc": "2026-10-31T15:01:30Z",
+      "sequence_number": 42,
+      "action": "set_setpoint",
+      "parameters": {
+        "setpoint_c": 24.0,
+        "control_mode": "auto"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "command_id": "b2c4d6e8-1a3b-4c5d-8e9f-0a1b2c3d4e5f",
+      "chamber_id": "A",
+      "experiment_id": "experiment_001",
+      "issued_at_utc": "2026-10-31T15:00:00Z",
+      "expires_at_utc": "2026-10-31T15:01:00Z",
+      "sequence_number": 43,
+      "action": "animate_motor",
+      "parameters": {
+        "duration_ms": 3000,
+        "pattern": "wiggle"
+      }
+    }
+  ]
+}

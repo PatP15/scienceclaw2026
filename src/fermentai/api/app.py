@@ -6,6 +6,7 @@ Run:  uv run uvicorn fermentai.api.app:app --host 0.0.0.0 --port 8000
 
 from __future__ import annotations
 
+import json
 import logging
 import os
 
@@ -45,6 +46,56 @@ placeholder is served instead.</p>
 </ul></body></html>"""
 
 
+class BodySizeLimit:
+    """Pure-ASGI request-size guard (PLAN_MASTER §4 "bounded request sizes").
+
+    Rejects with 413 before the body is parsed: by Content-Length when present, otherwise by
+    counting streamed bytes."""
+
+    def __init__(self, app, limits: dict[str, int], default: int):
+        self.app, self.limits, self.default = app, limits, default
+
+    def _limit(self, path: str) -> int:
+        return self.limits.get(path.rstrip("/"), self.default)
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http" or scope["method"] not in ("POST", "PUT", "PATCH"):
+            return await self.app(scope, receive, send)
+        limit = self._limit(scope["path"])
+        headers = dict(scope.get("headers") or [])
+        cl = headers.get(b"content-length")
+        if cl is not None and cl.isdigit() and int(cl) > limit:
+            return await self._reject(send, limit)
+        seen = 0
+        exceeded = False
+
+        async def limited_receive():
+            nonlocal seen, exceeded
+            msg = await receive()
+            if msg["type"] == "http.request" and not exceeded:
+                seen += len(msg.get("body", b""))
+                if seen > limit:
+                    exceeded = True  # end the body here; the app's response is discarded below
+                    return {"type": "http.request", "body": b"", "more_body": False}
+            return msg
+
+        async def guarded_send(msg):
+            if not exceeded:
+                await send(msg)
+
+        await self.app(scope, limited_receive, guarded_send)
+        if exceeded:
+            await self._reject(send, limit)
+
+    @staticmethod
+    async def _reject(send, limit: int):
+        body = json.dumps({"detail": f"request body exceeds {limit} bytes"}).encode()
+        await send({"type": "http.response.start", "status": 413,
+                    "headers": [(b"content-type", b"application/json"),
+                                (b"content-length", str(len(body)).encode())]})
+        await send({"type": "http.response.body", "body": body})
+
+
 def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or Settings.from_env()
     db = Database(settings.db_path)
@@ -56,9 +107,20 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.settings = settings
     app.state.service = service
 
+    for cid in settings.hardware.chambers:
+        if cid not in settings.device_tokens:
+            log.info("no FERMENTAI_DEVICE_TOKEN_%s; chamber %s devices use the operator token",
+                     cid.upper(), cid)
     if settings.token_is_default:
         log.warning("FERMENTAI_API_TOKEN is unset or the .env.example default; "
                     "set a unique token in .env before the demo")
+
+    rl = settings.hardware.request_limits
+    app.add_middleware(BodySizeLimit, limits={
+        "/api/v1/telemetry": rl.telemetry_max_bytes,
+        "/api/v1/control-ack": rl.ack_max_bytes,
+        "/api/v1/images": rl.image_max_bytes,
+    }, default=rl.default_max_bytes)
 
     origins = os.environ.get("FERMENTAI_CORS_ORIGINS")
     if origins:

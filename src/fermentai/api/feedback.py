@@ -12,6 +12,7 @@ import dataclasses
 import json
 import logging
 import math
+import re
 import uuid
 from typing import Any
 
@@ -68,7 +69,7 @@ def first_setpoint(steps: Any) -> float | None:
     """Extract the first step's setpoint from a schedule of unknown-but-plausible shape:
     [{"t_h":0,"setpoint_c":24}, ...] | [[0, 24], ...] | [24, ...] | {"steps": [...]}."""
     if isinstance(steps, dict):
-        steps = steps.get("steps") or steps.get("schedule") or [steps]
+        steps = steps.get("points") or steps.get("steps") or steps.get("schedule") or [steps]
     if not isinstance(steps, (list, tuple)) or not steps:
         return None
     s0 = steps[0]
@@ -119,6 +120,8 @@ def build_context(svc: ControlService, settings: Settings, fb: TasteFeedbackIn, 
         "limits": {"min_setpoint_c": t.min_setpoint_c, "max_setpoint_c": t.max_setpoint_c,
                    "max_step_c_per_update": t.max_step_c_per_update},
         "llm_mode": settings.llm_mode,
+        # The pipeline appends to this findings log (served by GET /api/v1/findings).
+        **({"findings_log_path": str(settings.findings_path)} if settings.findings_path else {}),
     }
 
 
@@ -142,7 +145,7 @@ def placeholder_result(fb: TasteFeedbackIn, context: dict, why: str) -> dict:
             "schedules": {cid: [{"t_h": 0.0, "setpoint_c": v}] for cid, v in sp.items()},
         },
         "mode_label": "placeholder (agents pipeline unavailable)",
-        "provenance": {"source": "placeholder", "reason": why},
+        "provenance": {"source": "placeholder", "decision_source": "placeholder", "reason": why},
     }
 
 
@@ -164,26 +167,50 @@ def call_pipeline(fb: TasteFeedbackIn, context: dict) -> tuple[dict, bool]:
     return result, True
 
 
+_ARROW = re.compile(r"^\s*\[\s*([^\]\s]+)\s*(?:→|->)\s*([^\]\s]+)\s*\]")
+
+
 def _store_messages(svc: ControlService, feedback_id: int, messages: Any) -> list[dict]:
+    """Store agent messages. Accepts Finding dicts (agent_id, id, in_reply_to, ...) as produced
+    by fermentai.agents.communication, and looser {from, to, type, content} dicts."""
     stored = []
     if not isinstance(messages, list):
         messages = [] if messages is None else [messages]
+    senders_by_uid: dict[str, str] = {}
     with svc.db.tx() as conn:
         for m in messages:
             md = m if isinstance(m, dict) else {"content": m}
-            sender = md.get("from") or md.get("sender") or md.get("agent") or md.get("author")
-            recipient = md.get("to") or md.get("recipient")
+            sender = (md.get("agent_id") or md.get("from") or md.get("sender") or md.get("agent")
+                      or md.get("author"))
+            uid = md.get("id") if isinstance(md.get("id"), str) else None
+            in_reply_to = md.get("in_reply_to")
+            recipient = md.get("to_agent_id") or md.get("to") or md.get("recipient")
+            if recipient is None and isinstance(md.get("content"), str):
+                hit = _ARROW.match(md["content"])  # "[scientist_A → scientist_B] ..."
+                if hit:
+                    recipient = hit.group(2)
+            if recipient is None and in_reply_to:
+                recipient = senders_by_uid.get(in_reply_to)
+                if recipient is None:
+                    row = conn.execute("SELECT sender FROM agent_messages WHERE message_uid=? LIMIT 1",
+                                       (in_reply_to,)).fetchone()
+                    recipient = row["sender"] if row else None
             kind = md.get("type") or md.get("kind") or md.get("message_type")
             now = iso(svc.clock())
             mid = conn.execute(
                 "INSERT INTO agent_messages(created_at_utc, feedback_id, sender, recipient, sender_key,"
-                " recipient_key, kind, content_json) VALUES (?,?,?,?,?,?,?,?)",
+                " recipient_key, kind, content_json, message_uid, in_reply_to, chamber_id, cycle_id)"
+                " VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
                 (now, feedback_id, None if sender is None else str(sender),
                  None if recipient is None else str(recipient), agent_key(sender),
-                 agent_key(recipient), None if kind is None else str(kind), dumps(md)),
+                 agent_key(recipient), None if kind is None else str(kind), dumps(md), uid,
+                 in_reply_to, md.get("chamber_id"), md.get("cycle_id")),
             ).lastrowid
-            rec = {"message_id": mid, "feedback_id": feedback_id, "created_at_utc": now,
-                   "sender": sender, "recipient": recipient, "kind": kind, "content": md}
+            if uid and sender:
+                senders_by_uid[uid] = str(sender)
+            rec = {"message_id": mid, "message_uid": uid, "feedback_id": feedback_id,
+                   "created_at_utc": now, "sender": sender, "recipient": recipient,
+                   "in_reply_to": in_reply_to, "kind": kind, "content": md}
             svc.db.emit("message", rec, None, conn=conn)
             stored.append(rec)
     return stored
@@ -191,27 +218,50 @@ def _store_messages(svc: ControlService, feedback_id: int, messages: Any) -> lis
 
 def store_experiment(svc: ControlService, exp: dict, *, proposed_by: str, provenance: str,
                      feedback_id: int | None = None, status: str = "proposed") -> dict:
-    exp_id = str(exp.get("experiment_id") or f"exp_{svc.clock():%Y%m%d_%H%M%S}_{uuid.uuid4().hex[:6]}")
+    exp_id = str(exp.get("experiment_id") or exp.get("id")
+                 or f"exp_{svc.clock():%Y%m%d_%H%M%S}_{uuid.uuid4().hex[:6]}")[:64]
     if svc.db.query_one("SELECT 1 FROM experiments WHERE experiment_id=?", (exp_id,)):
-        exp_id = f"{exp_id}_{uuid.uuid4().hex[:6]}"
+        exp_id = f"{exp_id[:56]}_{uuid.uuid4().hex[:6]}"
     schedules = exp.get("schedules") or {}
     now = iso(svc.clock())
+    hyp = exp.get("hypothesis")
+    hyp_text = hyp if isinstance(hyp, str) or hyp is None else (
+        hyp.get("statement") or hyp.get("text") if isinstance(hyp, dict) else None) or json.dumps(hyp, default=str)
     with svc.db.tx() as conn:
         conn.execute(
             "INSERT INTO experiments(experiment_id, created_at_utc, title, hypothesis, status,"
             " proposed_by, provenance, feedback_id, schedules_json, payload_json)"
             " VALUES (?,?,?,?,?,?,?,?,?,?)",
-            (exp_id, now, str(exp.get("title") or "Untitled experiment")[:200],
-             None if exp.get("hypothesis") is None else str(exp.get("hypothesis")),
+            (exp_id, now, str(exp.get("title") or "Untitled experiment")[:200], hyp_text,
              str(exp.get("status") or status), proposed_by, provenance, feedback_id,
              dumps(jsonable(schedules)), dumps(jsonable(exp))),
         )
+        if isinstance(schedules, dict):
+            for cid, steps in schedules.items():
+                conn.execute(
+                    "INSERT INTO temperature_schedules(experiment_id, chamber_id, created_at_utc, source,"
+                    " steps_json) VALUES (?,?,?,?,?)",
+                    (exp_id, str(cid), now, provenance, dumps(normalize_steps(steps))))
         rec = {"experiment_id": exp_id, "created_at_utc": now, "title": exp.get("title"),
-               "hypothesis": exp.get("hypothesis"), "status": exp.get("status") or status,
+               "hypothesis": hyp_text, "status": exp.get("status") or status,
                "proposed_by": proposed_by, "provenance": provenance, "feedback_id": feedback_id,
                "schedules": jsonable(schedules)}
         svc.db.emit("experiment", rec, None, conn=conn)
     return rec
+
+
+def normalize_steps(steps: Any) -> list[dict]:
+    """Best-effort [{t_h, setpoint_c}] view of a schedule (pairs, dicts, {points: ...})."""
+    if isinstance(steps, dict):
+        steps = steps.get("points") or steps.get("steps") or steps.get("schedule") or []
+    out = []
+    for st in steps if isinstance(steps, (list, tuple)) else []:
+        if isinstance(st, (list, tuple)) and len(st) >= 2:
+            out.append({"t_h": st[0], "setpoint_c": st[1]})
+        elif isinstance(st, dict):
+            sp = next((st[k] for k in SETPOINT_KEYS if k in st), None)
+            out.append({"t_h": st.get("t_h", st.get("time_h")), "setpoint_c": sp})
+    return out
 
 
 def apply_schedules(svc: ControlService, schedules: Any, source: str, rationale: str,
@@ -235,6 +285,32 @@ def apply_schedules(svc: ControlService, schedules: Any, source: str, rationale:
     return out
 
 
+def _store_hypothesis_and_calibration(svc: ControlService, fid: int, experiment_id: str,
+                                      result: dict, provenance: str) -> None:
+    hyp = result.get("hypothesis")
+    now = iso(svc.clock())
+    with svc.db.tx() as conn:
+        if hyp:
+            statement = hyp if isinstance(hyp, str) else (
+                (hyp.get("statement") or hyp.get("text")) if isinstance(hyp, dict) else None) or str(hyp)
+            agent = hyp.get("proposed_by") if isinstance(hyp, dict) else None
+            conn.execute(
+                "INSERT INTO scientist_hypotheses(created_at_utc, feedback_id, experiment_id, agent_id,"
+                " statement, provenance, payload_json) VALUES (?,?,?,?,?,?,?)",
+                (now, fid, experiment_id, agent, statement, provenance, dumps(hyp)))
+        prov = result.get("provenance") if isinstance(result.get("provenance"), dict) else {}
+        cal = prov.get("calibration")
+        if isinstance(cal, dict):
+            for model, c in cal.items():
+                c = c if isinstance(c, dict) else {"value": c}
+                conn.execute(
+                    "INSERT INTO model_calibrations(created_at_utc, model, status, n_points, source,"
+                    " feedback_id, payload_json) VALUES (?,?,?,?,?,?,?)",
+                    (now, f"sensory_map:{model}", c.get("status"),
+                     c.get("n_points") if isinstance(c.get("n_points"), int) else None,
+                     provenance, fid, dumps(c)))
+
+
 def run_feedback(svc: ControlService, settings: Settings, fb: TasteFeedbackIn) -> dict:
     now = iso(svc.clock())
     with svc.db.tx() as conn:
@@ -255,12 +331,14 @@ def run_feedback(svc: ControlService, settings: Settings, fb: TasteFeedbackIn) -
     nxt = result.get("next_experiment")
     nxt = dict(nxt) if isinstance(nxt, dict) else {"title": str(nxt) if nxt else "Next experiment"}
     nxt.setdefault("schedules", result.get("recommended_schedules") or {})
-    nxt.setdefault("hypothesis", result.get("hypothesis") if isinstance(result.get("hypothesis"), str)
-                   else json.dumps(result.get("hypothesis"), default=str))
-    prov = result.get("provenance")
-    prov_label = (prov.get("source") if isinstance(prov, dict) else None) or str(result.get("mode_label") or "unknown")
+    nxt.setdefault("hypothesis", result.get("hypothesis"))
+    prov = result.get("provenance") if isinstance(result.get("provenance"), dict) else {}
+    # Explicit provenance (dashboard request): the pipeline's decision_source
+    # (offline_policy | llm | placeholder), never the free-text mode_label.
+    prov_label = str(prov.get("decision_source") or prov.get("source") or "unknown")[:64]
     experiment = store_experiment(svc, nxt, proposed_by="agents_taste_feedback",
-                                  provenance=str(prov_label)[:64], feedback_id=fid)
+                                  provenance=prov_label, feedback_id=fid)
+    _store_hypothesis_and_calibration(svc, fid, experiment["experiment_id"], result, prov_label)
 
     apply = settings.hardware.taste_feedback.apply_first_schedule_step if fb.apply_schedule is None \
         else fb.apply_schedule
@@ -277,7 +355,7 @@ def run_feedback(svc: ControlService, settings: Settings, fb: TasteFeedbackIn) -
         for cid in svc.chamber_ids:
             motors.append(svc.issue_motor_command(
                 cid, dur, tf.motor_pattern, f"new experiment proposed ({experiment['experiment_id']})",
-                "taste_feedback"))
+                "taste_feedback", experiment_id=experiment["experiment_id"]))
 
     response = {
         "feedback_id": fid,

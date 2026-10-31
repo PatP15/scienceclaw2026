@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "chamber_id": "A",
+  "experiment_id": "experiment_001",
+  "timestamp_utc": null,
+  "chamber_temperature_c": 24.3,
+  "starter_temperature_c": 23.9,
+  "relative_humidity_percent": 72.0,
+  "gas_resistance_ohms": 105432.0,
+  "ph": null,
+  "ph_method": null,
+  "starter_height_mm": null,
+  "door_open": false,
+  "peltier_mode": "heating",
+  "temperature_setpoint_c": 25.0,
+  "motor_running": false,
+  "source": "measured",
+  "quality_flags": [
+    "illustrative_fixture"
+  ],
+  "device_id": "fermentai-esp32-a",
+  "boot_id": "boot_a001",
+  "sequence_number": 120,
+  "timestamp_quality": "unsynced",
+  "device_uptime_ms": 120000,
+  "internal_heatsink_temperature_c": 31.2,
+  "external_heatsink_temperature_c": 37.1,
+  "pressure_pa": 101325.0,
+  "peltier_output_fraction": 0.35,
+  "diagnostics": {
+    "wifi_rssi_dbm": -58.0,
+    "free_heap_bytes": 182344,
+    "firmware_version": "1.1.0",
+    "last_command_id": "6f1c2a9e-0d3b-4c1e-9a57-2b8d4e6f7a10",
+    "sensor_health": {
+      "bme680": "ok",
+      "ds18b20_starter": "ok",
+      "ds18b20_heatsink_internal": "ok",
+      "ds18b20_heatsink_external": "ok",
+      "ph": "missing",
+      "camera": "ok"
+    }
+  },
+  "field_provenance": {
+    "chamber_temperature_c": "measured"
+  }
+}

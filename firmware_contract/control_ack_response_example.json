@@ -2,6 +2,7 @@
   "ok": true,
   "command_id": "6f1c2a9e-0d3b-4c1e-9a57-2b8d4e6f7a10",
   "command_type": "control",
+  "action": "set_setpoint",
   "command_status": "accepted",
   "late": false,
   "server_time_utc": "2026-10-31T12:00:02Z"

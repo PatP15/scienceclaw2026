@@ -1,0 +1,603 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fermentai.local/contracts/telemetry_v1.schema.json",
+  "title": "FermentAI telemetry (device -> POST /api/v1/telemetry)",
+  "x-contract-revision": "1.1",
+  "x-generated-by": "uv run python -m fermentai.api.contract --write-schemas (source: src/fermentai/api/schemas.py)",
+  "$defs": {
+    "Diagnostics": {
+      "additionalProperties": true,
+      "description": "v1.1 optional device diagnostics. Extra keys are allowed here (diagnostic-only).",
+      "properties": {
+        "wifi_rssi_dbm": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Wifi Rssi Dbm"
+        },
+        "free_heap_bytes": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Free Heap Bytes"
+        },
+        "firmware_version": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Firmware Version"
+        },
+        "last_command_id": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Last Command Id"
+        },
+        "sensor_health": {
+          "additionalProperties": {
+            "enum": [
+              "ok",
+              "missing",
+              "stale",
+              "invalid",
+              "uncalibrated"
+            ],
+            "type": "string"
+          },
+          "description": "sensor name (e.g. bme680, ds18b20_starter, ph) or telemetry field -> health",
+          "propertyNames": {
+            "maxLength": 64
+          },
+          "title": "Sensor Health",
+          "type": "object"
+        }
+      },
+      "title": "Diagnostics",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0",
+      "description": "Must be \"1.0\".",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "chamber_id": {
+      "pattern": "^[A-Za-z0-9_-]{1,16}$",
+      "title": "Chamber Id",
+      "type": "string"
+    },
+    "experiment_id": {
+      "anyOf": [
+        {
+          "maxLength": 64,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Experiment Id"
+    },
+    "timestamp_utc": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Device wall-clock time (ISO-8601, Z). null until the device clock is synced; the server never invents it (it stores received_at_utc separately).",
+      "title": "Timestamp Utc"
+    },
+    "chamber_temperature_c": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Chamber Temperature C"
+    },
+    "starter_temperature_c": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Starter Temperature C"
+    },
+    "relative_humidity_percent": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Relative Humidity Percent"
+    },
+    "gas_resistance_ohms": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "BME680 raw gas resistance. NOT a CO2 measurement.",
+      "title": "Gas Resistance Ohms"
+    },
+    "ph": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Ph"
+    },
+    "ph_method": {
+      "anyOf": [
+        {
+          "maxLength": 64,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "e.g. probe_immersed | probe_sample | strip | manual",
+      "title": "Ph Method"
+    },
+    "starter_height_mm": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Starter Height Mm"
+    },
+    "door_open": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Door Open"
+    },
+    "peltier_mode": {
+      "anyOf": [
+        {
+          "enum": [
+            "idle",
+            "heat",
+            "cool",
+            "heating",
+            "cooling",
+            "switching",
+            "fault",
+            "off"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Peltier Mode"
+    },
+    "temperature_setpoint_c": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Setpoint the device is ACTUALLY using (after local limits).",
+      "title": "Temperature Setpoint C"
+    },
+    "motor_running": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Motor Running"
+    },
+    "source": {
+      "description": "Record provenance: \"measured\" for physical devices (\"real\" accepted as alias).",
+      "enum": [
+        "measured",
+        "real",
+        "simulated",
+        "replay"
+      ],
+      "title": "Source",
+      "type": "string"
+    },
+    "quality_flags": {
+      "items": {
+        "maxLength": 64,
+        "type": "string"
+      },
+      "title": "Quality Flags",
+      "type": "array"
+    },
+    "device_id": {
+      "anyOf": [
+        {
+          "maxLength": 64,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Device Id"
+    },
+    "firmware_version": {
+      "anyOf": [
+        {
+          "maxLength": 64,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Firmware Version"
+    },
+    "uptime_s": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Uptime S"
+    },
+    "wifi_rssi_dbm": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Wifi Rssi Dbm"
+    },
+    "heatsink_temperature_c": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Heatsink Temperature C"
+    },
+    "fan_running": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Fan Running"
+    },
+    "peltier_duty_percent": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Peltier Duty Percent"
+    },
+    "last_command_id": {
+      "anyOf": [
+        {
+          "maxLength": 64,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Last Command Id"
+    },
+    "last_sequence_number": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Last Sequence Number"
+    },
+    "fault_codes": {
+      "items": {
+        "maxLength": 64,
+        "type": "string"
+      },
+      "title": "Fault Codes",
+      "type": "array"
+    },
+    "boot_id": {
+      "anyOf": [
+        {
+          "maxLength": 64,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Random id generated at each boot.",
+      "title": "Boot Id"
+    },
+    "sequence_number": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Monotonic per boot. (device_id, boot_id, sequence_number) deduplicates retries.",
+      "title": "Sequence Number"
+    },
+    "timestamp_quality": {
+      "anyOf": [
+        {
+          "enum": [
+            "synced",
+            "unsynced",
+            "estimated"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Timestamp Quality"
+    },
+    "device_uptime_ms": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Device Uptime Ms"
+    },
+    "internal_heatsink_temperature_c": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Internal Heatsink Temperature C"
+    },
+    "external_heatsink_temperature_c": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "External Heatsink Temperature C"
+    },
+    "pressure_pa": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Pressure Pa"
+    },
+    "peltier_output_fraction": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Peltier Output Fraction"
+    },
+    "diagnostics": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Diagnostics"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "field_provenance": {
+      "additionalProperties": {
+        "enum": [
+          "measured",
+          "simulated",
+          "replay",
+          "manual",
+          "estimated"
+        ],
+        "type": "string"
+      },
+      "description": "telemetry field name -> provenance of that one value",
+      "propertyNames": {
+        "maxLength": 64
+      },
+      "title": "Field Provenance",
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema_version",
+    "chamber_id",
+    "source"
+  ],
+  "type": "object",
+  "examples": [
+    {
+      "schema_version": "1.0",
+      "chamber_id": "A",
+      "experiment_id": "experiment_001",
+      "timestamp_utc": null,
+      "chamber_temperature_c": 24.3,
+      "starter_temperature_c": 23.9,
+      "relative_humidity_percent": 72.0,
+      "gas_resistance_ohms": 105432.0,
+      "ph": null,
+      "ph_method": null,
+      "starter_height_mm": null,
+      "door_open": false,
+      "peltier_mode": "heating",
+      "temperature_setpoint_c": 25.0,
+      "motor_running": false,
+      "source": "measured",
+      "quality_flags": [
+        "illustrative_fixture"
+      ],
+      "device_id": "fermentai-esp32-a",
+      "boot_id": "boot_a001",
+      "sequence_number": 120,
+      "timestamp_quality": "unsynced",
+      "device_uptime_ms": 120000,
+      "internal_heatsink_temperature_c": 31.2,
+      "external_heatsink_temperature_c": 37.1,
+      "pressure_pa": 101325.0,
+      "peltier_output_fraction": 0.35,
+      "diagnostics": {
+        "wifi_rssi_dbm": -58.0,
+        "free_heap_bytes": 182344,
+        "firmware_version": "1.1.0",
+        "last_command_id": "6f1c2a9e-0d3b-4c1e-9a57-2b8d4e6f7a10",
+        "sensor_health": {
+          "bme680": "ok",
+          "ds18b20_starter": "ok",
+          "ds18b20_heatsink_internal": "ok",
+          "ds18b20_heatsink_external": "ok",
+          "ph": "missing",
+          "camera": "ok"
+        }
+      },
+      "field_provenance": {
+        "chamber_temperature_c": "measured"
+      }
+    }
+  ]
+}

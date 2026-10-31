@@ -1,0 +1,497 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fermentai.local/contracts/command_v1.schema.json",
+  "title": "FermentAI device command (GET /api/v1/chambers/{id}/desired-control -> commands[])",
+  "x-contract-revision": "1.1",
+  "x-generated-by": "uv run python -m fermentai.api.contract --write-schemas (source: src/fermentai/api/schemas.py)",
+  "$defs": {
+    "AnimateMotorCommand": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "command_id": {
+          "maxLength": 64,
+          "title": "Command Id",
+          "type": "string"
+        },
+        "chamber_id": {
+          "pattern": "^[A-Za-z0-9_-]{1,16}$",
+          "title": "Chamber Id",
+          "type": "string"
+        },
+        "experiment_id": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Experiment Id"
+        },
+        "issued_at_utc": {
+          "title": "Issued At Utc",
+          "type": "string"
+        },
+        "expires_at_utc": {
+          "title": "Expires At Utc",
+          "type": "string"
+        },
+        "sequence_number": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Monotonic per chamber across ALL actions; process ascending.",
+          "title": "Sequence Number"
+        },
+        "action": {
+          "const": "animate_motor",
+          "title": "Action",
+          "type": "string"
+        },
+        "parameters": {
+          "$ref": "#/$defs/AnimateMotorParams"
+        }
+      },
+      "required": [
+        "command_id",
+        "chamber_id",
+        "issued_at_utc",
+        "expires_at_utc",
+        "action",
+        "parameters"
+      ],
+      "title": "AnimateMotorCommand",
+      "type": "object"
+    },
+    "AnimateMotorParams": {
+      "additionalProperties": false,
+      "properties": {
+        "duration_ms": {
+          "exclusiveMinimum": 0,
+          "maximum": 10000,
+          "title": "Duration Ms",
+          "type": "integer"
+        },
+        "pattern": {
+          "default": "wiggle",
+          "enum": [
+            "wiggle",
+            "nod",
+            "spin"
+          ],
+          "title": "Pattern",
+          "type": "string"
+        }
+      },
+      "required": [
+        "duration_ms"
+      ],
+      "title": "AnimateMotorParams",
+      "type": "object"
+    },
+    "CaptureImageCommand": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "command_id": {
+          "maxLength": 64,
+          "title": "Command Id",
+          "type": "string"
+        },
+        "chamber_id": {
+          "pattern": "^[A-Za-z0-9_-]{1,16}$",
+          "title": "Chamber Id",
+          "type": "string"
+        },
+        "experiment_id": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Experiment Id"
+        },
+        "issued_at_utc": {
+          "title": "Issued At Utc",
+          "type": "string"
+        },
+        "expires_at_utc": {
+          "title": "Expires At Utc",
+          "type": "string"
+        },
+        "sequence_number": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Monotonic per chamber across ALL actions; process ascending.",
+          "title": "Sequence Number"
+        },
+        "action": {
+          "const": "capture_image",
+          "title": "Action",
+          "type": "string"
+        },
+        "parameters": {
+          "$ref": "#/$defs/CaptureImageParams"
+        }
+      },
+      "required": [
+        "command_id",
+        "chamber_id",
+        "issued_at_utc",
+        "expires_at_utc",
+        "action"
+      ],
+      "title": "CaptureImageCommand",
+      "type": "object"
+    },
+    "CaptureImageParams": {
+      "additionalProperties": false,
+      "properties": {},
+      "title": "CaptureImageParams",
+      "type": "object"
+    },
+    "NoopCommand": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "command_id": {
+          "maxLength": 64,
+          "title": "Command Id",
+          "type": "string"
+        },
+        "chamber_id": {
+          "pattern": "^[A-Za-z0-9_-]{1,16}$",
+          "title": "Chamber Id",
+          "type": "string"
+        },
+        "experiment_id": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Experiment Id"
+        },
+        "issued_at_utc": {
+          "title": "Issued At Utc",
+          "type": "string"
+        },
+        "expires_at_utc": {
+          "title": "Expires At Utc",
+          "type": "string"
+        },
+        "sequence_number": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Monotonic per chamber across ALL actions; process ascending.",
+          "title": "Sequence Number"
+        },
+        "action": {
+          "const": "noop",
+          "title": "Action",
+          "type": "string"
+        },
+        "parameters": {
+          "$ref": "#/$defs/NoopParams"
+        }
+      },
+      "required": [
+        "command_id",
+        "chamber_id",
+        "issued_at_utc",
+        "expires_at_utc",
+        "action"
+      ],
+      "title": "NoopCommand",
+      "type": "object"
+    },
+    "NoopParams": {
+      "additionalProperties": false,
+      "properties": {},
+      "title": "NoopParams",
+      "type": "object"
+    },
+    "SetSetpointCommand": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "command_id": {
+          "maxLength": 64,
+          "title": "Command Id",
+          "type": "string"
+        },
+        "chamber_id": {
+          "pattern": "^[A-Za-z0-9_-]{1,16}$",
+          "title": "Chamber Id",
+          "type": "string"
+        },
+        "experiment_id": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Experiment Id"
+        },
+        "issued_at_utc": {
+          "title": "Issued At Utc",
+          "type": "string"
+        },
+        "expires_at_utc": {
+          "title": "Expires At Utc",
+          "type": "string"
+        },
+        "sequence_number": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Monotonic per chamber across ALL actions; process ascending.",
+          "title": "Sequence Number"
+        },
+        "action": {
+          "const": "set_setpoint",
+          "title": "Action",
+          "type": "string"
+        },
+        "parameters": {
+          "$ref": "#/$defs/SetSetpointParams"
+        }
+      },
+      "required": [
+        "command_id",
+        "chamber_id",
+        "issued_at_utc",
+        "expires_at_utc",
+        "action",
+        "parameters"
+      ],
+      "title": "SetSetpointCommand",
+      "type": "object"
+    },
+    "SetSetpointParams": {
+      "additionalProperties": false,
+      "properties": {
+        "setpoint_c": {
+          "title": "Setpoint C",
+          "type": "number"
+        },
+        "control_mode": {
+          "default": "auto",
+          "enum": [
+            "auto",
+            "hold",
+            "idle"
+          ],
+          "title": "Control Mode",
+          "type": "string"
+        }
+      },
+      "required": [
+        "setpoint_c"
+      ],
+      "title": "SetSetpointParams",
+      "type": "object"
+    },
+    "StopMotorCommand": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0",
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "command_id": {
+          "maxLength": 64,
+          "title": "Command Id",
+          "type": "string"
+        },
+        "chamber_id": {
+          "pattern": "^[A-Za-z0-9_-]{1,16}$",
+          "title": "Chamber Id",
+          "type": "string"
+        },
+        "experiment_id": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Experiment Id"
+        },
+        "issued_at_utc": {
+          "title": "Issued At Utc",
+          "type": "string"
+        },
+        "expires_at_utc": {
+          "title": "Expires At Utc",
+          "type": "string"
+        },
+        "sequence_number": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Monotonic per chamber across ALL actions; process ascending.",
+          "title": "Sequence Number"
+        },
+        "action": {
+          "const": "stop_motor",
+          "title": "Action",
+          "type": "string"
+        },
+        "parameters": {
+          "$ref": "#/$defs/StopMotorParams"
+        }
+      },
+      "required": [
+        "command_id",
+        "chamber_id",
+        "issued_at_utc",
+        "expires_at_utc",
+        "action"
+      ],
+      "title": "StopMotorCommand",
+      "type": "object"
+    },
+    "StopMotorParams": {
+      "additionalProperties": false,
+      "properties": {
+        "target_command_id": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "animate_motor command being cancelled (if any).",
+          "title": "Target Command Id"
+        }
+      },
+      "title": "StopMotorParams",
+      "type": "object"
+    }
+  },
+  "discriminator": {
+    "mapping": {
+      "animate_motor": "#/$defs/AnimateMotorCommand",
+      "capture_image": "#/$defs/CaptureImageCommand",
+      "noop": "#/$defs/NoopCommand",
+      "set_setpoint": "#/$defs/SetSetpointCommand",
+      "stop_motor": "#/$defs/StopMotorCommand"
+    },
+    "propertyName": "action"
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/SetSetpointCommand"
+    },
+    {
+      "$ref": "#/$defs/AnimateMotorCommand"
+    },
+    {
+      "$ref": "#/$defs/StopMotorCommand"
+    },
+    {
+      "$ref": "#/$defs/CaptureImageCommand"
+    },
+    {
+      "$ref": "#/$defs/NoopCommand"
+    }
+  ],
+  "examples": [
+    {
+      "schema_version": "1.0",
+      "command_id": "6f1c2a9e-0d3b-4c1e-9a57-2b8d4e6f7a10",
+      "chamber_id": "A",
+      "experiment_id": "experiment_001",
+      "issued_at_utc": "2026-10-31T15:00:00Z",
+      "expires_at_utc": "2026-10-31T15:01:30Z",
+      "sequence_number": 42,
+      "action": "set_setpoint",
+      "parameters": {
+        "setpoint_c": 24.0,
+        "control_mode": "auto"
+      }
+    }
+  ]
+}

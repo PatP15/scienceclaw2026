@@ -12,7 +12,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import FileResponse, StreamingResponse
 
 from . import datafiles
-from .auth import require_token
+from .auth import Principal, require_device, require_operator
 from .config import Settings
 from .db import dumps, iso, loads_cols, parse_iso
 from .devices import ControlService, agent_key
@@ -35,7 +35,8 @@ from .schemas import (
 )
 
 router = APIRouter(prefix="/api/v1")
-AUTH = [Depends(require_token)]
+AUTH = [Depends(require_operator)]          # dashboard / agents / operator writes
+DEVICE = Depends(require_device)             # ESP32 endpoints (device token or operator token)
 
 
 def svc(request: Request) -> ControlService:
@@ -75,27 +76,29 @@ def health(request: Request):
 
 
 # ============================================================================ device endpoints
-@router.post("/telemetry", response_model=TelemetryAck, dependencies=AUTH, tags=["device"])
-def post_telemetry(t: TelemetryIn, request: Request):
-    return svc(request).ingest_telemetry(t)
+@router.post("/telemetry", response_model=TelemetryAck, tags=["device"])
+def post_telemetry(t: TelemetryIn, request: Request, principal: Principal = DEVICE):
+    return svc(request).ingest_telemetry(t, principal)
 
 
 @router.get("/chambers/{chamber_id}/desired-control", response_model=DesiredControl,
-            dependencies=AUTH, tags=["device"])
-def desired_control(chamber_id: str, request: Request):
-    return svc(request).desired_control(chamber_id)
+            tags=["device"])
+def desired_control(chamber_id: str, request: Request, principal: Principal = DEVICE):
+    c = svc(request)
+    c.authorize(principal, chamber_id)
+    return c.desired_control(chamber_id)
 
 
-@router.post("/control-ack", response_model=ControlAckOut, dependencies=AUTH, tags=["device"])
-def control_ack(ack: ControlAckIn, request: Request):
-    return svc(request).record_ack(ack)
+@router.post("/control-ack", response_model=ControlAckOut, tags=["device"])
+def control_ack(ack: ControlAckIn, request: Request, principal: Principal = DEVICE):
+    return svc(request).record_ack(ack, principal)
 
 
 _SAFE = re.compile(r"[^A-Za-z0-9_.-]")
 
 
-@router.post("/images", response_model=ImageOut, dependencies=AUTH, tags=["device"])
-async def post_image(request: Request):
+@router.post("/images", response_model=ImageOut, tags=["device"])
+async def post_image(request: Request, principal: Principal = DEVICE):
     """Either multipart/form-data (file, chamber_id, timestamp_utc, source[, experiment_id])
     or a raw `Content-Type: image/jpeg` body with the same fields as query parameters."""
     c, s = svc(request), settings(request)
@@ -118,10 +121,11 @@ async def post_image(request: Request):
     if not body.startswith(b"\xff\xd8"):
         raise HTTPException(422, "file is not a JPEG (missing FF D8 header)")
     chamber_id = fields.get("chamber_id") or ""
-    c.require_chamber(chamber_id)
+    c.authorize(principal, chamber_id, fields.get("device_id"))
     source = fields.get("source")
-    if source not in ("real", "simulated", "replay"):
-        raise HTTPException(422, "field 'source' must be one of real | simulated | replay")
+    if source not in ("measured", "real", "simulated", "replay"):
+        raise HTTPException(422, "field 'source' must be one of measured | simulated | replay")
+    source = "measured" if source == "real" else source
     now = c.clock()
     ts_raw = fields.get("timestamp_utc") or fields.get("timestamp")
     try:
@@ -190,8 +194,12 @@ def chamber_telemetry(chamber_id: str, request: Request, limit: int = Query(500,
 @router.post("/chambers/{chamber_id}/setpoint", response_model=SetpointResult, dependencies=AUTH,
              tags=["chambers"])
 def post_setpoint(chamber_id: str, body: SetpointIn, request: Request):
-    """Operator/agent setpoint request -> clamped, step-limited, rate-limited."""
-    return svc(request).set_desired_setpoint(chamber_id, body.setpoint_c, body.source, body.rationale)
+    """Operator/agent setpoint request -> clamped, step-limited, rate-limited.
+    Optional control_mode (auto|hold|idle) is applied first; it never changes the value."""
+    c = svc(request)
+    if body.control_mode is not None:
+        c.set_control_mode(chamber_id, body.control_mode, body.source, body.rationale)
+    return c.set_desired_setpoint(chamber_id, body.setpoint_c, body.source, body.rationale)
 
 
 @router.get("/chambers/{chamber_id}/setpoint-history", tags=["chambers"])
@@ -205,15 +213,36 @@ def setpoint_history(chamber_id: str, request: Request, limit: int = Query(200, 
 @router.post("/chambers/{chamber_id}/motor", dependencies=AUTH, tags=["chambers"])
 def post_motor(chamber_id: str, body: MotorCommandIn, request: Request):
     """Bounded chef-hat animation. Separate command type; cannot carry setpoint/Peltier fields."""
-    return svc(request).issue_motor_command(chamber_id, body.duration_s, body.pattern, body.reason,
+    duration_s = body.duration_ms / 1000.0 if body.duration_ms is not None else body.duration_s
+    return svc(request).issue_motor_command(chamber_id, duration_s, body.pattern, body.reason,
                                             body.source)
+
+
+@router.post("/chambers/{chamber_id}/capture-image", dependencies=AUTH, tags=["chambers"])
+def post_capture_image(chamber_id: str, request: Request):
+    """v1.1 capture_image command (device uploads a fresh JPEG via POST /images and acks)."""
+    return svc(request).issue_capture_command(chamber_id, "dashboard", "operator capture request")
+
+
+@router.get("/chambers/{chamber_id}/readings", tags=["chambers"])
+def chamber_readings(chamber_id: str, request: Request, field: str | None = None,
+                     limit: int = Query(500, le=20000)):
+    """Per-field sensor readings with unit, provenance and quality (v1.1)."""
+    return svc(request).readings(chamber_id, field, limit)
+
+
+@router.get("/devices", tags=["chambers"])
+def devices(request: Request, chamber_id: str | None = None):
+    """Device registry: device_id -> bound chamber, last boot/sequence/uptime."""
+    return svc(request).list_devices(chamber_id)
 
 
 # ============================================================================ commands
 @router.get("/commands", tags=["commands"])
 def list_commands(request: Request, chamber_id: str | None = None, command_type: str | None = None,
+                  action: str | None = None,
                   status: str | None = None, limit: int = Query(100, le=5000)):
-    return svc(request).list_commands(chamber_id, command_type, status, limit)
+    return svc(request).list_commands(chamber_id, command_type, status, limit, action)
 
 
 @router.delete("/commands/{command_id}", dependencies=AUTH, tags=["commands"])
@@ -328,8 +357,8 @@ def run_simulation(body: SimulationRunIn, request: Request):
                              "summary": result.get("summary")})
     if status == "error":
         raise HTTPException(422, {"simulation_id": sid, **result})
-    return {"simulation_id": sid, "status": status, "provenance": "simulated",
-            "schedule": candidates["schedule"], "result": result}
+    return {"schema_version": SCHEMA_VERSION, "simulation_id": sid, "status": status,
+            "provenance": "simulated", "schedule": candidates["schedule"], "result": result}
 
 
 @router.get("/simulations", tags=["simulations"])
@@ -342,10 +371,16 @@ def list_simulations(request: Request, limit: int = Query(20, le=500)):
 
 @router.get("/simulations/{simulation_id}", tags=["simulations"])
 def get_simulation(simulation_id: int, request: Request):
+    """Stored run in the simulation_result_v1 shape (+ request, created_at_utc)."""
     r = svc(request).db.query_one("SELECT * FROM simulations WHERE id=?", (simulation_id,))
     if not r:
         raise HTTPException(404, "simulation not found")
-    return loads_cols(r, "request_json", "result_json")
+    r = loads_cols(r, "request_json", "result_json")
+    req = r.get("request") or {}
+    return {"schema_version": SCHEMA_VERSION, "simulation_id": r["id"], "status": r["status"],
+            "provenance": "simulated", "created_at_utc": r["created_at_utc"],
+            "schedule": (req.get("kwargs") or {}).get("schedule"), "result": r.get("result"),
+            "request": req.get("request")}
 
 
 # ============================================================================ taste feedback
@@ -376,6 +411,72 @@ def agent_messages(agent_id: str, request: Request, limit: int = Query(100, le=2
             " OR recipient_key IN ('all','both','broadcast')) ORDER BY id DESC LIMIT ?",
             (since_id, key, key, limit))
     return [loads_cols(r, "content_json") for r in reversed(rows)]
+
+
+@router.get("/agents/{agent_id}/state", tags=["agents"])
+def agent_state(agent_id: str, request: Request):
+    """Calls fermentai.agents.state.get_agent_state(agent_id) when available; otherwise a
+    clearly-labelled stub derived from the API's own records."""
+    try:
+        from fermentai.agents.state import get_agent_state
+    except ImportError as e:
+        get_agent_state, why = None, f"fermentai.agents.state not importable ({e})"
+    if get_agent_state is not None:
+        try:
+            state = jsonable(get_agent_state(agent_id))
+            if isinstance(state, dict):
+                state.setdefault("available", True)
+                state.setdefault("agent_id", agent_id)
+                return state
+            return {"agent_id": agent_id, "available": True, "state": state}
+        except Exception as e:  # never break the dashboard on an agents-side error
+            why = f"get_agent_state failed: {type(e).__name__}: {e}"
+    c = svc(request)
+    key = agent_key(agent_id)
+    chamber = next((cid for cid in c.chamber_ids if cid.lower() == key), None)
+    last = c.db.query_one(
+        "SELECT * FROM agent_messages WHERE sender_key=? ORDER BY id DESC LIMIT 1", (key,))
+    hyp = c.db.query_one(
+        "SELECT * FROM scientist_hypotheses WHERE agent_id=? ORDER BY id DESC LIMIT 1", (agent_id,))
+    n = c.db.query_one("SELECT COUNT(*) AS n FROM agent_messages WHERE sender_key=?", (key,))["n"]
+    ctl = c.current_control(chamber) if chamber else None
+    return {
+        "agent_id": agent_id,
+        "available": False,
+        "stub": True,
+        "reason": why,
+        "chamber_id": chamber,
+        "messages_sent": n,
+        "latest_message": loads_cols(last, "content_json"),
+        "latest_hypothesis": loads_cols(hyp, "payload_json"),
+        "current_setpoint_c": ctl["setpoint_c"] if ctl else None,
+        "experiment_id": ctl.get("experiment_id") if ctl else None,
+        "provenance": "derived from API records (stub)",
+    }
+
+
+@router.get("/demos", tags=["data"])
+def demos(request: Request):
+    """Scripted/replay demo scenarios under data/demos (labelled replay by their authors)."""
+    root = settings(request).data_dir / "demos"
+    out = []
+    for f in datafiles.list_files(root, "/api/v1/demos", {".json"}):
+        try:
+            d = json.loads((root / f["path"]).read_text())
+            meta = d if isinstance(d, dict) else {}
+            f.update({k: meta.get(k) for k in ("title", "description", "label", "provenance", "mode")
+                      if k in meta})
+        except (OSError, json.JSONDecodeError) as e:
+            f["error"] = f"unreadable: {e}"
+        out.append(f)
+    return {"root": "data/demos", "files": out}
+
+
+@router.get("/demos/{path:path}", tags=["data"])
+def demo_file(path: str, request: Request):
+    if not path.lower().endswith(".json"):
+        raise HTTPException(415, "only .json demo files are served")
+    return datafiles.serve(settings(request).data_dir / "demos", path)
 
 
 # ============================================================================ events

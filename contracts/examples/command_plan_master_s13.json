@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0",
+  "command_id": "cmd_001",
+  "chamber_id": "A",
+  "action": "animate_motor",
+  "parameters": {
+    "duration_ms": 3000
+  },
+  "issued_at_utc": "2026-10-31T15:00:00Z",
+  "expires_at_utc": "2026-10-31T15:00:10Z"
+}

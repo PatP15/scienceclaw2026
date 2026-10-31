@@ -14,16 +14,13 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-SCHEMA = """
-CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
-
-CREATE TABLE IF NOT EXISTS telemetry (
+TELEMETRY_DDL = """CREATE TABLE IF NOT EXISTS telemetry (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     chamber_id TEXT NOT NULL,
     experiment_id TEXT,
-    timestamp_utc TEXT NOT NULL,          -- device time, or server receive time if missing
-    received_at_utc TEXT NOT NULL,
-    source TEXT NOT NULL,                 -- real | simulated | replay
+    timestamp_utc TEXT,                   -- device time; NULL when the device clock is unsynced (never invented)
+    received_at_utc TEXT NOT NULL,        -- server receipt time (always)
+    source TEXT NOT NULL,                 -- measured | simulated | replay  (v1.0 "real" stored as "measured")
     chamber_temperature_c REAL,
     starter_temperature_c REAL,
     relative_humidity_percent REAL,
@@ -36,8 +33,18 @@ CREATE TABLE IF NOT EXISTS telemetry (
     temperature_setpoint_c REAL,
     motor_running INTEGER,
     quality_flags_json TEXT NOT NULL DEFAULT '[]',
-    payload_json TEXT NOT NULL
+    payload_json TEXT NOT NULL,
+    device_id TEXT,
+    boot_id TEXT,
+    sequence_number INTEGER,
+    timestamp_quality TEXT,
+    device_uptime_ms INTEGER
 );
+"""
+
+SCHEMA = TELEMETRY_DDL + """
+CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
+
 CREATE INDEX IF NOT EXISTS ix_telemetry_chamber ON telemetry(chamber_id, id);
 
 CREATE TABLE IF NOT EXISTS chamber_control (
@@ -170,7 +177,133 @@ CREATE TABLE IF NOT EXISTS simulations (
     request_json TEXT NOT NULL,
     result_json TEXT
 );
+
+-- ---- v1.1 / PLAN_MASTER section 13 tables ------------------------------------------------
+CREATE TABLE IF NOT EXISTS devices (
+    device_id TEXT PRIMARY KEY,
+    chamber_id TEXT NOT NULL,             -- binding: a device may only write its own chamber
+    registered INTEGER NOT NULL DEFAULT 0, -- 1 = listed in configs/hardware.yaml
+    first_seen_at_utc TEXT,
+    last_seen_at_utc TEXT,
+    last_boot_id TEXT,
+    last_sequence_number INTEGER,
+    last_uptime_ms INTEGER,
+    firmware_version TEXT,
+    last_source TEXT
+);
+
+CREATE TABLE IF NOT EXISTS sensor_readings (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    telemetry_id INTEGER NOT NULL,
+    chamber_id TEXT NOT NULL,
+    device_id TEXT,
+    experiment_id TEXT,
+    field TEXT NOT NULL,                  -- telemetry field name (= sensor role)
+    value REAL,
+    unit TEXT,
+    provenance TEXT NOT NULL,             -- measured | simulated | replay | manual | estimated
+    quality TEXT,                         -- ok | missing | stale | invalid | uncalibrated | NULL
+    timestamp_utc TEXT,
+    received_at_utc TEXT NOT NULL,
+    device_uptime_ms INTEGER
+);
+CREATE INDEX IF NOT EXISTS ix_readings_chamber_field ON sensor_readings(chamber_id, field, id);
+
+CREATE TABLE IF NOT EXISTS temperature_schedules (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    experiment_id TEXT NOT NULL,
+    chamber_id TEXT NOT NULL,
+    created_at_utc TEXT NOT NULL,
+    source TEXT NOT NULL,
+    steps_json TEXT NOT NULL              -- [{"t_h":..,"setpoint_c":..}, ...] (proposal; clamped only when applied)
+);
+
+CREATE TABLE IF NOT EXISTS scientist_hypotheses (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    created_at_utc TEXT NOT NULL,
+    feedback_id INTEGER,
+    experiment_id TEXT,
+    agent_id TEXT,
+    statement TEXT NOT NULL,
+    provenance TEXT,
+    payload_json TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS model_calibrations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    created_at_utc TEXT NOT NULL,
+    model TEXT NOT NULL,
+    status TEXT,
+    n_points INTEGER,
+    source TEXT,
+    feedback_id INTEGER,
+    payload_json TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS molecular_results (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    imported_at_utc TEXT NOT NULL,
+    path TEXT NOT NULL UNIQUE,
+    system TEXT,
+    energy_ev REAL,
+    max_force_ev_per_a REAL,
+    converged INTEGER,
+    provenance TEXT NOT NULL,
+    payload_json TEXT NOT NULL
+);
 """
+
+# Columns added after the first release; added with ALTER TABLE on existing DBs (idempotent).
+ADDED_COLUMNS = {
+    "telemetry": [("device_id", "TEXT"), ("boot_id", "TEXT"), ("sequence_number", "INTEGER"),
+                  ("timestamp_quality", "TEXT"), ("device_uptime_ms", "INTEGER")],
+    "chamber_control": [("control_mode", "TEXT NOT NULL DEFAULT 'auto'")],
+    "commands": [("action", "TEXT")],
+    "agent_messages": [("message_uid", "TEXT"), ("in_reply_to", "TEXT"), ("chamber_id", "TEXT"),
+                       ("cycle_id", "TEXT")],
+}
+
+POST_MIGRATION = """
+CREATE UNIQUE INDEX IF NOT EXISTS ux_telemetry_dedup ON telemetry(device_id, boot_id, sequence_number)
+    WHERE device_id IS NOT NULL AND boot_id IS NOT NULL AND sequence_number IS NOT NULL;
+CREATE INDEX IF NOT EXISTS ix_telemetry_chamber ON telemetry(chamber_id, id);
+UPDATE commands SET action = CASE command_type WHEN 'control' THEN 'set_setpoint'
+    WHEN 'motor' THEN 'animate_motor' ELSE command_type END WHERE action IS NULL;
+-- PLAN_MASTER section 13 names as read-only aliases of the existing tables
+CREATE VIEW IF NOT EXISTS chambers AS SELECT * FROM chamber_control;
+CREATE VIEW IF NOT EXISTS camera_images AS SELECT * FROM images;
+CREATE VIEW IF NOT EXISTS experiment_definitions AS SELECT * FROM experiments;
+CREATE VIEW IF NOT EXISTS simulation_runs AS SELECT * FROM simulations;
+CREATE VIEW IF NOT EXISTS hardware_commands AS SELECT * FROM commands;
+CREATE VIEW IF NOT EXISTS command_acknowledgments AS SELECT * FROM acks;
+CREATE VIEW IF NOT EXISTS scientist_messages AS SELECT * FROM agent_messages;
+CREATE VIEW IF NOT EXISTS sensory_feedback AS SELECT * FROM taste_feedback;
+"""
+
+
+def migrate(conn: sqlite3.Connection) -> list[str]:
+    """Bring an existing DB up to the current schema. Safe to run repeatedly."""
+    done: list[str] = []
+    for table, cols in ADDED_COLUMNS.items():
+        have = {r[1] for r in conn.execute(f"PRAGMA table_info({table})")}
+        for name, decl in cols:
+            if name not in have:
+                try:
+                    conn.execute(f"ALTER TABLE {table} ADD COLUMN {name} {decl}")
+                    done.append(f"{table}.{name}")
+                except sqlite3.OperationalError as e:  # another process migrated concurrently
+                    if "duplicate column" not in str(e):
+                        raise
+    info = {r[1]: r for r in conn.execute("PRAGMA table_info(telemetry)")}
+    if info["timestamp_utc"][3]:  # NOT NULL from the first release -> rebuild as nullable
+        cols = ", ".join(info)
+        conn.execute("ALTER TABLE telemetry RENAME TO telemetry_v10_old")
+        conn.executescript(TELEMETRY_DDL)
+        conn.execute(f"INSERT INTO telemetry ({cols}) SELECT {cols} FROM telemetry_v10_old")
+        conn.execute("DROP TABLE telemetry_v10_old")
+        done.append("telemetry.timestamp_utc nullable")
+    conn.executescript(POST_MIGRATION)
+    return done
 
 
 def utcnow() -> datetime:
@@ -199,6 +332,7 @@ class Database:
         with self.connect() as conn:
             conn.execute("PRAGMA journal_mode=WAL")
             conn.executescript(SCHEMA)
+            self.migrations_applied = migrate(conn)
             conn.execute(
                 "INSERT OR IGNORE INTO meta(key, value) VALUES ('server_epoch', ?)",
                 (uuid.uuid4().hex[:12],),

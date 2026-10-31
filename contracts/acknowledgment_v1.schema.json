@@ -1,0 +1,162 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fermentai.local/contracts/acknowledgment_v1.schema.json",
+  "title": "FermentAI command acknowledgment (POST /api/v1/control-ack)",
+  "x-contract-revision": "1.1",
+  "x-generated-by": "uv run python -m fermentai.api.contract --write-schemas (source: src/fermentai/api/schemas.py)",
+  "additionalProperties": false,
+  "description": "Accepts the v1.0 shape (schema_version, message, applied_setpoint_c, ...) and the v1.1\nshape (device_id, device_uptime_ms, detail, result).",
+  "properties": {
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "command_id": {
+      "maxLength": 64,
+      "title": "Command Id",
+      "type": "string"
+    },
+    "chamber_id": {
+      "pattern": "^[A-Za-z0-9_-]{1,16}$",
+      "title": "Chamber Id",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "accepted",
+        "rejected",
+        "completed",
+        "failed",
+        "cancelled",
+        "expired"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "device_id": {
+      "anyOf": [
+        {
+          "maxLength": 64,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Device Id"
+    },
+    "device_uptime_ms": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Device Uptime Ms"
+    },
+    "detail": {
+      "anyOf": [
+        {
+          "maxLength": 300,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Detail"
+    },
+    "result": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "e.g. {\"applied_setpoint_c\": 24.0} or {\"ran_ms\": 3000}",
+      "title": "Result"
+    },
+    "sequence_number": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Sequence Number"
+    },
+    "timestamp_utc": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Timestamp Utc"
+    },
+    "applied_setpoint_c": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Control acks: setpoint actually applied after local limits.",
+      "title": "Applied Setpoint C"
+    },
+    "message": {
+      "anyOf": [
+        {
+          "maxLength": 300,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Message"
+    }
+  },
+  "required": [
+    "command_id",
+    "chamber_id",
+    "status"
+  ],
+  "type": "object",
+  "examples": [
+    {
+      "command_id": "b2c4d6e8-1a3b-4c5d-8e9f-0a1b2c3d4e5f",
+      "chamber_id": "A",
+      "status": "completed",
+      "device_id": "fermentai-esp32-a",
+      "device_uptime_ms": 123456,
+      "detail": "motor ran 3000 ms",
+      "result": {
+        "ran_ms": 3000
+      }
+    }
+  ]
+}
