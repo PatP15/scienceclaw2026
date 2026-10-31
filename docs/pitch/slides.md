@@ -62,18 +62,26 @@ slate = AI agent, crimson = the human judge.
 
 **Headline:** A head chef, two sous chefs, two stations
 
-**Figure:** `data/figures/architecture.png`. It shows the brigade in three rows with 4 arrows.
+**Figure:** `data/figures/architecture.png`, a four-panel strip read left → right, numbered 1–4.
+No line crosses another, and there are 5 arrows in total.
 
-- **Top:** the Pantry strip (NVIDIA ALCHEMI · COMPUTED, Fermentation model · MODELED) and a crimson
-  Guest chip. Guest feedback goes to the Head Chef (black, tall toque), and the Pantry feeds in
-  through a soft funnel.
-- **Middle:** the Head Chef issues one line, "goal: more sour, still airy", down to Sous Chef A (blue)
-  and Sous Chef B (orange), who argue across the pass in three stacked bubbles: "32 °C, then cool →",
-  "← overproof risk: 24 °C" and "trial 002 agreed".
-- **Under each sous chef:** muted "line cooks · simulations" chips (22°, 32→18°, 24° and 27°, 27→22°,
-  24°), placed beside them with no arrows.
-- **Bottom:** one "new schedule" arrow each to Station A and Station B. Each station is dashed
-  (measured, pending) with a lock glyph.
+1. **"Guest tastes":** the guest, with a bubble saying "more sour, still airy", above an arrow down to
+   the Head Chef (toque).
+2. **"Head Chef sets the goal":** a single "goal" arrow that splits to Sous Chef A (blue) and Sous
+   Chef B (orange).
+3. **"Sous chefs cook & argue":**
+   - Bubbles with tails sit on the pass counter: A says "32 °C, then cool", and B replies
+     "overproof: 24 °C". The caption reads "at the pass · on the Mac".
+   - Under each sous chef are three line cooks (pan glyphs), captioned "line cooks = simulations".
+   - Below them is the shared Pantry shelf, with two jars: "ALCHEMI · COMPUTED" and "forecasts ·
+     MODELED".
+4. **"Agreed trial → stations":** a "trial 002" ticket with one arrow each to Station A and Station B
+   (dashed green, lock glyph). The badge MEASURED · pending appears once.
+
+The notes narrate these four steps in order.
+
+`data/figures/scale.png` ("one kitchen → many kitchens") is a separate figure for the roadmap or Q&A,
+and is not in the deck yet.
 
 **Backups:** `data/figures/evidence_pipeline.png` (the five-stage pipeline) and
 `data/figures/dataflow.png` (what passes along each arrow). Both are for Q&A.

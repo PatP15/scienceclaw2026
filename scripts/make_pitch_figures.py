@@ -559,63 +559,107 @@ def icon_toque(ax, cx, cy, s, fc="white", ec=INK, tall=1.0):
     ax.plot([cx - 0.55 * s, cx + 0.55 * s], [cy + 0.05 * s] * 2, color=ec, lw=1.4, zorder=6)
 
 
+def _chef(ax, x0, y0, w, h, fc, letter=None, label=None):
+    """A chef card: toque + optional big letter or label."""
+    rbox(ax, x0, y0, w, h, fc=fc, ec=fc, r=2.4, zorder=2)
+    if letter:
+        icon_toque(ax, x0 + w * 0.32, y0 + h * 0.26, h * 0.17, tall=1.15)
+        ax.text(x0 + w * 0.72, y0 + h / 2, letter, fontsize=34, fontweight="bold", color="white", ha="center",
+                va="center", zorder=3)
+    else:
+        icon_toque(ax, x0 + 5.0, y0 + h * 0.24, h * 0.17, tall=1.2)
+        ax.text(x0 + w * 0.62, y0 + h / 2, label, fontsize=24, fontweight="bold", color="white", ha="center",
+                va="center", zorder=3, linespacing=1.0)
+
+
+def _bubble(ax, x0, y0, w, h, text, fc, tc, tail_x, tail_y):
+    """Speech bubble with a tail pointing at (tail_x, tail_y) below it."""
+    rbox(ax, x0, y0, w, h, fc=fc, ec="none", r=2.6, zorder=3)
+    ax.add_patch(Polygon([(tail_x - 1.6, y0 + 0.2), (tail_x + 1.6, y0 + 0.2), (tail_x, tail_y)], fc=fc, ec="none",
+                         zorder=3))
+    ax.text(x0 + w / 2, y0 + h / 2, text, fontsize=22, fontweight="bold", color=tc, ha="center", va="center",
+            zorder=4, linespacing=1.1)
+
+
+def _pan(ax, cx, cy, s, color=FAINT):
+    ax.add_patch(Circle((cx, cy), s, fc="white", ec=color, lw=2.2, zorder=3))
+    ax.plot([cx + s, cx + 2.2 * s], [cy, cy], color=color, lw=2.8, solid_capstyle="round", zorder=3)
+
+
 def fig_architecture():
-    """The brigade: Pantry + Guest -> Head Chef -> two Sous Chefs arguing -> their Stations. 4 arrows."""
+    """The brigade as a 4-panel strip, read left -> right. No crossing lines."""
     fig, ax = canvas()
-    # row 0: the pantry (shared evidence) and the guest
-    rbox(ax, 4.0, 75.0, 104.0, 13.0, fc=PANEL, ec="none", r=3.0, zorder=0)
-    ax.text(7.0, 81.5, "Pantry", fontsize=LBL, fontweight="bold", color=MUTED, va="center", rotation=0)
-    for k, (name, kind, word) in enumerate((("NVIDIA ALCHEMI", "computed", "COMPUTED"),
-                                            ("Fermentation model", "modeled", "MODELED"))):
-        x = 24.0 + k * 42.0
-        rbox(ax, x, 76.8, 40.0, 9.4, fc="white", ec=BADGES[kind][1], lw=3, r=2.0, zorder=2)
-        ax.text(x + 2.0, 83.6, name, fontsize=21, fontweight="bold", color=INK, va="center", zorder=3)
-        _b(ax, x + 2.0, 79.0, word, kind, size=17, ha="left")
-    rbox(ax, 116.0, 75.0, 40.0, 13.0, fc="white", ec=HUMAN, lw=3, r=3.0, zorder=2)
-    icon_person(ax, 124.0, 81.0, 3.4)
-    ax.text(131.0, 81.5, "Guest", fontsize=28, fontweight="bold", color=HUMAN, va="center", zorder=3)
-    # one soft funnel from the pantry; the guest's reaction goes to the head chef
-    ax.add_patch(Polygon([(40, 74.0), (92, 74.0), (72, 66.5), (60, 66.5)], fc="#e9e7e1", ec="none", zorder=0))
-    ax.add_patch(FancyArrowPatch((136.0, 74.6), (101.5, 63.0), connectionstyle="angle,angleA=-90,angleB=0,rad=6",
-                                 arrowstyle="-|>,head_length=0.9,head_width=0.5", mutation_scale=22, color=HUMAN,
-                                 lw=3.5, zorder=1, shrinkA=0, shrinkB=0))
-    # row 1: the head chef
-    rbox(ax, 58.0, 57.0, 43.0, 12.0, fc=INK, ec=INK, r=3.0, zorder=2)
-    icon_toque(ax, 66.0, 59.8, 3.0, tall=1.3)
-    ax.text(85.0, 63.0, "Head Chef", fontsize=30, fontweight="bold", color="white", ha="center", va="center",
-            zorder=3)
-    arrow(ax, (80.0, 56.6), (80.0, 49.6), color=INK, lw=4, head=22)
-    ax.text(82.5, 53.0, "goal: more sour, still airy", fontsize=SMALL, fontweight="bold", color=INK, ha="left",
-            va="center")
-    # row 2: two sous chefs arguing across the pass
-    for x, name, col in ((4.0, "Sous Chef A", A_COL), (112.0, "Sous Chef B", B_COL)):
-        rbox(ax, x, 31.0, 44.0, 15.0, fc=col, ec=col, r=3.0, zorder=2)
-        icon_toque(ax, x + 6.5, 35.5, 2.4, tall=1.1)
-        ax.text(x + 26.0, 38.5, name, fontsize=28, fontweight="bold", color="white", ha="center", va="center",
+    widths, gap, x = (34.0, 34.0, 52.0, 34.0), 1.4, 0.9
+    xs = []
+    for w in widths:
+        xs.append(x)
+        x += w + gap
+    titles = ("Guest\ntastes", "Head Chef\nsets the goal", "Sous chefs\ncook & argue", "Agreed trial\n→ stations")
+    for k, (x0, w, t) in enumerate(zip(xs, widths, titles)):
+        rbox(ax, x0, 2.0, w, 86.0, fc="#f7f6f2", ec="none", r=2.6, zorder=0)
+        ax.add_patch(Circle((x0 + 3.8, 81.8), 2.6, fc=INK, ec="none", zorder=2))
+        ax.text(x0 + 3.8, 81.8, str(k + 1), fontsize=20, fontweight="bold", color="white", ha="center", va="center",
                 zorder=3)
-    for k, (text, fc, tc) in enumerate((("32 °C, then cool →", "#e3eef8", A_COL),
-                                        ("← overproof risk: 24 °C", "#fde9d8", "#d4660a"),
-                                        ("trial 002 agreed", INK, "white"))):
-        by = 45.6 - k * 6.6
-        rbox(ax, 53.0, by - 2.9, 54.0, 5.8, fc=fc, ec="none", r=2.6, zorder=2)
-        ax.text(80.0, by, text, fontsize=24, fontweight="bold", color=tc, ha="center", va="center", zorder=3)
-    # line cooks: candidate simulations each sous chef dispatches (muted, no arrows)
-    for x0, temps in ((13.0, ("22°", "32→18°", "24°")), (112.0, ("27°", "27→22°", "24°"))):
-        ax.text(x0 + 17.5, 27.4, "line cooks · simulations", fontsize=18, color=MUTED, ha="center", va="center")
-        for k, t in enumerate(temps):
-            cx0 = x0 + k * 12.0
-            rbox(ax, cx0, 19.8, 11.0, 4.8, fc=PANEL, ec=LINE, lw=1.2, r=1.6, zorder=2)
-            ax.text(cx0 + 5.5, 22.2, t, fontsize=18, color=MUTED, ha="center", va="center", zorder=3)
-    # each sous chef runs its own station (arrows on the outer edges)
-    for cx, lab_x, ha in ((7.0, 10.0, "left"), (153.0, 150.0, "right")):
-        arrow(ax, (cx, 30.6), (cx, 14.4), color=INK, lw=4, head=22)
-        ax.text(lab_x, 16.8, "new schedule", fontsize=SMALL, fontweight="bold", color=INK, ha=ha, va="center")
-    for x, name, col in ((4.0, "Station A", A_COL), (112.0, "Station B", B_COL)):
-        rbox(ax, x, 2.0, 44.0, 12.0, fc="white", ec=col, lw=3.5, ls=(0, (5, 3)), r=2.0, zorder=2)
-        ax.text(x + 22.0, 8.0, name, fontsize=LBL + 2, fontweight="bold", color=INK, ha="center", va="center",
+        ax.text(x0 + 7.6, 81.8, t, fontsize=22, fontweight="bold", color=INK, ha="left", va="center",
+                linespacing=1.05)
+    # 1. guest tastes -> head chef
+    x0 = xs[0]
+    ax.add_patch(Circle((x0 + 8.0, 63.0), 3.0, fc=HUMAN, ec="none", zorder=3))
+    ax.add_patch(Wedge((x0 + 8.0, 52.5), 6.0, 0, 180, fc=HUMAN, ec="none", zorder=3))
+    _bubble(ax, x0 + 13.0, 62.0, 20.0, 12.0, "more sour,\nstill airy", "#fbe3ec", HUMAN, x0 + 13.5, 60.5)
+    arrow(ax, (x0 + 17.0, 50.0), (x0 + 17.0, 31.0), color=INK, lw=4, head=24)
+    _chef(ax, x0 + 4.0, 12.0, 26.0, 18.0, INK, label="Head\nChef")
+    # 2. head chef -> one goal, split to A and B
+    x0 = xs[1]
+    _chef(ax, x0 + 4.0, 60.0, 26.0, 16.0, INK, label="Head\nChef")
+    ax.plot([x0 + 17.0, x0 + 17.0], [59.6, 47.0], color=INK, lw=4, zorder=1)
+    ax.text(x0 + 18.8, 53.5, "goal", fontsize=24, fontweight="bold", color=INK, va="center")
+    for tx in (x0 + 8.5, x0 + 25.5):
+        ax.add_patch(FancyArrowPatch((x0 + 17.0, 47.0), (tx, 33.4), arrowstyle="-|>,head_length=0.9,head_width=0.5",
+                                     mutation_scale=22, color=INK, lw=4, zorder=1, shrinkA=0, shrinkB=0))
+    _chef(ax, x0 + 1.5, 16.0, 14.5, 17.0, A_COL, letter="A")
+    _chef(ax, x0 + 18.0, 16.0, 14.5, 17.0, B_COL, letter="B")
+    # 3. sous chefs cook from the shared pantry, run line cooks, and argue at the pass
+    x0 = xs[2]
+    ax_, bx_ = x0 + 1.5, x0 + 39.5
+    ax.add_patch(Rectangle((x0 + 1.5, 60.0), 49.0, 1.3, fc="#9aa3ab", ec="none", zorder=2))  # the pass counter
+    _bubble(ax, x0 + 1.5, 63.6, 23.5, 11.4, "32 °C,\nthen cool", "#e3eef8", A_COL, ax_ + 5.5, 61.4)
+    _bubble(ax, x0 + 27.0, 63.6, 23.5, 11.4, "overproof:\n24 °C", "#fde9d8", "#c2560a", bx_ + 5.5, 61.4)
+    _chef(ax, ax_, 46.0, 11.0, 12.5, A_COL, letter="A")
+    _chef(ax, bx_, 46.0, 11.0, 12.5, B_COL, letter="B")
+    ax.text(x0 + 26.0, 54.5, "at the pass", fontsize=18, color=MUTED, ha="center", va="center")
+    ax.text(x0 + 26.0, 50.5, "on the Mac", fontsize=18, color=MUTED, ha="center", va="center")
+    for cx0 in (ax_, bx_):  # three line cooks under each sous chef
+        for k in range(3):
+            _pan(ax, cx0 + 1.6 + k * 3.6, 41.8, 1.05)
+    ax.text(x0 + 26.0, 36.8, "line cooks = simulations", fontsize=17, color=MUTED, ha="center", va="center")
+    rbox(ax, x0 + 3.0, 10.0, 46.0, 22.0, fc="#efe6d4", ec="none", r=2.0, zorder=1)
+    ax.plot([x0 + 3.0, x0 + 49.0], [10.6, 10.6], color="#b98a52", lw=4, zorder=2)
+    for k, (name, kind, word) in enumerate((("ALCHEMI", "computed", "COMPUTED"), ("forecasts", "modeled", "MODELED"))):
+        jx = x0 + 5.0 + k * 22.5
+        col = BADGES[kind][1]
+        rbox(ax, jx, 12.0, 20.0, 15.0, fc="white", ec=col, lw=3, r=2.2, zorder=3)
+        rbox(ax, jx + 3.0, 26.4, 14.0, 2.6, fc=col, ec=col, r=0.8, zorder=3)  # lid
+        ax.text(jx + 10.0, 22.0, name, fontsize=21, fontweight="bold", color=INK, ha="center", va="center", zorder=4)
+        _b(ax, jx + 10.0, 16.0, word, kind, size=15)
+    # 4. one agreed ticket -> both stations
+    x0 = xs[3]
+    rbox(ax, x0 + 5.0, 62.0, 24.0, 12.0, fc=INK, ec=INK, r=1.2, zorder=2)
+    for yy in (62.0, 74.0):
+        ax.add_patch(Circle((x0 + 17.0, yy), 1.2, fc="#f7f6f2", ec="none", zorder=3))
+    ax.text(x0 + 17.0, 68.0, "trial 002", fontsize=26, fontweight="bold", color="white", ha="center", va="center",
+            zorder=4)
+    for (sx, tx) in ((x0 + 12.0, x0 + 9.0), (x0 + 22.0, x0 + 25.0)):
+        arrow(ax, (sx, 61.6), (tx, 42.4), color=INK, lw=4, head=24)
+    for sx0, letter, col in ((x0 + 1.5, "A", A_COL), (x0 + 18.0, "B", "#d4660a")):
+        rbox(ax, sx0, 22.0, 14.5, 20.0, fc="white", ec=GREEN, lw=3, ls=(0, (5, 3)), r=2.0, zorder=2)
+        ax.text(sx0 + 7.25, 36.0, letter, fontsize=34, fontweight="bold", color=col, ha="center", va="center",
                 zorder=3)
-        icon_lock(ax, x + 37.5, 7.6, 3.2, color=INK)
+        icon_lock(ax, sx0 + 7.25, 27.0, 3.0, color=INK)
+    _b(ax, x0 + 17.0, 13.0, "MEASURED · pending", "measured_pending", size=17)
     return save(fig, "architecture")
+
+
 
 
 
@@ -941,6 +985,49 @@ def fig_tech_highlights():
     return save(fig, "tech_highlights")
 
 
+def _kitchen_tile(ax, x, y, w, h):
+    """Compact kitchen: sous chefs A/B at a local pass, line cooks, two locked stations."""
+    rbox(ax, x, y, w, h, fc="#f7f6f2", ec=LINE, lw=1.5, r=2.0, zorder=1)
+    cw, ch = 0.28 * w, 0.24 * h
+    for cx, col in ((x + 0.06 * w, A_COL), (x + 0.66 * w, B_COL)):
+        rbox(ax, cx, y + 0.66 * h, cw, ch, fc=col, ec=col, r=1.2, zorder=2)
+        icon_toque(ax, cx + cw / 2, y + 0.66 * h + 0.22 * ch, 0.2 * ch, tall=1.0)
+        for k in range(3):
+            _pan(ax, cx + 0.15 * cw + k * 0.33 * cw, y + 0.56 * h, 0.035 * w)
+    ax.add_patch(Rectangle((x + 0.36 * w, y + 0.77 * h), 0.28 * w, 0.025 * h + 0.4, fc="#9aa3ab", ec="none",
+                           zorder=2))
+    for sx in (x + 0.06 * w, x + 0.54 * w):
+        rbox(ax, sx, y + 0.08 * h, 0.4 * w, 0.32 * h, fc="white", ec=GREEN, lw=2, ls=(0, (4, 2.5)), r=1.2, zorder=2)
+        icon_lock(ax, sx + 0.2 * w, y + 0.22 * h, 0.07 * h, color=INK)
+
+
+def fig_scale():
+    """One kitchen -> many kitchens, sharing a replicated findings log."""
+    fig, ax = canvas()
+    ax.text(80.0, 85.0, "one kitchen → many kitchens", fontsize=32, fontweight="bold", color=INK, ha="center",
+            va="center")
+    # chips above the shared bar
+    rbox(ax, 30.0, 66.0, 44.0, 10.0, fc=INK, ec=INK, r=2.4, zorder=2)
+    icon_toque(ax, 36.0, 68.4, 2.0, tall=1.2)
+    ax.text(55.0, 71.0, "executive chef", fontsize=26, fontweight="bold", color="white", ha="center", va="center",
+            zorder=3)
+    rbox(ax, 83.0, 66.0, 54.0, 10.0, fc="white", ec=TEAL, lw=3, r=2.4, zorder=2)
+    ax.text(110.0, 71.0, "pantry · ALCHEMI cache", fontsize=24, fontweight="bold", color=TEAL, ha="center",
+            va="center", zorder=3)
+    for cx in (52.0, 110.0):
+        ax.plot([cx, cx], [66.0, 61.5], color=FAINT, lw=3, zorder=1)
+    # the shared pass
+    rbox(ax, 4.0, 55.0, 152.0, 6.5, fc="#5f6b75", ec="none", r=1.6, zorder=2)
+    ax.text(80.0, 58.25, "shared pass · replicated findings log", fontsize=24, fontweight="bold", color="white",
+            ha="center", va="center", zorder=3)
+    # one kitchen (left, larger) and three more (right)
+    tiles = [(6.0, 6.0, 46.0, 44.0)] + [(62.0 + k * 32.0, 14.0, 28.0, 28.0) for k in range(3)]
+    for (tx, ty, tw, th) in tiles:
+        ax.plot([tx + tw / 2, tx + tw / 2], [ty + th, 55.0], color=FAINT, lw=3, zorder=0)
+        _kitchen_tile(ax, tx, ty, tw, th)
+    return save(fig, "scale")
+
+
 FIGURES = {
     "closed_loop": fig_closed_loop,
     "evidence_pipeline": fig_evidence_pipeline,
@@ -950,6 +1037,7 @@ FIGURES = {
     "benchmark_summary": fig_benchmark_summary,
     "tech_highlights": fig_tech_highlights,
     "dataflow": fig_dataflow,
+    "scale": fig_scale,
 }
 
 
