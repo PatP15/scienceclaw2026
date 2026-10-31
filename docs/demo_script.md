@@ -19,7 +19,7 @@ means sensor data, which is what the pitch calls **measured**. The UI names used
 - the reasoning label **Online Agent** / **Offline Policy**;
 - **Replay example**, **Interpret & plan next experiment** and **▶ Start automaton animation**.
 
-Spoken words come to about 281 (2 min 00 s at 140 wpm). The other ~60 s is for tasting, typing and
+Spoken words come to about 288 (2 min 03 s at 140 wpm). The other ~60 s is for tasting, typing and
 waiting for the agents.
 
 ---
@@ -57,13 +57,13 @@ waiting for the agents.
 
 | Time | Screen / action | Say |
 |---|---|---|
-| **0:00–0:20** | Hand each judge a slice of A and B. *Tap* **Live Laboratories**. | "Two loaves, same dough, two temperatures. These are the two chambers that fermented them. Each one has its own AI scientist agent." |
+| **0:00–0:20** | Hand each judge a slice of A and B. *Tap* **Live Laboratories**. | "Two loaves, same dough, two temperatures. These are the two stations that fermented them. Each one has its own sous chef, an AI scientist agent." |
 | **0:20–0:40** | Point at the A and B cards and at the mode indicator. | "A is blue and holds 22 degrees. B is orange, at 27. The indicator up here says whether you're seeing live hardware, a replay or a simulation, and every number carries its own badge." |
 | **0:40–0:58** | *Tap* **Digital Twin**. Point at the pH and rise curves, then at the crumb specimens on the table if they're printed. | "This is our fermentation model, so this is modeled, not measured. It predicts B acidifies faster and overproofs early. Each forecast becomes a crumb specimen, prepared for Formlabs printing." |
 | **0:58–1:15** | *Tap* **NVIDIA Molecular Explorer**. | "This part is computed: NVIDIA ALCHEMI on a Brev GPU, checked against published experiments. A thermodynamic cycle puts lactic acid about four pKa units stronger than acetic. Experiment says one, so the sign is right. That bounds the model's acid terms. It doesn't drive the bread." |
 | **1:15–1:42** | *Tap* **Taste → Next Experiment**. Hand the iPad to a judge, or type their words for them into the box under **What did the bread taste like?** | "Now you're the scientist. What did the bread taste like? Plain words are fine." |
 | **1:42–1:47** | *Tap* **Interpret & plan next experiment**. | "It's turning that into sensory preferences." |
-| **1:47–2:20** | Scroll the steps as they fill: interpretation, comparison, Agent A hypothesis, Agent B critique, recommended experiment. Point at the **Offline Policy** or **Online Agent** label, then at **Updated experiment plan**. | "Here are your words as structured preferences. Agent A proposes a new temperature schedule. Agent B checks it against its own model and pushes back. They agree, and the plan updates. This label says the deterministic offline policy made the decision, not a live model." *(If it says Online Agent, say "Claude made this decision live".)* |
+| **1:47–2:20** | Scroll the steps as they fill: interpretation, comparison, Agent A hypothesis, Agent B critique, recommended experiment. (On screen, Agent/Scientist A and B are the sous chefs from slide 2.) Point at the **Offline Policy** or **Online Agent** label, then at **Updated experiment plan**. | "The head chef turned your words into the goal. Sous Chef A proposes a new temperature schedule. Sous Chef B checks it against its own simulations and pushes back. They agree, and the plan updates. This label says the deterministic offline policy made the decision, not a live model." *(If it says Online Agent, say "Claude made this decision live".)* |
 | **2:20–2:35** | Look at the chambers. The chef-hats wiggle for up to 5 s. If they don't, *tap* **Live Laboratories**, then **▶ Start automaton animation** on A and on B. | "The chef-hats announce the new experiment. The motor is a separate, time-limited command. The language model never controls power. Setpoints are clamped by the API and again in the firmware." |
 | **2:35–2:55** | Stay on the plan card. | *(Read the measured / computed / modeled line below, word for word.)* |
 | **2:55–3:00** | — | "Taste, type, and the lab plans the next experiment. Thank you." |

@@ -28,8 +28,8 @@ EXAMPLE is grey. The figures live in
 every number from the data files. Partner names appear as plain-text wordmarks only. The deck
 sources in `docs/pitch/deck/slides/*.html` mirror this file.
 
-Timing assumes about 140 words per minute. The spoken notes total 409 words, which is
-2 min 55 s (see the table at the end).
+Timing assumes about 140 words per minute. The spoken notes total 410 words, which is
+2 min 56 s (see the table at the end).
 
 ---
 
@@ -58,32 +58,48 @@ slate = AI agent, crimson = the human judge.
 
 ---
 
-## Slide 2: two AI scientists
+## Slide 2: the brigade
 
-**Headline:** Two AI scientists, one experiment at a time
+**Headline:** A head chef, two sous chefs, two stations
 
-**Figure:** `data/figures/architecture.png`, three rows and 3 arrows.
+**Figure:** `data/figures/architecture.png`. It shows the brigade in three rows with 4 arrows.
 
-- **Top:** one evidence strip with three chips: NVIDIA ALCHEMI · COMPUTED, Fermentation model ·
-  MODELED, and Judge feedback. One wide arrow runs down from it.
-- **Middle:** Scientist A (blue) and Scientist B (orange), with three stacked bubbles between them:
-  "32 °C, then cool →", "← overproof risk: 24 °C" and "trial 002 agreed".
-- **Bottom:** "new schedule" arrows go straight down to Chamber A and Chamber B. Each chamber is
-  dashed (measured, pending) and has a lock glyph for the firmware safety limits.
+- **Top:** the Pantry strip (NVIDIA ALCHEMI · COMPUTED, Fermentation model · MODELED) and a crimson
+  Guest chip. Guest feedback goes to the Head Chef (black, tall toque), and the Pantry feeds in
+  through a soft funnel.
+- **Middle:** the Head Chef issues one line, "goal: more sour, still airy", down to Sous Chef A (blue)
+  and Sous Chef B (orange), who argue across the pass in three stacked bubbles: "32 °C, then cool →",
+  "← overproof risk: 24 °C" and "trial 002 agreed".
+- **Under each sous chef:** muted "line cooks · simulations" chips (22°, 32→18°, 24° and 27°, 27→22°,
+  24°), placed beside them with no arrows.
+- **Bottom:** one "new schedule" arrow each to Station A and Station B. Each station is dashed
+  (measured, pending) with a lock glyph.
 
 **Backups:** `data/figures/evidence_pipeline.png` (the five-stage pipeline) and
 `data/figures/dataflow.png` (what passes along each arrow). Both are for Q&A.
 
 **On-slide bullets:** none. The figure carries the slide.
 
-**Speaker notes (97 words, 42 s)**
+**Brigade glossary** (the kitchen name, then what it is in the code and data)
 
-> Each chamber has its own AI scientist. Both read the same evidence: computed molecular chemistry
-> from NVIDIA ALCHEMI, forecasts from our fermentation model, and whatever the judges said about the
-> last loaf. Then they argue. A proposes a hot start and a cool finish; B objects that it overproofs
-> and counters with a steady twenty-four. They settle on trial two, and each sends a new temperature
-> schedule down to its own chamber. The chamber firmware clamps every setpoint, so no model and no
-> judge can push the hardware past its limits. Everything runs on a laptop, offline.
+| Brigade | System |
+|---|---|
+| Guest | The judge (free-text taste feedback on the iPad) |
+| Head Chef | The orchestrator: `fermentai.agents.pipeline`, the taste-feedback cycle that sets the goal, assigns the agents and calls the plan |
+| Sous Chef A · B | The scientist agents, Scientist A / B (`ScientistAgent`, `agent_id` `scientist_A` / `scientist_B`) |
+| Line cooks | Candidate simulations: the schedule library run through the kinetics model |
+| Pantry | Shared evidence: NVIDIA ALCHEMI results (computed) and fermentation forecasts (modeled) |
+| Stations | The chambers: ESP32 + Peltier, setpoints clamped by API and firmware |
+| The pass | The shared append-only findings log, where proposals and critiques are exchanged |
+
+**Speaker notes (98 words, 42 s)**
+
+> Think of it as a kitchen brigade. The guest tastes and tells us what they think. Our Head Chef
+> turns that into the dish, more sour but still airy, and assigns the work. Two sous chefs
+> (Scientist A and B) each run their own station. Both draw on the same pantry: computed acid
+> chemistry from NVIDIA ALCHEMI and our modeled fermentation forecasts. Each sous chef sends out a
+> dozen line cooks, candidate simulations, and keeps the best. Then they argue across the pass until
+> they agree on a trial. Every station is safety-locked, because firmware clamps each setpoint.
 
 ---
 
@@ -155,10 +171,10 @@ slate = AI agent, crimson = the human judge.
 | Slide | Spoken words | At 140 wpm |
 |---|---|---|
 | 1 | 94 | 40 s |
-| 2 | 97 | 42 s |
+| 2 | 98 | 42 s |
 | 3 | 110 | 47 s |
 | 4 | 108 | 46 s |
-| **Total** | **409** | **2 min 55 s** |
+| **Total** | **410** | **2 min 56 s** |
 
 Recount with `sed -n '/^> /p' docs/pitch/slides.md | sed 's/^> //' | wc -w`.
 
