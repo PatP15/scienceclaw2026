@@ -90,7 +90,8 @@ Connect it to I²C 41/42.
 
 ## Step 6: DS18B20 probes, one at a time
 
-1. Connect the bus (4.7 kΩ pull-up) with **one** probe. Run `scan` and note its ROM. Assign it,
+1. Connect the bus (4.7 kΩ pull-up) with **one** probe. Run `scan` and note its ROM. If it shows 0
+   probes, `owtest` tells pull-up / presence apart and `owsearch` prints raw ROMs with CRC. Assign it,
    for example `assign 28ff641e0f123456 starter`, and label the cable.
 2. Add the next probe, run `scan` (the new ROM shows `UNASSIGNED`), and assign
    `internal_heatsink`. Repeat for `external_heatsink`.
@@ -203,7 +204,7 @@ able to reach the supply switch.
 | 3 | | | | |
 | 4 | A | pass (bench, bare reed on GPIO39): magnet near = `closed`, away = `open`, tracked every move; open count rose faster than the moves (possible bounce or threshold hover), recheck debounce once mounted on the door. | 2026-10-31 | PP + Claude |
 | 5 | A | ENS160+AHT21 on I²C 41/42 (instead of BME680): AHT21 0x38 23–25 °C / 21 % RH; ENS160 found at 0x53, first data after ~20 s (AQI 1, TVOC 9–24 ppb, eCO2 400 ppm, `warmup=1`). Pressure/gas null as expected. Breath test: RH 21→54 %, TVOC 22→91 ppb, eCO2 400→535, AQI 1→2, back to baseline within 15 s. Reference-thermometer comparison and unplug test pending. | 2026-10-31 | PP + Claude |
-| 6 | | | | |
+| 6 | A | in progress: probe 1 found after the OneWire GPIO47 fix, ROM `283e4825000000c6` → starter. Hand-warm, reboot-persistence and unplug tests pending; probes 2 and 3 pending. | 2026-10-31 | PP + Claude |
 | 7 | | | | |
 | 8 | | | | |
 | 9 | | | | |

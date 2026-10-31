@@ -106,6 +106,6 @@ port with DTR/RTS asserted resets the chip (new `boot_id`), so open it with both
 | GPIO38 level during reset (RST held) / after boot | | | |
 | GPIO40 level during reset / after boot | | | |
 | GPIO14 / GPIO21 level during reset | | | |
-| GPIO47 pull-up voltage (must be 3.3 V domain) | | | |
+| GPIO47 pull-up voltage (must be 3.3 V domain) | 3.3 V class module (8 MB octal PSRAM, not a "V" variant); 4.7 kΩ external pull-up fitted; `owtest` shows clean recovery and a presence pulse. **Stock OneWire 2.3.8 cannot use GPIO46-48 on the S3** (reads always 0, refuses output above GPIO33): fixed by the vendored copy in `lib/OneWire`. | 2026-10-31 | PP + Claude |
 | Pins 1, 14, 21, 38, 39, 40, 41, 42, 47 present on the header | | | |
 | Pin map chosen (default / ALT) | | | |

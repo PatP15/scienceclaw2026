@@ -335,7 +335,7 @@ void handleLine(char* line) {
         "status | scan | assign <rom16hex> <starter|internal_heatsink|external_heatsink> |\n"
         "unassign <role> | phcal 4|7|clear | arm peltier <CHAMBER_ID> | disarm peltier |\n"
         "arm motor | disarm motor | motor test <ms> | setpoint <C> (local, clamped) |\n"
-        "wifi <ssid> <pass> | backend <url> | token <token> | pin <gpio> | i2cscan | reboot");
+        "wifi <ssid> <pass> | backend <url> | token <token> | pin <gpio> | owtest | owsearch | i2cscan | reboot");
   } else if (!strcmp(cmd, "status")) {
     printStatus(now);
   } else if (!strcmp(cmd, "scan")) {
@@ -437,6 +437,59 @@ void handleLine(char* line) {
     } else {
       Serial.printf("GPIO%d level=%d\n", p, (int)digitalRead(p));
     }
+  } else if (!strcmp(cmd, "owtest")) {
+    // Read-only-ish diagnostic for the OneWire line: a 480 us reset pulse, then sample the line as
+    // it recovers. No internal pull-up is enabled, so the recovery shows the EXTERNAL 4.7k.
+    //   2us=1              -> external pull-up present
+    //   2us=0, 460us=0     -> no pull-up (line floats / stays low)
+    //   60-200us=0 with 2us=1 -> a DS18B20 presence pulse: a probe is answering
+    const int p = pins::kOneWire;
+    pinMode(p, INPUT);
+    const int idle = digitalRead(p);
+    noInterrupts();
+    pinMode(p, OUTPUT);
+    digitalWrite(p, LOW);
+    delayMicroseconds(480);
+    pinMode(p, INPUT);
+    delayMicroseconds(2);
+    const int r2 = digitalRead(p);
+    delayMicroseconds(58);
+    const int r60 = digitalRead(p);
+    delayMicroseconds(60);
+    const int r120 = digitalRead(p);
+    delayMicroseconds(80);
+    const int r200 = digitalRead(p);
+    delayMicroseconds(260);
+    const int r460 = digitalRead(p);
+    interrupts();
+    Serial.printf("owtest GPIO%d idle=%d release+2us=%d +60us=%d +120us=%d +200us=%d +460us=%d\n", p, idle,
+                  r2, r60, r120, r200, r460);
+    if (!r2 && !r460)
+      Serial.println("  -> NO PULL-UP seen: fit 4.7k between the data pin and 3V3 (or data wire is on the wrong pin)");
+    else if (r2 && (!r60 || !r120 || !r200))
+      Serial.println("  -> pull-up OK and a device answered (presence pulse)");
+    else if (r2)
+      Serial.println("  -> pull-up OK but NO device answers: check probe power (red=3V3, black=GND) and the data wire");
+    else
+      Serial.println("  -> ambiguous, repeat");
+  } else if (!strcmp(cmd, "owsearch")) {
+    // Raw OneWire ROM search on a temporary bus object: prints every address found, with its
+    // CRC result and family code, so a rejected clone / corrupt ROM is visible.
+    OneWire ow(pins::kOneWire);
+    Serial.printf("owsearch GPIO%d reset/presence=%d\n", pins::kOneWire, (int)ow.reset());
+    uint8_t a[8];
+    int n = 0;
+    ow.reset_search();
+    delay(2);
+    while (ow.search(a)) {
+      const bool crc_ok = OneWire::crc8(a, 7) == a[7];
+      Serial.printf("  rom %02x%02x%02x%02x%02x%02x%02x%02x crc=%s family=0x%02x%s\n", a[0], a[1], a[2], a[3],
+                    a[4], a[5], a[6], a[7], crc_ok ? "ok" : "BAD",
+                    a[0], a[0] == 0x28 ? " (DS18B20)" : a[0] == 0x10 ? " (DS18S20)" : a[0] == 0x22 ? " (DS1822)" : " (unknown)");
+      if (++n >= 16) break;
+    }
+    ow.reset_search();
+    Serial.printf("owsearch: %d address(es)\n", n);
   } else if (!strcmp(cmd, "i2cscan")) {
 #if FERMENTAI_NOIO
     Serial.println("ERR no I2C in NOIO build");
