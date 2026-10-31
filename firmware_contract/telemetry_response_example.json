@@ -1,0 +1,8 @@
+{
+  "ok": true,
+  "telemetry_id": 1234,
+  "chamber_id": "A",
+  "received_at_utc": "2026-10-31T12:00:01Z",
+  "server_time_utc": "2026-10-31T12:00:01Z",
+  "quality_flags": []
+}

@@ -1,0 +1,90 @@
+# FermentAI hardware / control-safety configuration (firmware contract v1.0)
+#
+# Read by src/fermentai/api/config.py. Every server-side setpoint goes through
+# fermentai.api.devices.ControlService.set_desired_setpoint(), which enforces the
+# `temperature` limits below. The ESP32 firmware MUST ALSO enforce its own compiled-in
+# limits (`firmware_local_limits`) regardless of what the server sends.
+#
+# Values are engineering assumptions for a small (~2-5 L) Peltier-controlled chamber,
+# not literature values, unless noted. Units are in the key names.
+
+schema_version: "1.0"
+
+chambers:
+  A:
+    label: "Chamber A - mild hypothesis"
+    device_id: "esp32-chamber-a"
+    initial_setpoint_c: 22.0     # PLAN.md section 5, Chamber A starting target
+  B:
+    label: "Chamber B - more-acidic hypothesis"
+    device_id: "esp32-chamber-b"
+    initial_setpoint_c: 27.0     # PLAN.md section 5, Chamber B starting target
+
+temperature:
+  # Server-side bounds for any commanded setpoint (assumption: sourdough fermentation
+  # range; retarding as low as ~4 C, above ~35 C LAB/yeast activity degrades and
+  # food-safety risk rises). Uncertainty: N/A (policy limits, not measurements).
+  min_setpoint_c: 4.0
+  max_setpoint_c: 35.0
+  # Max change applied per set_desired_setpoint() call (assumption: keeps Peltier
+  # transitions gentle and limits the effect of any single bad recommendation).
+  max_step_c_per_update: 3.0
+  # Minimum seconds between two *applied* setpoint changes for one chamber.
+  # Combined with the step limit this caps the slew rate (3 C / 5 s worst case).
+  min_update_interval_s: 5.0
+  # Deadband used only to compute the advisory `peltier_mode_hint`.
+  hint_deadband_c: 0.5
+
+commands:
+  # Lifetime of a control command (setpoint) returned by GET desired-control.
+  ttl_s: 90
+  # A still-valid control command is re-served (same command_id) until fewer than
+  # this many seconds remain, then a fresh command_id is issued.
+  reissue_when_remaining_s: 45
+
+motor:
+  # Decorative chef-hat automaton. Never coupled to the Peltier controller.
+  max_duration_s: 10.0
+  default_duration_s: 5.0
+  # A motor command not picked up within ttl_s is never executed.
+  ttl_s: 60
+  # After a cancel, desired-control keeps returning action "stop" this long (s).
+  stop_directive_window_s: 30
+  patterns: ["wiggle", "nod", "spin"]
+
+telemetry:
+  recommended_interval_s: 10
+  # Latest telemetry older than this is reported as stale on the dashboard.
+  stale_after_s: 60
+  # Device timestamps further than this from server time get a quality flag.
+  clock_skew_flag_s: 300
+
+polling:
+  desired_control_interval_s: 5
+
+images:
+  max_bytes: 3000000
+  recommended_interval_s: 300
+
+taste_feedback:
+  # If true, the first step of each recommended schedule is pushed (clamped,
+  # step-limited) to the live chamber setpoint right after a feedback cycle.
+  # Default false: the proposed experiment is displayed and an operator applies it
+  # via POST /api/v1/experiments/{experiment_id}/apply (human in the loop).
+  apply_first_schedule_step: false
+  motor_duration_s: 5.0
+  motor_pattern: "wiggle"
+
+# Limits the ESP32 firmware must enforce LOCALLY and independently (documented in
+# firmware_contract/README_FOR_ESP32_AGENT.md). The server never relaxes these.
+firmware_local_limits:
+  setpoint_min_c: 4.0
+  setpoint_max_c: 35.0
+  chamber_cutoff_high_c: 38.0      # Peltier off + fault if chamber exceeds this
+  chamber_cutoff_low_c: 2.0
+  heatsink_max_c: 60.0             # hot-side heatsink protection (assumption; check module datasheet)
+  heat_cool_dead_time_s: 60        # Peltier fully off this long before reversing polarity
+  fan_overrun_s: 30                # heatsink fan keeps running after Peltier stops
+  sensor_stale_s: 30               # no valid chamber temperature for this long -> Peltier off
+  offline_hold_s: 1800             # no valid command this long -> Peltier idle (passive)
+  motor_max_duration_s: 10.0
