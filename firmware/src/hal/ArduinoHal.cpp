@@ -2,6 +2,10 @@
 
 #if defined(ARDUINO)
 #include <driver/gpio.h>
+#include <soc/gpio_sig_map.h>
+#include <soc/gpio_struct.h>
+#include <soc/gpio_periph.h>
+#include <soc/io_mux_reg.h>
 
 #include "board_config.h"
 
@@ -68,6 +72,9 @@ void LedcPwmOut::begin() {
   if (pin_ < 0) return;
   ledcSetup(ch_, freq_, bits_);
   ledcAttachPin(pin_, ch_);
+  // Input buffer only (IO_MUX FUN_IE) for console read-back. NOT gpio_set_direction(): in IDF 4.4
+  // that calls gpio_output_enable(), which resets the GPIO matrix to SIG_GPIO_OUT_IDX and detaches LEDC.
+  PIN_INPUT_ENABLE(GPIO_PIN_MUX_REG[pin_]);
   ledcWrite(ch_, 0);
   attached_ = true;
   f_ = 0.0f;
@@ -77,6 +84,17 @@ void LedcPwmOut::setFraction(float f) {
   if (f > 1.0f) f = 1.0f;
   f_ = f;
   if (!attached_) return;
+  // Bring-up finding 2026-10-31: something later in setup() re-initialised GPIO14/21 back to plain
+  // GPIO output (GPIO matrix func_sel = SIG_GPIO_OUT_IDX), so LEDC duty never reached the pin.
+  // Re-attach whenever the routing is found lost; log the first occurrence.
+  if (GPIO.func_out_sel_cfg[pin_].func_sel == SIG_GPIO_OUT_IDX) {
+    if (!reattach_logged_) {
+      log_w("LEDC routing on GPIO%d was lost; re-attaching channel %u", pin_, (unsigned)ch_);
+      reattach_logged_ = true;
+    }
+    ledcAttachPin(pin_, ch_);
+    PIN_INPUT_ENABLE(GPIO_PIN_MUX_REG[pin_]);
+  }
   const uint32_t max = (1u << bits_) - 1u;
   ledcWrite(ch_, (uint32_t)(f * (float)max + 0.5f));
 }

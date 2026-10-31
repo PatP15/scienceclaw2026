@@ -13,6 +13,8 @@
 #include <Wire.h>
 #include <esp_system.h>
 #include <esp_timer.h>
+#include <driver/gpio.h>
+#include <soc/gpio_struct.h>
 
 #include <mutex>
 #include <new>
@@ -335,7 +337,7 @@ void handleLine(char* line) {
         "status | scan | assign <rom16hex> <starter|internal_heatsink|external_heatsink> |\n"
         "unassign <role> | phcal 4|7|clear | arm peltier <CHAMBER_ID> | disarm peltier |\n"
         "arm motor | disarm motor | motor test <ms> | setpoint <C> (local, clamped) |\n"
-        "wifi <ssid> <pass> | backend <url> | token <token> | pin <gpio> | owtest | owsearch | i2cscan | reboot");
+        "wifi <ssid> <pass> | backend <url> | token <token> | pin <gpio> | pwmdiag | owtest | owsearch | i2cscan | reboot");
   } else if (!strcmp(cmd, "status")) {
     printStatus(now);
   } else if (!strcmp(cmd, "scan")) {
@@ -439,8 +441,43 @@ void handleLine(char* line) {
     if (p < 0 || p > 48) {
       Serial.println("ERR gpio 0-48");
     } else {
-      Serial.printf("GPIO%d level=%d\n", p, (int)digitalRead(p));
+      // 2000 samples over ~20 ms: shows PWM duty, not just one instant.
+      int hi = 0;
+      for (int i = 0; i < 2000; ++i) {
+        hi += (int)gpio_get_level((gpio_num_t)p);
+        delayMicroseconds(10);
+      }
+      Serial.printf("GPIO%d level=%d duty_high=%.1f%%\n", p, hi > 1000 ? 1 : 0, hi / 20.0f);
     }
+  } else if (!strcmp(cmd, "pwmdiag")) {
+#if FERMENTAI_ALLOW_PELTIER_OUTPUT && !FERMENTAI_NOIO
+    // Signal-path check for the Peltier PWM with the BTS7960 ENABLE held LOW (no load current).
+    // Refused while armed so it can never fight the controller.
+    if (peltier.armed()) {
+      Serial.println("ERR disarm peltier first");
+    } else {
+      peltierEn.write(false);
+      auto measure = [](int p) {
+        int hi = 0;
+        for (int i = 0; i < 2000; ++i) { hi += (int)gpio_get_level((gpio_num_t)p); delayMicroseconds(10); }
+        return hi / 20.0f;
+      };
+      Serial.printf("pwmdiag EN(GPIO%d)=%d\n", pins::kPeltierEnablePin, (int)gpio_get_level((gpio_num_t)pins::kPeltierEnablePin));
+      for (int k = 0; k < 2; ++k) {
+        LedcPwmOut& o = k == 0 ? pwmA : pwmB;
+        const int pin = k == 0 ? pins::kPeltierPwmA : pins::kPeltierPwmB;
+        const int ch = k == 0 ? 2 : 3;
+        o.setFraction(0.30f);
+        delay(5);
+        Serial.printf("  ch%d GPIO%d: set 30%% ledcRead=%lu freq=%lu Hz func_out_sel=%lu measured_high=%.1f%%\n", ch, pin,
+                      (unsigned long)ledcRead(ch), (unsigned long)ledcReadFreq(ch),
+                      (unsigned long)GPIO.func_out_sel_cfg[pin].func_sel, measure(pin));
+        o.setFraction(0.0f);
+      }
+    }
+#else
+    Serial.println("ERR needs FERMENTAI_ALLOW_PELTIER_OUTPUT=1 hardware build");
+#endif
   } else if (!strcmp(cmd, "owtest")) {
     // Read-only-ish diagnostic for the OneWire line: a 480 us reset pulse, then sample the line as
     // it recovers. No internal pull-up is enabled, so the recovery shows the EXTERNAL 4.7k.

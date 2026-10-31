@@ -69,6 +69,7 @@ class LedcPwmOut : public IPwmOut {
   uint8_t bits_;
   float f_ = 0.0f;
   bool attached_ = false;
+  bool reattach_logged_ = false;
 };
 
 class AdcIn : public IAnalogIn {
