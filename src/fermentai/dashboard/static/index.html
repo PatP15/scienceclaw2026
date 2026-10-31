@@ -11,6 +11,7 @@
 <title>FermentAI Lab Dashboard</title>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="css/dashboard.css">
+<link rel="stylesheet" href="css/molecular.css">
 <!-- The only third-party library; vendored from the installed plotly Python package. No CDN. -->
 <script src="vendor/plotly.min.js" defer></script>
 <script type="module" src="js/app.js"></script>
@@ -54,18 +55,14 @@
     </div>
     <div id="lab-detail" hidden>
       <div class="detail-head" id="lab-detail-head"></div>
+      <aside class="card lab-hyp" id="lab-thread" aria-label="Current hypothesis"></aside>
       <div class="detail-charts" id="lab-detail-charts"></div>
       <section class="card lab-setpoint" id="lab-setpoint" aria-label="Target temperature"></section>
       <div class="detail-row">
         <div class="detail-chatcol">
-          <div class="detail-mode"><div class="seg seg-sm mode-seg" role="radiogroup" aria-label="Reasoning mode">
-            <button type="button" class="seg-btn" role="radio" data-mode="live" aria-checked="false" title="requests the configured online LLM; falls back to the Offline Policy (labelled) if unavailable">Online Agent</button>
-            <button type="button" class="seg-btn" role="radio" data-mode="offline" aria-checked="true" title="deterministic decision engine, no internet needed">Offline Policy</button>
-          </div></div>
           <div id="lab-chat"></div>
         </div>
         <div class="detail-side" id="lab-detail-side"></div>
-        <aside class="card live-side" id="lab-thread"></aside>
       </div>
       <section class="card lab-twin" id="lab-twin" aria-label="Digital twin">
         <div class="lab-twin-head">
@@ -94,7 +91,7 @@
     <div class="section-head">
       <div>
         <h2>NVIDIA Molecular Explorer</h2>
-        <p class="muted">ALCHEMI / AIMNet2 geometry optimisations of acetic- and lactic-acid–water clusters, computed on a remote NVIDIA GPU and cached on this Mac.</p>
+        <p class="muted">Lactic vs acetic acid in water, computed on an NVIDIA GPU.</p>
       </div>
       <div class="head-actions">
         <button class="btn btn-ghost" id="mol-reload" type="button">Check again</button>

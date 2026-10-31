@@ -876,3 +876,15 @@ main { padding: var(--gap); }
 .sg-ticket .sg-chip, .sg-ticket .sg-why { color: #5b5136; border-color: #c9b88f; }
 .sg-ticket-h { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #7a6a42; }
 .sg-ticket .spark { color: #8a5a14; }
+
+/* Current hypothesis card (lab detail): full width, top of view */
+.lab-hyp { margin-top: var(--gap); padding: 16px 20px; }
+.lab-hyp h3 { margin: 0 0 8px; }
+.lab-hyp .hyp-top { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+.lab-hyp .hyp-text { margin: 0 0 12px; font-size: 20px; line-height: 1.4; color: var(--text-primary, #f3efe6); }
+.lab-hyp .hyp-sched { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
+.lab-hyp .hyp-sched .spark { width: 320px; height: 40px; flex: none; background: var(--surface-2); border-radius: 6px; }
+.lab-hyp .hyp-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.lab-hyp .hyp-chip { background: var(--surface-2); border-radius: 999px; padding: 3px 12px; font-size: var(--fs-body); }
+.lab-hyp .hyp-success { color: var(--text-muted); margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.detail-row { grid-template-columns: minmax(0, 1.5fr) minmax(250px, .75fr); }

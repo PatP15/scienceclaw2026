@@ -20,20 +20,25 @@ export class ComparePanel {
   constructor(store, live) {
     this.store = store; this.live = live;
     this.root = document.getElementById("compare-body");
-    this.ids = []; this.picked = null; this.range = "6h";
+    this.ids = []; this.picked = this.loadPicked(); this.range = "6h";
     this.rows = {}; this.pred = null; this.loading = false; this.visible = false;
     setInterval(() => { if (this.visible) this.refresh(); }, 30000);
+    // the lab list arrives after the first show() on a direct #compare load
+    setInterval(() => { if (this.visible && this.live.ids.join() !== this.ids.join()) this.refresh(); }, 1000);
   }
+  loadPicked() { try { const v = JSON.parse(localStorage.getItem("fermentai.compare.labs")); return Array.isArray(v) ? v : null; } catch { return null; } }
+  savePicked() { try { localStorage.setItem("fermentai.compare.labs", JSON.stringify(this.picked)); } catch { /* storage blocked */ } }
   show() { this.visible = true; this.ids = this.live.ids.slice(); this.refresh(); }
   hide() { this.visible = false; }
   resize() { if (window.Plotly) document.querySelectorAll("#compare-body .cmp-chart").forEach((el) => { try { window.Plotly.Plots.resize(el); } catch { /* not drawn */ } }); }
 
   online(c) { const s = this.live.state[c]; return !!s?.latest_telemetry && !this.live.isStale(s); }
-  chosen() { return (this.picked || this.ids.filter((c) => this.online(c))).filter((c) => this.ids.includes(c)); }
+  chosen() { return (this.picked || this.ids.filter((c) => this.live.state[c]?.kind === "lab" && this.online(c))).filter((c) => this.ids.includes(c)); }
 
   async refresh() {
     if (this.loading) return;
     this.loading = true;
+    this.ids = this.live.ids.slice();
     try {
       const [, , hrs] = RANGES.find((r) => r[0] === this.range);
       let limit = 20000;
@@ -76,7 +81,7 @@ export class ComparePanel {
     const chips = h("div", { class: "cmp-bar" },
       h("div", { class: "cmp-chips" }, this.ids.map((c) => h("button", { type: "button", class: `chip chip-${c} cmp-chip${chosen.includes(c) ? " on" : ""}`, "aria-pressed": String(chosen.includes(c)),
         title: this.online(c) ? "online" : "offline / stale",
-        onclick: () => { const s = new Set(chosen); s.has(c) ? s.delete(c) : s.add(c); this.picked = [...s]; this.build(); this.draw(); } }, `Lab ${c}${this.online(c) ? "" : " ·off"}`))),
+        onclick: () => { const s = new Set(chosen); s.has(c) ? s.delete(c) : s.add(c); this.picked = [...s]; this.savePicked(); this.build(); this.draw(); } }, `Lab ${c}${this.online(c) ? "" : " ·off"}`))),
       h("div", { class: "seg seg-sm", role: "radiogroup", "aria-label": "Time range" }, RANGES.map(([k, label]) => h("button", { type: "button", class: "seg-btn", role: "radio", "aria-checked": String(this.range === k),
         onclick: () => { this.range = k; this.refresh(); } }, label))));
     const shown = [...CHARTS.filter((s) => chosen.some((c) => this.window(c).rows.some((r) => s.get(r) !== null))), ...(this.hasForecast(chosen) ? FORECASTS : [])];

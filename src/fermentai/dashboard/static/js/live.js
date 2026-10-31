@@ -231,6 +231,7 @@ export class LivePanel {
   async refreshAgent(c, rerender = true) {
     try { this.agentState[c] = await get(`/api/v1/agents/${c}/state`); } catch { /* keep last */ }
     if (rerender) this.render(c);
+    if (this.detailId === c) this.renderHypothesis();
   }
   async refreshState(c, rerender = true) {
     try {
@@ -434,8 +435,6 @@ export class LivePanel {
     this.detailView.dataset.chamber = c;
     const chatRoot = document.getElementById("lab-chat");
     const demo = isDemo(this.state[c]);
-    const modeSeg = this.detailView.querySelector(".detail-mode");
-    if (modeSeg) modeSeg.hidden = demo;
     if (demo) { clear(chatRoot, h("section", { class: "card chat-card demo-chat-note" }, "Demo lab — chat available at Stations A and B")); }
     else if (!this.chats[c]) {
       this.chats[c] = new ChatPanel(h("section", { class: "card chat-card" }), this.taste, { station: c });
@@ -524,7 +523,7 @@ export class LivePanel {
           img && !otherDevice ? h("div", { class: "snap-cap" }, h("span", null, hhmmss(img.timestamp_utc)), deviceBadge(img.source)) : null);
       }
     }
-    clear(box, ...(snap ? [snap] : []), this.deviceDrawer(c, f), this.agentBox(c, f.st));
+    clear(box, ...(snap ? [snap] : []), this.agentBox(c, f.st));
   }
 
   deviceDrawer(c, f) {
@@ -682,14 +681,48 @@ export class LivePanel {
         h("div", { class: "ptext" }, brigadeText(stripArrow(messageText(m.content ?? m)))));
     }));
   }
+  // Compact "Current hypothesis" card for the lab detail view (replaces the per-lab thread).
+  renderHypothesis() {
+    const lab = document.getElementById("lab-thread");
+    if (!lab || !this.detailId) return;
+    const c = this.detailId, st = this.state[c];
+    const head = h("h3", null, icon("toque", { size: 18 }), " Current hypothesis");
+    if (isDemo(st)) { clear(lab, head, emptyCard({ icon: "toque", title: "Demo lab", detail: "Fictional, simulated chamber: no hypothesis is tracked here.", compact: true })); return; }
+    const as = this.agentState[c], hyp = as?.current_hypothesis, dec = as?.last_decision;
+    const exp = (this.experiments || []).find((e) => e.schedules?.[c]);
+    const sch = exp?.schedules?.[c];
+    const pred = sch?.predicted || (as?.prediction_state && !sch ? as.prediction_state : null);
+    const text = hyp?.statement || exp?.hypothesis;
+    if (!text && !sch && !dec) { clear(lab, head, emptyCard({ icon: "toque", title: "No hypothesis yet", detail: "Taste a loaf to start.", compact: true })); return; }
+    const name = sch?.name || dec?.name || dec?.schedule_id;
+    const pts = normSchedule(sch || dec).points;
+    const spark = pts.length >= 2 ? sparkline([{ values: pts.map(([t, v]) => ({ t, v })), color: colorOf(c) }], { width: 320, height: 40 }) : null;
+    const winH = pts.length ? pts[pts.length - 1][0] : null;
+    const status = String(exp?.status || "proposed").toLowerCase();
+    const sug = exp?.chosen_suggestion || exp?.payload?.chosen_suggestion;
+    const crit = exp?.payload?.success_criteria || [];
+    const chip = (label, v) => v === null || v === undefined ? null : h("span", { class: "hyp-chip" }, h("span", { class: "tiny faint" }, label), " ", h("b", null, v));
+    const pk = pred?.time_to_peak_rise_h, risk = pred?.overproof_risk;
+    clear(lab, head,
+      h("div", { class: "hyp-top" }, statusBadge(status, /run|appl/.test(status) ? "good" : "info"), provBadge("modeled")),
+      text ? h("p", { class: "hyp-text" }, brigadeText(text)) : null,
+      name ? h("div", { class: "hyp-sched" }, h("b", null, name), spark, winH ? h("span", { class: "tiny faint" }, `${fmt(winH, 0)} h window`) : null) : null,
+      pred ? h("div", { class: "hyp-chips", title: "Expected result (model prediction)" },
+        chip(winH ? `pH @ ${fmt(winH, 0)} h` : "final pH", pred.final_ph != null ? fmt(pred.final_ph, 2) : null),
+        chip("peak rise", pred.rise_progress != null ? `${fmt(pred.rise_progress, 2)}×${pk != null ? ` @ ${fmt(pk, 1)} h` : ""}` : null),
+        chip("overproof risk", risk != null ? `${fmt(risk * 100, 0)} %` : null),
+        pred.uncertainty != null ? chip("±", fmt(pred.uncertainty, 2)) : null) : h("div", { class: "tiny faint" }, "No prediction yet."),
+      crit.length ? h("div", { class: "hyp-success tiny" }, h("b", null, "Success: "), crit.map((x) => String(x).split(":")[0]).slice(0, 4).join(" · ")) : null,
+      h("details", { class: "why" }, h("summary", null, "why"),
+        exp?.hypothesis && exp.hypothesis !== text ? h("p", { class: "small" }, brigadeText(exp.hypothesis)) : null,
+        sch?.summary ? h("p", { class: "small" }, brigadeText(sch.summary)) : null,
+        sug ? h("p", { class: "small" }, brigadeText(typeof sug === "string" ? sug : (sug.title || sug.name || sug.summary || JSON.stringify(sug)))) : null,
+        crit.length ? h("ul", { class: "tiny" }, crit.map((x) => h("li", null, brigadeText(String(x))))) : null,
+        as?.prediction_state?.summary ? h("p", { class: "tiny faint" }, brigadeText(as.prediction_state.summary)) : null));
+  }
   renderThreads() {
     if (this.passThreadEl) clear(this.passThreadEl, h("h3", null, icon("toque", { size: 18 }), " Latest A ↔ B"), this.thread(null));
-    const lab = document.getElementById("lab-thread");
-    if (lab && this.detailId) {
-      const c = this.detailId;
-      clear(lab, h("h3", null, icon("toque", { size: 18 }), ` Sous Chef ${c} thread`),
-        this.thread((m) => { const s = agentSide(m.sender ?? messageSender(m.content)); const r = agentSide(m.recipient ?? m.content?.to); return s === c || r === c || !s; }));
-    }
+    this.renderHypothesis();
     const plan = document.getElementById("pass-plan-history");
     if (plan) {
       clear(plan, this.experiments.length ? this.experiments.map((e, i) => h("div", { class: `ticket-card${i === 0 ? " latest" : ""}` },
