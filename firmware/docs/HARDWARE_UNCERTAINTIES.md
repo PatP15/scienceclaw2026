@@ -27,6 +27,7 @@ hardware.** Each item names the bring-up step that resolves it.
 | 20 | Wi-Fi RSSI inside an XPS/foil chamber | Dropped telemetry/commands | Local control continues offline. Check `wifi_rssi_dbm`. Move the antenna or board outside the foil. |
 | 21 | Camera through the window: glare, condensation, exposure drift | Bad height estimates on the Mac | BRINGUP 8. Fixed lighting. `CameraSettings` exposure fields. |
 | 22 | Food contact of the starter probe | Food safety | Separate non-edible instrumented sample (SENSOR_WIRING) |
+| 25 | Peltier runs without heatsink probes (`HEATSINK_PROBES_REQUIRED=0`, operator decision 2026-10-31) | Hot-side temperature invisible to firmware; thermostats are the sole protection | Fit KSD301-type thermostats on both heatsinks and test each opens before 10c. Re-enable the flag if probes are added. |
 | 24 | ~~OneWire library supports GPIO47 on the ESP32-S3~~ **Resolved 2026-10-31:** stock OneWire 2.3.8 direct-GPIO code caps the second bank at GPIO45 and refuses output above GPIO33 (original-ESP32 rules), so GPIO47 was dead. Patched copy vendored in `firmware/lib/OneWire` (`FERMENTAI_PATCH.md`). | No DS18B20 ever found although the bus is electrically fine | Console `owtest` (manual presence pulse) vs `owsearch` (library) |
 | 23 | Fans actually running (no tach/current sense in this design) | Peltier overheats with a dead fan. Only the heatsink probe and hardware thermostat catch it. | Visual check. Consider adding a tach input (contract `fan_fail` is reserved). |
 

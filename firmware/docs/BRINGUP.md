@@ -8,8 +8,12 @@ Two independent locks protect the Peltier:
 
 1. **Compile time:** `FERMENTAI_ALLOW_PELTIER_OUTPUT=0` in `platformio.ini` (the default).
    The BTS7960 pins are then never driven HIGH, whatever the software state.
-2. **Runtime:** the NVS flag set with `arm peltier <CHAMBER_ID>`. It is refused unless both
-   heatsink probes are assigned. `disarm peltier` clears it.
+2. **Runtime:** the NVS flag set with `arm peltier <CHAMBER_ID>`. With the default
+   `HEATSINK_PROBES_REQUIRED=1` it is refused unless both heatsink probes are assigned.
+   **Both chamber envs currently build with `HEATSINK_PROBES_REQUIRED=0`** (operator decision,
+   2026-10-31: heatsink probes not fitted). The firmware then has no view of the hot side, so the
+   bimetal thermostats on both heatsinks and the supply fuse are the only over-temp protection, and
+   step 10b item 7 cannot be tested. `disarm peltier` clears the flag.
 
 The motor needs `MOTOR_ENABLED=1` plus `arm motor`.
 

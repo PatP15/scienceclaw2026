@@ -50,7 +50,10 @@
 #ifndef FERMENTAI_CONTRACT_V11
 #define FERMENTAI_CONTRACT_V11 1
 #endif
-// Heatsink probes must be present and valid before the Peltier may be energised.
+// Heatsink probes must be present and valid before the Peltier may be energised (default 1).
+// Both chamber envs set 0 (operator decision 2026-10-31, no heatsink probes fitted): arming is then
+// allowed without them and the heatsink-sensor fault is not raised. The 60 C over-temp trip still
+// acts on any heatsink probe that IS assigned. Hardware thermostats are then the only protection.
 #ifndef HEATSINK_PROBES_REQUIRED
 #define HEATSINK_PROBES_REQUIRED 1
 #endif

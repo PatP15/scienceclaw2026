@@ -383,6 +383,10 @@ void handleLine(char* line) {
         nvs.putFlag("arm_peltier", true);
         peltier.setArmed(true);
         Serial.println("OK peltier ARMED (persisted). Stay with the device.");
+        if (!HEATSINK_PROBES_REQUIRED && (!ds.roleRom(ProbeRole::InternalHeatsink, a) ||
+                                          !ds.roleRom(ProbeRole::ExternalHeatsink, b)))
+          Serial.println("WARNING no heatsink probe: firmware cannot see the hot side. Hardware thermostats "
+                         "on BOTH heatsinks and a fused supply are the only over-temp protection.");
       }
 #else
       Serial.println("ERR firmware built with FERMENTAI_ALLOW_PELTIER_OUTPUT=0 (see BRINGUP step 9)");
@@ -708,8 +712,9 @@ void setup() {
   for (int i = 0; i < BootPinSnapshot::kN; ++i)
     Serial.printf(" GPIO%d=%u/%u", g_bootPins.gpio[i], (unsigned)g_bootPins.level[i],
                   (unsigned)g_bootPins.level_pd[i]);
-  Serial.printf("\npin map: %s (peltier_en=GPIO%d motor=GPIO%d)\n", FERMENTAI_PINMAP_ALT ? "ALT" : "default",
-                pins::kPeltierEnablePin, pins::kMotorPin);
+  Serial.printf("\npin map: %s (peltier_en=GPIO%d motor=GPIO%d) heatsink_probes_required=%d\n",
+                FERMENTAI_PINMAP_ALT ? "ALT" : "default", pins::kPeltierEnablePin, pins::kMotorPin,
+                HEATSINK_PROBES_REQUIRED);
 #endif
 
   nvs.begin();
