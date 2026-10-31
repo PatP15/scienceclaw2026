@@ -71,16 +71,45 @@ PROFILES: dict[str, PrintProfile] = {
 DEFAULT_PROFILE = "form4-grey-v5"
 
 
+ORIENTATIONS = ("open_face_up", "preform_auto")
+REPAIR_POLICIES = ("error", "error_then_repair", "repair")
+
+
 @dataclass
-class ChamberInput:
-    name: str  # "A" / "B"
+class PartSpec:
+    """One part to print (``count`` copies). The crumb chambers and user parts both use this.
+
+    ``orientation``: ``open_face_up`` (model +Z -> scene +Z after PreForm's auto-orient; for the
+    crumb slabs) or ``preform_auto`` (keep PreForm's auto-orient). ``repair``: ``error`` (refuse a
+    mesh that needs repair), ``error_then_repair`` (try strict, fall back to PreForm's repair and
+    record it) or ``repair``. Parts are never scaled.
+    """
+
+    name: str  # short key: "A", "B", "hat", "clawd"
     stl: Path
-    sha256_expected: str | None
-    stl_bytes_expected: int | None
-    validation_json: Path | None
-    validation_passed: bool | None
+    sha256_expected: str | None = None
+    stl_bytes_expected: int | None = None
+    validation_json: Path | None = None
+    validation_passed: bool | None = None
     temperature_c: float | None = None
     sha256_actual: str | None = None
+    display_name: str | None = None  # PreForm model name (raft label); default crumb_chamber_<name>
+    count: int = 1
+    orientation: str = "open_face_up"
+    repair: str = "error"
+    label: str | None = None  # human description, e.g. "mild, 22 °C"
+    provenance: str = "simulated"
+    inspection: dict | None = None
+
+    def __post_init__(self) -> None:
+        self.stl = Path(self.stl)
+        if self.orientation not in ORIENTATIONS:
+            raise ValueError(f"{self.name}: orientation must be one of {ORIENTATIONS}")
+        if self.repair not in REPAIR_POLICIES:
+            raise ValueError(f"{self.name}: repair must be one of {REPAIR_POLICIES}")
+        if int(self.count) < 1:
+            raise ValueError(f"{self.name}: count must be >= 1")
+        self.count = int(self.count)
 
     @property
     def sha256_matches(self) -> bool | None:
@@ -90,7 +119,29 @@ class ChamberInput:
 
     @property
     def model_name(self) -> str:
-        return f"crumb_chamber_{self.name}"
+        return self.display_name or f"crumb_chamber_{self.name}"
+
+
+ChamberInput = PartSpec  # backwards-compatible name
+
+
+@dataclass
+class Instance:
+    """One physical copy of a part on a build platform."""
+
+    key: str  # manifest key: "A", "hat_1"
+    model_name: str  # PreForm display name / raft label
+    part: PartSpec
+
+
+def expand_parts(parts: list[PartSpec]) -> list[Instance]:
+    """Parts -> copies, in priority (list) order: ``hat`` x2 -> ``hat_1``, ``hat_2``."""
+    out = []
+    for p in parts:
+        for i in range(1, p.count + 1):
+            suffix = f"_{i}" if p.count > 1 else ""
+            out.append(Instance(f"{p.name}{suffix}", f"{p.model_name}{suffix}", p))
+    return out
 
 
 def sha256_file(path: Path) -> str:
@@ -102,7 +153,7 @@ def sha256_file(path: Path) -> str:
 
 
 def load_chamber_inputs(chain_summary: Path = CHAIN_SUMMARY,
-                        names: tuple[str, ...] = ("A", "B")) -> list[ChamberInput]:
+                        names: tuple[str, ...] = ("A", "B")) -> list[PartSpec]:
     """Read the STL provenance written by the geometry chain and hash the STL files on disk."""
     chain = json.loads(Path(chain_summary).read_text())
     root = Path(chain_summary).resolve().parents[2]
@@ -111,10 +162,12 @@ def load_chamber_inputs(chain_summary: Path = CHAIN_SUMMARY,
         c = chain["chambers"][n]
         stl = (root / c["stl"]).resolve()
         vj = (root / c["validation_json"]).resolve() if c.get("validation_json") else None
-        ci = ChamberInput(name=n, stl=stl, sha256_expected=c.get("stl_sha256"),
-                          stl_bytes_expected=c.get("stl_bytes"), validation_json=vj,
-                          validation_passed=c.get("validation_passed"),
-                          temperature_c=c.get("temperature_c"))
+        t = c.get("temperature_c")
+        ci = PartSpec(name=n, stl=stl, sha256_expected=c.get("stl_sha256"),
+                      stl_bytes_expected=c.get("stl_bytes"), validation_json=vj,
+                      validation_passed=c.get("validation_passed"), temperature_c=t,
+                      label=f"chamber {n}, {t:g} °C" if t is not None else f"chamber {n}",
+                      orientation="open_face_up", repair="error", provenance="simulated")
         if stl.is_file():
             ci.sha256_actual = sha256_file(stl)
         out.append(ci)
@@ -166,20 +219,27 @@ class StepLog:
 def prepare_build(
     api: Any,
     profile: PrintProfile,
-    chambers: list[ChamberInput],
+    parts: list[PartSpec] | list[Instance],
     out_dir: Path,
     build_name: str,
     *,
-    orientation: str = "open_face_up",
+    orientation: str | None = "open_face_up",
+    allow_eject: bool = False,
     model_spacing_mm: float = 5.0,
     thin_feature_threshold_mm: float = 0.5,
     views: tuple[str, ...] = ("iso", "top"),
     echo: Callable[[str], None] | None = None,
 ) -> dict:
-    """Run the full PreForm preparation for ``chambers`` on one build platform.
+    """Run the full PreForm preparation for ``parts`` (or pre-expanded instances) on one platform.
 
-    Returns a JSON-able dict with every API result needed for the manifest. Raises if the server
-    reports a different printer/material than requested or a model fails a hard check.
+    ``orientation`` overrides every part's own policy; ``None`` uses each part's policy.
+    ``allow_eject``: when the parts do not all fit, delete the lowest-priority (last) copy and
+    retry the layout (Formlabs' "layout across builds" pattern); the copies left out are returned
+    in ``r["deferred"]`` (keys) and ``r["_deferred_instances"]`` (objects) for the next build.
+    Without it a failed layout raises. Parts are never scaled.
+
+    Returns a JSON-able dict (except ``_deferred_instances``) with every API result needed for
+    the manifest. Raises if the server reports a different printer/material than requested.
     """
     from formlabs_preform_api.models import (
         DirectionVectors,
@@ -188,13 +248,19 @@ def prepare_build(
         RenderViewType,
         RepairBehavior,
     )
+    from formlabs_sdk import PreFormApiError
 
-    if orientation not in ("open_face_up", "preform_auto"):
+    if orientation is not None and orientation not in ORIENTATIONS:
         raise ValueError(f"unknown orientation policy {orientation!r}")
+    instances = (list(parts) if parts and isinstance(parts[0], Instance)
+                 else expand_parts(list(parts)))
+    if not instances:
+        raise ValueError("no parts to prepare")
+    policy = {i.key: orientation or i.part.orientation for i in instances}
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     log = StepLog(echo=echo)
-    r: dict[str, Any] = {"build_name": build_name, "chambers": [c.name for c in chambers]}
+    r: dict[str, Any] = {"build_name": build_name, "chambers": [i.key for i in instances]}
 
     r["print_setting_validation"] = _d(log.run(
         "check printer/material/layer combination against PreForm's catalog",
@@ -222,15 +288,39 @@ def prepare_build(
     r["scene_settings"] = ss
 
     model_ids: dict[str, str] = {}
-    for c in chambers:
-        imp = _d(log.run(f"import {c.stl.name} (mm, refuse silent mesh repair)",
-                         "POST /v1/scene/model/import/",
-                         lambda c=c: api.import_models(
-                             scene_id=scene_id, file=str(c.stl), name=c.model_name,
-                             units=ImportUnits.MILLIMETERS,
-                             repair_behavior=RepairBehavior.ERROR)))
-        model_ids[c.name] = imp["new_models"][0]["model_id"]
+    imports: dict[str, dict] = {}
+    for inst in instances:
+        part = inst.part
+
+        def do_import(behavior: Any, inst: Instance = inst) -> dict:
+            return _d(log.run(
+                f"import {inst.part.stl.name} as {inst.model_name} "
+                f"(mm, repair_behavior={behavior.value})",
+                "POST /v1/scene/model/import/",
+                lambda: api.import_models(scene_id=scene_id, file=str(inst.part.stl),
+                                          name=inst.model_name, units=ImportUnits.MILLIMETERS,
+                                          repair_behavior=behavior)))
+
+        record: dict[str, Any] = {"policy": part.repair}
+        if part.repair == "repair":
+            imp = do_import(RepairBehavior.REPAIR)
+            record["repair_behavior_used"] = "REPAIR"
+        else:
+            try:
+                imp = do_import(RepairBehavior.ERROR)
+                record["repair_behavior_used"] = "ERROR"
+                record["needed_repair"] = False
+            except PreFormApiError as exc:
+                if part.repair != "error_then_repair":
+                    raise
+                record["strict_import_error"] = {"code": exc.code, "message": str(exc)[:300]}
+                record["needed_repair"] = True
+                imp = do_import(RepairBehavior.REPAIR)
+                record["repair_behavior_used"] = "REPAIR"
+        model_ids[inst.key] = imp["new_models"][0]["model_id"]
+        imports[inst.key] = record
     r["model_ids"] = model_ids
+    r["imports"] = imports
     by_id = {v: k for k, v in model_ids.items()}
 
     def models_snapshot(label: str) -> dict:
@@ -239,7 +329,9 @@ def prepare_build(
         snap = {}
         for m in lm["models"]:
             bb = m["bounding_box"]
-            snap[by_id.get(m["id"], m["id"])] = {
+            key = by_id.get(m["id"], m["id"])
+            snap[key] = {
+                "orientation_policy": policy.get(key),
                 "orientation_euler_deg": m["orientation"],
                 "position_mm": m["position"],
                 "bbox_min_mm": bb["min_corner"], "bbox_max_mm": bb["max_corner"],
@@ -254,26 +346,66 @@ def prepare_build(
     log.run("auto-orient (PreForm's suggestion, recorded)", "POST /v1/scene/model/auto-orient/",
             lambda: api.auto_orient_models(scene_id=scene_id))
     r["preform_auto_orient_suggestion"] = models_snapshot("after auto-orient")
-    if orientation == "open_face_up":
+    face_up = [model_ids[k] for k, v in policy.items() if v == "open_face_up"]
+    if face_up:
+        all_face_up = len(face_up) == len(instances)
         log.run("enforce open crumb face up (model +Z -> scene +Z)",
                 "POST /v1/scene/model/orient/",
-                lambda: api.orient_models(scene_id=scene_id, orientation=DirectionVectors(
-                    z_direction=[0.0, 0.0, 1.0], x_direction=[1.0, 0.0, 0.0])))
-    r["orientation_policy"] = orientation
+                lambda: api.orient_models(
+                    scene_id=scene_id,
+                    orientation=DirectionVectors(z_direction=[0.0, 0.0, 1.0],
+                                                 x_direction=[1.0, 0.0, 0.0]),
+                    **({} if all_face_up else {"model_ids": face_up})))
+    policies = set(policy.values())
+    r["orientation_policy"] = policies.pop() if len(policies) == 1 else "per_part"
+    r["orientation_policy_per_model"] = policy
 
     support_params = {"raft_type": "FULL_RAFT"}
-    log.run("auto-generate supports (raft + supports under the flat floor only)",
+    log.run("auto-generate supports (raft + supports; crumb slabs: under the flat floor only)",
             "POST /v1/scene/model/auto-support/",
             lambda: api.auto_support_models(scene_id=scene_id, raft_type=RaftType.FULL_RAFT))
     r["support_parameters"] = {**support_params,
-                               "other": "PreForm defaults for Grey V5 / 0.1 mm (density, "
+                               "other": "PreForm defaults for the material / layer (density, "
                                         "touchpoint size, slope multiplier)"}
-    layout = _d(log.run("auto-layout on one build platform", "POST /v1/scene/model/auto-layout/",
-                        lambda: api.auto_layout_models(scene_id=scene_id,
-                                                       model_spacing_mm=model_spacing_mm)))
+
+    remaining = list(instances)
+    deferred: list[Instance] = []
+    attempts: list[dict] = []
+    while True:
+        try:
+            layout = _d(log.run(
+                f"auto-layout {len(remaining)} model(s) on one build platform",
+                "POST /v1/scene/model/auto-layout/",
+                lambda: api.auto_layout_models(
+                    scene_id=scene_id, model_ids=[model_ids[i.key] for i in remaining],
+                    model_spacing_mm=model_spacing_mm)))
+            attempts.append({"models": [i.key for i in remaining], "fit": True})
+            break
+        except PreFormApiError as exc:
+            attempts.append({"models": [i.key for i in remaining], "fit": False,
+                             "error_code": exc.code})
+            if not allow_eject or exc.code != "OPERATION_FAILED" or len(remaining) == 1:
+                raise
+            out = remaining.pop()  # lowest priority = last in list
+            deferred.insert(0, out)
+            log.run(f"does not all fit: defer {out.key} to the next build",
+                    "POST /v1/scene/model/delete/",
+                    lambda out=out: api.delete_models(scene_id=scene_id,
+                                                      model_ids=[model_ids[out.key]]))
+    for d in deferred:
+        model_ids.pop(d.key)
+        by_id.pop(next(k for k, v in by_id.items() if v == d.key))
+    r["model_ids"] = model_ids
+    r["chambers"] = [i.key for i in remaining]
+    r["placed"] = [i.key for i in remaining]
+    r["deferred"] = [i.key for i in deferred]
+    r["_deferred_instances"] = deferred
+    r["_placed_instances"] = remaining
     r["layout"] = {"model_spacing_mm": model_spacing_mm,
                    "laid_out": [by_id.get(i, i) for i in layout.get("laid_out_model_ids", [])],
-                   "ejected": [by_id.get(i, i) for i in layout.get("ejected_model_ids", [])]}
+                   "ejected": [by_id.get(i, i) for i in layout.get("ejected_model_ids", [])],
+                   "attempts": attempts,
+                   "deferred_to_next_build": [i.key for i in deferred]}
     if r["layout"]["ejected"]:
         raise RuntimeError(f"PreForm could not fit {r['layout']['ejected']} on one platform")
     r["models_final"] = models_snapshot("final")
@@ -304,7 +436,8 @@ def prepare_build(
                                            threshold_mm=thin_feature_threshold_mm)))
     checks["thin_feature_threshold_mm"] = thin_feature_threshold_mm
     r["printability_checks"] = {k: _rekey(v, by_id) for k, v in checks.items()}
-    r["warnings"] = _warnings(r["printability_checks"])
+    r["warnings"] = _warnings(r["printability_checks"],
+                              {k for k, v in policy.items() if v == "open_face_up"})
 
     scene = _d(log.run("scene: material usage + layer count", "POST /v1/scene/get/",
                        lambda: api.get_scene(scene_id=scene_id)))
@@ -346,8 +479,8 @@ def prepare_build(
         "scene_count": len(scenes),
         "scene_settings": rt_settings,
         "model_count": rt_models,
-        "expected_model_count": len(chambers),
-        "ok": (len(scenes) == 1 and rt_models == len(chambers)
+        "expected_model_count": len(remaining),
+        "ok": (len(scenes) == 1 and rt_models == len(remaining)
                and rt_settings.get("machine_type") == profile.machine_type
                and rt_settings.get("material_code") == profile.material_code),
     }
@@ -361,27 +494,31 @@ def prepare_build(
     return r
 
 
-def _warnings(checks: dict) -> list[str]:
+def _warnings(checks: dict, crumb_keys: set[str] | frozenset = frozenset()) -> list[str]:
     """Human-readable printability warnings reported by PreForm (never silently dropped)."""
     out = []
     for name, res in (checks.get("cups") or {}).items():
         if isinstance(res, dict) and res.get("cup_count"):
-            out.append(f"chamber {name}: PreForm reports {res['cup_count']} cup(s) — concave "
+            out.append(f"{name}: PreForm reports {res['cup_count']} cup(s) — concave "
                        "pockets under overhanging pore lips that can add peel suction. All pores "
                        "open to the cut face (mesh validation: no enclosed cavities), so resin "
-                       "drains in the wash; a human should review them in PreForm.")
+                       "drains in the wash; a human should review them in PreForm."
+                       if name in crumb_keys else
+                       f"{name}: PreForm reports {res['cup_count']} cup(s) — pockets that can "
+                       "trap resin or add peel suction; review in PreForm (drain holes or a "
+                       "different orientation may be needed).")
     for name, res in (checks.get("minima") or {}).items():
         if isinstance(res, dict) and res.get("minima_count"):
-            out.append(f"chamber {name}: {res['minima_count']} unsupported minima")
+            out.append(f"{name}: {res['minima_count']} unsupported minima")
     for name, res in (checks.get("supportedness") or {}).items():
         if isinstance(res, dict) and res.get("percent_unsupported"):
-            out.append(f"chamber {name}: {res['percent_unsupported']}% undersupported area")
+            out.append(f"{name}: {res['percent_unsupported']:.3g}% of its area is undersupported")
     for name, res in (checks.get("thin_features") or {}).items():
         if isinstance(res, dict) and res.get("has_thin_walls"):
-            out.append(f"chamber {name}: thin walls ({res.get('thin_volume_mm3')} mm^3)")
+            out.append(f"{name}: thin walls ({res.get('thin_volume_mm3')} mm^3)")
     for name, res in (checks.get("manifoldness") or {}).items():
         if isinstance(res, dict) and res.get("is_manifold") is False:
-            out.append(f"chamber {name}: not manifold ({res.get('status')})")
+            out.append(f"{name}: not manifold ({res.get('status')})")
     ib = checks.get("in_bounds") or {}
     if ib.get("all_in_bounds") is False:
         out.append("not every model fits the build volume")

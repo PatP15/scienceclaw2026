@@ -1,0 +1,92 @@
+{
+  "provenance": "estimated",
+  "source": "preform_local_api",
+  "job": "hackathon",
+  "job_file": "data/stl/print/jobs/hackathon_six.yaml",
+  "profile": "form4-grey-v5",
+  "job_submitted": false,
+  "builds": [
+    {
+      "build": 1,
+      "form": "data/stl/print/hackathon_job1_form4-grey-v5.form",
+      "manifest": "data/stl/print/hackathon_job1_form4-grey-v5_manifest.json",
+      "placed": [
+        "A",
+        "B"
+      ],
+      "estimates": {
+        "print_time_s": 4889,
+        "print_time_h": 1.36,
+        "print_time_source": "POST /v1/scene/calculate-print-time/ total_print_time_s",
+        "material_volume_ml": 150.3,
+        "material_volume_source": "POST /v1/scene/get/ material_usage.volume_ml (models + supports + raft)",
+        "models_volume_ml": 126.9,
+        "raft_volume_ml": 21.34,
+        "supports_volume_ml_derived": 2.06,
+        "layer_count": 185,
+        "provenance": "estimated"
+      },
+      "warnings": [
+        "A: PreForm reports 1 cup(s) \u2014 concave pockets under overhanging pore lips that can add peel suction. All pores open to the cut face (mesh validation: no enclosed cavities), so resin drains in the wash; a human should review them in PreForm.",
+        "B: PreForm reports 2 cup(s) \u2014 concave pockets under overhanging pore lips that can add peel suction. All pores open to the cut face (mesh validation: no enclosed cavities), so resin drains in the wash; a human should review them in PreForm."
+      ],
+      "form_roundtrip_ok": true
+    },
+    {
+      "build": 2,
+      "form": "data/stl/print/hackathon_job2_form4-grey-v5.form",
+      "manifest": "data/stl/print/hackathon_job2_form4-grey-v5_manifest.json",
+      "placed": [
+        "hat_1",
+        "hat_2",
+        "clawd_1",
+        "clawd_2"
+      ],
+      "estimates": {
+        "print_time_s": 8285,
+        "print_time_h": 2.3,
+        "print_time_source": "POST /v1/scene/calculate-print-time/ total_print_time_s",
+        "material_volume_ml": 165.08,
+        "material_volume_source": "POST /v1/scene/get/ material_usage.volume_ml (models + supports + raft)",
+        "models_volume_ml": 144.51,
+        "raft_volume_ml": 14.85,
+        "supports_volume_ml_derived": 5.73,
+        "layer_count": 772,
+        "provenance": "estimated"
+      },
+      "warnings": [
+        "hat_2: PreForm reports 1 cup(s) \u2014 pockets that can trap resin or add peel suction; review in PreForm (drain holes or a different orientation may be needed).",
+        "hat_1: PreForm reports 1 cup(s) \u2014 pockets that can trap resin or add peel suction; review in PreForm (drain holes or a different orientation may be needed).",
+        "hat_2: 0.0625% of its area is undersupported",
+        "hat_1: 0.0625% of its area is undersupported"
+      ],
+      "form_roundtrip_ok": true
+    }
+  ],
+  "parts": {
+    "A": {
+      "count": 1,
+      "label": "mild, 22 \u00b0C",
+      "stl": "data/stl/crumb_chamber_A.stl",
+      "sha256": "88bc2dd6cc8ad6ff134c9de9136b8fc0ca2a1915c8e254553cf0cde263038abc"
+    },
+    "B": {
+      "count": 1,
+      "label": "sour, 27 \u00b0C",
+      "stl": "data/stl/crumb_chamber_B.stl",
+      "sha256": "976a17927aa03d158e6f0ce53ebba743086fb1a031c401ba82dcf6fd25e6abd2"
+    },
+    "hat": {
+      "count": 2,
+      "label": "chef hat, user-supplied",
+      "stl": "data/stl/external/hat.stl",
+      "sha256": "d11ed5e0ec996b7984eeb8207e1601fcc19da2a6683b5b66a61a3356b0428d2f"
+    },
+    "clawd": {
+      "count": 2,
+      "label": "Clawd figure, user-supplied",
+      "stl": "data/stl/external/clawd.stl",
+      "sha256": "1bd06366a547fcae9e3efaa0696f76db9463e3e2ed11f30b0a7e361dd17c898d"
+    }
+  }
+}

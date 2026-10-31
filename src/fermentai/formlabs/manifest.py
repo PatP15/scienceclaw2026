@@ -49,6 +49,35 @@ def file_record(path: str | Path, backend: str) -> dict:
     return rec
 
 
+def _input_record(c: Any, build: dict) -> dict:
+    placed = build.get("placed") or build.get("chambers") or []
+    copies = [k for k in placed if k == c.name or k.startswith(f"{c.name}_")]
+    imports = build.get("imports") or {}
+    chain = c.sha256_expected is not None
+    rec = {
+        "chamber": c.name,
+        "part": c.name,
+        "label": getattr(c, "label", None),
+        "model_name": c.model_name,
+        "copies_on_build": copies,
+        "stl": rel(c.stl),
+        "stl_sha256": c.sha256_actual,
+        "stl_sha256_chain_summary": c.sha256_expected,
+        "sha256_matches_chain_summary": c.sha256_matches,
+        "validation_json": rel(c.validation_json),
+        "mesh_validation_passed": c.validation_passed,
+        "chamber_temperature_c": c.temperature_c,
+        "geometry_provenance": ("simulated (data/stl/chain_summary.json)" if chain
+                                else getattr(c, "provenance", None)),
+        "orientation_policy": getattr(c, "orientation", None),
+        "import": {k: imports[k] for k in copies if k in imports},
+        "scaled": False,
+    }
+    if getattr(c, "inspection", None):
+        rec["inspection"] = c.inspection
+    return rec
+
+
 def build_manifest(
     *,
     backend: str,
@@ -92,18 +121,7 @@ def build_manifest(
         "food_contact": FOOD_CONTACT,
         "generated_utc": datetime.now(UTC).isoformat(timespec="seconds"),
         "host": {"platform": platform.platform(), "machine": platform.machine()},
-        "inputs": [{
-            "chamber": c.name,
-            "model_name": c.model_name,
-            "stl": rel(c.stl),
-            "stl_sha256": c.sha256_actual,
-            "stl_sha256_chain_summary": c.sha256_expected,
-            "sha256_matches_chain_summary": c.sha256_matches,
-            "validation_json": rel(c.validation_json),
-            "mesh_validation_passed": c.validation_passed,
-            "chamber_temperature_c": c.temperature_c,
-            "geometry_provenance": "simulated (data/stl/chain_summary.json)",
-        } for c in chambers],
+        "inputs": [_input_record(c, build) for c in chambers],
         "printer": {"label": profile.printer_label, "machine_type": ss.get("machine_type"),
                     "build_volume_mm": (build.get("scene") or {}).get("build_volume")},
         "material": {"label": meta.get("MaterialName") or profile.material_label,
@@ -124,6 +142,7 @@ def build_manifest(
                 k: {"orientation_euler_deg": v["orientation_euler_deg"],
                     "open_face_up": v["open_face_up"], "height_mm": v["height_mm"]}
                 for k, v in (build.get("preform_auto_orient_suggestion") or {}).items()},
+            "per_model_policy": build.get("orientation_policy_per_model"),
             "final": {k: {"orientation_euler_deg": v["orientation_euler_deg"],
                           "open_face_up": v["open_face_up"], "height_mm": v["height_mm"],
                           "has_supports": v["has_supports"], "in_bounds": v["in_bounds"]}

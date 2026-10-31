@@ -1,0 +1,133 @@
+{
+  "provenance": "imported_human: user-supplied STL files, copied unchanged and inspected with trimesh (no rescaling, no repair on disk)",
+  "generated_utc": "2026-10-31T15:22:32+00:00",
+  "generated_by": "fermentai.formlabs.parts.inspect_stl",
+  "parts": {
+    "hat": {
+      "file": "data/stl/external/hat.stl",
+      "bytes": 464184,
+      "sha256": "d11ed5e0ec996b7984eeb8207e1601fcc19da2a6683b5b66a61a3356b0428d2f",
+      "triangles": 9282,
+      "units_assumed": "mm (STL has no units; PreForm import uses MILLIMETERS)",
+      "bbox_min_mm": [
+        -33.938,
+        -21.345,
+        0.0
+      ],
+      "bbox_max_mm": [
+        33.938,
+        21.345,
+        64.915
+      ],
+      "extents_mm": [
+        67.875,
+        42.689,
+        64.915
+      ],
+      "units_check": {
+        "verdict": "mm plausible",
+        "plausible": true,
+        "reason": "largest extent 67.88 within 5-300 mm",
+        "if_inches_mm": 1724.02,
+        "if_cm_mm": 678.75,
+        "if_m_mm": 67875.0
+      },
+      "as_supplied": {
+        "watertight": false,
+        "winding_consistent": true,
+        "components": 32,
+        "zero_volume_components": 31,
+        "degenerate_zero_area_triangles": 62,
+        "volume_mm3": 47116.958
+      },
+      "after_dropping_zero_area_triangles": {
+        "note": "analysis only \u2014 the file on disk is unchanged",
+        "watertight": true,
+        "components": 1,
+        "volume_mm3": 47116.958,
+        "euler_number": 2
+      },
+      "fits_form4_platform_unrotated": true,
+      "wall_thickness": {
+        "samples": 3000,
+        "hits": 3000,
+        "min_mm": 0.8,
+        "p01_mm": 0.8,
+        "p05_mm": 0.8,
+        "p25_mm": 0.8,
+        "median_mm": 0.801,
+        "p75_mm": 19.746,
+        "method": "ray from surface sample along -normal to the next surface (trimesh); approximate, informational"
+      },
+      "defects": [
+        "62 zero-area triangles make the mesh non-manifold as supplied; without them it is one watertight solid with the same volume -> cosmetic; PreForm's import repair handles it"
+      ],
+      "printable_verdict": "printable as supplied (after PreForm import repair of degenerate triangles)",
+      "copied_from": "~/Downloads/hat.stl",
+      "inspector_note": "Chef's hat: hollow cylindrical band (~0.8-0.9 mm wall, open at the bottom, cavity up to z~48 mm at the centre) under a solid puff. The 0.8 mm figure is the band wall, not an artefact. The open-bottom cavity is a potential PreForm 'cup' depending on orientation."
+    },
+    "clawd": {
+      "file": "data/stl/external/clawd.stl",
+      "bytes": 29584,
+      "sha256": "1bd06366a547fcae9e3efaa0696f76db9463e3e2ed11f30b0a7e361dd17c898d",
+      "triangles": 590,
+      "units_assumed": "mm (STL has no units; PreForm import uses MILLIMETERS)",
+      "bbox_min_mm": [
+        -22.875,
+        -11.25,
+        0.0
+      ],
+      "bbox_max_mm": [
+        22.875,
+        11.25,
+        33.0
+      ],
+      "extents_mm": [
+        45.75,
+        22.5,
+        33.0
+      ],
+      "units_check": {
+        "verdict": "mm plausible",
+        "plausible": true,
+        "reason": "largest extent 45.75 within 5-300 mm",
+        "if_inches_mm": 1162.05,
+        "if_cm_mm": 457.5,
+        "if_m_mm": 45750.0
+      },
+      "as_supplied": {
+        "watertight": false,
+        "winding_consistent": true,
+        "components": 33,
+        "zero_volume_components": 32,
+        "degenerate_zero_area_triangles": 32,
+        "volume_mm3": 24438.205
+      },
+      "after_dropping_zero_area_triangles": {
+        "note": "analysis only \u2014 the file on disk is unchanged",
+        "watertight": true,
+        "components": 1,
+        "volume_mm3": 24438.205,
+        "euler_number": 0
+      },
+      "fits_form4_platform_unrotated": true,
+      "wall_thickness": {
+        "samples": 3000,
+        "hits": 3000,
+        "min_mm": 2.0,
+        "p01_mm": 2.0,
+        "p05_mm": 4.875,
+        "p25_mm": 8.31,
+        "median_mm": 22.5,
+        "p75_mm": 27.855,
+        "method": "ray from surface sample along -normal to the next surface (trimesh); approximate, informational"
+      },
+      "defects": [
+        "32 zero-area triangles make the mesh non-manifold as supplied; without them it is one watertight solid with the same volume -> cosmetic; PreForm's import repair handles it"
+      ],
+      "printable_verdict": "printable as supplied (after PreForm import repair of degenerate triangles)",
+      "copied_from": "~/Downloads/clawd.stl",
+      "inspector_note": "Blocky solid figure (genus 1: one through-hole); thinnest walls ~2 mm."
+    }
+  }
+}

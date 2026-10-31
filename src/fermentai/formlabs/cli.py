@@ -27,6 +27,7 @@ from .client import (
     server_version,
 )
 from .manifest import PITCH_CLAIM, build_manifest, rel, write_manifest
+from .parts import load_job, parse_part_arg, render_print_sheet
 from .prepare import (
     CHAIN_SUMMARY,
     CONFIRM_ENV,
@@ -36,6 +37,7 @@ from .prepare import (
     FIXTURE,
     PROFILES,
     REPO_ROOT,
+    expand_parts,
     load_chamber_inputs,
     prepare_build,
     submit_print,
@@ -66,6 +68,8 @@ def _home_rel(p: Path | None) -> str | None:
 
 
 def cmd_prepare(args: argparse.Namespace) -> int:
+    if args.job or args.part:
+        return cmd_prepare_jobs(args)
     profile = PROFILES[args.profile]
     chambers = load_chamber_inputs(Path(args.chain_summary), tuple(args.chambers))
     for c in chambers:
@@ -187,6 +191,157 @@ def cmd_prepare(args: argparse.Namespace) -> int:
     return 0
 
 
+def _transcript_doc(transcript: list[dict], server_version: str | None) -> dict:
+    return {"provenance": f"real: verbatim wire transcript of live PreForm API calls to "
+                          f"PreFormServer {server_version} (recorded by RecordingProxy)",
+            "recorded_by": "fermentai.formlabs.replay.RecordingProxy",
+            "server_version": server_version, "sdk": sdk_versions(),
+            "endpoints_used": endpoints_used(transcript),
+            "entries": scrub_paths(transcript, {str(REPO_ROOT): "<REPO>",
+                                                str(Path.home()): "~"})}
+
+
+def cmd_prepare_jobs(args: argparse.Namespace) -> int:
+    """Generic parts list -> the fewest Form 4 builds that hold every copy (never scaled)."""
+    if args.job:
+        job = load_job(args.job)
+    else:
+        job = {"name": args.name or "parts", "profile": args.profile,
+               "parts": [parse_part_arg(a) for a in args.part], "spacing_mm": args.spacing,
+               "source": "command line --part"}
+    name = job["name"]
+    profile = PROFILES[job["profile"]]
+    parts = job["parts"]
+    for p in parts:
+        if not p.stl.is_file():
+            print(f"ERROR: {p.stl} not found", file=sys.stderr)
+            return 1
+        print(f"part {p.name} x{p.count}: {rel(p.stl)} sha256 {p.sha256_actual[:12]}... "
+              f"orientation={p.orientation} repair={p.repair}"
+              + (f" ({p.label})" if p.label else ""))
+    live_out = Path(args.out) if args.out else DEFAULT_OUT_DIR
+    server_log = live_out / f"{name}_preformserver.log"
+    fixture = Path(args.fixture) if args.fixture != str(FIXTURE) else job_fixture(name)
+    builds: list[dict] = []
+    try:
+        with open_preform(args.backend, port=args.port, server_exe=args.server_exe,
+                          server_log=server_log, data_dir=Path(args.data_dir).expanduser(),
+                          fixture=fixture, keep_server=args.keep_server) as h:
+            out_dir = Path(args.out) if args.out else (
+                DEFAULT_OUT_DIR if h.backend == "live" else DEFAULT_OUT_DIR / "mock")
+            print(f"backend: {h.backend}  PreForm {h.server_version} at {h.base_url}")
+            for n in h.notes:
+                print(f"  note: {n}")
+            remaining = expand_parts(parts)
+            total = len(remaining)
+            while remaining:
+                k = len(builds) + 1
+                if k > total:
+                    raise RuntimeError("layout made no progress")
+                bname = f"{name}_job{k}_{profile.key}"
+                print(f"\n== build {k}: {len(remaining)} copies to place on one "
+                      f"{profile.printer_label} platform ==")
+                r = prepare_build(h.api, profile, remaining, out_dir, bname, orientation=None,
+                                  allow_eject=True, model_spacing_mm=job["spacing_mm"],
+                                  echo=print)
+                remaining = r.pop("_deferred_instances")
+                placed = r.pop("_placed_instances")
+                r["labels"] = {i.key: i.part.label for i in placed}
+                builds.append({"result": r, "parts": list({id(i.part): i.part
+                                                           for i in placed}.values())})
+            backend = h.backend
+            transcript = h.transcript
+            mock_requests = list(h.mock.requests) if h.mock is not None else []
+            server = _server_info(h)
+            notes = list(h.notes)
+            if h.mock is not None and h.mock.unmatched:
+                notes.append(f"mock had no recording for: {sorted(set(h.mock.unmatched))}")
+    except PreFormUnavailable as exc:
+        print(f"\nPreForm API unavailable: {exc}", file=sys.stderr)
+        return 3
+
+    replacements = {str(REPO_ROOT): "<REPO>", str(Path.home()): "~"}
+    transcript_path = None
+    if backend == "live":
+        transcript_path = out_dir / f"{name}_preform_api_transcript.json"
+        doc = _transcript_doc(transcript, server["version"])
+        transcript_path.write_text(json.dumps(doc, indent=1, default=str) + "\n")
+        if args.update_fixture:
+            job_fixture(name).parent.mkdir(parents=True, exist_ok=True)
+            job_fixture(name).write_text(json.dumps(doc, indent=1, default=str) + "\n")
+            print(f"updated mock fixture {rel(job_fixture(name))}")
+        used = endpoints_used(transcript)
+        if server_log.is_file():
+            server["log_lines"] = len(server_log.read_text(errors="replace").splitlines())
+    else:
+        used = endpoints_used(mock_requests)
+    api = {"sdk": sdk_versions(), "docs": "https://developer.formlabs.com/api-reference/",
+           "endpoints_used": used, "http_requests": len(transcript or mock_requests)}
+    mock_reason = None if backend == "live" or args.backend == "auto" else \
+        f"replay of the recorded PreForm session for job {name!r} (--backend mock requested)"
+    sheet_jobs = []
+    summary = []
+    for k, b in enumerate(builds, 1):
+        r = b["result"]
+        m = build_manifest(backend=backend, profile=profile, chambers=b["parts"], build=r,
+                           per_chamber=None, server=server, api=api,
+                           transcript_path=transcript_path,
+                           server_log_path=server_log if backend == "live"
+                           and server_log.is_file() else None,
+                           mock_reason=mock_reason,
+                           notes=notes + [(f"build {k} of {len(builds)} for job {name!r} "
+                                          f"({job['source']})")])
+        m["job"] = {"name": name, "build": k, "builds_total": len(builds),
+                    "placed": r["placed"], "labels": r["labels"],
+                    "deferred_to_next_build": r["deferred"]}
+        m = scrub_paths(m, replacements)
+        mpath = write_manifest(out_dir / f"{r['build_name']}_manifest.json", m)
+        sheet_jobs.append({**r, "manifest": str(mpath)})
+        summary.append({"build": k, "form": rel(r["outputs"]["form"]),
+                        "manifest": rel(mpath), "placed": r["placed"],
+                        "estimates": r["estimates"], "warnings": r["warnings"],
+                        "form_roundtrip_ok": r["form_roundtrip"]["ok"]})
+    jobs_doc = {"provenance": "estimated" if backend == "live" else "replay",
+                "source": m["source"], "job": name, "job_file": job["source"],
+                "profile": profile.key, "job_submitted": False,
+                "builds": summary, "parts": {p.name: {"count": p.count, "label": p.label,
+                                                       "stl": rel(p.stl),
+                                                       "sha256": p.sha256_actual}
+                                              for p in parts}}
+    jobs_doc = scrub_paths(jobs_doc, replacements)
+    (out_dir / f"{name}_jobs.json").write_text(json.dumps(jobs_doc, indent=2) + "\n")
+    sheet = render_print_sheet(name, sheet_jobs, profile.key, m["source"], server["version"])
+    sheet_path = Path(args.print_sheet) if args.print_sheet else out_dir / "PRINT_SHEET.md"
+    sheet_path.write_text(sheet)
+
+    print(f"\n== {m['source']}: {len(builds)} build(s) for {total} copies ==")
+    for row in summary:
+        e = row["estimates"]
+        print(f"build {row['build']}: {', '.join(row['placed'])} -> {e['print_time_h']} h, "
+              f"{e['material_volume_ml']} mL, {e['layer_count']} layers; {row['form']}")
+        for w in row["warnings"]:
+            print(f"   WARNING: {w}")
+    print(f"print sheet: {rel(sheet_path)}   summary: {rel(out_dir / f'{name}_jobs.json')}")
+    if transcript_path:
+        print(f"transcript: {rel(transcript_path)} ({len(transcript)} HTTP requests)")
+    print("job_submitted: false  -- " + PITCH_CLAIM)
+    return 0
+
+
+def _server_info(h: object) -> dict:
+    live = h.backend == "live"
+    return {"version": h.server_version, "base_url": h.base_url,
+            "executable": _home_rel(h.server_exe),
+            "code_signature": _codesign(h.server_exe) if live else None,
+            "started_by_fermentai": h.server_started_by_us,
+            "ready_after_s": h.server_ready_after_s,
+            "download_url": DOWNLOAD_URLS.get("mac-arm64")}
+
+
+def job_fixture(name: str) -> Path:
+    return FIXTURE.with_name(f"preform_3.64.2_job_{name}.json")
+
+
 def cmd_status(args: argparse.Namespace) -> int:
     exe = locate_preform_server(args.server_exe)
     running = server_version(f"http://localhost:{args.port}")
@@ -224,6 +379,15 @@ def build_parser() -> argparse.ArgumentParser:
     pp.add_argument("--profile", choices=sorted(PROFILES), default=DEFAULT_PROFILE,
                     help=f"printer/material/layer profile [{DEFAULT_PROFILE}]")
     pp.add_argument("--chambers", nargs="+", default=["A", "B"], choices=["A", "B"])
+    pp.add_argument("--job", help="YAML job file with a parts list (e.g. "
+                                  "data/stl/print/jobs/hackathon_six.yaml); split into the fewest "
+                                  "builds that fit, never scaled")
+    pp.add_argument("--part", action="append", metavar="PATH[:COUNT[:ORIENTATION]]",
+                    help="ad-hoc part (repeatable), e.g. --part hat.stl:2 "
+                         "--part slab.stl:1:open_face_up")
+    pp.add_argument("--name", help="job name for --part runs [parts]")
+    pp.add_argument("--print-sheet", help="where to write the print sheet "
+                                          "[<out>/PRINT_SHEET.md] (job mode)")
     pp.add_argument("--orientation", choices=("open_face_up", "preform_auto"),
                     default="open_face_up",
                     help="open_face_up: crumb face away from the platform, supports only on "

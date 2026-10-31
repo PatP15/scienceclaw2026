@@ -41,3 +41,19 @@
 - `uv run python scripts/prepare_print.py prepare --backend live --update-fixture` (regenerates outputs + fixture)
 - `uv run python scripts/prepare_print.py prepare --backend mock --out /tmp/x` (no binary needed)
 - `uv run pytest tests/test_formlabs_*.py`
+
+## Six-part hackathon job (2026-10-31, done)
+- User STLs copied unchanged: data/stl/external/{hat,clawd}.stl (sha256 d11ed5e0…, 1bd06366…);
+  data/stl/external/parts_report.json (provenance imported_human). Both mm-plausible
+  (hat 67.9x42.7x64.9, clawd 45.8x22.5x33.0); not watertight as supplied only because of 62/32
+  zero-area triangles; PreForm accepted both with strict import (no repair).
+- New: src/fermentai/formlabs/parts.py (inspect_stl, load_job, parse_part_arg, render_print_sheet);
+  PartSpec/Instance/expand_parts + eject-and-retry layout in prepare.py; `prepare --job/--part` in cli.py;
+  data/stl/print/jobs/hackathon_six.yaml; fixture fixtures/preform_3.64.2_job_hackathon.json.
+- LIVE (headless on port 44390, desktop PreForm Insider open alongside — no conflict):
+  build 1 = A+B 1.36 h / 150.3 mL / 185 layers; build 2 = 2 hats + 2 clawds 2.30 h / 165.1 mL / 772 layers.
+  data/stl/print/PRINT_SHEET.md, hackathon_jobN_* (.form, iso/top png, manifest), hackathon_jobs.json,
+  hackathon_preform_api_transcript.json, hackathon_preformserver.log.
+- Chamber default outputs + default fixture re-recorded (chamber STLs had been regenerated).
+- Tests: 32 passed, 1 skipped (+ live opt-in passed); provenance audit passes.
+- Resume: `uv run python scripts/prepare_print.py prepare --job data/stl/print/jobs/hackathon_six.yaml --backend live --port 44390 --update-fixture`

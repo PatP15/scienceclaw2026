@@ -1,6 +1,6 @@
 # Formlabs workflow: crumb-chamber specimens → PreForm API → prepared `.form`
 
-**What ran (live, 2026-10-31):** a real PreFormServer 3.64.2.665 (the headless PreForm from
+**What ran (live, 2026-10-31; re-run after the chamber STLs were regenerated):** a real PreFormServer 3.64.2.665 (the headless PreForm from
 Formlabs, Developer-ID-signed by Formlabs Inc. and notarized) on this Mac, driven by the
 official Formlabs Python SDK. It imported `crumb_chamber_A.stl` and `crumb_chamber_B.stl`,
 oriented, supported and laid them out on one Form 4 build platform in Grey V5 at 0.1 mm, ran 7
@@ -106,7 +106,7 @@ platform.
   found no enclosed cavities, so no drain holes are needed.
 - `percent_unsupported = 0` and `minima_count = 0` for both models. Both are manifold and in
   bounds, with no collisions and no thin walls.
-- **Reported, not hidden:** PreForm's cup check flags **1 cup on A and 3 on B**. These are
+- **Reported, not hidden:** PreForm's cup check flags **1 cup on A and 2 on B** (current STLs; 1 and 3 on the previous geometry). These are
   pockets under overhanging pore lips, which can add peel suction. Resin can still drain from
   them because they open to the face. They appear as `printability_warnings` in the manifest.
   Look at them in PreForm before printing.
@@ -117,13 +117,13 @@ takes longer. The crumb faces stay support-free in this layout too.
 
 | Live result (A+B, Form 4, Grey V5, 0.1 mm) | Open face up (default) | PreForm auto-orient |
 |---|---|---|
-| Print time (`calculate-print-time`) | **1.36 h** (4894 s) | 1.60 h (5778 s) |
-| Resin total (`scene.material_usage`) | **150.2 mL** | 158.3 mL |
-| of which: models / raft / supports | 127.05 / 21.14 / 2.04 mL | 127.05 / 21.67 / 9.62 mL |
-| Layers | 185 | 341 |
-| Cups (A, B) | 1, 3 | 0, 1 |
+| Print time (`calculate-print-time`) | **1.36 h** (4892 s) | 1.62 h (5822 s) |
+| Resin total (`scene.material_usage`) | **150.3 mL** | 160.0 mL |
+| of which: models / raft / supports | 126.9 / 21.34 / 2.06 mL | 126.9 / 21.47 / 11.63 mL |
+| Layers | 185 | 361 |
+| Cups (A, B) | 1, 2 | 0, 1 |
 
-Single-chamber builds (open face up): A takes 1.06 h and 76.1 mL; B takes 1.05 h and 74.2 mL.
+Single-chamber builds (open face up): A takes 1.06 h and 76.2 mL; B takes 1.05 h and 74.1 mL.
 Print times vary by a few seconds between runs because auto-layout placement varies. Resin
 volumes are stable. All of these are PreForm **estimates** for the prepared scene (provenance
 `estimated`), not measurements of a finished print.
@@ -174,7 +174,56 @@ food-safe. Never place a printed crumb specimen in contact with bread, dough or 
 put one in a fermentation chamber. They sit next to the real loaf cross-section for visual
 comparison.
 
-## 10. Mock vs live in tests
+## 10. Any parts: job files (the six-part hackathon print)
+
+```bash
+uv run python scripts/prepare_print.py prepare --job data/stl/print/jobs/hackathon_six.yaml \
+    --backend live --port 44390
+uv run python scripts/prepare_print.py prepare --part ~/model.stl:2 --part slab.stl:1:open_face_up
+```
+
+A job file lists parts in **priority order**, each with `count`, `orientation` (`open_face_up` or
+`preform_auto`), `repair` and `label`. `chamber: A` pulls the hash and validation from
+`chain_summary.json`. All copies are imported into one scene, oriented and supported, then laid
+out. If they do not all fit (`auto-layout` fails with `OPERATION_FAILED`), the lowest-priority
+copy is deleted and the layout retried. This is Formlabs' own "layout across builds" pattern.
+Deferred copies start the next build. Every attempt is recorded in the manifest under
+`layout.attempts`. **Parts are never scaled.** User files are imported strictly first; PreForm's
+repair is used only if PreForm refuses the mesh, and that is recorded per copy under
+`inputs[].import`.
+
+**User parts (`data/stl/external/`, copied unchanged from `~/Downloads/`; see
+`parts_report.json`):**
+- `hat.stl`: 67.9 × 42.7 × 64.9 mm, so millimetres are plausible. It is a chef's hat: a hollow band
+  with 0.8 mm walls, open at the bottom, under a solid puff. Volume 47.1 cm³.
+- `clawd.stl`: 45.8 × 22.5 × 33.0 mm, so millimetres are plausible. It is a blocky solid with one
+  through-hole and walls of 2 mm or more. Volume 24.4 cm³.
+- Neither file is watertight as supplied, because of 62 and 32 zero-area triangles respectively.
+  Without those triangles each is one watertight solid with the same volume. PreForm imported
+  both under its strict `repair_behavior=ERROR` setting, so no repair was applied.
+
+**Live result, Form 4 / Grey V5 / 0.1 mm:** 2 builds is the minimum, because A + B + one hat does
+not fit on one platform.
+
+| Build | `.form` | Parts | Time | Resin | Layers | PreForm warnings |
+|---|---|---|---|---|---|---|
+| 1 | `hackathon_job1_form4-grey-v5.form` | crumb A (mild, 22 °C), crumb B (sour, 27 °C) | 1.36 h | 150.3 mL | 185 | cups: A 1, B 2 |
+| 2 | `hackathon_job2_form4-grey-v5.form` | 2× hat, 2× Clawd (PreForm auto-orient, tilted) | 2.30 h | 165.1 mL | 772 | cups: 1 per hat; 0.06% undersupported per hat |
+
+`data/stl/print/PRINT_SHEET.md` is the one-page operator sheet: the file to open, parts,
+estimates, warnings, the PreForm desktop click path, and wash/cure notes.
+`hackathon_jobs.json` summarises the builds. Each build has its own manifest. On the
+auto-oriented parts (hat, Clawd), support touchpoints land on visible surfaces.
+
+**PreForm desktop and the headless server together:** with the PreForm Insider desktop app open,
+the headless PreFormServer started and ran normally on port 44390, then shut down. The desktop
+app kept running. The desktop app serves the API only after **File › Start PreForm Server**,
+which uses port 44388 by default. Use a different `--port` for the headless server, or attach
+to the desktop app on 44388: `prepare` attaches to any server already answering on `--port`, and
+the scenes then appear in the desktop window. To do it all by hand in the desktop app, open each
+`.form` (File › Open), which already has orientation, supports and layout in place.
+
+## 11. Mock vs live in tests
 
 - `tests/test_formlabs_mock.py`: **mock.** The real SDK talks to `MockPreFormServer`, which
   replays `src/fermentai/formlabs/fixtures/preform_3.64.2_session.json` (a recorded live session).
@@ -182,5 +231,7 @@ comparison.
 - `tests/test_formlabs_manifest.py`: manifest provenance rules, plus a check that the committed
   **live** manifest matches the files on disk (sha256).
 - `tests/test_formlabs_submit.py`: the print gate refuses without both confirmations; CLI help.
+- `tests/test_formlabs_parts.py`: job files, STL inspection, and the six-part job through the
+  **mock** (replays `fixtures/preform_3.64.2_job_hackathon.json`, recorded live).
 - `tests/test_formlabs_live.py`: **live**, opt-in (`FERMENTAI_FORMLABS_LIVE=1`). It starts
   PreFormServer and prepares chamber B for real.
