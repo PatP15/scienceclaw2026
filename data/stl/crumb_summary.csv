@@ -1,0 +1,3 @@
+name,provenance,porosity_target,cut_face_pore_area_fraction,porosity_3d_void_fraction,cut_face_pore_count,cut_face_pore_density_per_cm2,eqd_mean_mm,eqd_sd_mm,eqd_median_mm,eqd_p90_mm,mean_pore_depth_mm,volume_mm3,surface_area_mm2,extent_x_mm,extent_y_mm,extent_z_mm,triangle_count,stl_bytes,validation_passed
+mild,simulated,0.28,0.2861,0.01799,245,4.89088,2.27091,1.51669,1.86097,4.35619,0.79657,66651.75195,15885.63347,80.09952,80.09952,12.0,103910,5195584,True
+sour,simulated,0.42,0.41,0.09639,84,1.67687,3.65987,4.23672,2.67489,7.0107,2.88407,61330.9785,17965.10568,80.09952,80.09952,12.0,121698,6084984,True

@@ -1,0 +1,110 @@
+{
+  "name": "sour",
+  "provenance": "simulated",
+  "passed": true,
+  "min_thickness_mm": 0.9,
+  "checks": {
+    "watertight": {
+      "passed": true,
+      "value": true,
+      "method": "every edge shared by exactly 2 faces (trimesh)",
+      "exact": true,
+      "note": ""
+    },
+    "winding_consistent": {
+      "passed": true,
+      "value": true,
+      "method": "consistent face orientation (trimesh)",
+      "exact": true,
+      "note": ""
+    },
+    "positive_volume": {
+      "passed": true,
+      "value": 61330.978,
+      "method": "signed volume (mm^3) > 0 and trimesh is_volume",
+      "exact": true,
+      "note": ""
+    },
+    "manifold3d_valid": {
+      "passed": true,
+      "value": {
+        "status": "Error.NoError",
+        "genus": 8,
+        "volume": 61330.97849723294
+      },
+      "method": "manifold3d.Manifold accepts mesh as 2-manifold; volume agrees with trimesh",
+      "exact": true,
+      "note": ""
+    },
+    "self_intersections": {
+      "passed": true,
+      "value": {
+        "pairs_tested": 164811,
+        "intersecting_pairs": 0,
+        "examples": []
+      },
+      "method": "rtree AABB candidate pairs (no shared vertex) + segment/triangle tests",
+      "exact": false,
+      "note": "best effort: vertex-sharing pairs and coplanar overlaps are not tested"
+    },
+    "single_component": {
+      "passed": true,
+      "value": 1,
+      "method": "face-adjacency connected components",
+      "exact": true,
+      "note": ""
+    },
+    "voxel_volume_agreement": {
+      "passed": true,
+      "value": {
+        "voxel_volume": 61338.77,
+        "relative_error": 0.00013,
+        "pitch_mm": 0.15
+      },
+      "method": "parity re-voxelisation volume vs mesh volume",
+      "exact": false,
+      "note": ""
+    },
+    "min_thickness": {
+      "passed": true,
+      "value": {
+        "thin_volume_fraction": 0.001372,
+        "thin_clusters_gt_1mm3": 0,
+        "ball_radius_mm": 0.3,
+        "pitch_mm": 0.15,
+        "ray_thickness_informational": {
+          "samples": 2000,
+          "hits": 2000,
+          "p01_mm": 1.3185865203674418,
+          "p05_mm": 2.4136933079763683,
+          "median_mm": 11.999650378658346
+        }
+      },
+      "method": "solid volume not covered by inscribed balls of diameter ~0.9 mm (minus 1 voxel tolerance) on a 0.15 mm re-voxelisation; pass if < 1%",
+      "exact": false,
+      "note": "approximate (voxel resolution); ray thickness is informational only"
+    },
+    "enclosed_cavities": {
+      "passed": true,
+      "value": {
+        "voxel_enclosed_regions": 0,
+        "voxel_enclosed_volume_mm3": 0.0,
+        "topological_single_shell": true
+      },
+      "method": "single watertight shell => no internal cavity (exact); voxel void labelling (approx.)",
+      "exact": false,
+      "note": "a cavity smaller than the voxel pitch could be missed by the voxel check, but not by the topological argument"
+    },
+    "dimensions": {
+      "passed": true,
+      "value": [
+        80.1,
+        80.1,
+        12.0
+      ],
+      "method": "bounding box extents vs (80.0, 80.0, 12.0) mm (+-1 mm)",
+      "exact": true,
+      "note": ""
+    }
+  }
+}

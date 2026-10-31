@@ -1,0 +1,188 @@
+{
+  "provenance": "simulated",
+  "disclaimer": "Illustrative hypothesis only: sourdough sourness does not determine crumb structure. These geometries are parameterized stochastic models, not ALCHEMI predictions.",
+  "models": [
+    {
+      "name": "mild",
+      "provenance": "simulated",
+      "volume_mm3": 66651.75195240065,
+      "surface_area_mm2": 15885.633471726775,
+      "bounding_box_mm": [
+        [
+          0.0004818677844014019,
+          0.0004818677844014019,
+          0.0
+        ],
+        [
+          80.0999984741211,
+          80.0999984741211,
+          12.0
+        ]
+      ],
+      "extents_mm": [
+        80.09951660633669,
+        80.09951660633669,
+        12.0
+      ],
+      "triangle_count": 103910,
+      "vertex_count": 51957,
+      "footprint_area_mm2": 5656.080000000001,
+      "porosity_3d_void_fraction": 0.017992556204994736,
+      "cut_face_pore_area_fraction": 0.2860987120008305,
+      "porosity_target": 0.28,
+      "cut_face_pore_count": 245,
+      "cut_face_pore_density_per_cm2": 4.890883393354787,
+      "cut_face_eq_diameter_mm": {
+        "n": 245,
+        "mean": 2.2709111344186077,
+        "sd": 1.5166856495469676,
+        "median": 1.8609705966725114,
+        "p10": 0.8136857890256439,
+        "p90": 4.356185713592408,
+        "max": 9.595868062621902
+      },
+      "cut_face_eccentricity": {
+        "n": 245,
+        "mean": 0.6564166459179701,
+        "sd": 0.24842686508752332,
+        "median": 0.7341240594930701,
+        "p10": 0.29517017408020396,
+        "p90": 0.9133011375523852,
+        "max": 1.0
+      },
+      "mean_pore_depth_mm": 0.7965656547116703,
+      "max_pore_depth_mm": 2.3937121665405066,
+      "stl_file": "crumb_mild.stl",
+      "stl_bytes": 5195584,
+      "generator_stats": {
+        "pores_placed": 880,
+        "cut_face_pore_fraction_after_placement": 0.2214203647852937,
+        "cut_face_pore_fraction_voxel": 0.28854301306907937,
+        "enclosed_voids_filled": 0,
+        "void_fraction_3d_voxel_in_footprint": 0.018310665712240493,
+        "grid_shape": [
+          267,
+          267,
+          40
+        ],
+        "calibration_iteration": 2,
+        "internal_placement_target": 0.22090621858394377
+      },
+      "self_consistency_vs_params": {
+        "params_name": "mild",
+        "measured_provenance": "simulated",
+        "params_provenance": "simulated",
+        "pore_area_fraction": {
+          "measured": 0.2860987120008305,
+          "param_target": 0.28,
+          "difference": 0.006098712000830453
+        },
+        "notes": [
+          "2D section statistics; generator sizes are 3D equivalent-sphere diameters.",
+          "Expected section diameter uses sphere stereology and ignores pore coalescence."
+        ],
+        "mean_section_diameter_mm": {
+          "measured": 2.2709111344186077,
+          "expected_from_params": 1.213098073421481,
+          "ratio": 1.8719930269228928
+        },
+        "suggested_params": {
+          "porosity_target": 0.286,
+          "pore_diam_mean_mm": 2.621
+        }
+      },
+      "validation_passed": true
+    },
+    {
+      "name": "sour",
+      "provenance": "simulated",
+      "volume_mm3": 61330.97849723294,
+      "surface_area_mm2": 17965.1056833437,
+      "bounding_box_mm": [
+        [
+          0.0004818677844014019,
+          0.0004818677844014019,
+          0.0
+        ],
+        [
+          80.0999984741211,
+          80.0999984741211,
+          12.0
+        ]
+      ],
+      "extents_mm": [
+        80.09951660633669,
+        80.09951660633669,
+        12.0
+      ],
+      "triangle_count": 121698,
+      "vertex_count": 60835,
+      "footprint_area_mm2": 5656.080000000001,
+      "porosity_3d_void_fraction": 0.09638568146677351,
+      "cut_face_pore_area_fraction": 0.40999576788865555,
+      "porosity_target": 0.42,
+      "cut_face_pore_count": 84,
+      "cut_face_pore_density_per_cm2": 1.6768743062930695,
+      "cut_face_eq_diameter_mm": {
+        "n": 84,
+        "mean": 3.659868356940711,
+        "sd": 4.236715481923114,
+        "median": 2.67489061624497,
+        "p10": 1.0061427520153046,
+        "p90": 7.010695175298356,
+        "max": 33.81148210928956
+      },
+      "cut_face_eccentricity": {
+        "n": 84,
+        "mean": 0.6685891246229658,
+        "sd": 0.17370791648120876,
+        "median": 0.6839175282673248,
+        "p10": 0.468347119234076,
+        "p90": 0.8707954502828241,
+        "max": 1.0
+      },
+      "mean_pore_depth_mm": 2.8840701828974504,
+      "max_pore_depth_mm": 8.099999904632568,
+      "stl_file": "crumb_sour.stl",
+      "stl_bytes": 6084984,
+      "generator_stats": {
+        "pores_placed": 416,
+        "cut_face_pore_fraction_after_placement": 0.34291971851213554,
+        "cut_face_pore_fraction_voxel": 0.40783426683900614,
+        "enclosed_voids_filled": 1,
+        "void_fraction_3d_voxel_in_footprint": 0.09667541557305337,
+        "grid_shape": [
+          267,
+          267,
+          40
+        ],
+        "calibration_iteration": 1,
+        "internal_placement_target": 0.342190147924745
+      },
+      "self_consistency_vs_params": {
+        "params_name": "sour",
+        "measured_provenance": "simulated",
+        "params_provenance": "simulated",
+        "pore_area_fraction": {
+          "measured": 0.40999576788865555,
+          "param_target": 0.42,
+          "difference": -0.010004232111344435
+        },
+        "notes": [
+          "2D section statistics; generator sizes are 3D equivalent-sphere diameters.",
+          "Expected section diameter uses sphere stereology and ignores pore coalescence."
+        ],
+        "mean_section_diameter_mm": {
+          "measured": 3.659868356940711,
+          "expected_from_params": 3.038278653450091,
+          "ratio": 1.2045861405058351
+        },
+        "suggested_params": {
+          "porosity_target": 0.41,
+          "pore_diam_mean_mm": 3.373
+        }
+      },
+      "validation_passed": true
+    }
+  ]
+}
