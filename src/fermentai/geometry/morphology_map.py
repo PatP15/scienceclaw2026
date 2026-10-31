@@ -798,6 +798,7 @@ def _chain_summary(specs: list[_Specimen], files: dict, render_path: Path | None
     for sp in specs:
         f = files[sp.chamber_id]
         up = sp.inputs.upstream or {}
+        dp = up.get("descriptor_provenance")
         s = _public_summary(sp.summary)
         chambers[sp.chamber_id] = {
             "temperature_c": CHAMBER_TEMPS_C.get(sp.chamber_id),
@@ -820,13 +821,11 @@ def _chain_summary(specs: list[_Specimen], files: dict, render_path: Path | None
             "alchemi": {
                 "applied_to_kinetics": bool(up.get("alchemi_applied")),
                 "status": up.get("status"),
-                "descriptor_provenance": (
-                dp.get("label") if isinstance(dp := up.get("descriptor_provenance"), dict) else dp
-            ),
-                "method": (up.get("descriptor_provenance") or {}).get("method"),
-                "checkpoint": (up.get("descriptor_provenance") or {}).get("checkpoint"),
-                "descriptor_source_files": (up.get("descriptor_provenance") or {}).get(
-                    "source_files"),
+                # descriptor_provenance is a dict in older reports and a plain string now
+                "descriptor_provenance": (dp.get("label") if isinstance(dp, dict) else dp),
+                "method": (dp.get("method") if isinstance(dp, dict) else None),
+                "checkpoint": (dp.get("checkpoint") if isinstance(dp, dict) else None),
+                "descriptor_source_files": (dp.get("source_files") if isinstance(dp, dict) else None),
                 "descriptors_used": up.get("descriptors"),
                 "changed_kinetic_parameters": up.get("changed_parameters"),
                 "notes": up.get("notes"),

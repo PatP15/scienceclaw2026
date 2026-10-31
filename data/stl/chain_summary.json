@@ -34,8 +34,8 @@
     "A": {
       "temperature_c": 22.0,
       "stl": "data/stl/crumb_chamber_A.stl",
-      "stl_sha256": "c7c03914b635f9c18392feb4664f8ef90c581ebd0e54190a6889dfcbb353365d",
-      "stl_bytes": 22123884,
+      "stl_sha256": "88bc2dd6cc8ad6ff134c9de9136b8fc0ca2a1915c8e254553cf0cde263038abc",
+      "stl_bytes": 22137284,
       "validation_json": "data/stl/crumb_chamber_A_validation.json",
       "validation_passed": true,
       "mapping_report": "data/stl/crumb_chamber_A_mapping.json",
@@ -55,16 +55,16 @@
         },
         "t_end_h": 16.0,
         "summary_used": {
-          "co2_retained_g_per_kg": 1.5402498185291944,
-          "co2_retained_peak_g_per_kg": 1.7475161741483038,
-          "expansion_ratio_peak": 2.1053783216342765,
-          "expansion_ratio_final": 1.9742735343397237,
-          "max_expansion_rate_per_h": 0.20518461145524824,
+          "co2_retained_g_per_kg": 1.5391027760008846,
+          "co2_retained_peak_g_per_kg": 1.7469171877079621,
+          "expansion_ratio_peak": 2.104999437229141,
+          "expansion_ratio_final": 1.9735479811439691,
+          "max_expansion_rate_per_h": 0.20491713184353166,
           "overproof_flag": true,
-          "expansion_fall_from_peak_fraction": 0.11860625880623148,
-          "final_ph": 4.125360749402346,
-          "gluten_weakening_index": 0.48860480119606464,
-          "final_fermentation_quotient": 3.5821160858883303
+          "expansion_fall_from_peak_fraction": 0.1189606543282911,
+          "final_ph": 4.116030299920456,
+          "gluten_weakening_index": 0.4915567890094614,
+          "final_fermentation_quotient": 3.581937575922948
         },
         "literature_summary": {
           "co2_retained_g_per_kg": 1.5402550145641583,
@@ -86,147 +86,156 @@
       },
       "alchemi": {
         "applied_to_kinetics": true,
-        "status": "partial",
+        "status": "applied",
         "descriptor_provenance": "real: ALCHEMI/AIMNet2 on NVIDIA RTX A6000",
-        "method": "AIMNet2 via nvalchemi-toolkit (PipelineModelWrapper: AIMNet2 + Ewald + DFT-D3(BJ)), FIRE2 optimisation",
-        "checkpoint": "aimnet2_wb97m_d3_3",
-        "descriptor_source_files": [
-          "data/alchemi/results/json/",
-          "data/alchemi/analysis/association_energies.csv",
-          "data/alchemi/analysis/deprotonation_energies.csv",
-          "data/alchemi/analysis/hbonds.csv"
-        ],
-        "descriptors_used": {
-          "lactic": {
-            "assoc_energy_per_water_kcal": -9.65547643035451,
-            "deprot_energy_n6_kcal": 11.250146001528442,
-            "hbond_min_A": 1.6388945782576574
-          },
-          "acetic": {
-            "assoc_energy_per_water_kcal": -9.540135226879892,
-            "hbond_min_A": 1.4911789725626
-          }
-        },
+        "method": null,
+        "checkpoint": null,
+        "descriptor_source_files": null,
+        "descriptors_used": null,
         "changed_kinetic_parameters": {
           "undissociated_lactic_rel_potency": {
-            "value": 0.12366468525748014,
+            "value": 0.1271577792699662,
             "literature_value": 0.1,
             "inputs": {
-              "d_assoc_per_water_kcal": -0.11534120347461752,
-              "d_hbond_min_A": 0.14771560569505748
+              "d_assoc_per_water_kcal": -0.044331063887414146,
+              "d_assoc_campaign": "campaign 2 (Boltzmann-averaged neutral clusters, mean over common n)",
+              "d_hbond_min_A": 0.14771560569505748,
+              "d_hbond_campaign": "campaign 1 (shortest acid-water H...O contact)"
             },
-            "mapping": "hydrophilicity score h=-0.119; tanh-bounded move within [0.0, 0.3]"
+            "mapping": "hydrophilicity score h=-0.137; tanh-bounded move within [0.0, 0.3]"
+          },
+          "pka_lactic": {
+            "value": 3.835,
+            "literature_value": 3.86,
+            "inputs": {
+              "field": "relative_pka_estimate.value",
+              "campaign": "campaign 2 (cluster-phase quasi-harmonic exchange cycle, n=6 and n=10)",
+              "cluster_dpka": -3.885729964356191,
+              "experimental_dpka": -0.8999999999999999
+            },
+            "mapping": "gap shift = clip(0.1 x (-3.886 - (-0.90)), +-0.05) = -0.0500"
+          },
+          "pka_acetic": {
+            "value": 4.785,
+            "literature_value": 4.76,
+            "inputs": {
+              "field": "relative_pka_estimate.value",
+              "campaign": "campaign 2 (cluster-phase quasi-harmonic exchange cycle, n=6 and n=10)",
+              "cluster_dpka": -3.885729964356191,
+              "experimental_dpka": -0.8999999999999999
+            },
+            "mapping": "gap shift = clip(0.1 x (-3.886 - (-0.90)), +-0.05) = -0.0500"
           }
         },
         "notes": [
-          "pKa: need deprot_energy_n6_kcal for both acids"
+          "pKa: the 0.05 cap binds; the applied shift reflects only the sign of the cluster-vs-experiment discrepancy"
         ],
         "cross_reference": "data/predictions/molecular_coupling_report.json",
         "attribution": {
           "available": true,
           "input_deltas_alchemi_minus_literature": {
-            "co2_retained_g_per_kg": -5.196034963850238e-06,
-            "co2_retained_peak_g_per_kg": -0.00028896477506901164,
-            "expansion_ratio_peak": -0.00018278251314818306,
-            "expansion_ratio_final": -3.2867131602998256e-06,
-            "max_expansion_rate_per_h": -0.0001518706471124176,
+            "co2_retained_g_per_kg": -0.001152238563273622,
+            "co2_retained_peak_g_per_kg": -0.0008879512154107427,
+            "expansion_ratio_peak": -0.000561666918283521,
+            "expansion_ratio_final": -0.0007288399089149245,
+            "max_expansion_rate_per_h": -0.0004193502588289988,
             "overproof_flag": 0.0,
-            "expansion_fall_from_peak_fraction": -0.00014274801215069521,
-            "final_ph": -0.00013945117762848014,
-            "gluten_weakening_index": 1.5632927719333445e-05,
-            "final_fermentation_quotient": 1.384745003285559e-05
+            "expansion_fall_from_peak_fraction": 0.0002116475099089299,
+            "final_ph": -0.009469900659518693,
+            "gluten_weakening_index": 0.002967620741116117,
+            "final_fermentation_quotient": -0.00016466251534952292
           },
           "crumb_param_deltas": {
             "porosity_target": {
-              "alchemi_informed": 0.3876,
+              "alchemi_informed": 0.3875,
               "literature": 0.3876,
-              "delta": 0.0,
-              "relative": 0.0
+              "delta": -9.999999999998899e-05,
+              "relative": -0.00025799793601648344
             },
             "pore_diam_median_mm": {
-              "alchemi_informed": 1.9925,
+              "alchemi_informed": 1.9942,
               "literature": 1.9932,
-              "delta": -0.000700000000000145,
-              "relative": -0.000351194059803404
+              "delta": 0.0009999999999998899,
+              "relative": 0.0005017057997189895
             },
             "pore_diam_cv": {
-              "alchemi_informed": 0.5714,
+              "alchemi_informed": 0.5717,
               "literature": 0.5715,
-              "delta": -9.999999999998899e-05,
-              "relative": -0.00017497812773401396
+              "delta": 0.00019999999999997797,
+              "relative": 0.0003499562554680279
             },
             "pore_diam_mean_mm": {
-              "alchemi_informed": 2.2948,
+              "alchemi_informed": 2.297,
               "literature": 2.2957,
-              "delta": -0.0009000000000001229,
-              "relative": -0.0003920372871020268
+              "delta": 0.0013000000000000789,
+              "relative": 0.0005662760813695513
             },
             "pore_diam_sd_mm": {
-              "alchemi_informed": 1.3112,
+              "alchemi_informed": 1.3131,
               "literature": 1.3119,
-              "delta": -0.000700000000000145,
-              "relative": -0.0005335772543640101
+              "delta": 0.0011999999999998678,
+              "relative": 0.0009147038646237272
             },
             "pore_diam_max_mm": {
-              "alchemi_informed": 8.3419,
+              "alchemi_informed": 8.3465,
               "literature": 8.3437,
-              "delta": -0.0017999999999993577,
-              "relative": -0.00021573162985238654
+              "delta": 0.00280000000000058,
+              "relative": 0.0003355825353261239
             },
             "eccentricity": {
-              "alchemi_informed": 0.4183,
+              "alchemi_informed": 0.4189,
               "literature": 0.4185,
-              "delta": -0.00019999999999997797,
-              "relative": -0.0004778972520907479
+              "delta": 0.00040000000000001146,
+              "relative": 0.0009557945041816283
             },
             "eccentricity_jitter": {
-              "alchemi_informed": 0.4091,
+              "alchemi_informed": 0.4095,
               "literature": 0.4092,
-              "delta": -9.999999999998899e-05,
-              "relative": -0.0002443792766373142
+              "delta": 0.00029999999999996696,
+              "relative": 0.0007331378299119427
             },
             "clustering": {
-              "alchemi_informed": 0.4299,
+              "alchemi_informed": 0.4303,
               "literature": 0.4301,
-              "delta": -0.00019999999999997797,
-              "relative": -0.00046500813764235757
+              "delta": 0.00020000000000003348,
+              "relative": 0.0004650081376424866
             },
             "cluster_radius_mm": {
-              "alchemi_informed": 4.0855,
+              "alchemi_informed": 4.0866,
               "literature": 4.0859,
-              "delta": -0.00039999999999995595,
-              "relative": -9.789764800899582e-05
+              "delta": 0.000700000000000145,
+              "relative": 0.000171320884015797
             },
             "cluster_spacing_mm": {
-              "alchemi_informed": 16.1709,
+              "alchemi_informed": 16.1732,
               "literature": 16.1719,
-              "delta": -0.0010000000000012221,
-              "relative": -6.183565320099815e-05
+              "delta": 0.001300000000000523,
+              "relative": 8.038634916123169e-05
             },
             "min_wall_mm": {
-              "alchemi_informed": 1.1785,
+              "alchemi_informed": 1.1757,
               "literature": 1.1785,
-              "delta": 0.0,
-              "relative": 0.0
+              "delta": -0.0028000000000001357,
+              "relative": -0.0023759015697922235
             }
           },
           "geometry_identical_after_rounding": false,
-          "max_abs_relative_param_change": 0.0005335772543640101
+          "max_abs_relative_param_change": 0.0023759015697922235
         }
       },
       "crumb_params": {
         "name": "chamber_A",
-        "porosity_target": 0.3876,
-        "pore_diam_mean_mm": 2.2948,
-        "pore_diam_sd_mm": 1.3112,
+        "porosity_target": 0.3875,
+        "pore_diam_mean_mm": 2.297,
+        "pore_diam_sd_mm": 1.3131,
         "pore_diam_min_mm": 0.6,
-        "pore_diam_max_mm": 8.3419,
-        "eccentricity": 0.4183,
-        "eccentricity_jitter": 0.4091,
-        "clustering": 0.4299,
-        "cluster_radius_mm": 4.0855,
-        "cluster_spacing_mm": 16.1709,
-        "min_wall_mm": 1.1785,
+        "pore_diam_max_mm": 8.3465,
+        "eccentricity": 0.4189,
+        "eccentricity_jitter": 0.4095,
+        "clustering": 0.4303,
+        "cluster_radius_mm": 4.0866,
+        "cluster_spacing_mm": 16.1732,
+        "min_wall_mm": 1.1757,
         "width_mm": 80.0,
         "depth_mm": 80.0,
         "thickness_mm": 12.0,
@@ -240,60 +249,60 @@
         "description": "Chamber A (22 degC): simulation-derived crumb hypothesis from the alchemi_informed kinetics run at t=16 h (morphology_map)."
       },
       "mapping_drivers": {
-        "gas_fraction": 0.49348457414517277,
-        "s_gas": 0.6254520908118494,
-        "s_rate": 0.420738445820993,
-        "s_gwi": 0.48860480119606464,
-        "s_collapse": 0.5427351705601261,
-        "s_acid": 0.5830928337317692,
-        "s_size": 0.4749908513870513,
-        "s_irreg": 0.45467162350852885,
-        "s_weak": 0.5358488174639169
+        "gas_fraction": 0.49329835932321797,
+        "s_gas": 0.6249034568971221,
+        "s_rate": 0.4196685273741267,
+        "s_gwi": 0.4915567890094614,
+        "s_collapse": 0.543311063283473,
+        "s_acid": 0.5893131333863627,
+        "s_size": 0.4757400529238304,
+        "s_irreg": 0.4556126581917941,
+        "s_weak": 0.540434961197912
       },
       "measured_on_mesh": {
-        "cut_face_pore_area_fraction": 0.3867240525735823,
-        "porosity_target": 0.3876,
-        "cut_face_pore_count": 92,
-        "cut_face_pore_density_per_cm2": 1.8365619560183333,
+        "cut_face_pore_area_fraction": 0.38726703610840507,
+        "porosity_target": 0.3875,
+        "cut_face_pore_count": 93,
+        "cut_face_pore_density_per_cm2": 1.8565245859750543,
         "cut_face_eq_diameter_mm": {
-          "n": 92,
-          "mean": 3.731701644770499,
-          "sd": 3.6092305904507316,
-          "median": 2.8621227621929943,
-          "p10": 0.7849561960427691,
-          "p90": 7.70212865529764,
-          "max": 26.51090773047596
+          "n": 93,
+          "mean": 3.7165764926663862,
+          "sd": 3.589583799298706,
+          "median": 2.7914558950087667,
+          "p10": 0.842440925813203,
+          "p90": 7.691531346614484,
+          "max": 26.454175159475955
         },
-        "porosity_3d_void_fraction": 0.0570910743538281,
-        "mean_pore_depth_mm": 1.933608004287853,
-        "volume_mm3": 63998.472390309915,
+        "porosity_3d_void_fraction": 0.05727467170850786,
+        "mean_pore_depth_mm": 1.9368177922539207,
+        "volume_mm3": 63986.0110062729,
         "extents_mm": [
           80.1,
           80.1,
           12.0
         ],
-        "triangle_count": 442476
+        "triangle_count": 442744
       },
       "generator_stats": {
         "pores_placed": 512,
-        "cut_face_pore_fraction_after_placement": 0.32523696682464454,
-        "cut_face_pore_fraction_voxel": 0.3791289673991096,
+        "cut_face_pore_fraction_after_placement": 0.32584733591842596,
+        "cut_face_pore_fraction_voxel": 0.3796495763320408,
         "enclosed_voids_filled": 0,
-        "void_fraction_3d_voxel_in_footprint": 0.0573661815000398,
+        "void_fraction_3d_voxel_in_footprint": 0.057550703889286514,
         "grid_shape": [
           267,
           267,
           40
         ],
         "calibration_iteration": 1,
-        "internal_placement_target": 0.32187528364210827
+        "internal_placement_target": 0.3211008186126669
       }
     },
     "B": {
       "temperature_c": 27.0,
       "stl": "data/stl/crumb_chamber_B.stl",
-      "stl_sha256": "564498e68dcd95703022d7f80e9e0ae8d17b832686c84c76b33184124b6d7da3",
-      "stl_bytes": 4924984,
+      "stl_sha256": "976a17927aa03d158e6f0ce53ebba743086fb1a031c401ba82dcf6fd25e6abd2",
+      "stl_bytes": 5078484,
       "validation_json": "data/stl/crumb_chamber_B_validation.json",
       "validation_passed": true,
       "mapping_report": "data/stl/crumb_chamber_B_mapping.json",
@@ -313,16 +322,16 @@
         },
         "t_end_h": 16.0,
         "summary_used": {
-          "co2_retained_g_per_kg": 1.2608528445792662,
-          "co2_retained_peak_g_per_kg": 1.6879045601645464,
-          "expansion_ratio_peak": 2.085758369193451,
-          "expansion_ratio_final": 1.81105387154701,
-          "max_expansion_rate_per_h": 0.26331998729577144,
+          "co2_retained_g_per_kg": 1.258442292717743,
+          "co2_retained_peak_g_per_kg": 1.6870584460737332,
+          "expansion_ratio_peak": 2.0852140994064774,
+          "expansion_ratio_final": 1.8095032644097386,
+          "max_expansion_rate_per_h": 0.2629470924295827,
           "overproof_flag": true,
-          "expansion_fall_from_peak_fraction": 0.25300702756774857,
-          "final_ph": 3.8994309876922952,
-          "gluten_weakening_index": 0.7682497243417044,
-          "final_fermentation_quotient": 4.076453061479612
+          "expansion_fall_from_peak_fraction": 0.2540612356101251,
+          "final_ph": 3.8879008579938983,
+          "gluten_weakening_index": 0.7716004789234595,
+          "final_fermentation_quotient": 4.075403581666047
         },
         "literature_summary": {
           "co2_retained_g_per_kg": 1.2608922068657131,
@@ -344,147 +353,156 @@
       },
       "alchemi": {
         "applied_to_kinetics": true,
-        "status": "partial",
+        "status": "applied",
         "descriptor_provenance": "real: ALCHEMI/AIMNet2 on NVIDIA RTX A6000",
-        "method": "AIMNet2 via nvalchemi-toolkit (PipelineModelWrapper: AIMNet2 + Ewald + DFT-D3(BJ)), FIRE2 optimisation",
-        "checkpoint": "aimnet2_wb97m_d3_3",
-        "descriptor_source_files": [
-          "data/alchemi/results/json/",
-          "data/alchemi/analysis/association_energies.csv",
-          "data/alchemi/analysis/deprotonation_energies.csv",
-          "data/alchemi/analysis/hbonds.csv"
-        ],
-        "descriptors_used": {
-          "lactic": {
-            "assoc_energy_per_water_kcal": -9.65547643035451,
-            "deprot_energy_n6_kcal": 11.250146001528442,
-            "hbond_min_A": 1.6388945782576574
-          },
-          "acetic": {
-            "assoc_energy_per_water_kcal": -9.540135226879892,
-            "hbond_min_A": 1.4911789725626
-          }
-        },
+        "method": null,
+        "checkpoint": null,
+        "descriptor_source_files": null,
+        "descriptors_used": null,
         "changed_kinetic_parameters": {
           "undissociated_lactic_rel_potency": {
-            "value": 0.12366468525748014,
+            "value": 0.1271577792699662,
             "literature_value": 0.1,
             "inputs": {
-              "d_assoc_per_water_kcal": -0.11534120347461752,
-              "d_hbond_min_A": 0.14771560569505748
+              "d_assoc_per_water_kcal": -0.044331063887414146,
+              "d_assoc_campaign": "campaign 2 (Boltzmann-averaged neutral clusters, mean over common n)",
+              "d_hbond_min_A": 0.14771560569505748,
+              "d_hbond_campaign": "campaign 1 (shortest acid-water H...O contact)"
             },
-            "mapping": "hydrophilicity score h=-0.119; tanh-bounded move within [0.0, 0.3]"
+            "mapping": "hydrophilicity score h=-0.137; tanh-bounded move within [0.0, 0.3]"
+          },
+          "pka_lactic": {
+            "value": 3.835,
+            "literature_value": 3.86,
+            "inputs": {
+              "field": "relative_pka_estimate.value",
+              "campaign": "campaign 2 (cluster-phase quasi-harmonic exchange cycle, n=6 and n=10)",
+              "cluster_dpka": -3.885729964356191,
+              "experimental_dpka": -0.8999999999999999
+            },
+            "mapping": "gap shift = clip(0.1 x (-3.886 - (-0.90)), +-0.05) = -0.0500"
+          },
+          "pka_acetic": {
+            "value": 4.785,
+            "literature_value": 4.76,
+            "inputs": {
+              "field": "relative_pka_estimate.value",
+              "campaign": "campaign 2 (cluster-phase quasi-harmonic exchange cycle, n=6 and n=10)",
+              "cluster_dpka": -3.885729964356191,
+              "experimental_dpka": -0.8999999999999999
+            },
+            "mapping": "gap shift = clip(0.1 x (-3.886 - (-0.90)), +-0.05) = -0.0500"
           }
         },
         "notes": [
-          "pKa: need deprot_energy_n6_kcal for both acids"
+          "pKa: the 0.05 cap binds; the applied shift reflects only the sign of the cluster-vs-experiment discrepancy"
         ],
         "cross_reference": "data/predictions/molecular_coupling_report.json",
         "attribution": {
           "available": true,
           "input_deltas_alchemi_minus_literature": {
-            "co2_retained_g_per_kg": -3.936228644696449e-05,
-            "co2_retained_peak_g_per_kg": -0.0004098442777702438,
-            "expansion_ratio_peak": -0.000263635672985707,
-            "expansion_ratio_final": -2.532011166311854e-05,
-            "max_expansion_rate_per_h": -0.0002458729828891393,
+            "co2_retained_g_per_kg": -0.0024499141479701336,
+            "co2_retained_peak_g_per_kg": -0.0012559583685833875,
+            "expansion_ratio_peak": -0.0008079054599594571,
+            "expansion_ratio_final": -0.0015759272489344056,
+            "max_expansion_rate_per_h": -0.0006187678490778836,
             "overproof_flag": 0.0,
-            "expansion_fall_from_peak_fraction": -0.00015802063178338432,
-            "final_ph": -0.0013810358306241,
-            "gluten_weakening_index": 7.332536152337976e-05,
-            "final_fermentation_quotient": 0.00033515559197105915
+            "expansion_fall_from_peak_fraction": 0.0008961874105931633,
+            "final_ph": -0.012911165529021051,
+            "gluten_weakening_index": 0.003424079943278535,
+            "final_fermentation_quotient": -0.0007143242215938983
           },
           "crumb_param_deltas": {
             "porosity_target": {
-              "alchemi_informed": 0.3474,
+              "alchemi_informed": 0.347,
               "literature": 0.3474,
-              "delta": 0.0,
-              "relative": 0.0
+              "delta": -0.00040000000000001146,
+              "relative": -0.0011514104778353814
             },
             "pore_diam_median_mm": {
-              "alchemi_informed": 2.5571,
+              "alchemi_informed": 2.5594,
               "literature": 2.5581,
-              "delta": -0.0009999999999998899,
-              "relative": -0.0003909151323247292
+              "delta": 0.0013000000000000789,
+              "relative": 0.0005081896720222348
             },
             "pore_diam_cv": {
-              "alchemi_informed": 0.6806,
+              "alchemi_informed": 0.6814,
               "literature": 0.6807,
-              "delta": -9.999999999998899e-05,
-              "relative": -0.00014690759512265167
+              "delta": 0.0007000000000000339,
+              "relative": 0.0010283531658587248
             },
             "pore_diam_mean_mm": {
-              "alchemi_informed": 3.0931,
+              "alchemi_informed": 3.0972,
               "literature": 3.0945,
-              "delta": -0.0013999999999998458,
-              "relative": -0.0004524155760219246
+              "delta": 0.0026999999999999247,
+              "relative": 0.0008725157537566407
             },
             "pore_diam_sd_mm": {
-              "alchemi_informed": 2.1051,
+              "alchemi_informed": 2.1105,
               "literature": 2.1064,
-              "delta": -0.0012999999999996348,
-              "relative": -0.0006171667299656452
+              "delta": 0.004100000000000215,
+              "relative": 0.0019464489175846063
             },
             "pore_diam_max_mm": {
-              "alchemi_informed": 10.0891,
+              "alchemi_informed": 10.1028,
               "literature": 10.0911,
-              "delta": -0.002000000000000668,
-              "relative": -0.00019819444857356163
+              "delta": 0.011699999999999378,
+              "relative": 0.0011594375241548867
             },
             "eccentricity": {
-              "alchemi_informed": 0.5975,
+              "alchemi_informed": 0.5982,
               "literature": 0.5979,
-              "delta": -0.00039999999999995595,
-              "relative": -0.0006690081953503194
+              "delta": 0.00029999999999996696,
+              "relative": 0.0005017561465127396
             },
             "eccentricity_jitter": {
-              "alchemi_informed": 0.4988,
+              "alchemi_informed": 0.4991,
               "literature": 0.4989,
-              "delta": -9.999999999998899e-05,
-              "relative": -0.00020044097013427337
+              "delta": 0.00019999999999997797,
+              "relative": 0.00040088194026854674
             },
             "clustering": {
-              "alchemi_informed": 0.5828,
+              "alchemi_informed": 0.584,
               "literature": 0.583,
-              "delta": -0.00019999999999997797,
-              "relative": -0.00034305317324181473
+              "delta": 0.0010000000000000009,
+              "relative": 0.0017152658662092641
             },
             "cluster_radius_mm": {
-              "alchemi_informed": 4.5223,
+              "alchemi_informed": 4.5257,
               "literature": 4.5228,
-              "delta": -0.0004999999999997229,
-              "relative": -0.00011055098611473488
+              "delta": 0.0028999999999994586,
+              "relative": 0.0006411957194656978
             },
             "cluster_spacing_mm": {
-              "alchemi_informed": 17.0445,
+              "alchemi_informed": 17.0514,
               "literature": 17.0456,
-              "delta": -0.001100000000000989,
-              "relative": -6.453278265364605e-05
+              "delta": 0.0058000000000006935,
+              "relative": 0.0003402637630825957
             },
             "min_wall_mm": {
-              "alchemi_informed": 1.0494,
+              "alchemi_informed": 1.0461,
               "literature": 1.0497,
-              "delta": -0.00029999999999996696,
-              "relative": -0.0002857959416975964
+              "delta": -0.0036000000000000476,
+              "relative": -0.00342955130037158
             }
           },
           "geometry_identical_after_rounding": false,
-          "max_abs_relative_param_change": 0.0006690081953503194
+          "max_abs_relative_param_change": 0.00342955130037158
         }
       },
       "crumb_params": {
         "name": "chamber_B",
-        "porosity_target": 0.3474,
-        "pore_diam_mean_mm": 3.0931,
-        "pore_diam_sd_mm": 2.1051,
+        "porosity_target": 0.347,
+        "pore_diam_mean_mm": 3.0972,
+        "pore_diam_sd_mm": 2.1105,
         "pore_diam_min_mm": 0.6,
-        "pore_diam_max_mm": 10.0891,
-        "eccentricity": 0.5975,
-        "eccentricity_jitter": 0.4988,
-        "clustering": 0.5828,
-        "cluster_radius_mm": 4.5223,
-        "cluster_spacing_mm": 17.0445,
-        "min_wall_mm": 1.0494,
+        "pore_diam_max_mm": 10.1028,
+        "eccentricity": 0.5982,
+        "eccentricity_jitter": 0.4991,
+        "clustering": 0.584,
+        "cluster_radius_mm": 4.5257,
+        "cluster_spacing_mm": 17.0514,
+        "min_wall_mm": 1.0461,
         "width_mm": 80.0,
         "depth_mm": 80.0,
         "thickness_mm": 12.0,
@@ -498,66 +516,66 @@
         "description": "Chamber B (27 degC): simulation-derived crumb hypothesis from the alchemi_informed kinetics run at t=16 h (morphology_map)."
       },
       "mapping_drivers": {
-        "gas_fraction": 0.44783530975486896,
-        "s_gas": 0.49131681420991435,
-        "s_rate": 0.6532799491830859,
-        "s_gwi": 0.7682497243417044,
-        "s_collapse": 0.7611364197975914,
-        "s_acid": 0.7337126748718031,
-        "s_size": 0.7204834881422287,
-        "s_irreg": 0.7107648367623951,
-        "s_weak": 0.7509811996067537
+        "gas_fraction": 0.4473621464694064,
+        "s_gas": 0.49002356677681674,
+        "s_rate": 0.6517883697183309,
+        "s_gwi": 0.7716004789234595,
+        "s_collapse": 0.7628495078664532,
+        "s_acid": 0.7413994280040678,
+        "s_size": 0.7214878924771564,
+        "s_irreg": 0.7116944243208951,
+        "s_weak": 0.7564999534637636
       },
       "measured_on_mesh": {
-        "cut_face_pore_area_fraction": 0.34326593543542344,
-        "porosity_target": 0.3474,
-        "cut_face_pore_count": 53,
-        "cut_face_pore_density_per_cm2": 1.0585011623541065,
+        "cut_face_pore_area_fraction": 0.35600789282376155,
+        "porosity_target": 0.347,
+        "cut_face_pore_count": 52,
+        "cut_face_pore_density_per_cm2": 1.0385294423096894,
         "cut_face_eq_diameter_mm": {
-          "n": 53,
-          "mean": 4.345345785541847,
-          "sd": 4.77905206670197,
-          "median": 2.59281792577143,
-          "p10": 0.901197152722263,
-          "p90": 10.114494853550232,
-          "max": 24.207349463931635
+          "n": 52,
+          "mean": 4.29900784151295,
+          "sd": 5.065433657278613,
+          "median": 2.6410279250917115,
+          "p10": 0.8727994009256069,
+          "p90": 9.723516115177395,
+          "max": 32.871294578158135
         },
-        "porosity_3d_void_fraction": 0.08867664751355486,
-        "mean_pore_depth_mm": 3.240633617854883,
-        "volume_mm3": 61827.9673378268,
+        "porosity_3d_void_fraction": 0.09077274242734867,
+        "mean_pore_depth_mm": 3.2039101268845958,
+        "volume_mm3": 61685.75953912018,
         "extents_mm": [
           80.09835662844125,
           80.09835662844125,
           12.0
         ],
-        "triangle_count": 98498
+        "triangle_count": 101568
       },
       "generator_stats": {
-        "pores_placed": 224,
-        "cut_face_pore_fraction_after_placement": 0.29584949016228634,
-        "cut_face_pore_fraction_voxel": 0.3375161568289531,
+        "pores_placed": 240,
+        "cut_face_pore_fraction_after_placement": 0.3056872037914692,
+        "cut_face_pore_fraction_voxel": 0.34992101105845186,
         "enclosed_voids_filled": 1,
-        "void_fraction_3d_voxel_in_footprint": 0.08934502505368647,
+        "void_fraction_3d_voxel_in_footprint": 0.09143879742304939,
         "grid_shape": [
           267,
           267,
           40
         ],
-        "calibration_iteration": 1,
-        "internal_placement_target": 0.2810954186413902
+        "calibration_iteration": 2,
+        "internal_placement_target": 0.30385365503374984
       }
     }
   },
   "comparison_B_minus_A": {
     "pair": "B - A",
-    "porosity_target": -0.040200000000000014,
-    "pore_diam_mean_mm": 0.7983000000000002,
-    "eccentricity": 0.17920000000000003,
-    "clustering": 0.15289999999999998,
-    "min_wall_mm": -0.1291,
-    "measured_cut_face_pore_fraction": -0.043458117138158836,
-    "measured_section_diameter_mean_mm": 0.6136441407713478,
-    "measured_pore_count": -39
+    "porosity_target": -0.040500000000000036,
+    "pore_diam_mean_mm": 0.8001999999999998,
+    "eccentricity": 0.17929999999999996,
+    "clustering": 0.15369999999999995,
+    "min_wall_mm": -0.12959999999999994,
+    "measured_cut_face_pore_fraction": -0.03125914328464352,
+    "measured_section_diameter_mean_mm": 0.5824313488465633,
+    "measured_pore_count": -41
   },
   "how_to_test": "Photograph real loaf cross-sections with a scale; run image_analysis.analyze_crumb_image(path, scale_mm_per_px=...) and compare_to_params(measured, CrumbParams) against crumb_chamber_<id>."
 }
