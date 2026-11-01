@@ -15,7 +15,7 @@ design internals or simulated_devices/ (report bugs instead).
     preference / 2 agents w/ in_reply_to / next experiment / motors accepted->completed + `ran` invariant,
     (c) agent state, (d) molecular/predictions/stl, (e) dashboard crawl + external-URL scan,
     (g) provenance audit (+ strict xfail), no-outbound-connections assertion
-  - test_inprocess_flow.py: fake-clock exact motor timing, live->offline fallback, setpoint clamp,
+  - test_inprocess_flow.py: stub-clock exact motor timing, live->offline fallback, setpoint clamp,
     telemetry reaches agents; 2 xfail bug reproducers (setpoints context key; agent-state findings path)
   - test_replay_contract_offline.py: (f) contract --check, (h) replay CLI -> source replay,
     0.0.0.0 + LAN-IP full loop with audit, audit positive control

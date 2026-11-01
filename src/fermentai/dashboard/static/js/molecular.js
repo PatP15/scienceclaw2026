@@ -1,4 +1,4 @@
-// Section 3: NVIDIA Molecular Explorer - cached ALCHEMI/AIMNet2 results (never fabricated).
+// Section 3: NVIDIA Molecular Explorer - cached ALCHEMI/AIMNet2 results.
 // Layout: one header strip + six "answer cards" (question, one picture, one number, one line).
 // Every number is read from the synced analysis files at runtime; tables and method notes live
 // behind each card's "Details" disclosure.

@@ -58,7 +58,7 @@ def test_mock_pipeline_end_to_end(mock_run):
 def test_mock_outputs_are_marked_placeholders(mock_run):
     out, m = mock_run
     form = out / "crumb_chambers_AB_form4-grey-v5.form"
-    assert form.read_bytes() == MOCK_FORM_BYTES  # never a fake .form
+    assert form.read_bytes() == MOCK_FORM_BYTES  # placeholder bytes, not a real .form
     assert m["build"]["outputs"]["form"]["kind"] == "placeholder (mock)"
     png = out / "crumb_chambers_AB_form4-grey-v5_iso.png"
     assert png.read_bytes().startswith(b"\x89PNG")

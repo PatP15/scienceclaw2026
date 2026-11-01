@@ -325,9 +325,9 @@ def test_cli_config_parsing_never_opens_ports(tmp_path, monkeypatch):
     monkeypatch.setenv("FERMENTAI_DEVICE_TOKEN_B", "tok-b")
     monkeypatch.setenv("FERMENTAI_API_TOKEN", "op")
     cfg = config_from_args(build_parser().parse_args(
-        ["--port", "/dev/cu.usbmodemFAKE1=a", "--port", "/dev/cu.usbmodemFAKE2", "--map", "/dev/cu.usbmodemFAKE2=B",
+        ["--port", "/dev/cu.usbmodemTEST1=a", "--port", "/dev/cu.usbmodemTEST2", "--map", "/dev/cu.usbmodemTEST2=B",
          "--status-file", str(tmp_path / "s.json")]))
-    assert [(p.path, p.chamber_id) for p in cfg.ports] == [("/dev/cu.usbmodemFAKE1", "A"), ("/dev/cu.usbmodemFAKE2", "B")]
+    assert [(p.path, p.chamber_id) for p in cfg.ports] == [("/dev/cu.usbmodemTEST1", "A"), ("/dev/cu.usbmodemTEST2", "B")]
     assert cfg.discover is False and cfg.device_tokens == {"B": "tok-b"} and cfg.operator_token == "op"
     assert cfg.chambers == {"A": "fermentai-esp32-a", "B": "fermentai-esp32-b"}
     cfg = config_from_args(build_parser().parse_args([]))

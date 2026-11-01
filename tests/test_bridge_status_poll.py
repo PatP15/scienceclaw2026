@@ -5,10 +5,10 @@ import asyncio
 from fermentai.api.testing import TEST_TOKEN, make_app
 from fermentai.bridge import PortSpec
 from fermentai.bridge.testing import BridgeHarness, asgi_client, close_fds, pty_pair, wait_for
-from tests.test_bridge_legacy_console import STATUS_BLOCK, FakeLegacyConsole
+from tests.test_bridge_legacy_console import STATUS_BLOCK, StubLegacyConsole
 
 
-class PollConsole(FakeLegacyConsole):
+class PollConsole(StubLegacyConsole):
     """Answers `status` with the same block the board prints every 30 s."""
 
     def __init__(self, fd):

@@ -18,7 +18,7 @@ TELEMETRY_DDL = """CREATE TABLE IF NOT EXISTS telemetry (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     chamber_id TEXT NOT NULL,
     experiment_id TEXT,
-    timestamp_utc TEXT,                   -- device time; NULL when the device clock is unsynced (never invented)
+    timestamp_utc TEXT,                   -- device time; NULL when the device clock is unsynced
     received_at_utc TEXT NOT NULL,        -- server receipt time (always)
     source TEXT NOT NULL,                 -- measured | simulated | replay  (v1.0 "real" stored as "measured")
     chamber_temperature_c REAL,

@@ -191,7 +191,7 @@ class _ChatMessages:
         return SimpleNamespace(stop_reason="end_turn", content=[SimpleNamespace(type="text", text=json.dumps(out))])
 
 
-def _fake_adapter(reply):
+def _stub_adapter(reply):
     models = SimpleNamespace(list=lambda **kw: iter([SimpleNamespace(id="claude-sonnet-x", created_at="2026")]))
     return LLMAdapter("anthropic_api", client=SimpleNamespace(models=models, messages=_ChatMessages(reply)))
 
@@ -203,7 +203,7 @@ def test_live_without_configuration_falls_back(ctx):
 
 
 def test_live_llm_words_reply_but_never_decides_handoff(ctx):
-    ad = _fake_adapter("Lovely! I'm handing this to the Head Chef now — any aroma or crust notes?")
+    ad = _stub_adapter("Lovely! I'm handing this to the Head Chef now — any aroma or crust notes?")
     r = chat_turn("l1", "Loaf A was mild and airy.", dict(ctx, llm_adapter=ad), mode="live")
     assert r["chat_mode_label"] == "live:anthropic_api" and r["reasoning_mode_label"] == "Online Agent"
     assert r["reply"].startswith("Lovely! I'm handing")
@@ -213,14 +213,14 @@ def test_live_llm_words_reply_but_never_decides_handoff(ctx):
 
 
 def test_live_bad_llm_reply_falls_back_to_template(ctx):
-    ad = _fake_adapter("Thanks for that.")  # no question although one is required
+    ad = _stub_adapter("Thanks for that.")  # no question although one is required
     r = chat_turn("l2", "Loaf A was mild and airy.", dict(ctx, llm_adapter=ad), mode="live")
     assert r["chat_mode_label"].startswith("offline:templated (live unavailable: ValueError")
     assert "crust" in r["reply"].lower() and r["reasoning_mode_label"] == "Offline Policy"
 
 
 def test_live_handoff_cycle_falls_back_cleanly(ctx):
-    ad = _fake_adapter("So mild A, sour dense B, you preferred B, more sour but fluffy — right?")
+    ad = _stub_adapter("So mild A, sour dense B, you preferred B, more sour but fluffy — right?")
     c = dict(ctx, llm_adapter=ad)
     r1 = chat_turn("l3", "Loaf A was mild and fluffy. Loaf B was more sour but dense and I preferred B. I'd like it "
                          "more sour but still fluffy.", c, mode="live")

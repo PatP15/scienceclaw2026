@@ -1,5 +1,5 @@
 // SerialLink — byte-stream port abstraction for SerialTransport (USB CDC / UART on the device,
-// an in-memory fake in native tests). Header-only.
+// an in-memory stub in native tests). Header-only.
 #pragma once
 
 #include <stddef.h>

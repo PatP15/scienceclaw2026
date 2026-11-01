@@ -73,7 +73,7 @@ def telemetry_record(row: dict) -> dict:
     rec.update({
         "telemetry_id": row["id"],
         "chamber_id": row["chamber_id"],
-        "timestamp_utc": row.get("timestamp_utc"),   # NULL stays null (never invented)
+        "timestamp_utc": row.get("timestamp_utc"),   # NULL stays null
         "received_at_utc": row["received_at_utc"],
         "time_basis": row.get("time_basis"),
         "source": row["source"],

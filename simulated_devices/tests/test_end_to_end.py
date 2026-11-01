@@ -113,7 +113,7 @@ def test_v11_extras_survive_when_backend_supports_them(tmp_path):
             if rig.contract.mode == "v1.1":
                 assert payload.get("boot_id") == rig.devs["A"].boot_id
                 assert payload.get("sequence_number", 0) >= 1
-                assert payload.get("timestamp_utc") is None  # unsynced: server must not invent it
+                assert payload.get("timestamp_utc") is None  # unsynced: server leaves it null
                 assert payload.get("timestamp_quality") == "unsynced"
                 assert payload.get("field_provenance", {}).get("chamber_temperature_c") == "simulated"
             else:  # v1.0 server: fell back, nothing beyond the frozen field set was sent

@@ -748,7 +748,7 @@ class ControlService:
         flags = list(t.quality_flags)
         ts_iso: str | None = None
         if t.timestamp_utc is None:
-            flags.append("timestamp_unavailable")  # never invented; see received_at_utc
+            flags.append("timestamp_unavailable")  # left unset; see received_at_utc
         else:
             if t.timestamp_utc.tzinfo is None:
                 flags.append("timestamp_without_timezone_assumed_utc")

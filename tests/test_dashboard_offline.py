@@ -100,7 +100,7 @@ def test_data_snapshots_match_their_sources():
     assert vendor.snapshot_problems() == []
 
 
-def test_live_cards_never_invent_missing_values():
+def test_live_cards_omit_missing_values():
     """Lab cards show ONLY sensors that report a value from the current device (null -> no tile, never a
     number); missing sensors are listed once as "not fitted" in the collapsed device drawer. The card badge
     comes from telemetry provenance (measured -> real/physical), and a camera frame from another device is

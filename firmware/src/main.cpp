@@ -366,7 +366,7 @@ void handleLine(char* line) {
       if (e >= 0)
         formatIso8601Utc(e, date, sizeof date);
       else
-        snprintf(date, sizeof date, "unsynced+%lums", (unsigned long)now);  // never invented
+        snprintf(date, sizeof date, "unsynced+%lums", (unsigned long)now);  // left unset
       ph.update(now);
       const bool ok = ph.calibratePoint(atoi(argv[1]), date);
       Serial.printf("%s pH%s point mv=%.1f date=%s\n", ok ? "OK" : "ERR (voltage outside window?)",

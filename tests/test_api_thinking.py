@@ -92,7 +92,7 @@ def test_pulse_capped_at_motor_max_and_disabled(tmp_path, monkeypatch):
     assert [r for r in motors(off) if r["source"] == "thinking"] == []
 
 
-def fake_chat(monkeypatch, seconds, handoff_on_turn=None):
+def stub_chat(monkeypatch, seconds, handoff_on_turn=None):
     mod = types.ModuleType("fermentai.agents.chat")
     turns = {}
 
@@ -110,7 +110,7 @@ def fake_chat(monkeypatch, seconds, handoff_on_turn=None):
 
 def test_chat_pulses_only_the_sous_chef_station(tmp_path, monkeypatch):
     c = TestClient(make_app(tmp_path, hw_overrides=FAST))
-    fake_chat(monkeypatch, 0.25, handoff_on_turn=2)
+    stub_chat(monkeypatch, 0.25, handoff_on_turn=2)
     j = c.post("/api/v1/chat", headers=auth(), json={"text": "hi", "sous_chef": "B"}).json()
     p1 = [r for r in motors(c) if r["source"] == "thinking"]
     assert p1 and {r["chamber_id"] for r in p1} == {"B"} and len(j["thinking_pulse_ids"]) == len(p1)
@@ -127,7 +127,7 @@ def test_chat_pulses_only_the_sous_chef_station(tmp_path, monkeypatch):
 def test_rate_limit_across_turns(tmp_path, monkeypatch):
     c = TestClient(make_app(tmp_path, hw_overrides={"thinking_pulses": {
         "motor_on_thinking": True, "pulse_ms": 100, "min_gap_s": 30, "max_pulses_per_cycle": 3}}))
-    fake_chat(monkeypatch, 0.05)
+    stub_chat(monkeypatch, 0.05)
     sid = c.post("/api/v1/chat", headers=auth(), json={"text": "hi", "sous_chef": "A"}).json()["session_id"]
     c.post("/api/v1/chat", headers=auth(), json={"text": "more", "session_id": sid})
     assert len([r for r in motors(c) if r["source"] == "thinking"]) == 1       # one per 30.1 s per station

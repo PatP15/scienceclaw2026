@@ -67,8 +67,8 @@ def test_write_gains_and_csv_roundtrip(tmp_path):
     assert doc["recommended"]["pid"]["kp"] > 0 and (tmp_path / "pid.json").exists()
 
 
-# ---------------------------------------------------------------- run / abort logic with a fake API
-class FakeApi:
+# ---------------------------------------------------------------- run / abort logic with a stub API
+class StubApi:
     def __init__(self, plant_gain=0.3, armed=True, fault_at=None, temp_jump=None, max_step=3.0):
         self.now = 0.0; self.sp = 22.0; self.T = 22.0; self.seq = 0; self.armed = armed
         self.fault_at = fault_at; self.temp_jump = temp_jump; self.max_step = max_step; self.sets = []
@@ -105,7 +105,7 @@ def run_test(api, tmp_path, **kw):
 
 
 def test_run_completes_logs_and_restores(tmp_path):
-    api = FakeApi(); api.sp = 21.0
+    api = StubApi(); api.sp = 21.0
     res = run_test(api, tmp_path)
     assert res.status == "completed" and res.restored and api.sp == 21.0
     rows = list(csv.DictReader(open(res.csv_path)))
@@ -114,24 +114,24 @@ def test_run_completes_logs_and_restores(tmp_path):
 
 
 def test_refuses_when_peltier_disarmed(tmp_path):
-    res = run_test(FakeApi(armed=False), tmp_path)
+    res = run_test(StubApi(armed=False), tmp_path)
     assert res.status == "aborted" and "disarmed" in res.reason and res.restored
 
 
 def test_aborts_on_fault_flag_and_restores(tmp_path):
-    api = FakeApi(fault_at=15)
+    api = StubApi(fault_at=15)
     res = run_test(api, tmp_path)
     assert res.status == "aborted" and "fault" in res.reason and api.sp == 22.0 and res.restored
 
 
 def test_aborts_when_temperature_leaves_window(tmp_path):
-    api = FakeApi(temp_jump=(10, 40.0))
+    api = StubApi(temp_jump=(10, 40.0))
     res = run_test(api, tmp_path)
     assert res.status == "aborted" and "left the allowed window" in res.reason
 
 
 def test_ctrl_c_restores(tmp_path):
-    api = FakeApi()
+    api = StubApi()
     n = {"c": 0}
     def sleep(s):
         n["c"] += 1

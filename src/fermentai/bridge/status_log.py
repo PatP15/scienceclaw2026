@@ -13,7 +13,7 @@ and at boot a banner `FermentAI 0.3.0 chamber=A device=fermentai-esp32-a boot=11
 
 One telemetry record is produced per block (emitted on the `wifi=` line, on the next header, or
 `block_timeout_s` after the block's last line). Continuation lines are recognised by their keys, so missing or
-reordered lines are tolerated. Rules (never invent data):
+reordered lines are tolerated. Rules (only recorded values are reported):
   * "nan" -> null; units are stripped; source "measured"; quality flag "legacy_status_log";
   * pH is reported only when cal=1 (ph_method "probe"); otherwise ph=null + "ph_uncalibrated"
     (the raw mV/ADC stay in diagnostics);

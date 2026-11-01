@@ -6,7 +6,7 @@ Mirrors the firmware loop in firmware_contract/README_FOR_ESP32_AGENT.md §4:
   every image_interval_s : POST image (synthetic JPEG stamped SIMULATED)
   continuously : local thermal control + interlocks, motor timing (independent of the network)
 
-Clock: an injectable monotonic clock (seconds). Tests drive ``await device.step()`` with a fake
+Clock: an injectable monotonic clock (seconds). Tests drive ``await device.step()`` with a stubbed
 clock; ``run()`` is the real-time loop.
 """
 

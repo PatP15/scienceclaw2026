@@ -24,7 +24,7 @@ STATUS_BLOCK = [
 ]
 
 
-class FakeLegacyConsole:
+class StubLegacyConsole:
     """fw 0.3.0 console stand-in: prints status blocks, answers `motor test <ms>`."""
 
     def __init__(self, fd, reply=None):
@@ -84,7 +84,7 @@ async def setup(tmp_path, **cfg):
     m, s, _ = pty_pair()
     h = BridgeHarness(app, [PortSpec(fd=m, label="usbmodem-A", chamber_id="A")], operator_token=TEST_TOKEN, **cfg)
     await h.__aenter__()
-    dev = FakeLegacyConsole(s)
+    dev = StubLegacyConsole(s)
     await dev.status_block()
     await wait_for(lambda: h.session().protocol == "legacy_status_log", what="legacy mode")
     return app, api, h, dev, (m, s)
@@ -128,7 +128,7 @@ async def test_refusals_become_rejected_with_console_text(tmp_path):
     replies = iter(["ERR motor not armed (commissioning)", "ERR door open"])
     try:
         async with BridgeHarness(app, [PortSpec(fd=m, label="u", chamber_id="A")], operator_token=TEST_TOKEN) as h:
-            dev = FakeLegacyConsole(s, reply=lambda ms: next(replies))
+            dev = StubLegacyConsole(s, reply=lambda ms: next(replies))
             await dev.status_block()
             await wait_for(lambda: h.session().protocol == "legacy_status_log", what="legacy")
             for expected in ("ERR motor not armed (commissioning)", "ERR door open"):
@@ -152,7 +152,7 @@ async def test_no_reply_is_failed(tmp_path):
     try:
         async with BridgeHarness(app, [PortSpec(fd=m, label="u", chamber_id="A")], operator_token=TEST_TOKEN,
                                  console_reply_timeout_s=0.4) as h:
-            dev = FakeLegacyConsole(s, reply=lambda ms: None)          # console says nothing
+            dev = StubLegacyConsole(s, reply=lambda ms: None)          # console says nothing
             await dev.status_block()
             await wait_for(lambda: h.session().protocol == "legacy_status_log", what="legacy")
             cid = (await api.post("/api/v1/chambers/A/motor", headers=auth(), json={"duration_ms": 3000})).json()["command_id"]
@@ -225,7 +225,7 @@ async def test_unidentified_port_receives_nothing(tmp_path):
     try:
         async with BridgeHarness(app, [PortSpec(fd=m, label="u", chamber_id="A")], operator_token=TEST_TOKEN,
                                  ping_interval_s=0.1, time_interval_s=0.1):
-            dev = FakeLegacyConsole(s)
+            dev = StubLegacyConsole(s)
             await dev.ch.write_line(b"ESP-ROM:esp32s3-20210327\r\n")
             await asyncio.sleep(1.0)
             assert dev.rx == []
@@ -263,7 +263,7 @@ async def test_set_setpoint_accepted_when_armed_and_idle_rejected(tmp_path):
     m, s, _ = pty_pair()
     try:
         async with BridgeHarness(app, [PortSpec(fd=m, label="u", chamber_id="A")], operator_token=TEST_TOKEN) as h:
-            dev = FakeLegacyConsole(s)
+            dev = StubLegacyConsole(s)
             await dev.status_block(armed_peltier=1)
             await wait_for(lambda: h.session().protocol == "legacy_status_log", what="legacy")
 

@@ -389,7 +389,7 @@ def benchmark_numbers(variant: str = "well_specified") -> dict:
 # ============================================================================================
 # 7. Technology partners: NVIDIA ALCHEMI | Formlabs PreForm (text wordmarks, no logos)
 # ============================================================================================
-# Shown only if the live PreForm manifest is missing. Never invent these.
+# Shown only if the live PreForm manifest is missing. Placeholders only.
 HERO_PNG = STL / "hero_chamber_AB.png"
 
 

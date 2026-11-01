@@ -128,7 +128,7 @@ class ChamberObservation(BaseModel):
     timestamp_utc: str | None = None  # device wall clock, only if reported
     timestamp_quality: str = "missing"  # synced | unsynced | missing | invalid
     received_at_utc: str | None = None  # backend receipt time, if supplied
-    effective_time_utc: str | None = None  # device time if synced, else receipt time; never invented
+    effective_time_utc: str | None = None  # device time if synced, else receipt time
     time_basis: str = "none"  # device_utc | server_receipt | uptime_only | none
     device_uptime_ms: int | None = None
     age_s: float | None = None
@@ -262,7 +262,7 @@ def normalize_observation(
     if obs.record_source == "unknown":
         obs.notes.append("record source not stated; treated as unverified")
 
-    # --- timestamps (never invent wall-clock time) ---
+    # --- timestamps (timestamp stays null when unsynced) ---
     dev_t = _parse_utc(rec.get("timestamp_utc"))
     tq = str(rec.get("timestamp_quality") or "").lower()
     if rec.get("timestamp_utc") not in (None, "") and dev_t is None:
@@ -295,9 +295,9 @@ def normalize_observation(
 
     # --- simulated data labeled as measured? ---
     dev_id = (obs.device_id or "").lower()
-    mislabeled_record = obs.record_source == "measured" and (
+    sim_flagged_record = obs.record_source == "measured" and (
         _flagged(flags, "simulated", "synthetic", "virtual") or dev_id.startswith(("virtual", "sim-", "sim_", "fake")))
-    if mislabeled_record:
+    if sim_flagged_record:
         obs.anomalies.append(Anomaly(code="simulated_labelled_as_measured", severity="critical", category="data_quality",
                                      message="Record says 'measured' but carries simulation markers; all values rejected."))
     wrong_chamber = rec_ch is not None and chamber_id is not None and rec_ch != chamber_id
@@ -391,7 +391,7 @@ def normalize_observation(
                 obs.anomalies.append(Anomaly(code="simulated_field_in_measured_record", severity="critical",
                                              category="data_quality", fields=[name],
                                              message=f"{name} is simulated but the record is labeled measured; rejected."))
-            elif mislabeled_record:
+            elif sim_flagged_record:
                 q, notes = "invalid", notes + ["record flagged as simulated data labeled measured"]
             elif stale and role not in ("decorative",):
                 q, notes = "stale", notes + [f"reading is {obs.age_s:.0f} s old (> {lim['stale_after_s']:.0f} s)"]
@@ -589,7 +589,7 @@ def normalize_history(
     timed = all(o.effective_time_utc for _, o in pairs)
     if timed:
         pairs.sort(key=lambda p: (_parse_utc(p[1].effective_time_utc), p[1].sequence_number or 0))
-    else:  # arrival order within boots, then uptime / sequence number (never invented wall-clock)
+    else:  # arrival order within boots, then uptime / sequence number (wall-clock unset)
         pairs.sort(key=lambda p: (boot_order[p[1].boot_id], p[1].device_uptime_ms or 0, p[1].sequence_number or 0))
     obs = [o for _, o in pairs]
     if obs and timed:

@@ -23,7 +23,7 @@ from fermentai.formlabs.prepare import (
 LIVE_MANIFEST = REPO_ROOT / "data" / "stl" / "print" / "print_manifest.json"
 
 
-def _fake_build():
+def _stub_build():
     return {"build_name": "t", "chambers": ["A", "B"], "orientation_policy": "open_face_up",
             "scene_settings": {"machine_type": "FORM-4-0", "material_code": "FLGPGR05",
                                "layer_thickness_mm": "0.1", "print_setting": "DEFAULT"},
@@ -34,7 +34,7 @@ def _fake_build():
 def _manifest(backend, **kw):
     chambers = load_chamber_inputs(CHAIN_SUMMARY)
     return build_manifest(backend=backend, profile=PROFILES["form4-grey-v5"], chambers=chambers,
-                          build=_fake_build(), per_chamber=None, server={}, api={},
+                          build=_stub_build(), per_chamber=None, server={}, api={},
                           transcript_path=None, server_log_path=None, **kw)
 
 

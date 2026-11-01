@@ -1,5 +1,5 @@
 // HttpTransport — minimal HTTP abstraction so the retry/queue logic in TelemetryClient and
-// CommandClient is portable and unit-tested natively with a fake transport.
+// CommandClient is portable and unit-tested natively with a stub transport.
 // The ESP32 implementation (HTTPClient over Wi-Fi) is NetworkManager.
 #pragma once
 

@@ -108,9 +108,9 @@ def test_wrong_chamber_and_simulated_labelled_measured():
     wc = normalize_observation(rec(chamber_id="B"), "A", NOW)
     assert q(wc, "starter_temperature") == "wrong_chamber"
     assert any(a.code == "wrong_chamber" and a.severity == "critical" for a in wc.anomalies)
-    fake = normalize_observation(rec(device_id="virtual-esp32-a"), "A", NOW)
-    assert q(fake, "starter_temperature") == "invalid"
-    assert any(a.code == "simulated_labelled_as_measured" for a in fake.anomalies)
+    stub = normalize_observation(rec(device_id="virtual-esp32-a"), "A", NOW)
+    assert q(stub, "starter_temperature") == "invalid"
+    assert any(a.code == "simulated_labelled_as_measured" for a in stub.anomalies)
     mixed = normalize_observation(rec(ph=4.2, ph_method="probe_sample", field_provenance={"ph": {"source": "simulated"}}),
                                   "A", NOW)
     assert q(mixed, "ph") == "invalid"

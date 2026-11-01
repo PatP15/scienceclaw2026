@@ -64,7 +64,7 @@ status is at `GET /api/v1/bridge/status`, with `transport: "usb-serial"` and a p
 ## Telemetry (`telemetry_v1`)
 
 - Required: `schema_version`, `chamber_id`, `source`. Everything else is optional and nullable.
-  Use `null` for a missing sensor, never an invented value. NaN and Infinity are rejected.
+  Use `null` for a missing sensor, no placeholder value. NaN and Infinity are rejected.
 - `source` (record provenance): `measured` for physical devices, `simulated` for virtual
   devices, `replay` for recorded data. The v1.0 spelling `real` is accepted and **stored as
   `measured`** (the raw value is kept in the payload as `source_as_sent`).
@@ -72,7 +72,7 @@ status is at `GET /api/v1/bridge/status`, with `transport: "usb-serial"` and a p
   `{"ph": "manual"}`. Values: `measured | simulated | replay | manual | estimated`.
 - **Clock (PLAN_MASTER §4):**
   - `timestamp_utc` may be `null`, with `timestamp_quality` set to `unsynced`.
-  - The server **never invents** `timestamp_utc`. It stores `NULL`, adds the quality flag
+  - The server leaves `timestamp_utc` unset. It stores `NULL`, adds the quality flag
     `timestamp_unavailable`, and always records its own `received_at_utc`.
   - Ordering uses `boot_id`, `sequence_number` and `device_uptime_ms`.
   - API rows also carry `time_basis`: `device` or `server_receipt`.
@@ -225,4 +225,4 @@ and its `telemetry` table is rebuilt so `timestamp_utc` becomes nullable.
 12. The v1.0 quality flag `timestamp_missing_server_time_used` is gone. The server no longer
     substitutes a time; the flag is now `timestamp_unavailable`.
 13. Image uploads without a `timestamp_utc` still use server receipt time as the image
-    timestamp. The "never invent" rule is implemented for telemetry, as the brief specifies.
+    timestamp. The null-timestamp rule is implemented for telemetry, as the brief specifies.

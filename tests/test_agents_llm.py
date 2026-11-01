@@ -41,7 +41,7 @@ CRITIC_OUT = {
 }
 
 
-class FakeModels:
+class StubModels:
     def __init__(self, models=None, fail=False):
         self._models = models if models is not None else [
             SimpleNamespace(id="claude-haiku-9", created_at="2026-09-01T00:00:00Z"),
@@ -57,7 +57,7 @@ class FakeModels:
         return iter(self._models)
 
 
-class FakeMessages:
+class StubMessages:
     def __init__(self, lead=LEAD_OUT, critic=CRITIC_OUT, raw=None):
         self.lead, self.critic, self.raw = lead, critic, raw
         self.calls = []
@@ -71,10 +71,10 @@ class FakeMessages:
         return SimpleNamespace(stop_reason="end_turn", content=[SimpleNamespace(type="text", text=text)])
 
 
-class FakeClient:
+class StubClient:
     def __init__(self, **kw):
-        self.models = FakeModels(**{k: v for k, v in kw.items() if k in ("models", "fail")})
-        self.messages = FakeMessages(**{k: v for k, v in kw.items() if k in ("lead", "critic", "raw")})
+        self.models = StubModels(**{k: v for k, v in kw.items() if k in ("models", "fail")})
+        self.messages = StubMessages(**{k: v for k, v in kw.items() if k in ("lead", "critic", "raw")})
 
 
 @pytest.fixture(autouse=True)
@@ -114,7 +114,7 @@ def test_unknown_mode_falls_back():
 
 
 def test_live_api_success_with_model_discovery():
-    client = FakeClient()
+    client = StubClient()
     adapter = LLMAdapter("anthropic_api", client=client)
     r = run_taste_feedback_cycle(PLAN_EXAMPLE, dict(CTX, llm_adapter=adapter), mode="live")
     assert r["mode_label"] == "live:anthropic_api"
@@ -140,7 +140,7 @@ def test_live_api_success_with_model_discovery():
 
 def test_model_listing_failure_uses_configurable_fallback(monkeypatch):
     monkeypatch.setenv("FERMENTAI_ANTHROPIC_MODEL_FALLBACK", "my-fallback-model")
-    adapter = LLMAdapter("anthropic_api", client=FakeClient(fail=True))
+    adapter = LLMAdapter("anthropic_api", client=StubClient(fail=True))
     r = run_taste_feedback_cycle(PLAN_EXAMPLE, dict(CTX, llm_adapter=adapter), mode="live")
     assert r["mode_label"] == "live:anthropic_api"
     assert r["provenance"]["llm"]["model"] == "my-fallback-model"
@@ -149,7 +149,7 @@ def test_model_listing_failure_uses_configurable_fallback(monkeypatch):
 
 def test_pinned_model(monkeypatch):
     monkeypatch.setenv("FERMENTAI_ANTHROPIC_MODEL", "pinned-x")
-    adapter = LLMAdapter("anthropic_api", client=FakeClient())
+    adapter = LLMAdapter("anthropic_api", client=StubClient())
     assert adapter.resolve_api_model() == "pinned-x"
 
 
@@ -159,7 +159,7 @@ def test_pinned_model(monkeypatch):
     ({"lead": {k: v for k, v in LEAD_OUT.items() if k != "rationale"}}, "schema validation"),
 ])
 def test_invalid_llm_output_falls_back(kw, needle):
-    adapter = LLMAdapter("anthropic_api", client=FakeClient(**kw))
+    adapter = LLMAdapter("anthropic_api", client=StubClient(**kw))
     r = run_taste_feedback_cycle(PLAN_EXAMPLE, dict(CTX, llm_adapter=adapter), mode="live")
     assert r["mode_label"].startswith("offline:deterministic_fallback (live unavailable: ")
     assert needle in r["mode_label"]
@@ -172,7 +172,7 @@ def test_live_cli_success_and_env_isolation(monkeypatch):
     monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-should-not-reach-cli")
     seen = []
 
-    def fake_run(cmd, input, capture_output, text, timeout, cwd, env):
+    def stub_run(cmd, input, capture_output, text, timeout, cwd, env):
         seen.append({"cmd": cmd, "env": env, "input": input})
         schema = json.loads(cmd[cmd.index("--json-schema") + 1])
         out = CRITIC_OUT if "critique" in schema["properties"] else LEAD_OUT
@@ -180,7 +180,7 @@ def test_live_cli_success_and_env_isolation(monkeypatch):
                    "structured_output": out, "modelUsage": {"claude-sonnet-x": {}}, "duration_ms": 1234}
         return subprocess.CompletedProcess(cmd, 0, stdout=json.dumps(payload), stderr="")
 
-    adapter = LLMAdapter("claude_cli", runner=fake_run)
+    adapter = LLMAdapter("claude_cli", runner=stub_run)
     monkeypatch.setattr(LLMAdapter, "cli_path", staticmethod(lambda: "/usr/bin/claude"))
     r = run_taste_feedback_cycle(PLAN_EXAMPLE, dict(CTX, llm_adapter=adapter), mode="live")
     assert r["mode_label"] == "live:claude_cli"
@@ -193,21 +193,21 @@ def test_live_cli_success_and_env_isolation(monkeypatch):
 
 
 def test_cli_error_result_falls_back(monkeypatch):
-    def fake_run(cmd, **kw):
+    def stub_run(cmd, **kw):
         return subprocess.CompletedProcess(cmd, 0, stdout=json.dumps({"is_error": True, "result": "rate limited"}), stderr="")
 
     monkeypatch.setattr(LLMAdapter, "cli_path", staticmethod(lambda: "/usr/bin/claude"))
-    adapter = LLMAdapter("claude_cli", runner=fake_run)
+    adapter = LLMAdapter("claude_cli", runner=stub_run)
     r = run_taste_feedback_cycle(PLAN_EXAMPLE, dict(CTX, llm_adapter=adapter), mode="live")
     assert "live unavailable: LLMError: claude CLI reported an error: rate limited" in r["mode_label"]
 
 
 def test_cli_timeout_falls_back(monkeypatch):
-    def fake_run(cmd, **kw):
+    def stub_run(cmd, **kw):
         raise subprocess.TimeoutExpired(cmd, 1)
 
     monkeypatch.setattr(LLMAdapter, "cli_path", staticmethod(lambda: "/usr/bin/claude"))
-    adapter = LLMAdapter("claude_cli", runner=fake_run, timeout_s=1)
+    adapter = LLMAdapter("claude_cli", runner=stub_run, timeout_s=1)
     r = run_taste_feedback_cycle(PLAN_EXAMPLE, dict(CTX, llm_adapter=adapter), mode="live")
     assert "timed out" in r["mode_label"]
 
@@ -225,7 +225,7 @@ def test_live_reasoning_label_and_quality_gated_context():
              "starter_temperature_c": 26.8, "temperature_setpoint_c": 27.0, "starter_height_mm": 20 + i,
              "gas_resistance_ohms": 99000.0, "source": "measured", "raw_secret_field": "should-not-reach-llm"}
             for i in range(4)]
-    client = FakeClient()
+    client = StubClient()
     adapter = LLMAdapter("anthropic_api", client=client)
     r = run_taste_feedback_cycle(PLAN_EXAMPLE, dict(CTX, llm_adapter=adapter, telemetry={"B": rows}), mode="live")
     assert r["mode_label"] == "live:anthropic_api"

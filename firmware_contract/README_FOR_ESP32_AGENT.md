@@ -123,7 +123,7 @@ Rules:
 
 - Required fields: `schema_version` (must be `"1.0"`), `chamber_id` (`"A"` or `"B"`), and
   `source`. Everything else is optional and may be `null` or omitted.
-- **Missing or failed sensor:** send `null`, never a fake value, and add a quality flag such as
+- **Missing or failed sensor:** send `null`, no placeholder value, and add a quality flag such as
   `"bme680_read_failed"` or `"ds18b20_disconnected"`. The JSON must not contain NaN or Infinity.
   Those values are rejected with 422.
 - `source`: real hardware sends `"real"`. `"simulated"` and `"replay"` are only for software stand-ins.
@@ -413,7 +413,7 @@ example with `diagnostics` and `field_provenance`, see `telemetry_v1_1_example.j
   **Retry a failed post with the same `sequence_number`.** The server answers
   `{"duplicate": true}` and doesn't store it twice. Keep a small local queue (≤ 50) while offline.
 - `timestamp_utc: null` with `timestamp_quality: "unsynced"` until you have a real time source.
-  Never fabricate a wall-clock time. You may set `"synced"` after setting the clock from
+  Leave the wall-clock time unset until it is known. You may set `"synced"` after setting the clock from
   `server_time_utc` (that's server-derived; `"estimated"` is also acceptable). The server always
   records `received_at_utc` itself.
 - `device_uptime_ms`: `millis()`.

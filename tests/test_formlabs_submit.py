@@ -1,5 +1,5 @@
 """The human print gate and the CLI surface. No test here can reach a printer: every path that
-would open a PreForm connection is given a fake that records calls."""
+would open a PreForm connection is given a stub that records calls."""
 
 import contextlib
 
@@ -53,22 +53,22 @@ def test_submit_with_both_but_no_printer_still_refuses(form):
 def test_submit_with_both_only_queues_never_print_now(form):
     calls = []
 
-    class FakeApi:
+    class StubApi:
         def open_form_file(self, file):
             calls.append(("open", file))
             return {"project_name": "p", "scenes": [{"scene_id": "s1", "new_model_ids": []}]}
 
         def print_scene(self, **kw):
             calls.append(("print", kw))
-            return {"job_id": "fake"}
+            return {"job_id": "stub"}
 
     @contextlib.contextmanager
-    def fake_open(backend, allow_print=False):
+    def stub_open(backend, allow_print=False):
         assert backend == "live" and allow_print is True
-        yield type("H", (), {"api": FakeApi()})()
+        yield type("H", (), {"api": StubApi()})()
 
     rc = submit_print(form, "Form4-Test", i_confirm_print=True,
-                      env={CONFIRM_ENV: CONFIRM_VALUE}, open_preform_fn=fake_open)
+                      env={CONFIRM_ENV: CONFIRM_VALUE}, open_preform_fn=stub_open)
     assert rc == 0
     kind, kw = calls[-1]
     assert kind == "print" and kw["print_now"] is False and kw["printer"] == "Form4-Test"

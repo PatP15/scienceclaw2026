@@ -1,4 +1,4 @@
-"""Taste feedback round trip (acceptance test #9) with placeholder and a fake pipeline."""
+"""Taste feedback round trip (acceptance test #9) with placeholder and a stub pipeline."""
 
 import sys
 import types
@@ -33,7 +33,7 @@ def no_pipeline(monkeypatch):
 
 
 @pytest.fixture
-def fake_pipeline(monkeypatch):
+def stub_pipeline(monkeypatch):
     calls = {}
 
     def run_taste_feedback_cycle(feedback_text, context, mode="offline"):
@@ -79,7 +79,7 @@ def test_placeholder_round_trip(client, no_pipeline):
     assert m["action"] == "run"
 
 
-def test_fake_pipeline_messages_context_and_safety(client, app, fake_pipeline, clock):
+def test_stub_pipeline_messages_context_and_safety(client, app, stub_pipeline, clock):
     client.post("/api/v1/experiments", headers=auth(), json={
         "title": "baseline", "schedules": {"A": [{"t_h": 0, "setpoint_c": 22}]}})
     client.post("/api/v1/taste-feedback", headers=auth(), json={"text": "earlier feedback"})
@@ -88,8 +88,8 @@ def test_fake_pipeline_messages_context_and_safety(client, app, fake_pipeline, c
                     json={"text": JUDGE, "mode": "live", "apply_schedule": True})
     assert r.status_code == 200, r.text
     j = r.json()
-    ctx = fake_pipeline["context"]
-    assert fake_pipeline["mode"] == "live" and fake_pipeline["text"] == JUDGE
+    ctx = stub_pipeline["context"]
+    assert stub_pipeline["mode"] == "live" and stub_pipeline["text"] == JUDGE
     assert set(ctx) >= {"recent_telemetry", "current_setpoints", "experiments", "prior_feedback"}
     assert ctx["prior_feedback"] and ctx["experiments"]
     # 90 C recommendation for A is clamped AND step-limited; B list-of-pairs parsed
@@ -199,12 +199,12 @@ def _run_sim_devices(client, clock, seconds=60):
             d.step()
 
 
-def test_context_carries_full_telemetry_limits_and_experiment(client, clock, fake_pipeline):
+def test_context_carries_full_telemetry_limits_and_experiment(client, clock, stub_pipeline):
     client.post("/api/v1/experiments", headers=auth(), json={"experiment_id": "exp_run_7", "title": "run",
                                                               "status": "running"})
     _run_sim_devices(client, clock, 25)
     assert client.post("/api/v1/taste-feedback", headers=auth(), json={"text": JUDGE}).status_code == 200
-    ctx = fake_pipeline["context"]
+    ctx = stub_pipeline["context"]
     assert set(ctx["telemetry"]) == {"A", "B"} and len(ctx["telemetry"]["A"]) >= 2
     rec = ctx["telemetry"]["A"][-1]
     for k in ("received_at_utc", "boot_id", "sequence_number", "device_uptime_ms", "timestamp_quality",

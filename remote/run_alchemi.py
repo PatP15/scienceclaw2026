@@ -21,7 +21,7 @@ selftest   single-point E/F for water + both acids; asserts finite; cross-checks
 optimize   FIRE2 geometry optimisation of every manifest structure -> results/results/
 md         NVT Langevin (BAOAB) MD of the lowest-energy optimised clusters -> results/md/
 
-Never fabricates numbers: every value written comes from a model evaluation in this process; any
+Every value written comes from a model evaluation in this process; any
 exception is logged with its traceback and recorded as status="failed".
 """
 

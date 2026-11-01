@@ -1,4 +1,4 @@
-"""Shared helpers for simulated_devices tests (no network; fake monotonic clocks)."""
+"""Shared helpers for simulated_devices tests (no network; stubbed monotonic clocks)."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from simulated_devices.device import ChamberConfig, VirtualChamber
 
 
 class Mono:
-    """Fake monotonic clock (seconds)."""
+    """Stubbed monotonic clock (seconds)."""
 
     def __init__(self, t: float = 1000.0):
         self.t = t

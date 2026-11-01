@@ -1,4 +1,4 @@
-// Network logic tests with a fake HTTP transport: telemetry sequence numbers and retry of the
+// Network logic tests with a stub HTTP transport: telemetry sequence numbers and retry of the
 // SAME payload, bounded offline queue, 4xx drop, clock sync from server_time_utc; ack retry /
 // drop policy; desired-control poll with backoff.
 #include <deque>
@@ -15,7 +15,7 @@ using namespace fa;
 void setUp() {}
 void tearDown() {}
 
-struct FakeHttp : IHttpTransport {
+struct StubHttp : IHttpTransport {
   struct Call {
     std::string method, path, ctype, body;
   };
@@ -51,7 +51,7 @@ static int seqOf(const std::string& body) {
 }
 
 void test_telemetry_sequence_starts_at_1_and_increments() {
-  FakeHttp http;
+  StubHttp http;
   TelemetryClient tc(&http, 50, 4000);
   TelemetryRecord r = rec();
   TEST_ASSERT_EQUAL_UINT32(1, tc.enqueue(r, ContractProfile::V1_1));
@@ -64,7 +64,7 @@ void test_telemetry_sequence_starts_at_1_and_increments() {
 }
 
 void test_telemetry_retry_resends_identical_payload_with_backoff() {
-  FakeHttp http;
+  StubHttp http;
   TelemetryClient tc(&http, 50, 4000);
   TelemetryRecord r = rec();
   tc.enqueue(r, ContractProfile::V1_1);
@@ -84,7 +84,7 @@ void test_telemetry_retry_resends_identical_payload_with_backoff() {
 }
 
 void test_telemetry_offline_queue_bounded_drops_oldest() {
-  FakeHttp http;
+  StubHttp http;
   TelemetryClient tc(&http, 3, 4000);
   TelemetryRecord r = rec();
   for (int i = 0; i < 5; ++i) tc.enqueue(r, ContractProfile::V1_1);
@@ -96,7 +96,7 @@ void test_telemetry_offline_queue_bounded_drops_oldest() {
 }
 
 void test_telemetry_422_dropped_not_retried() {
-  FakeHttp http;
+  StubHttp http;
   TelemetryClient tc(&http, 50, 4000);
   int rejected_status = 0;
   tc.onRejected = [&](int st, const std::string&) { rejected_status = st; };
@@ -111,7 +111,7 @@ void test_telemetry_422_dropped_not_retried() {
 }
 
 void test_telemetry_server_time_syncs_clock() {
-  FakeHttp http;
+  StubHttp http;
   TelemetryClient tc(&http, 50, 4000);
   int64_t got = -1;
   tc.onServerTime = [&](int64_t ms) { got = ms; };
@@ -124,7 +124,7 @@ void test_telemetry_server_time_syncs_clock() {
 }
 
 void test_poll_parses_and_backs_off() {
-  FakeHttp http;
+  StubHttp http;
   CommandClient cc(&http, "A", "fermentai-esp32-a", ContractProfile::V1_1, 4000, 6);
   int64_t synced = -1;
   cc.onServerTime = [&](int64_t ms, uint32_t) { synced = ms; };
@@ -145,7 +145,7 @@ void test_poll_parses_and_backs_off() {
 }
 
 void test_acks_retry_then_drop() {
-  FakeHttp http;
+  StubHttp http;
   CommandClient cc(&http, "A", "fermentai-esp32-a", ContractProfile::V1_1, 4000, 3);
   AckQueue q(8);
   AckRecord a;

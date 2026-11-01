@@ -46,7 +46,7 @@ def test_plan_master_telemetry_fixture_ingests(client):
     assert r.status_code == 200, r.text
     assert r.json()["duplicate"] is False and "timestamp_unavailable" in r.json()["quality_flags"]
     tel = client.get("/api/v1/chambers/A/state").json()["latest_telemetry"]
-    assert tel["timestamp_utc"] is None                      # never invented
+    assert tel["timestamp_utc"] is None                      # stays null
     assert tel["received_at_utc"] == "2026-10-31T12:00:00Z"   # server receipt always stored
     assert tel["boot_id"] == "boot_a001" and tel["sequence_number"] == 120
     assert tel["device_uptime_ms"] == 120000 and tel["timestamp_quality"] == "unsynced"

@@ -18,7 +18,7 @@ void setUp() {}
 void tearDown() {}
 
 // In-memory full-duplex port: `in` = host->device bytes, `out` = device->host bytes.
-struct FakePort : ISerialPort {
+struct StubPort : ISerialPort {
   std::string in;
   size_t pos = 0;
   std::string out;
@@ -51,7 +51,7 @@ struct FakePort : ISerialPort {
 };
 
 struct Rig {
-  FakePort port;
+  StubPort port;
   SerialTransportConfig cfg;
   SerialTransport* st;
   uint32_t t = 1000;

@@ -229,7 +229,7 @@ void test_ph_two_point_calibration_and_persistence() {
   ph2.update(3000);
   TEST_ASSERT_TRUE(ph2.ph(3000).valid);
   TEST_ASSERT_FLOAT_WITHIN(0.02, 6.0f, ph2.ph(3000).value);
-  // Saturated input is invalid (never a fabricated pH)
+  // Saturated input is invalid (no pH value reported)
   adc.millivolts = 3200.0f;
   ph2.update(4000);
   TEST_ASSERT_FALSE(ph2.ph(4000).valid);

@@ -1,6 +1,6 @@
 // PHSensor — reads the CONDITIONED output of a pH interface board (never the raw glass electrode)
 // on an ADC1 pin. Two-point calibration (pH 4 and pH 7 buffers) stored in NVS together with a
-// calibration date (wall-clock if synced, otherwise "unsynced+<uptime>ms" — never invented).
+// calibration date (wall-clock if synced, otherwise "unsynced+<uptime>ms" — left unset).
 //
 // Published: raw ADC counts, calibrated millivolts, pH estimate, calibration validity, health.
 // pH is reported (non-null) ONLY when the sensor is enabled, the calibration is valid and the

@@ -1,6 +1,6 @@
 """Mac-side tests for fermentai.molecular.analysis using a tiny SYNTHETIC fixture.
 
-The energies below are made-up test numbers (not ALCHEMI output) and are written only to pytest's
+The energies below are synthetic test numbers (not ALCHEMI output) and are written only to pytest's
 tmp_path; nothing here touches data/alchemi/.
 """
 
@@ -150,7 +150,7 @@ def test_full_run_writes_outputs(fixture_dir, tmp_path):
 
 
 def test_deprotonation_and_descriptors(fixture_dir, tmp_path):
-    """Synthetic charged species: anion.H2O, ion pair, hydronium (made-up energies)."""
+    """Synthetic charged species: anion.H2O, ion pair, hydronium (synthetic energies)."""
     asyms, axyz = _acetic()
     keep = [i for i in range(8) if i != 4]  # drop carboxylic H (index 4)
     an_syms = [asyms[i] for i in keep] + ["O", "H", "H"]

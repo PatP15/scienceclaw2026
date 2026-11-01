@@ -318,7 +318,7 @@ class SimulatedDevice:
         else:
             self.telemetry_seq += 1
             extra = {
-                "timestamp_utc": None, "timestamp_quality": "unsynced",  # never invent wall-clock time
+                "timestamp_utc": None, "timestamp_quality": "unsynced",  # timestamp stays null when unsynced
                 "device_id": self.device_id, "boot_id": self.boot_id,
                 "sequence_number": self.telemetry_seq, "device_uptime_ms": self.uptime_ms(),
                 "peltier_mode": {"heat": "heating", "cool": "cooling"}.get(self.peltier_mode,

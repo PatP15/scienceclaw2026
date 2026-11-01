@@ -1,6 +1,6 @@
 """Deterministic end-to-end flow in one process: the real app (create_app, temp SQLite) + the real
 VirtualChamber devices talking to it through httpx's ASGI transport + the real agents pipeline,
-with a fake clock so motor timing can be asserted exactly. Complements test_live_stack.py,
+with a stub clock so motor timing can be asserted exactly. Complements test_live_stack.py,
 which does the same over real sockets and wall-clock time.
 """
 
@@ -32,7 +32,7 @@ class Mono:
 
 
 class Rig:
-    """Two virtual chambers + the app, advanced in lock-step by a fake clock."""
+    """Two virtual chambers + the app, advanced in lock-step by a stub clock."""
 
     def __init__(self, tmp_path, *, use_fermentation_model: bool = False):
         self.clock = FakeClock(datetime.now(UTC).replace(microsecond=0))

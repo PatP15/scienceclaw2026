@@ -1,4 +1,4 @@
-"""POST/GET/DELETE /api/v1/chat (kitchen-brigade conversation) with a fake and the real chat module."""
+"""POST/GET/DELETE /api/v1/chat (kitchen-brigade conversation) with a stub and the real chat module."""
 
 import sys
 import types
@@ -9,7 +9,7 @@ from fastapi.testclient import TestClient
 from fermentai.api.testing import auth, make_app, telemetry
 
 HANDOFF = {
-    "cycle_id": "cyc_fake_1",
+    "cycle_id": "cyc_stub_1",
     "sensory_interpretation": {"sourness": {"A": "low", "B": "high"}},
     "hypothesis": {"statement": "Warm late phase raises acidity", "proposed_by": "scientist_A"},
     "recommended_schedules": {"A": [[0, 90.0], [6, 24.0]], "B": [[0, 26.0]]},
@@ -23,7 +23,7 @@ HANDOFF = {
 }
 
 
-def fake_chat_module(calls):
+def stub_chat_module(calls):
     mod = types.ModuleType("fermentai.agents.chat")
     sessions = {}
 
@@ -56,9 +56,9 @@ def client(tmp_path):
 
 
 @pytest.fixture
-def fake(monkeypatch):
+def stub(monkeypatch):
     calls = []
-    monkeypatch.setitem(sys.modules, "fermentai.agents.chat", fake_chat_module(calls))
+    monkeypatch.setitem(sys.modules, "fermentai.agents.chat", stub_chat_module(calls))
     return calls
 
 
@@ -66,7 +66,7 @@ def chat(client, **body):
     return client.post("/api/v1/chat", headers=auth(), json=body)
 
 
-def test_chat_flow_with_fake_module(client, fake, tmp_path):
+def test_chat_flow_with_stub_module(client, stub, tmp_path):
     client.post("/api/v1/telemetry", headers=auth(), json=telemetry("A", chamber_temperature_c=24.0))
     before = client.get("/api/v1/chambers/A/state").json()["desired_setpoint_c"]
     r1 = chat(client, text="hello", sous_chef="B", judge_name="Judge 1")
@@ -74,7 +74,7 @@ def test_chat_flow_with_fake_module(client, fake, tmp_path):
     j1 = r1.json()
     sid = j1["session_id"]
     assert sid.startswith("chat_") and j1["stage"] == "collecting" and j1["handoff_persisted"] is False
-    ctx = fake[0]["context"]
+    ctx = stub[0]["context"]
     for k in ("telemetry", "recent_telemetry", "current_setpoints", "experiments", "prior_feedback", "limits",
               "hardware_limits", "now_utc"):
         assert k in ctx, k
@@ -117,7 +117,7 @@ def test_chat_flow_with_fake_module(client, fake, tmp_path):
 
     d = client.delete(f"/api/v1/chat/{sid}", headers=auth()).json()
     assert d["reset"] and d["existed"] and d["module_reset"]
-    assert fake[-1]["reset"] == sid and fake[-1]["context"]["chat_sessions_path"]
+    assert stub[-1]["reset"] == sid and stub[-1]["context"]["chat_sessions_path"]
     assert client.get(f"/api/v1/chat/{sid}").status_code == 404
 
 
@@ -140,7 +140,7 @@ def test_chat_module_error_is_503(client, monkeypatch):
     assert r.status_code == 503 and "LLM timeout" in r.json()["detail"]
 
 
-def test_chat_auth_and_validation(client, fake):
+def test_chat_auth_and_validation(client, stub):
     assert client.post("/api/v1/chat", json={"text": "hi"}).status_code == 401
     assert client.post("/api/v1/chat", headers={"Authorization": "Bearer dev-a"}, json={"text": "hi"}).status_code == 403
     assert chat(client, text="").status_code == 422

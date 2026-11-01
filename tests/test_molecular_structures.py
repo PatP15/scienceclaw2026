@@ -132,7 +132,7 @@ def test_repo_inputs_match_generator_if_present():
             assert e["derived_from"] in ids
 
 
-def _fake_results_from_inputs(cfg, tmp_path):
+def _stub_results_from_inputs(cfg, tmp_path):
     """Package generator geometries as if they were optimised results (TEST FIXTURE, no energies)."""
     d = tmp_path / "res"
     d.mkdir()
@@ -149,7 +149,7 @@ def _fake_results_from_inputs(cfg, tmp_path):
 def test_derived_species_composition_and_charge(small_cfg, tmp_path):
     from collections import Counter
 
-    d = _fake_results_from_inputs(small_cfg, tmp_path)
+    d = _stub_results_from_inputs(small_cfg, tmp_path)
     der = {s.id: s for s in st.build_derived(d, small_cfg)}
     base = {s.id: s for s in st.build_all(small_cfg)}
     assert der["hydronium__n0__c0"].charge == 1 and st.formula(der["hydronium__n0__c0"].symbols) == "H3O"
@@ -175,7 +175,7 @@ def test_derived_species_composition_and_charge(small_cfg, tmp_path):
 def test_protonation_state_classifier(small_cfg, tmp_path):
     from fermentai.molecular import analysis as an
 
-    d = _fake_results_from_inputs(small_cfg, tmp_path)
+    d = _stub_results_from_inputs(small_cfg, tmp_path)
     der = {s.id: s for s in st.build_derived(d, small_cfg)}
     base = {s.id: s for s in st.build_all(small_cfg)}
     neu = base["acetic_acid__n3__c0"]
@@ -189,7 +189,7 @@ def test_protonation_state_classifier(small_cfg, tmp_path):
 
 def test_derived_structures_have_no_atom_overlaps(small_cfg, tmp_path):
     """Regression for v1 ion-pair bug: the transferred proton landed ~0.1 A from an existing H."""
-    d = _fake_results_from_inputs(small_cfg, tmp_path)
+    d = _stub_results_from_inputs(small_cfg, tmp_path)
     for s in st.build_derived(d, small_cfg):
         x = s.coords
         dm = np.linalg.norm(x[:, None, :] - x[None, :, :], axis=-1) + np.eye(len(x)) * 99

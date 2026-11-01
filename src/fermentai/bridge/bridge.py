@@ -6,7 +6,7 @@ One `PortSession` per serial port:
 Telemetry and acks are forwarded unchanged (except provenance/NaN fixes listed below) to the
 local FastAPI backend with the chamber's device token + X-Device-Id; desired-control is polled
 per chamber and every NEW command_v1 object is written to the device once (dedupe by command_id,
-bounded re-send while it stays pending). The bridge never invents measurements or timestamps.
+bounded re-send while it stays pending). The bridge only relays values the device reported.
 
 Provenance policy for telemetry `source`:
   * replay mode                     -> "replay" (always)

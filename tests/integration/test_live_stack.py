@@ -67,7 +67,7 @@ def test_both_virtual_chambers_boot_and_post_v11_telemetry(http, live_stack):
         for k in ("boot_id", "sequence_number", "device_uptime_ms", "timestamp_quality", "device_id"):
             assert payload.get(k) is not None, (cid, k, payload)
         assert payload["timestamp_quality"] == "unsynced" and tel["timestamp_utc"] is None
-        assert tel["time_basis"] == "server_receipt"    # server never invented a timestamp
+        assert tel["time_basis"] == "server_receipt"    # server left the timestamp unset
         device_ids[cid] = payload["device_id"]
         assert payload["firmware_version"].startswith("virtual")
         # the device that wrote is registered (and bound) to this chamber only

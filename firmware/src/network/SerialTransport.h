@@ -82,7 +82,7 @@ class SerialTransport : public IHttpTransport {
   // Optional: called on every hello_ack/time/command server_time_utc (epoch ms, receipt millis).
   std::function<void(int64_t, uint32_t)> onServerTime;
   // Monotonic ms used inside request() (which has no time argument). Defaults to millis() on the
-  // ESP32; native tests inject a fake. If unset off-target, the last poll() time is used.
+  // ESP32; native tests inject a stub. If unset off-target, the last poll() time is used.
   std::function<uint32_t()> nowFn;
 
   struct Stats {

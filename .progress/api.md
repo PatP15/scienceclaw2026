@@ -19,7 +19,7 @@ scripts/start_demo.sh, scripts/simulate_device.py, tests/test_api_*.py
 
 ## Known open items
 - fermentai.agents.pipeline not present yet at time of writing -> placeholder path used; tested with a
-  fake pipeline module. Re-run tests/test_api_feedback.py once it lands.
+  stub pipeline module. Re-run tests/test_api_feedback.py once it lands.
 - Dashboard static dir absent -> placeholder page at "/".
 
 ## Resume
@@ -38,7 +38,7 @@ Done:
   devices/sensor_readings/temperature_schedules/scientist_hypotheses/model_calibrations/molecular_results,
   §13 alias views, dedup unique index
 - auth.py: require_operator / require_device / Principal; FERMENTAI_DEVICE_TOKEN_<X>; X-Device-Id
-- devices.py: device<->chamber binding (config + auto-bind), dedup, null timestamps never invented,
+- devices.py: device<->chamber binding (config + auto-bind), dedup, null timestamps left null,
   sensor_readings w/ unit/provenance/quality, single per-chamber seq counter, commands[] list,
   stop_motor rows on cancel, capture_image, ack v1.1 (result/detail/device_uptime_ms), motor `ran`
 - feedback.py: agent_id->sender, in_reply_to/recipient (arrow prefix / reply), decision_source provenance,
@@ -62,5 +62,5 @@ Resume: read contracts/README.md (semantics + deviations), run the tests above.
 - src/fermentai/api/chat.py (chat_turn/chat_state/chat_reset), routes POST /chat, GET/DELETE /chat/{id},
   ChatIn schema, chat_sessions table, taste_feedback.chat_session_id, SSE `chat` events, health.chat_available.
 - feedback.py refactor: insert_feedback + persist_cycle shared by taste-feedback and chat hand-off.
-- tests/test_api_chat.py (5: fake module flow, 503 unavailable/error, auth/validation, real module e2e).
+- tests/test_api_chat.py (5: stub module flow, 503 unavailable/error, auth/validation, real module e2e).
 - Full repo: 538 passed, 1 skipped, 1 xfailed.

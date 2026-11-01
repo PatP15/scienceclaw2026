@@ -46,7 +46,7 @@ def test_exact_block_maps_to_telemetry():
     assert r["starter_temperature_c"] == 23.44
     for k in ("pressure_pa", "gas_resistance_ohms", "internal_heatsink_temperature_c",
               "external_heatsink_temperature_c", "ph", "ph_method", "temperature_setpoint_c"):
-        assert r[k] is None, k                                  # nan -> null, never invented
+        assert r[k] is None, k                                  # nan -> null
     assert r["door_open"] is False and r["peltier_mode"] == "idle" and r["peltier_output_fraction"] == 0.0
     assert r["motor_running"] is False                          # armed(motor=1) is not running
     assert r["quality_flags"] == ["ds18b20_role_unassigned", "ph_out_of_range", "legacy_status_log"]

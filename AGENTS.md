@@ -19,7 +19,7 @@ if you need a new dependency, say so in your report (you may add it locally with
 and the orchestrator will reconcile).
 
 ## Non-negotiables (from PLAN.md §18)
-- Never fabricate ALCHEMI outputs, physical measurements, sensory observations or benchmark wins.
+- ALCHEMI outputs, physical measurements, sensory observations and benchmark results are reported only when they come from a real run or recorded source, and are labelled accordingly.
 - Every data artifact and every dashboard value carries a provenance label:
   `real` | `simulated` | `replay` | `estimated` | `imported_human`.
 - No secrets in the repo. `.env` is gitignored; `.env.example` documents variables.

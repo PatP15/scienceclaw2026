@@ -1,4 +1,4 @@
-// TimeUtil — ISO-8601 parsing/formatting and wall-clock tracking that never invents time.
+// TimeUtil — ISO-8601 parsing/formatting and wall-clock tracking that leaves time unset until synced.
 #pragma once
 
 #include <stddef.h>

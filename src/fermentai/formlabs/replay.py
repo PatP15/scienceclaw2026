@@ -12,8 +12,8 @@ Two small HTTP servers, both bound to 127.0.0.1 on an ephemeral port:
     Replays a recorded transcript so the same SDK code path can run in tests without the
     PreFormServer binary. It answers requests in recorded order per ``(method, path)`` (and per
     ``operation_id`` for ``/v1/operation/get/``). Endpoints that write files on the server's
-    machine (``/v1/scene/save/``, ``/v1/scene/render/``) write clearly-marked placeholders, never a
-    fake ``.form``. Anything produced through the mock is provenance ``replay``.
+    machine (``/v1/scene/save/``, ``/v1/scene/render/``) write clearly-marked placeholders (not a
+    real ``.form``). Anything produced through the mock is provenance ``replay``.
 
 Neither server ever answers ``/v1/scene/print/``: the proxy refuses to forward it unless the
 caller explicitly allows it, and the mock always refuses it.
