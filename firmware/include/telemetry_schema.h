@@ -9,7 +9,7 @@
 //                          peltier_mode heat|cool|switching|idle|fault, source real|simulated
 //   ContractProfile::V1_1  v1.0 fields + v1.1 fields; schema_version stays "1.0" on the wire;
 //                          peltier_mode heating|cooling|switching|idle|fault, source measured|simulated
-// Rules (both): missing/failed values are JSON null, never NaN/Infinity, never invented.
+// Rules (both): missing/failed values are JSON null, never NaN/Infinity.
 // timestamp_utc is null until the clock has been synced from SNTP or a server response.
 #pragma once
 
